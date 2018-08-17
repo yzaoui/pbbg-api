@@ -1,0 +1,60 @@
+buildscript {
+    ext.kotlin_version = '1.2.60'
+    ext.ktor_version = '0.9.3'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    }
+}
+
+group = 'bitwiserain'
+version = '0.0.1'
+
+apply plugin: 'kotlin'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'application'
+
+mainClassName = "io.ktor.server.netty.DevelopmentEngine"
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url = "https://kotlin.bintray.com/ktor" }
+    maven { url = "https://dl.bintray.com/kotlin/exposed" }
+}
+
+dependencies {
+    compile "com.h2database:h2:1.4.197"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.exposed:exposed:0.10.4"
+    compile "at.favre.lib:bcrypt:0.4.1"
+    compile "io.ktor:ktor-freemarker:$ktor_version"
+    compile "io.ktor:ktor-locations:$ktor_version"
+    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "io.ktor:ktor-html-builder:$ktor_version"
+    compile "ch.qos.logback:logback-classic:1.2.3"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+
+shadowJar {
+    baseName = 'miner'
+    classifier = null
+    version = null
+}

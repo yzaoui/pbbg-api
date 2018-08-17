@@ -1,0 +1,10 @@
+# Build files
+build/
+
+# Gradle generated files
+.gradle/
+
+# User-specific configurations
+.idea/
+
+out/
