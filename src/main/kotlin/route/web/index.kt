@@ -11,6 +11,7 @@ import miner.MinerSession
 import miner.domain.usecase.UserUseCase
 import miner.href
 import miner.view.homeGuestPage
+import miner.view.homeMemberPage
 
 @Location("/")
 class IndexLocation
@@ -19,12 +20,20 @@ fun Route.index(userUC: UserUseCase) {
     get<IndexLocation> { _ ->
         val loggedInUser = call.sessions.get<MinerSession>()?.let { userUC.getUserById(it.userId) }
 
-        call.respondHtmlTemplate(
-            homeGuestPage(
-                mineURL = href(MineLocation()),
-                registerURL = href(RegisterLocation()),
-                loginURL = href(LoginLocation())
-            )
-        ) {}
+        if (loggedInUser != null) {
+            call.respondHtmlTemplate(
+                homeMemberPage(
+                    mineURL = href(MineLocation()),
+                    logoutURL = href(LogoutLocation())
+                )
+            ) {}
+        } else {
+            call.respondHtmlTemplate(
+                homeGuestPage(
+                    registerURL = href(RegisterLocation()),
+                    loginURL = href(LoginLocation())
+                )
+            ) {}
+        }
     }
 }
