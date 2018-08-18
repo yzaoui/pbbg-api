@@ -21,8 +21,11 @@ import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
+import miner.data.MineContentsTable
+import miner.data.MineSessionTable
 import miner.data.UserTable
-import miner.domain.usecase.UserUseCaseImpl
+import miner.domain.usecase.MiningUCImpl
+import miner.domain.usecase.UserUCImpl
 import miner.route.api.pickaxe
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
@@ -38,10 +41,11 @@ fun Application.main() {
     Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
     transaction {
         addLogger(Slf4jSqlDebugLogger)
-        SchemaUtils.create(UserTable)
+        SchemaUtils.create(UserTable, MineSessionTable, MineContentsTable)
     }
 
-    val userUC = UserUseCaseImpl()
+    val userUC = UserUCImpl()
+    val miningUC = MiningUCImpl()
 
     install(DefaultHeaders)
     install(CallLogging)
@@ -62,7 +66,7 @@ fun Application.main() {
         login(userUC)
         logout()
         register(userUC)
-        mine(userUC)
+        mineWeb(userUC, miningUC)
         route("/api") {
             pickaxe()
         }

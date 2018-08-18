@@ -1,5 +1,5 @@
 let grid;
-const GRID_WIDTH = 20;
+const GRID_WIDTH = 30;
 const GRID_HEIGHT = 20;
 let equippedPickaxe;
 

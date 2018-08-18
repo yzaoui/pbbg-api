@@ -6,13 +6,13 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
-interface UserUseCase {
+interface UserUC {
     fun getUserById(userId: Int): User?
     fun getUserByUsername(username: String): User?
     fun registerUser(username: String, passwordHash: ByteArray): Int
 }
 
-class UserUseCaseImpl : UserUseCase {
+class UserUCImpl : UserUC {
     override fun getUserById(userId: Int): User? = transaction {
         UserTable.select { UserTable.id.eq(userId) }
             .mapNotNull {

@@ -13,14 +13,14 @@ import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
 import miner.MinerSession
-import miner.domain.usecase.UserUseCase
+import miner.domain.usecase.UserUC
 import miner.href
 import miner.view.loginPage
 
 @Location("/login")
 class LoginLocation
 
-fun Route.login(userUC: UserUseCase) {
+fun Route.login(userUC: UserUC) {
     get<LoginLocation> {
         val loggedInUser = call.sessions.get<MinerSession>()?.let { userUC.getUserById(it.userId) }
         if (loggedInUser != null) {

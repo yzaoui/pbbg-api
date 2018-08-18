@@ -8,7 +8,7 @@ import io.ktor.routing.Route
 import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import miner.MinerSession
-import miner.domain.usecase.UserUseCase
+import miner.domain.usecase.UserUC
 import miner.href
 import miner.view.homeGuestPage
 import miner.view.homeMemberPage
@@ -16,14 +16,14 @@ import miner.view.homeMemberPage
 @Location("/")
 class IndexLocation
 
-fun Route.index(userUC: UserUseCase) {
+fun Route.index(userUC: UserUC) {
     get<IndexLocation> { _ ->
         val loggedInUser = call.sessions.get<MinerSession>()?.let { userUC.getUserById(it.userId) }
 
         if (loggedInUser != null) {
             call.respondHtmlTemplate(
                 homeMemberPage(
-                    mineURL = href(MineLocation()),
+                    mineURL = href(MineWebLocation()),
                     logoutURL = href(LogoutLocation())
                 )
             ) {}
