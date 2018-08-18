@@ -1,4 +1,4 @@
-package miner.route
+package route.web
 
 import io.ktor.application.call
 import io.ktor.locations.Location

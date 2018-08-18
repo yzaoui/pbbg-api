@@ -1,4 +1,4 @@
-package miner.route
+package route.web
 
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
@@ -24,6 +24,6 @@ fun Route.login(userUC: UserUseCase) {
             return@get
         }
 
-        call.respondHtmlTemplate(MainTemplate()) {}
+        call.respondHtmlTemplate(MainTemplate("Log in")) {}
     }
 }

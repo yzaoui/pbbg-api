@@ -8,25 +8,29 @@ import io.ktor.application.install
 import io.ktor.content.resources
 import io.ktor.content.static
 import io.ktor.features.CallLogging
+import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
 import io.ktor.freemarker.FreeMarker
+import io.ktor.jackson.jackson
 import io.ktor.locations.Locations
 import io.ktor.locations.locations
 import io.ktor.pipeline.PipelineContext
 import io.ktor.routing.Route
 import io.ktor.routing.application
+import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
 import miner.data.UserTable
 import miner.domain.usecase.UserUseCaseImpl
-import miner.route.*
+import miner.route.api.pickaxe
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Slf4jSqlDebugLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
+import route.web.*
 
 data class MinerSession(val userId: Int)
 
@@ -50,22 +54,26 @@ fun Application.main() {
             cookie.path = "/"
         }
     }
+    install(ContentNegotiation) {
+        jackson {  }
+    }
     routing {
         index(userUC)
         login(userUC)
         logout()
         register(userUC)
         mine(userUC)
-        static("assets") {
-            static("css") {
-                resources("css")
-            }
-            static("js") {
-                resources("js")
-            }
-            static("img") {
-                resources("img")
-            }
+        route("/api") {
+            pickaxe()
+        }
+        static("css") {
+            resources("css")
+        }
+        static("js") {
+            resources("js")
+        }
+        static("img") {
+            resources("img")
         }
     }
 }

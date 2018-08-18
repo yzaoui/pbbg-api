@@ -1,0 +1,21 @@
+#mining-grid {
+    table-layout: fixed;
+    border-spacing: 0;
+    border: 1px solid;
+}
+
+#mining-grid tr {
+    height: 16px;
+}
+
+#mining-grid td {
+    min-width: 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 16px;
+    cursor: pointer;
+}
+
+.selected-item {
+    background-color: limegreen;
+}
