@@ -40,6 +40,7 @@ dependencies {
     compile "io.ktor:ktor-jackson:$ktor_version"
     compile "org.jetbrains.kotlinx:kotlinx-html-jvm:0.6.10"
     compile "ch.qos.logback:logback-classic:1.2.3"
+    compile "at.favre.lib:bcrypt:0.4.1"
 }
 
 compileKotlin {

@@ -5,6 +5,7 @@ import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location
 import io.ktor.locations.get
+import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import io.ktor.sessions.get
 import io.ktor.sessions.sessions
@@ -21,10 +22,10 @@ class MineLocation
 fun Route.mine(userUC: UserUseCase) {
     get<MineLocation> {
         val loggedInUser = call.sessions.get<MinerSession>()?.let { userUC.getUserById(it.userId) }
-//        if (loggedInUser == null) {
-//            call.respondRedirect(href(IndexLocation()))
-//            return@get
-//        }
+        if (loggedInUser == null) {
+            call.respondRedirect(href(IndexLocation()))
+            return@get
+        }
 
         val grid = generateGrid().map { row ->
             row.map { item ->
