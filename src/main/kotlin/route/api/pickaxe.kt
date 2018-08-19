@@ -15,18 +15,23 @@ import miner.MinerSession
 import miner.domain.usecase.EquipmentUC
 import miner.domain.usecase.UserUC
 import miner.href
+import miner.respondFail
+import miner.respondSuccess
 import route.web.LoginLocation
 import java.util.*
 
 @Location("/pickaxe")
 class PickaxeLocation
 
+@Location("/pickaxe/all")
+class PickaxeAllLocation
+
 fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
     get<PickaxeLocation> {
         // TODO: Remove cookie dependency
         val loggedInUser = call.sessions.get<MinerSession>()?.let { userUC.getUserById(it.userId) }
         if (loggedInUser == null) {
-            call.respond(HttpStatusCode.Forbidden)
+            call.respondFail(HttpStatusCode.Unauthorized)
             return@get
         }
 
@@ -37,6 +42,18 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
         }
 
         call.respond(pickaxe.toJSON())
+    }
+
+    get<PickaxeAllLocation> {
+        // TODO: Remove cookie dependency
+        val loggedInUser = call.sessions.get<MinerSession>()?.let { userUC.getUserById(it.userId) }
+        if (loggedInUser == null) {
+            call.respond(HttpStatusCode.Unauthorized)
+            return@get
+        }
+
+        val pickaxes = equipmentUC.getAllPickaxes().map { it.toJSON() }
+        call.respondSuccess(pickaxes)
     }
 
     /**
@@ -59,6 +76,5 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
     }
 }
 
-data class PickaxeJSON(val type: String, val tiles: List<IntArray>)
-
-fun Pickaxe.toJSON() = PickaxeJSON(type, tiles.map { kotlin.intArrayOf(it.first, it.second) })
+data class PickaxeJSON(val id: Int, val type: String, val tiles: List<IntArray>)
+fun Pickaxe.toJSON() = PickaxeJSON(this.ordinal, type, tiles.map { kotlin.intArrayOf(it.first, it.second) })

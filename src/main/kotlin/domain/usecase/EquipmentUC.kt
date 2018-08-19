@@ -11,6 +11,7 @@ import java.util.*
 
 interface EquipmentUC {
     fun getPickaxe(userId: Int): Pickaxe?
+    fun getAllPickaxes(): Array<Pickaxe>
     fun generatePickaxe(userId: Int): Pickaxe?
 }
 
@@ -19,6 +20,10 @@ class EquipmentUCImpl : EquipmentUC {
         EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
             .singleOrNull()
+    }
+
+    override fun getAllPickaxes(): Array<Pickaxe> {
+        return Pickaxe.values()
     }
 
     override fun generatePickaxe(userId: Int): Pickaxe? = transaction {
