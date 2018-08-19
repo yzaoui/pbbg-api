@@ -15,7 +15,7 @@ interface MiningUC {
     fun getMineSession(userId: Int): Int?
     fun getMine(mineSessionId: Int): Mine?
     fun generateMine(userId: Int, width: Int, height: Int)
-    fun mine(userId: Int, x: Int, y: Int): Iterable<MineResultItem>?
+    fun mine(userId: Int, x: Int, y: Int): List<MineResultItem>?
 }
 
 class MiningUCImpl : MiningUC {
@@ -63,7 +63,7 @@ class MiningUCImpl : MiningUC {
         }
     }
 
-    override fun mine(userId: Int, x: Int, y: Int): Iterable<MineResultItem>? = transaction {
+    override fun mine(userId: Int, x: Int, y: Int): List<MineResultItem>? = transaction {
         val pickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
             .singleOrNull() ?: return@transaction null

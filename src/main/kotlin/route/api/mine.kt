@@ -1,5 +1,6 @@
 package miner.route.api
 
+import data.model.MineResultItem
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
@@ -29,7 +30,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
             val results = miningUC.mine(loggedInUser.id, x, y)
             if (results != null) {
-                call.respondSuccess(results)
+                call.respondSuccess(MineResultItemsJSON(results))
             } else {
                 call.respond(HttpStatusCode.Accepted)
             }
@@ -40,3 +41,5 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
         }
     }
 }
+
+data class MineResultItemsJSON(val results: List<MineResultItem>)

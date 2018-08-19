@@ -22,6 +22,9 @@ fun minePageExistingMine(homeURL: String, mine: MineVM): Template<HTML> = MainTe
                 +"Loading..."
             }
         }
+        ul {
+            id = "results-list"
+        }
         script(src = "/js/mine.js") {}
     }
 }

@@ -58,7 +58,7 @@ const clickedCell = async (x, y) => {
     if (!mineActionSubmitting) {
         mineActionSubmitting = true;
 
-        const res = await fetch("/api/mine", {
+        const {status, data} = await (await fetch("/api/mine", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json; charset=utf-8"
@@ -67,6 +67,14 @@ const clickedCell = async (x, y) => {
                 x: x,
                 y: y
             })
+        })).json();
+
+        const resultsList = document.getElementById("results-list");
+
+        data.results.forEach(result => {
+            const li = document.createElement("li");
+            li.textContent = `Obtained ${result.item} × ${result.amount}`;
+            resultsList.appendChild(li);
         });
 
         const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.tiles);
