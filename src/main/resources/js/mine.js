@@ -13,8 +13,9 @@ window.onload = async () => {
 
     grid.forEach((row, y) => {
         row.forEach((cell, x) => {
-            cell.onmouseenter = () => {enteredCell(x, y)};
-            cell.onmouseleave = () => {leftCell(x, y)};
+            cell.onmouseenter = () => { enteredCell(x, y) };
+            cell.onmouseleave = () => { leftCell(x, y) };
+            cell.onclick = () => { clickedCell(x, y) };
         });
     });
 };
@@ -49,5 +50,25 @@ const leftCell = (x, y) => {
     affectedCells.forEach(cell => {
         const [x, y] = cell;
         grid[y][x].classList.remove("selected-item");
+    })
+};
+
+const clickedCell = (x, y) => {
+    const res = fetch("/api/mine", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify({
+            x: x,
+            y: y
+        })
+    });
+
+    const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.tiles);
+
+    affectedCells.forEach(cell => {
+        const [x, y] = cell;
+        grid[y][x].style = "";
     })
 };

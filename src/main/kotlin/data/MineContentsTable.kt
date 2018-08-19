@@ -1,11 +1,11 @@
 package miner.data
 
-import miner.data.model.MineItem
-import org.jetbrains.exposed.sql.Table
+import miner.data.model.MineEntity
+import org.jetbrains.exposed.dao.IntIdTable
 
-object MineContentsTable : Table() {
+object MineContentsTable : IntIdTable() {
     val mineId = reference("mine_id", MineSessionTable)
     val x = integer("x")
     val y = integer("y")
-    val content = enumeration("content", MineItem::class.java)
+    val mineItem = enumeration("mine_item", MineEntity::class.java)
 }

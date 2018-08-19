@@ -1,5 +1,8 @@
 package data.model
 
+/**
+ * Entity that can be equipped in the pickaxe slot and used for mining.
+ */
 enum class Pickaxe(val type: String, val tiles: Set<Pair<Int, Int>>) {
     PLUS("Plus-shaped", setOf(
         0 to -1,

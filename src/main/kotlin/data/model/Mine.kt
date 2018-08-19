@@ -1,3 +1,10 @@
 package miner.data.model
 
-data class Mine(val width: Int, val height: Int, val grid: Map<Pair<Int, Int>, MineItem>)
+/**
+ * Represents a mine entity.
+ */
+data class Mine(
+    val width: Int,
+    val height: Int,
+    val grid: Map<Pair<Int, Int>, MineEntity>
+)

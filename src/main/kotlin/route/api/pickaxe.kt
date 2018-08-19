@@ -30,7 +30,11 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
             return@get
         }
 
-        val pickaxe = equipmentUC.getPickaxe(loggedInUser.id) ?: return@get
+        val pickaxe = equipmentUC.getPickaxe(loggedInUser.id)
+        if (pickaxe == null) {
+            call.respond(HttpStatusCode.InternalServerError)
+            return@get
+        }
 
         call.respond(pickaxe.toJSON())
     }

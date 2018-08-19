@@ -11,7 +11,7 @@ import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import miner.MinerSession
 import miner.data.model.Mine
-import miner.data.model.MineItem
+import miner.data.model.MineEntity
 import miner.domain.usecase.MiningUC
 import miner.domain.usecase.UserUC
 import miner.href
@@ -65,8 +65,8 @@ private fun Mine.toVM() = MineVM(
     content = List(height) { y -> List(width) { x -> grid[x to y]?.toVM() } }
 )
 
-private fun MineItem.toVM() = MineItemVM(
+private fun MineEntity.toVM() = MineItemVM(
     imageURL = when (this) {
-        MineItem.ROCK -> "/img/item/rock.png"
+        MineEntity.ROCK -> "/img/item/rock.png"
     }
 )
