@@ -9,7 +9,6 @@ import io.ktor.content.resources
 import io.ktor.content.static
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
-import io.ktor.features.DefaultHeaders
 import io.ktor.freemarker.FreeMarker
 import io.ktor.gson.gson
 import io.ktor.locations.Locations
@@ -52,7 +51,6 @@ fun Application.main() {
     val miningUC = MiningUCImpl()
     val equipmentUC = EquipmentUCImpl()
 
-    install(DefaultHeaders)
     install(CallLogging)
     install(Locations)
     install(FreeMarker) {
