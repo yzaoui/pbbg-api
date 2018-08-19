@@ -2,6 +2,7 @@ let grid;
 const GRID_WIDTH = 30;
 const GRID_HEIGHT = 20;
 let equippedPickaxe;
+let mineActionSubmitting = false;
 
 window.onload = async () => {
     grid = [...document.getElementById("mining-grid").firstElementChild.children].map(row => [...row.children]);
@@ -53,22 +54,28 @@ const leftCell = (x, y) => {
     })
 };
 
-const clickedCell = (x, y) => {
-    const res = fetch("/api/mine", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        },
-        body: JSON.stringify({
-            x: x,
-            y: y
-        })
-    });
+const clickedCell = async (x, y) => {
+    if (!mineActionSubmitting) {
+        mineActionSubmitting = true;
 
-    const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.tiles);
+        const res = await fetch("/api/mine", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=utf-8"
+            },
+            body: JSON.stringify({
+                x: x,
+                y: y
+            })
+        });
 
-    affectedCells.forEach(cell => {
-        const [x, y] = cell;
-        grid[y][x].style = "";
-    })
+        const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.tiles);
+
+        affectedCells.forEach(cell => {
+            const [x, y] = cell;
+            grid[y][x].style = "";
+        });
+
+        mineActionSubmitting = false;
+    }
 };
