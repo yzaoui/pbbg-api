@@ -65,7 +65,9 @@ fun Application.main() {
         }
     }
     install(ContentNegotiation) {
-        gson { }
+        gson {
+            serializeNulls()
+        }
     }
     routing {
         index(userUC)
@@ -98,28 +100,25 @@ fun Application.main() {
 fun Route.href(location: Any) = application.locations.href(location)
 fun PipelineContext<Unit, ApplicationCall>.href(location: Any) = application.locations.href(location)
 
-suspend inline fun ApplicationCall.respondSuccess(data: Any) {
+suspend inline fun ApplicationCall.respondSuccess(data: Any? = null) {
     respond(mapOf("status" to "success", "data" to data))
 }
 
-suspend inline fun ApplicationCall.respondSuccess(status: HttpStatusCode, data: Any) {
-    response.status(status)
-    respondSuccess(data)
+suspend inline fun ApplicationCall.respondSuccess(status: HttpStatusCode, data: Any? = null) {
+    respond(status, mapOf("status" to "success", "data" to data))
 }
 
-suspend inline fun ApplicationCall.respondFail(data: Any) {
+suspend inline fun ApplicationCall.respondFail(data: Any? = null) {
     respond(mapOf("status" to "fail", "data" to data))
 }
 
-suspend inline fun ApplicationCall.respondFail(status: HttpStatusCode, data: Any) {
-    response.status(status)
-    respondFail(data)
+suspend inline fun ApplicationCall.respondFail(status: HttpStatusCode, data: Any? = null) {
+    respond(status, mapOf("status" to "fail", "data" to data))
 }
-suspend inline fun ApplicationCall.respondError(message: String?) {
+suspend inline fun ApplicationCall.respondError(message: String = "") {
     respond(mapOf("status" to "error", "message" to message))
 }
 
-suspend inline fun ApplicationCall.respondError(status: HttpStatusCode, message: String?) {
-    response.status(status)
-    respondError(message)
+suspend inline fun ApplicationCall.respondError(status: HttpStatusCode, message: String = "") {
+    respond(status, mapOf("status" to "error", "message" to message))
 }

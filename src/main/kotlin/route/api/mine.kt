@@ -43,7 +43,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) {
         } catch (e: ContentTransformationException) {
             call.respondFail(HttpStatusCode.BadRequest, "Missing or invalid parameters.")
         } catch (e: Exception) {
-            call.respondError(HttpStatusCode.InternalServerError, e.message)
+            call.respondError(HttpStatusCode.InternalServerError, e.message.orEmpty())
         }
     }
 }
