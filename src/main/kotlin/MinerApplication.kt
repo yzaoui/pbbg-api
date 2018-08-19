@@ -11,7 +11,7 @@ import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
 import io.ktor.freemarker.FreeMarker
-import io.ktor.jackson.jackson
+import io.ktor.gson.gson
 import io.ktor.locations.Locations
 import io.ktor.locations.locations
 import io.ktor.pipeline.PipelineContext
@@ -64,7 +64,7 @@ fun Application.main() {
         }
     }
     install(ContentNegotiation) {
-        jackson {  }
+        gson { }
     }
     routing {
         index(userUC)
