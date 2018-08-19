@@ -10,6 +10,7 @@ import io.ktor.sessions.sessions
 import miner.MinerSession
 import miner.domain.usecase.UserUC
 import miner.href
+import miner.route.web.EquipmentLocation
 import miner.view.homeGuestPage
 import miner.view.homeMemberPage
 
@@ -24,6 +25,7 @@ fun Route.index(userUC: UserUC) {
             call.respondHtmlTemplate(
                 homeMemberPage(
                     mineURL = href(MineWebLocation()),
+                    equipmentURL = href(EquipmentLocation()),
                     logoutURL = href(LogoutLocation())
                 )
             ) {}
