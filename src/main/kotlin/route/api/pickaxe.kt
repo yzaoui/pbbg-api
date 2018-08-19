@@ -4,74 +4,57 @@ import data.model.Pickaxe
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
-import io.ktor.locations.get
-import io.ktor.locations.post
 import io.ktor.response.respond
-import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
-import io.ktor.sessions.get
-import io.ktor.sessions.sessions
-import miner.MinerSession
+import io.ktor.routing.get
+import io.ktor.routing.post
+import io.ktor.routing.route
 import miner.domain.usecase.EquipmentUC
 import miner.domain.usecase.UserUC
-import miner.href
-import miner.respondFail
+import miner.interceptSetUserOr401
+import miner.loggedInUserKey
 import miner.respondSuccess
-import route.web.LoginLocation
-import java.util.*
 
-@Location("/pickaxe")
+const val PICKAXE_PATH = "/pickaxe"
+@Location(PICKAXE_PATH)
 class PickaxeLocation
 
-@Location("/pickaxe/all")
+const val PICKAXE_ALL_PATH = "$PICKAXE_PATH/all"
+@Location(PICKAXE_ALL_PATH)
 class PickaxeAllLocation
 
 fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
-    get<PickaxeLocation> {
-        // TODO: Remove cookie dependency
-        val loggedInUser = call.sessions.get<MinerSession>()?.let { userUC.getUserById(it.userId) }
-        if (loggedInUser == null) {
-            call.respondFail(HttpStatusCode.Unauthorized)
-            return@get
-        }
+    interceptSetUserOr401(userUC)
 
-        val pickaxe = equipmentUC.getPickaxe(loggedInUser.id)
-        if (pickaxe == null) {
-            call.respond(HttpStatusCode.InternalServerError)
-            return@get
-        }
+    route(PICKAXE_PATH) {
+        get {
+            val loggedInUser = call.attributes[loggedInUserKey]
 
-        call.respond(pickaxe.toJSON())
-    }
+            val pickaxe = equipmentUC.getPickaxe(loggedInUser.id)
+            if (pickaxe == null) {
+                call.respond(HttpStatusCode.InternalServerError)
+                return@get
+            }
 
-    get<PickaxeAllLocation> {
-        // TODO: Remove cookie dependency
-        val loggedInUser = call.sessions.get<MinerSession>()?.let { userUC.getUserById(it.userId) }
-        if (loggedInUser == null) {
-            call.respond(HttpStatusCode.Unauthorized)
-            return@get
-        }
-
-        val pickaxes = equipmentUC.getAllPickaxes().map { it.toJSON() }
-        call.respondSuccess(pickaxes)
-    }
-
-    /**
-     * Generate and return pickaxe for this user
-     */
-    post<PickaxeLocation> {
-        // TODO: Remove cookie dependency
-        val loggedInUser = call.sessions.get<MinerSession>()?.let { userUC.getUserById(it.userId) }
-        if (loggedInUser == null) {
-            call.respond(HttpStatusCode.Forbidden)
-            return@post
-        }
-
-        val pickaxe = equipmentUC.generatePickaxe(loggedInUser.id)
-        if (pickaxe != null) {
             call.respond(pickaxe.toJSON())
-        } else {
-            call.respond(HttpStatusCode.InternalServerError)
+        }
+
+        post {
+            val loggedInUser = call.attributes[loggedInUserKey]
+
+            val pickaxe = equipmentUC.generatePickaxe(loggedInUser.id)
+            if (pickaxe != null) {
+                call.respond(pickaxe.toJSON())
+            } else {
+                call.respond(HttpStatusCode.InternalServerError)
+            }
+        }
+    }
+
+    route(PICKAXE_ALL_PATH) {
+        get {
+            val pickaxes = equipmentUC.getAllPickaxes().map { it.toJSON() }
+            call.respondSuccess(pickaxes)
         }
     }
 }

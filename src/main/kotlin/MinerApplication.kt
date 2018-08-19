@@ -1,10 +1,7 @@
 package miner
 
 import freemarker.cache.ClassTemplateLoader
-import io.ktor.application.Application
-import io.ktor.application.ApplicationCall
-import io.ktor.application.application
-import io.ktor.application.install
+import io.ktor.application.*
 import io.ktor.content.resources
 import io.ktor.content.static
 import io.ktor.features.CallLogging
@@ -16,18 +13,24 @@ import io.ktor.locations.Locations
 import io.ktor.locations.locations
 import io.ktor.pipeline.PipelineContext
 import io.ktor.response.respond
+import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import io.ktor.routing.application
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
+import io.ktor.sessions.get
+import io.ktor.sessions.sessions
+import io.ktor.util.AttributeKey
 import miner.data.EquipmentTable
 import miner.data.MineContentsTable
 import miner.data.MineSessionTable
 import miner.data.UserTable
+import miner.data.model.User
 import miner.domain.usecase.EquipmentUCImpl
 import miner.domain.usecase.MiningUCImpl
+import miner.domain.usecase.UserUC
 import miner.domain.usecase.UserUCImpl
 import miner.route.api.equipmentAPI
 import miner.route.api.mine
@@ -41,7 +44,8 @@ import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 import route.web.*
 
-data class MinerSession(val userId: Int)
+data class ApplicationSession(val userId: Int)
+val loggedInUserKey = AttributeKey<User>("loggedInUser")
 
 fun Application.main() {
     Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
@@ -60,7 +64,7 @@ fun Application.main() {
         templateLoader = ClassTemplateLoader(this::class.java.classLoader, "")
     }
     install(Sessions) {
-        cookie<MinerSession>("miner_session") {
+        cookie<ApplicationSession>("miner_session") {
             cookie.path = "/"
         }
     }
@@ -96,6 +100,46 @@ fun Application.main() {
 /**
  * Ktor-related extensions
  */
+
+fun PipelineContext<Unit, ApplicationCall>.getUserUsingSession(userUC: UserUC): User? {
+    return call.sessions.get<ApplicationSession>()?.let { userUC.getUserById(it.userId) }
+}
+
+fun Route.interceptSetUserOrRedirect(userUC: UserUC) {
+    intercept(ApplicationCallPipeline.Infrastructure) {
+        val user = getUserUsingSession(userUC)
+        if (user == null) {
+            call.respondRedirect(href(LoginLocation()))
+            finish()
+        } else {
+            call.attributes.put(loggedInUserKey, user)
+        }
+    }
+}
+
+fun Route.interceptSetUserOr401(userUC: UserUC) {
+    intercept(ApplicationCallPipeline.Infrastructure) {
+        val user = getUserUsingSession(userUC)
+        if (user == null) {
+            call.respondFail(HttpStatusCode.Unauthorized)
+            finish()
+        } else {
+            call.attributes.put(loggedInUserKey, user)
+        }
+    }
+}
+
+/**
+ *
+ */
+fun Route.interceptGuestOnly(userUC: UserUC) {
+    intercept(ApplicationCallPipeline.Infrastructure) {
+        if (getUserUsingSession(userUC) != null) {
+            call.respondRedirect(href(IndexLocation()))
+            finish()
+        }
+    }
+}
 
 fun Route.href(location: Any) = application.locations.href(location)
 fun PipelineContext<Unit, ApplicationCall>.href(location: Any) = application.locations.href(location)

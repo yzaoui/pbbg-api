@@ -3,12 +3,11 @@ package route.web
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location
-import io.ktor.locations.get
 import io.ktor.routing.Route
-import io.ktor.sessions.get
-import io.ktor.sessions.sessions
-import miner.MinerSession
+import io.ktor.routing.get
+import io.ktor.routing.route
 import miner.domain.usecase.UserUC
+import miner.getUserUsingSession
 import miner.href
 import miner.route.web.EquipmentLocation
 import miner.view.homeGuestPage
@@ -17,9 +16,9 @@ import miner.view.homeMemberPage
 @Location("/")
 class IndexLocation
 
-fun Route.index(userUC: UserUC) {
-    get<IndexLocation> { _ ->
-        val loggedInUser = call.sessions.get<MinerSession>()?.let { userUC.getUserById(it.userId) }
+fun Route.index(userUC: UserUC) = route("/") {
+    get {
+        val loggedInUser = getUserUsingSession(userUC)
 
         if (loggedInUser != null) {
             call.respondHtmlTemplate(

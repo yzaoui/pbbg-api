@@ -3,10 +3,10 @@ window.onload = async () => {
     equippedPickaxeSpan.innerText = "Loading...";
 
     const res = await fetch("/api/equipment");
-    const equipment = await res.json();
+    const { pickaxe } = await res.json();
 
-    if (equipment.hasOwnProperty("pickaxe")) {
-        equippedPickaxeSpan.innerText = equipment.pickaxe;
+    if (pickaxe !== null) {
+        equippedPickaxeSpan.innerText = pickaxe;
     } else {
         equippedPickaxeSpan.innerText = "None";
 
