@@ -7,11 +7,12 @@ fun equipmentPage(homeURL: String): Template<HTML> = MainTemplate("Equipment").a
     content {
         a(href = homeURL) { +"Return home" }
         br { }
-        +"Equipped pickaxe: "
-        span {
-            id = "equipped-pickaxe"
+        div {
+            +"Equipped pickaxe: "
+            span {
+                id = "equipped-pickaxe"
+            }
         }
-
     }
     endOfBody {
         script(src = "/js/equipment.js") {}
