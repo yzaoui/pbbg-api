@@ -34,8 +34,9 @@ fun minePageExistingMine(homeURL: String, mine: MineVM): Template<HTML> = MainTe
     }
 }
 
-fun minePageNoMine(mineURL: String): Template<HTML> = MainTemplate("Mine").apply {
+fun minePageNoMine(homeURL: String, mineURL: String): Template<HTML> = MainTemplate("Mine").apply {
     content {
+        a(href = homeURL) {+"Return home"}
         form(action = mineURL, method = FormMethod.post) {
             button(type = ButtonType.submit) { +"Generate new mine" }
         }

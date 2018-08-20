@@ -40,7 +40,7 @@ fun Route.mineWeb(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
             call.respondHtmlTemplate(minePageExistingMine(href(IndexLocation()), mine.toVM())) {}
         } else {
-            call.respondHtmlTemplate(minePageNoMine(href(MineWebLocation()))) {}
+            call.respondHtmlTemplate(minePageNoMine(href(IndexLocation()), href(MineWebLocation()))) {}
         }
     }
 

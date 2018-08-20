@@ -11,7 +11,7 @@ body {
     padding: 20px;
 }
 
-.container a, .container button, .container div, .container form {
+.container a, .container div, .container form {
     margin: 4px;
 }
 
