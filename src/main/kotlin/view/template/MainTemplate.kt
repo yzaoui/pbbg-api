@@ -6,11 +6,13 @@ import io.ktor.html.insert
 import kotlinx.html.*
 
 open class MainTemplate(private val pageTitle: String) : Template<HTML> {
+    val headContent = Placeholder<HEAD>()
     val content = Placeholder<BODY>()
     override fun HTML.apply() {
         head {
             title { +pageTitle }
-            link(href = "/css/style.css", rel = "stylesheet")
+            link(href = "/css/common.css", rel = "stylesheet")
+            insert(headContent)
         }
         body {
             insert(content)

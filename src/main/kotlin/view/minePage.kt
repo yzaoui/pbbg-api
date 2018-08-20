@@ -5,9 +5,12 @@ import kotlinx.html.*
 import miner.view.model.MineVM
 
 fun minePageExistingMine(homeURL: String, mine: MineVM): Template<HTML> = MainTemplate("Mine").apply {
+    headContent {
+        link(href = "/css/mine.css", rel = "stylesheet")
+    }
     content {
         a(href = homeURL) {+"Return home"}
-        table {
+        table(classes = "mining-grid") {
             id = "mining-grid"
             mine.content.forEach { row -> tr {
                 row.forEach { item -> td {
