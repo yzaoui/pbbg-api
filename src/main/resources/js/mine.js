@@ -7,18 +7,22 @@ let mineActionSubmitting = false;
 window.onload = async () => {
     grid = [...document.getElementById("mining-grid").firstElementChild.children].map(row => [...row.children]);
 
-    const res = await fetch("/api/pickaxe");
-    equippedPickaxe = await res.json();
+    const {status, data}  = await (await fetch("/api/pickaxe")).json();
+    equippedPickaxe = data;
 
-    document.getElementById("equipped-pickaxe").innerText = equippedPickaxe.type;
+    if (equippedPickaxe !== null) {
+        document.getElementById("equipped-pickaxe").innerText = equippedPickaxe.type;
 
-    grid.forEach((row, y) => {
-        row.forEach((cell, x) => {
-            cell.onmouseenter = () => { enteredCell(x, y) };
-            cell.onmouseleave = () => { leftCell(x, y) };
-            cell.onclick = () => { clickedCell(x, y) };
+        grid.forEach((row, y) => {
+            row.forEach((cell, x) => {
+                cell.onmouseenter = () => { enteredCell(x, y) };
+                cell.onmouseleave = () => { leftCell(x, y) };
+                cell.onclick = () => { clickedCell(x, y) };
+            });
         });
-    });
+    } else {
+        document.getElementById("equipped-pickaxe").innerText = "None. Go to your inventory and generate one."
+    }
 };
 
 const reachableCells = (x, y, gridWidth, gridHeight, targets) => {
@@ -37,7 +41,7 @@ const reachableCells = (x, y, gridWidth, gridHeight, targets) => {
 };
 
 const enteredCell = (x, y) => {
-    const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.tiles);
+    const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.cells);
 
     affectedCells.forEach(cell => {
         const [x, y] = cell;
@@ -46,7 +50,7 @@ const enteredCell = (x, y) => {
 };
 
 const leftCell = (x, y) => {
-    const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.tiles);
+    const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.cells);
 
     affectedCells.forEach(cell => {
         const [x, y] = cell;
@@ -77,7 +81,7 @@ const clickedCell = async (x, y) => {
             resultsList.appendChild(li);
         });
 
-        const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.tiles);
+        const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.cells);
 
         affectedCells.forEach(cell => {
             const [x, y] = cell;

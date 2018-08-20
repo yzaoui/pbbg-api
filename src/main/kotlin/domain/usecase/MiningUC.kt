@@ -72,7 +72,7 @@ class MiningUCImpl : MiningUC {
             .map { it.toMineSession() }
             .singleOrNull() ?: return@transaction null
 
-        val reacheableCells = reacheableCells(x, y, mineSession.width, mineSession.height, pickaxe.tiles)
+        val reacheableCells = reacheableCells(x, y, mineSession.width, mineSession.height, pickaxe.cells)
         val cellsWithContent = MineContentsTable.select { MineContentsTable.mineId.eq(mineSession.id) }
             .map { it.toMineContent() }
         val reachableCellsWithContent = cellsWithContent.filter { reacheableCells.contains(it.x to it.y) }

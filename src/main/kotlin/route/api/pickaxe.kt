@@ -13,6 +13,7 @@ import miner.domain.usecase.EquipmentUC
 import miner.domain.usecase.UserUC
 import miner.interceptSetUserOr401
 import miner.loggedInUserKey
+import miner.respondError
 import miner.respondSuccess
 
 const val PICKAXE_PATH = "/pickaxe"
@@ -31,22 +32,19 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
             val loggedInUser = call.attributes[loggedInUserKey]
 
             val pickaxe = equipmentUC.getPickaxe(loggedInUser.id)
-            if (pickaxe == null) {
-                call.respond(HttpStatusCode.InternalServerError)
-                return@get
-            }
 
-            call.respond(pickaxe.toJSON())
+            call.respondSuccess(pickaxe?.toJSON())
         }
 
+        //TODO: Remove this, only temporarily randomly generating a pickaxe
         post {
             val loggedInUser = call.attributes[loggedInUserKey]
 
             val pickaxe = equipmentUC.generatePickaxe(loggedInUser.id)
             if (pickaxe != null) {
-                call.respond(pickaxe.toJSON())
+                call.respondSuccess(pickaxe.toJSON())
             } else {
-                call.respond(HttpStatusCode.InternalServerError)
+                call.respondError(HttpStatusCode.InternalServerError)
             }
         }
     }
@@ -59,5 +57,5 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
     }
 }
 
-data class PickaxeJSON(val id: Int, val type: String, val tiles: List<IntArray>)
-fun Pickaxe.toJSON() = PickaxeJSON(this.ordinal, type, tiles.map { kotlin.intArrayOf(it.first, it.second) })
+data class PickaxeJSON(val id: Int, val type: String, val cells: List<IntArray>)
+fun Pickaxe.toJSON() = PickaxeJSON(this.ordinal, type, cells.map { kotlin.intArrayOf(it.first, it.second) })
