@@ -1,24 +1,34 @@
 window.onload = async () => {
-    const equippedPickaxeSpan = document.getElementById("equipped-pickaxe");
-    equippedPickaxeSpan.innerText = "Loading...";
+    const equippedPickaxeLabel = document.getElementById("equipped-pickaxe");
+    equippedPickaxeLabel.innerText = "Loading...";
 
     const res = await fetch("/api/equipment");
     const { pickaxe } = await res.json();
 
     if (pickaxe !== null) {
-        equippedPickaxeSpan.innerText = pickaxe;
+        equippedPickaxeLabel.innerText = pickaxe;
     } else {
-        equippedPickaxeSpan.innerText = "None";
+        equippedPickaxeLabel.innerText = "None";
 
-        const button = document.createElement("button");
-        button.innerText = "Click here to generate a pickaxe";
-        button.onclick = () => {
-            const res = fetch("/api/pickaxe", {
+        const generatePickaxeButton = document.createElement("button");
+        generatePickaxeButton.id = "generate-pickaxe";
+        generatePickaxeButton.innerText = "Click here to generate a pickaxe";
+        generatePickaxeButton.onclick = async (e) => {
+            const equippedPickaxeLabel = document.getElementById("equipped-pickaxe");
+            equippedPickaxeLabel.innerText = "Loading...";
+
+            const { status, data: pickaxe } = await (await fetch("/api/pickaxe", {
                 method: "POST"
-            });
+            })).json();
+
+            equippedPickaxeLabel.innerText = pickaxe.type;
+
+            const generatePickaxeButton = document.getElementById("generate-pickaxe");
+            const message = document.createTextNode("Success! Obtained new pickaxe");
+            generatePickaxeButton.parentNode.replaceChild(message, generatePickaxeButton);
         };
 
-        equippedPickaxeSpan.parentNode.insertBefore(button, equippedPickaxeSpan.nextSibling);
-        button.parentNode.insertBefore(document.createElement("br"), button);
+        equippedPickaxeLabel.parentNode.insertBefore(generatePickaxeButton, equippedPickaxeLabel.nextSibling);
+        generatePickaxeButton.parentNode.insertBefore(document.createElement("br"), generatePickaxeButton);
     }
 };
