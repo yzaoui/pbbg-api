@@ -7,7 +7,8 @@ import kotlinx.html.*
 
 open class MainTemplate(private val pageTitle: String) : Template<HTML> {
     val headContent = Placeholder<HEAD>()
-    val content = Placeholder<BODY>()
+    val content = Placeholder<DIV>()
+    val endOfBody = Placeholder<BODY>()
     override fun HTML.apply() {
         head {
             title { +pageTitle }
@@ -15,7 +16,10 @@ open class MainTemplate(private val pageTitle: String) : Template<HTML> {
             insert(headContent)
         }
         body {
-            insert(content)
+            div(classes = "container") {
+                insert(content)
+            }
+            insert(endOfBody)
         }
     }
 }

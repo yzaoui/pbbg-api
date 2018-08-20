@@ -11,6 +11,9 @@ fun equipmentPage(homeURL: String): Template<HTML> = MainTemplate("Equipment").a
         span {
             id = "equipped-pickaxe"
         }
+
+    }
+    endOfBody {
         script(src = "/js/equipment.js") {}
     }
 }

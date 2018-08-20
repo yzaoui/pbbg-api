@@ -28,6 +28,8 @@ fun minePageExistingMine(homeURL: String, mine: MineVM): Template<HTML> = MainTe
         ul {
             id = "results-list"
         }
+    }
+    endOfBody {
         script(src = "/js/mine.js") {}
     }
 }
