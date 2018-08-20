@@ -27,7 +27,9 @@ fun Route.login(userUC: UserUC) = route("/login") {
     get {
         call.respondHtmlTemplate(
             loginPage(
-                loginURL = href(LoginLocation())
+                loginURL = href(LoginLocation()),
+                homeURL = href(IndexLocation()),
+                registerURL = href(RegisterLocation())
             )
         ) {}
     }

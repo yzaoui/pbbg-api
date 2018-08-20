@@ -25,7 +25,11 @@ fun Route.register(userUC: UserUC) = route("/register") {
     interceptGuestOnly(userUC)
 
     get {
-        call.respondHtmlTemplate(registerPage(registerURL = href(RegisterLocation()))) {}
+        call.respondHtmlTemplate(registerPage(
+            registerURL = href(RegisterLocation()),
+            homeURL = href(IndexLocation()),
+            loginURL = href(LoginLocation())
+        )) {}
     }
 
     post {
