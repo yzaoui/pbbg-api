@@ -24,11 +24,13 @@ window.onload = async () => {
             equippedPickaxeLabel.innerText = pickaxe.type;
 
             const generatePickaxeButton = document.getElementById("generate-pickaxe");
-            const message = document.createTextNode("Success! Obtained new pickaxe");
+            const message = document.createElement("div");
+            message.classList.add("success-message");
+            message.innerText = "Success! Obtained new pickaxe";
             generatePickaxeButton.parentNode.replaceChild(message, generatePickaxeButton);
         };
 
-        equippedPickaxeLabel.parentNode.insertBefore(generatePickaxeButton, equippedPickaxeLabel.nextSibling);
+        equippedPickaxeLabel.parentNode.parentNode.insertBefore(generatePickaxeButton, equippedPickaxeLabel.nextSibling);
         generatePickaxeButton.parentNode.insertBefore(document.createElement("br"), generatePickaxeButton);
     }
 };

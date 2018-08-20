@@ -11,10 +11,14 @@ body {
     padding: 20px;
 }
 
+.container a, .container button, .container div, .container form {
+    margin: 4px;
+}
+
 .container a, .container div {
     display: inline-block;
 }
 
-.container a, .container button, .container div {
-    margin: 4px;
+.container input {
+    padding: 4px;
 }

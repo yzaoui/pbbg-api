@@ -4,6 +4,9 @@ import io.ktor.html.Template
 import kotlinx.html.*
 
 fun equipmentPage(homeURL: String): Template<HTML> = MainTemplate("Equipment").apply {
+    headContent {
+        link(href = "/css/equipment.css", rel = "stylesheet")
+    }
     content {
         a(href = homeURL) { +"Return home" }
         br { }
