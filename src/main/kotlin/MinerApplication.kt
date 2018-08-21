@@ -51,8 +51,8 @@ fun Application.main() {
     }
 
     val userUC = UserUCImpl()
-    val miningUC = MiningUCImpl()
     val inventoryUC = InventoryUCImpl()
+    val miningUC = MiningUCImpl(inventoryUC)
     val equipmentUC = EquipmentUCImpl(inventoryUC)
 
     install(CallLogging)
@@ -128,9 +128,6 @@ fun Route.interceptSetUserOr401(userUC: UserUC) {
     }
 }
 
-/**
- *
- */
 fun Route.interceptGuestOnly(userUC: UserUC) {
     intercept(ApplicationCallPipeline.Infrastructure) {
         if (getUserUsingSession(userUC) != null) {
@@ -141,6 +138,7 @@ fun Route.interceptGuestOnly(userUC: UserUC) {
 }
 
 fun Route.href(location: Any) = application.locations.href(location)
+
 fun PipelineContext<Unit, ApplicationCall>.href(location: Any) = application.locations.href(location)
 
 suspend inline fun ApplicationCall.respondSuccess(data: Any? = null) {
@@ -158,6 +156,7 @@ suspend inline fun ApplicationCall.respondFail(data: Any? = null) {
 suspend inline fun ApplicationCall.respondFail(status: HttpStatusCode, data: Any? = null) {
     respond(status, mapOf("status" to "fail", "data" to data))
 }
+
 suspend inline fun ApplicationCall.respondError(message: String = "") {
     respond(mapOf("status" to "error", "message" to message))
 }

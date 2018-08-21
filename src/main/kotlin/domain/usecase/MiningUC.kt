@@ -18,7 +18,7 @@ interface MiningUC {
     fun mine(userId: Int, x: Int, y: Int): List<MineResultItem>?
 }
 
-class MiningUCImpl : MiningUC {
+class MiningUCImpl(private val inventoryUC: InventoryUC) : MiningUC {
     private val random = Random()
 
     override fun getMineSession(userId: Int): Int? = transaction {
@@ -77,10 +77,16 @@ class MiningUCImpl : MiningUC {
             .map { it.toMineContent() }
         val reachableCellsWithContent = cellsWithContent.filter { reacheableCells.contains(it.x to it.y) }
         val obtainedItems = reachableCellsWithContent.map { it.mineEntity.toItem() }
+        val obtainedItemsGroupWithCount = obtainedItems.groupingBy { it }.eachCount()
 
         MineContentsTable.deleteWhere { MineContentsTable.id.inList(reachableCellsWithContent.map { it.id }) }
 
-        obtainedItems.groupingBy { it }.eachCount().map { MineResultItem(it.key, it.value) }
+        //TODO: Store in batch
+        obtainedItemsGroupWithCount.forEach {
+            inventoryUC.storeInInventory(userId, it.key, it.value)
+        }
+
+        obtainedItemsGroupWithCount.map { MineResultItem(it.key, it.value) }
     }
 
     private fun ResultRow.toMineSession() = MineSession(

@@ -6,9 +6,7 @@ import miner.data.model.Inventory
 import miner.data.model.InventoryItem
 import miner.data.model.Item
 import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 interface InventoryUC {
@@ -25,12 +23,24 @@ class InventoryUCImpl : InventoryUC {
         Inventory(items)
     }
 
-    override fun storeInInventory(userId: Int, item: Item, quantity: Int) {
+    override fun storeInInventory(userId: Int, item: Item, quantity: Int): Unit = transaction {
         // TODO: Consider checking if user exists
-        InventoryTable.insert {
-            it[InventoryTable.userId] = EntityID(userId, UserTable)
-            it[InventoryTable.item] = item
-            it[InventoryTable.quantity] = quantity
+        val entry = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.item.eq(item) }
+            .map { it.toInventoryItem() }
+            .singleOrNull()
+
+        if (entry != null) {
+            InventoryTable.update({ InventoryTable.userId.eq(userId) and InventoryTable.item.eq(item) }) {
+                with (SqlExpressionBuilder) {
+                    it.update(InventoryTable.quantity, InventoryTable.quantity + quantity)
+                }
+            }
+        } else {
+            InventoryTable.insert {
+                it[InventoryTable.userId] = EntityID(userId, UserTable)
+                it[InventoryTable.item] = item
+                it[InventoryTable.quantity] = quantity
+            }
         }
     }
 
