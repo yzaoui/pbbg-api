@@ -17,6 +17,7 @@ open class MainTemplate(private val pageTitle: String) : Template<HTML> {
         }
         body {
             div(classes = "container") {
+                id = "container"
                 insert(content)
             }
             insert(endOfBody)

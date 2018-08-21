@@ -7,7 +7,7 @@ window.onload = async () => {
 
     if (pickaxe !== null) {
         equippedPickaxeLabel.innerText = pickaxe.friendlyName;
-        const container = equippedPickaxeLabel.parentNode.parentNode;
+        const container = document.getElementById("container");
 
         const pickaxeImg = document.createElement("img");
         pickaxeImg.src = pickaxe.imgURL;
@@ -38,7 +38,7 @@ window.onload = async () => {
             const pickaxeImg = document.createElement("img");
             pickaxeImg.src = pickaxe.imgURL;
 
-            const container = generatePickaxeButton.parentNode;
+            const container = document.getElementById("container");
             container.replaceChild(message, generatePickaxeButton);
             container.appendChild(document.createElement("br"));
             container.appendChild(pickaxeImg);
