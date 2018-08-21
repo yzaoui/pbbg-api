@@ -6,7 +6,14 @@ window.onload = async () => {
     const { pickaxe } = await res.json();
 
     if (pickaxe !== null) {
-        equippedPickaxeLabel.innerText = pickaxe;
+        equippedPickaxeLabel.innerText = pickaxe.friendlyName;
+        const container = equippedPickaxeLabel.parentNode.parentNode;
+
+        const pickaxeImg = document.createElement("img");
+        pickaxeImg.src = pickaxe.imgURL;
+
+        container.appendChild(document.createElement("br"));
+        container.appendChild(pickaxeImg);
     } else {
         equippedPickaxeLabel.innerText = "None";
 
@@ -21,13 +28,21 @@ window.onload = async () => {
                 method: "POST"
             })).json();
 
-            equippedPickaxeLabel.innerText = pickaxe.type;
+            equippedPickaxeLabel.innerText = pickaxe.friendlyName;
 
             const generatePickaxeButton = document.getElementById("generate-pickaxe");
             const message = document.createElement("div");
             message.classList.add("success-message");
-            message.innerText = "Success! Obtained new pickaxe";
-            generatePickaxeButton.parentNode.replaceChild(message, generatePickaxeButton);
+            message.innerText = "Success! Obtained new pickaxe: " + pickaxe.friendlyName;
+
+            const pickaxeImg = document.createElement("img");
+            pickaxeImg.src = pickaxe.imgURL;
+
+            const container = generatePickaxeButton.parentNode;
+            container.replaceChild(message, generatePickaxeButton);
+            container.appendChild(document.createElement("br"));
+            container.appendChild(pickaxeImg);
+
         };
 
         equippedPickaxeLabel.parentNode.parentNode.insertBefore(generatePickaxeButton, equippedPickaxeLabel.nextSibling);

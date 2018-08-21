@@ -18,7 +18,7 @@ enum class Pickaxe(val type: String, val cells: Set<Pair<Int, Int>>) {
         -1 to 1,
         1 to 1
     )),
-    RECTANGLE("Open rectangle", setOf(
+    SQUARE("Square-shaped", setOf(
         -1 to -1,
         0 to -1,
         1 to -1,
