@@ -23,19 +23,15 @@ import io.ktor.sessions.cookie
 import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import io.ktor.util.AttributeKey
-import miner.data.EquipmentTable
-import miner.data.MineContentsTable
-import miner.data.MineSessionTable
-import miner.data.UserTable
+import miner.data.*
 import miner.data.model.User
-import miner.domain.usecase.EquipmentUCImpl
-import miner.domain.usecase.MiningUCImpl
-import miner.domain.usecase.UserUC
-import miner.domain.usecase.UserUCImpl
+import miner.domain.usecase.*
 import miner.route.api.equipmentAPI
+import miner.route.api.inventoryAPI
 import miner.route.api.mine
 import miner.route.api.pickaxe
 import miner.route.web.equipmentWeb
+import miner.route.web.inventoryWeb
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -51,12 +47,13 @@ fun Application.main() {
     Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
     transaction {
         addLogger(Slf4jSqlDebugLogger)
-        SchemaUtils.create(UserTable, MineSessionTable, MineContentsTable, EquipmentTable)
+        SchemaUtils.create(UserTable, MineSessionTable, MineContentsTable, EquipmentTable, InventoryTable)
     }
 
     val userUC = UserUCImpl()
     val miningUC = MiningUCImpl()
-    val equipmentUC = EquipmentUCImpl()
+    val inventoryUC = InventoryUCImpl()
+    val equipmentUC = EquipmentUCImpl(inventoryUC)
 
     install(CallLogging)
     install(Locations)
@@ -80,10 +77,12 @@ fun Application.main() {
         register(userUC)
         mineWeb(userUC, miningUC)
         equipmentWeb(userUC)
+        inventoryWeb(userUC)
         route("/api") {
             pickaxe(userUC, equipmentUC)
             equipmentAPI(userUC, equipmentUC)
             mine(userUC, miningUC)
+            inventoryAPI(userUC, inventoryUC)
         }
         static("css") {
             resources("css")

@@ -14,9 +14,6 @@ import miner.domain.usecase.UserUC
 import miner.interceptSetUserOr401
 import miner.loggedInUserKey
 
-@Location("/equipment")
-class EquipmentAPILocation
-
 fun Route.equipmentAPI(userUC: UserUC, equipmentUC: EquipmentUC) = route("/equipment") {
     interceptSetUserOr401(userUC)
     get {

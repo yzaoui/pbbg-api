@@ -10,6 +10,7 @@ import miner.domain.usecase.UserUC
 import miner.getUserUsingSession
 import miner.href
 import miner.route.web.EquipmentLocation
+import miner.route.web.InventoryLocation
 import miner.view.homeGuestPage
 import miner.view.homeMemberPage
 
@@ -24,6 +25,7 @@ fun Route.index(userUC: UserUC) = route("/") {
             call.respondHtmlTemplate(
                 homeMemberPage(
                     mineURL = href(MineWebLocation()),
+                    inventoryURL = href(InventoryLocation()),
                     equipmentURL = href(EquipmentLocation()),
                     logoutURL = href(LogoutLocation())
                 )

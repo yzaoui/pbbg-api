@@ -77,7 +77,7 @@ const clickedCell = async (x, y) => {
 
         data.results.forEach(result => {
             const li = document.createElement("li");
-            li.textContent = `Obtained ${result.item} × ${result.amount}`;
+            li.textContent = `Obtained ${result.item} ×${result.amount}`;
             resultsList.appendChild(li);
         });
 

@@ -3,9 +3,11 @@ package miner.view
 import io.ktor.html.Template
 import kotlinx.html.*
 
-fun homeMemberPage(mineURL: String, equipmentURL: String, logoutURL: String): Template<HTML> = MainTemplate("Home").apply {
+fun homeMemberPage(mineURL: String, inventoryURL: String, equipmentURL: String, logoutURL: String): Template<HTML> = MainTemplate("Home").apply {
     content {
         a(href = mineURL) { +"> Mine" }
+        br { }
+        a(href = inventoryURL) { +"> Inventory" }
         br { }
         a(href = equipmentURL) { +"> Equipment" }
         br { }
