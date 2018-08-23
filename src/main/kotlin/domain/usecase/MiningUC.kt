@@ -12,38 +12,31 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.Random
 
 interface MiningUC {
-    fun getMineSession(userId: Int): Int?
-    fun getMine(mineSessionId: Int): Mine?
-    fun generateMine(userId: Int, width: Int, height: Int)
+    fun getMine(userId: Int): Mine?
+    fun generateMine(userId: Int, width: Int, height: Int): Mine
     fun mine(userId: Int, x: Int, y: Int): List<MineResultItem>?
 }
 
 class MiningUCImpl(private val inventoryUC: InventoryUC) : MiningUC {
     private val random = Random()
 
-    override fun getMineSession(userId: Int): Int? = transaction {
-        MineSessionTable.select { MineSessionTable.userId.eq(userId) }
-            .map { it[MineSessionTable.id].value }
-            .singleOrNull()
-    }
-
-    override fun getMine(mineSessionId: Int): Mine? = transaction {
-        val mineSession = MineSessionTable.select { MineSessionTable.id.eq(mineSessionId) }
+    override fun getMine(userId: Int): Mine? = transaction {
+        val mineSession = MineSessionTable.select { MineSessionTable.userId.eq(userId) }
             .map { it.toMineSession() }
             .singleOrNull() ?: return@transaction null
 
         val grid = mutableMapOf<Pair<Int, Int>, MineEntity> ()
-        MineContentsTable.select { MineContentsTable.mineId.eq(mineSessionId) }
+        MineContentsTable.select { MineContentsTable.mineId.eq(mineSession.id) }
             .forEach { grid[it[MineContentsTable.x] to it[MineContentsTable.y]] = it[MineContentsTable.mineItem] }
 
         Mine(mineSession.width, mineSession.height, grid)
     }
 
-    override fun generateMine(userId: Int, width: Int, height: Int) {
-        val itemEntries = mutableSetOf<Triple<Int, Int, MineEntity>>()
+    override fun generateMine(userId: Int, width: Int, height: Int): Mine {
+        val itemEntries = mutableMapOf<Pair<Int, Int>, MineEntity>()
         (0 until height).forEach { y ->
             (0 until width).forEach { x ->
-                rollForRandomMineItem()?.let { itemEntries.add(Triple(x, y, it)) }
+                rollForRandomMineItem()?.let { itemEntries.put(x to y, it) }
             }
         }
 
@@ -54,13 +47,15 @@ class MiningUCImpl(private val inventoryUC: InventoryUC) : MiningUC {
                 it[MineSessionTable.height] = height
             }
 
-            MineContentsTable.batchInsert(itemEntries) { item ->
+            MineContentsTable.batchInsert(itemEntries.asIterable()) { (pos, entity) ->
                 this[MineContentsTable.mineId] = mineSessionId
-                this[MineContentsTable.x] = item.first
-                this[MineContentsTable.y] = item.second
-                this[MineContentsTable.mineItem] = item.third
+                this[MineContentsTable.x] = pos.first
+                this[MineContentsTable.y] = pos.second
+                this[MineContentsTable.mineItem] = entity
             }
         }
+
+        return Mine(width, height, itemEntries)
     }
 
     override fun mine(userId: Int, x: Int, y: Int): List<MineResultItem>? = transaction {
@@ -72,7 +67,7 @@ class MiningUCImpl(private val inventoryUC: InventoryUC) : MiningUC {
             .map { it.toMineSession() }
             .singleOrNull() ?: return@transaction null
 
-        val reacheableCells = reacheableCells(x, y, mineSession.width, mineSession.height, pickaxe.cells)
+        val reacheableCells = reachableCells(x, y, mineSession.width, mineSession.height, pickaxe.cells)
         val cellsWithContent = MineContentsTable.select { MineContentsTable.mineId.eq(mineSession.id) }
             .map { it.toMineContent() }
         val reachableCellsWithContent = cellsWithContent.filter { reacheableCells.contains(it.x to it.y) }
@@ -116,7 +111,7 @@ class MiningUCImpl(private val inventoryUC: InventoryUC) : MiningUC {
         }
     }
 
-    private fun reacheableCells(x: Int, y: Int, width: Int, height: Int, tiles: Set<Pair<Int, Int>>): Set<Pair<Int, Int>> {
+    private fun reachableCells(x: Int, y: Int, width: Int, height: Int, tiles: Set<Pair<Int, Int>>): Set<Pair<Int, Int>> {
         val cells = mutableSetOf<Pair<Int, Int>>()
 
         tiles.forEach {

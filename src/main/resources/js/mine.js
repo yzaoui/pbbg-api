@@ -5,23 +5,25 @@ let equippedPickaxe;
 let mineActionSubmitting = false;
 
 window.onload = async () => {
-    grid = [...document.getElementById("mining-grid").firstElementChild.children].map(row => [...row.children]);
+    const container = document.getElementById("container");
 
-    const {status, data}  = await (await fetch("/api/pickaxe")).json();
-    equippedPickaxe = data;
+    const statusMessage = document.createElement("div");
+    statusMessage.innerText = "Loading...";
+    container.appendChild(statusMessage);
 
-    if (equippedPickaxe !== null) {
-        document.getElementById("equipped-pickaxe").innerText = equippedPickaxe.type;
+    const { status, data } = await (await fetch("/api/mine")).json();
 
-        grid.forEach((row, y) => {
-            row.forEach((cell, x) => {
-                cell.onmouseenter = () => { enteredCell(x, y) };
-                cell.onmouseleave = () => { leftCell(x, y) };
-                cell.onclick = () => { clickedCell(x, y) };
-            });
-        });
+    statusMessage.parentNode.removeChild(statusMessage);
+    container.appendChild(document.createElement("br"));
+
+    if (data !== null) {
+        const mine = createMiningGrid("mining-grid", data);
+        container.appendChild(mine);
+
+        setupPickaxeAndResultsList();
     } else {
-        document.getElementById("equipped-pickaxe").innerText = "None. Go to your inventory and generate one."
+        container.appendChild(document.createElement("br"));
+        container.appendChild(generateMineButton());
     }
 };
 
@@ -89,5 +91,88 @@ const clickedCell = async (x, y) => {
         });
 
         mineActionSubmitting = false;
+    }
+};
+
+const generateMineButton = () => {
+    const button = document.createElement("button");
+    button.id = "generate-mine";
+    button.innerText = "Generate new mine";
+    button.onclick = () => generateMine();
+
+    return button;
+};
+
+const generateMine = async () => {
+    /* Replace button with loading message */
+    const generateMineButton = document.getElementById("generate-mine");
+    const statusMessage = document.createElement("div");
+    statusMessage.innerText = "Loading...";
+    generateMineButton.parentNode.replaceChild(statusMessage, generateMineButton);
+
+    /* Get mine from API */
+    const { status, data } = await (await fetch("/api/mine/generate", { method: "POST" })).json();
+    if (status === "success") {
+        const mine = createMiningGrid("mining-grid", data);
+        statusMessage.parentNode.replaceChild(mine, statusMessage);
+    } else {
+        statusMessage.innerText = "Error occurred. Try refreshing."
+    }
+
+    setupPickaxeAndResultsList();
+};
+
+const createMiningGrid = (id, { width, height, cells }) => {
+    const table = document.createElement("table");
+    table.id = id;
+    table.classList.add("mining-grid");
+    const tbody = document.createElement("tbody");
+    table.appendChild(tbody);
+    cells.forEach(row => {
+        const tr = document.createElement("tr");
+        row.forEach(cell => {
+            const td = document.createElement("td");
+            if (cell !== null) {
+                td.style.backgroundImage = `url("${cell.imageURL}")`
+            }
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+
+    return table;
+};
+
+const setupPickaxeAndResultsList = async () => {
+    const { status, data } = await (await fetch("/api/pickaxe")).json();
+    const container = document.getElementById("container");
+
+    if (data !== null) {
+        const miningGrid = document.getElementById("mining-grid");
+        equippedPickaxe = data;
+
+        const equippedPickaxeDisplay = document.createElement("div");
+        equippedPickaxeDisplay.innerText = "Equipped pickaxe: " + equippedPickaxe.type;
+        container.appendChild(equippedPickaxeDisplay);
+
+        const resultsList = document.createElement("ul");
+        resultsList.id = "results-list";
+        container.appendChild(resultsList);
+
+        grid = [...miningGrid.firstElementChild.children].map(row => [...row.children]);
+
+        grid.forEach((row, y) => {
+            row.forEach((cell, x) => {
+                cell.onmouseenter = () => { enteredCell(x, y) };
+                cell.onmouseleave = () => { leftCell(x, y) };
+                cell.onclick = () => { clickedCell(x, y) };
+            });
+        });
+
+        miningGrid.classList.add("enabled");
+    } else {
+        const noPickaxe = document.createElement("div");
+        noPickaxe.innerText = "No pickaxe equipped. Go to your inventory and generate one.";
+        container.appendChild(noPickaxe);
     }
 };

@@ -12,7 +12,7 @@ fun minePageExistingMine(homeURL: String, mine: MineVM): Template<HTML> = MainTe
         a(href = homeURL) {+"Return home"}
         table(classes = "mining-grid") {
             id = "mining-grid"
-            mine.content.forEach { row -> tr {
+            mine.cells.forEach { row -> tr {
                 row.forEach { item -> td {
                     item?.let { style = "background-image: url('${it.imageURL}')" }
                 } }
@@ -40,5 +40,17 @@ fun minePageNoMine(homeURL: String, mineURL: String): Template<HTML> = MainTempl
         form(action = mineURL, method = FormMethod.post) {
             button(type = ButtonType.submit) { +"Generate new mine" }
         }
+    }
+}
+
+fun minePage(homeURL: String): Template<HTML> = MainTemplate("Mine").apply {
+    headContent {
+        link(href = "/css/mine.css", rel = "stylesheet")
+    }
+    content {
+        a(href = homeURL) {+"Return home"}
+    }
+    endOfBody {
+        script(src = "/js/mine.js") {}
     }
 }

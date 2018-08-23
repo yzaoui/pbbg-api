@@ -15,6 +15,7 @@ import miner.domain.usecase.UserUC
 import miner.href
 import miner.interceptSetUserOrRedirect
 import miner.loggedInUserKey
+import miner.view.minePage
 import miner.view.minePageExistingMine
 import miner.view.minePageNoMine
 import miner.view.model.MineItemVM
@@ -27,24 +28,11 @@ fun Route.mineWeb(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
     interceptSetUserOrRedirect(userUC)
 
     get {
-        val loggedInUser = call.attributes[loggedInUserKey]
-
-        val mineSessionId = miningUC.getMineSession(userId = loggedInUser.id)
-
-        if (mineSessionId != null) {
-            val mine = miningUC.getMine(mineSessionId = mineSessionId)
-            if (mine == null) {
-                call.respondRedirect(href(MineWebLocation()))
-                return@get
-            }
-
-            call.respondHtmlTemplate(minePageExistingMine(href(IndexLocation()), mine.toVM())) {}
-        } else {
-            call.respondHtmlTemplate(minePageNoMine(href(IndexLocation()), href(MineWebLocation()))) {}
-        }
+        call.respondHtmlTemplate(minePage(href(IndexLocation()))) {}
     }
 
     post {
+        // TODO: Remove this, move to API
         val loggedInUser = call.attributes[loggedInUserKey]
 
         miningUC.generateMine(loggedInUser.id, 30, 20)
@@ -52,15 +40,3 @@ fun Route.mineWeb(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
         call.respondRedirect(href(MineWebLocation()))
     }
 }
-
-private fun Mine.toVM() = MineVM(
-    width = width,
-    height = height,
-    content = List(height) { y -> List(width) { x -> grid[x to y]?.toVM() } }
-)
-
-private fun MineEntity.toVM() = MineItemVM(
-    imageURL = when (this) {
-        MineEntity.ROCK -> "/img/mine/rock.png"
-    }
-)

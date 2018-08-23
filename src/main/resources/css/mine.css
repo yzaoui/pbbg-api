@@ -14,9 +14,12 @@
     background-repeat: no-repeat;
     background-position: center;
     height: 16px;
+}
+
+.mining-grid.enabled td {
     cursor: pointer;
 }
 
-.selected-item {
+.mining-grid.enabled .selected-item {
     background-color: limegreen;
 }
