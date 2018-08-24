@@ -4,7 +4,6 @@ import data.model.Pickaxe
 import miner.data.EquipmentTable
 import miner.data.UserTable
 import miner.route.api.toItem
-import miner.view.inventoryPage
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select

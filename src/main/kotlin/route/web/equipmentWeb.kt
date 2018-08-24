@@ -20,6 +20,6 @@ fun Route.equipmentWeb(userUC: UserUC) = route("/equipment") {
     interceptSetUserOrRedirect(userUC)
 
     get {
-        call.respondHtmlTemplate(equipmentPage(href(IndexLocation()), call.attributes[memberPageVM])) {}
+        call.respondHtmlTemplate(equipmentPage(call.attributes[memberPageVM])) {}
     }
 }

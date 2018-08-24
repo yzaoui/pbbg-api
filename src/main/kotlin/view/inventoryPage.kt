@@ -6,10 +6,7 @@ import kotlinx.html.a
 import kotlinx.html.script
 import miner.view.template.MemberTemplate
 
-fun inventoryPage(homeURL: String, memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Inventory", memberPageVM).apply {
-    content {
-        a(href = homeURL) { +"Return home" }
-    }
+fun inventoryPage(memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Inventory", memberPageVM).apply {
     endOfBody {
         script(src = "/js/inventory.js") {}
     }

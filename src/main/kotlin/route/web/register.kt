@@ -28,7 +28,6 @@ fun Route.register(userUC: UserUC) = route("/register") {
     get {
         call.respondHtmlTemplate(registerPage(
             registerURL = href(RegisterLocation()),
-            homeURL = href(IndexLocation()),
             loginURL = href(LoginLocation()),
             guestPageVM = GuestPageVM()
         )) {}

@@ -4,13 +4,11 @@ import io.ktor.html.Template
 import kotlinx.html.*
 import miner.view.template.MemberTemplate
 
-fun equipmentPage(homeURL: String, memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Equipment", memberPageVM).apply {
+fun equipmentPage(memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Equipment", memberPageVM).apply {
     headContent {
         link(href = "/css/equipment.css", rel = "stylesheet")
     }
     content {
-        a(href = homeURL) { +"Return home" }
-        br { }
         div {
             +"Equipped pickaxe: "
             span {

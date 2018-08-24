@@ -25,7 +25,6 @@ fun Route.mineWeb(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
     get {
         call.respondHtmlTemplate(
             minePage(
-                homeURL = href(IndexLocation()),
                 memberPageVM = call.attributes[memberPageVM]
             )
         ) {}

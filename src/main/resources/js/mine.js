@@ -14,7 +14,6 @@ window.onload = async () => {
     const { status, data } = await (await fetch("/api/mine")).json();
 
     statusMessage.parentNode.removeChild(statusMessage);
-    main.appendChild(document.createElement("br"));
 
     if (data !== null) {
         const mine = createMiningGrid("mining-grid", data);
@@ -22,7 +21,6 @@ window.onload = async () => {
 
         setupPickaxeAndResultsList();
     } else {
-        main.appendChild(document.createElement("br"));
         main.appendChild(generateMineButton());
     }
 };
