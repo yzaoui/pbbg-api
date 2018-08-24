@@ -32,6 +32,7 @@ import miner.route.api.mine
 import miner.route.api.pickaxe
 import miner.route.web.equipmentWeb
 import miner.route.web.inventoryWeb
+import miner.view.ActionVM
 import miner.view.MemberPageVM
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
@@ -106,6 +107,13 @@ fun PipelineContext<Unit, ApplicationCall>.getUserUsingSession(userUC: UserUC): 
     return call.sessions.get<ApplicationSession>()?.let { userUC.getUserById(it.userId) }
 }
 
+fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPageVM {
+    return MemberPageVM(
+        user = user,
+        home = ActionVM("Home", href(IndexLocation()))
+    )
+}
+
 fun Route.interceptSetUserOrRedirect(userUC: UserUC) {
     intercept(ApplicationCallPipeline.Infrastructure) {
         val user = getUserUsingSession(userUC)
@@ -114,7 +122,7 @@ fun Route.interceptSetUserOrRedirect(userUC: UserUC) {
             finish()
         } else {
             call.attributes.put(loggedInUserKey, user)
-            call.attributes.put(memberPageVM, MemberPageVM(user))
+            call.attributes.put(memberPageVM, getMemberPageVM(user))
         }
     }
 }

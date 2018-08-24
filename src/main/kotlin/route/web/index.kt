@@ -7,6 +7,7 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 import miner.domain.usecase.UserUC
+import miner.getMemberPageVM
 import miner.getUserUsingSession
 import miner.href
 import miner.route.web.EquipmentLocation
@@ -30,7 +31,7 @@ fun Route.index(userUC: UserUC) = route("/") {
                     inventoryURL = href(InventoryLocation()),
                     equipmentURL = href(EquipmentLocation()),
                     logoutURL = href(LogoutLocation()),
-                    memberPageVM = MemberPageVM(loggedInUser)
+                    memberPageVM = getMemberPageVM(loggedInUser)
                 )
             ) {}
         } else {

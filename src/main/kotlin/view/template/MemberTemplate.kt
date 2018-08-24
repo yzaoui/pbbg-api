@@ -23,6 +23,11 @@ open class MemberTemplate(private val pageTitle: String, private val memberPageV
                         div(classes = "username") {
                             +memberPageVM.user.username
                         }
+                        div {
+                            a(href = memberPageVM.home.url) {
+                                +memberPageVM.home.label
+                            }
+                        }
                     }
                     main {
                         id = "main"
