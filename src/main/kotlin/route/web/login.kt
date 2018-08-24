@@ -16,6 +16,7 @@ import miner.ApplicationSession
 import miner.domain.usecase.UserUC
 import miner.href
 import miner.interceptGuestOnly
+import miner.view.GuestPageVM
 import miner.view.loginPage
 
 @Location("/login")
@@ -29,7 +30,8 @@ fun Route.login(userUC: UserUC) = route("/login") {
             loginPage(
                 loginURL = href(LoginLocation()),
                 homeURL = href(IndexLocation()),
-                registerURL = href(RegisterLocation())
+                registerURL = href(RegisterLocation()),
+                guestPageVM = GuestPageVM()
             )
         ) {}
     }

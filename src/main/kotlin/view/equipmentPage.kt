@@ -2,8 +2,9 @@ package miner.view
 
 import io.ktor.html.Template
 import kotlinx.html.*
+import miner.view.template.MemberTemplate
 
-fun equipmentPage(homeURL: String): Template<HTML> = MainTemplate("Equipment").apply {
+fun equipmentPage(homeURL: String, memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Equipment", memberPageVM).apply {
     headContent {
         link(href = "/css/equipment.css", rel = "stylesheet")
     }

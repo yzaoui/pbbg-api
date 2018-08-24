@@ -8,18 +8,13 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
-import miner.data.model.Mine
-import miner.data.model.MineEntity
 import miner.domain.usecase.MiningUC
 import miner.domain.usecase.UserUC
 import miner.href
 import miner.interceptSetUserOrRedirect
 import miner.loggedInUserKey
+import miner.memberPageVM
 import miner.view.minePage
-import miner.view.minePageExistingMine
-import miner.view.minePageNoMine
-import miner.view.model.MineItemVM
-import miner.view.model.MineVM
 
 @Location("/mine")
 class MineWebLocation
@@ -28,7 +23,12 @@ fun Route.mineWeb(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
     interceptSetUserOrRedirect(userUC)
 
     get {
-        call.respondHtmlTemplate(minePage(href(IndexLocation()))) {}
+        call.respondHtmlTemplate(
+            minePage(
+                homeURL = href(IndexLocation()),
+                memberPageVM = call.attributes[memberPageVM]
+            )
+        ) {}
     }
 
     post {

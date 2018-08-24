@@ -7,13 +7,13 @@ window.onload = async () => {
 
     if (pickaxe !== null) {
         equippedPickaxeLabel.innerText = pickaxe.friendlyName;
-        const container = document.getElementById("container");
+        const main = document.getElementById("main");
 
         const pickaxeImg = document.createElement("img");
         pickaxeImg.src = pickaxe.imgURL;
 
-        container.appendChild(document.createElement("br"));
-        container.appendChild(pickaxeImg);
+        main.appendChild(document.createElement("br"));
+        main.appendChild(pickaxeImg);
     } else {
         equippedPickaxeLabel.innerText = "None";
 
@@ -38,10 +38,10 @@ window.onload = async () => {
             const pickaxeImg = document.createElement("img");
             pickaxeImg.src = pickaxe.imgURL;
 
-            const container = document.getElementById("container");
-            container.replaceChild(message, generatePickaxeButton);
-            container.appendChild(document.createElement("br"));
-            container.appendChild(pickaxeImg);
+            const main = document.getElementById("main");
+            main.replaceChild(message, generatePickaxeButton);
+            main.appendChild(document.createElement("br"));
+            main.appendChild(pickaxeImg);
 
         };
 

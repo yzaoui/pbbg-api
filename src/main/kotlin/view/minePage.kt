@@ -1,49 +1,13 @@
 package miner.view
 
 import io.ktor.html.Template
-import kotlinx.html.*
-import miner.view.model.MineVM
+import kotlinx.html.HTML
+import kotlinx.html.a
+import kotlinx.html.link
+import kotlinx.html.script
+import miner.view.template.MemberTemplate
 
-fun minePageExistingMine(homeURL: String, mine: MineVM): Template<HTML> = MainTemplate("Mine").apply {
-    headContent {
-        link(href = "/css/mine.css", rel = "stylesheet")
-    }
-    content {
-        a(href = homeURL) {+"Return home"}
-        table(classes = "mining-grid") {
-            id = "mining-grid"
-            mine.cells.forEach { row -> tr {
-                row.forEach { item -> td {
-                    item?.let { style = "background-image: url('${it.imageURL}')" }
-                } }
-            } }
-        }
-        div {
-            +"Equipped pickaxe: "
-            span {
-                id = "equipped-pickaxe"
-                +"Loading..."
-            }
-        }
-        ul {
-            id = "results-list"
-        }
-    }
-    endOfBody {
-        script(src = "/js/mine.js") {}
-    }
-}
-
-fun minePageNoMine(homeURL: String, mineURL: String): Template<HTML> = MainTemplate("Mine").apply {
-    content {
-        a(href = homeURL) {+"Return home"}
-        form(action = mineURL, method = FormMethod.post) {
-            button(type = ButtonType.submit) { +"Generate new mine" }
-        }
-    }
-}
-
-fun minePage(homeURL: String): Template<HTML> = MainTemplate("Mine").apply {
+fun minePage(homeURL: String, memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Mine", memberPageVM).apply {
     headContent {
         link(href = "/css/mine.css", rel = "stylesheet")
     }

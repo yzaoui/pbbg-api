@@ -32,6 +32,7 @@ import miner.route.api.mine
 import miner.route.api.pickaxe
 import miner.route.web.equipmentWeb
 import miner.route.web.inventoryWeb
+import miner.view.MemberPageVM
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -42,6 +43,7 @@ import route.web.*
 
 data class ApplicationSession(val userId: Int)
 val loggedInUserKey = AttributeKey<User>("loggedInUser")
+val memberPageVM = AttributeKey<MemberPageVM>("memberPageVM")
 
 fun Application.main() {
     Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
@@ -112,6 +114,7 @@ fun Route.interceptSetUserOrRedirect(userUC: UserUC) {
             finish()
         } else {
             call.attributes.put(loggedInUserKey, user)
+            call.attributes.put(memberPageVM, MemberPageVM(user))
         }
     }
 }

@@ -4,21 +4,48 @@ body {
 
 .container {
     width: 992px;
-    background: #e1e4ffcf;
     margin-top: 100px;
     margin-left: auto;
     margin-right: auto;
-    padding: 20px;
 }
 
-.container a, .container div, .container form {
+.container > footer {
+    text-align: center;
+    font-size: 12px;
+}
+
+.content {
+    display: flex;
+    background: #e1e4ffcf;
+}
+
+.sidebar {
+    border: black 1px solid;
+    flex: 0 0 150px;
+    order: -1;
+    text-align: center;
+}
+
+.sidebar > .username {
+    font-weight: bold;
+    width: 100%;
+    border-bottom: grey 1px solid;
+}
+
+.content main {
+    flex: 1;
+    border: black 1px solid;
+    padding: 6px;
+}
+
+.content main a, .content main div, .content main form {
     margin: 4px;
 }
 
-.container a, .container div {
+.content main a, .content main div {
     display: inline-block;
 }
 
-.container input {
+.content main input {
     padding: 4px;
 }

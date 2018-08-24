@@ -2,8 +2,9 @@ package miner.view
 
 import io.ktor.html.Template
 import kotlinx.html.*
+import miner.view.template.GuestTemplate
 
-fun registerPage(registerURL: String, homeURL: String, loginURL: String): Template<HTML> = MainTemplate("Register").apply {
+fun registerPage(registerURL: String, homeURL: String, loginURL: String, guestPageVM: GuestPageVM): Template<HTML> = GuestTemplate("Register", guestPageVM).apply {
     content {
         a(href = homeURL) { +"Return home" }
         form(action = registerURL, method = FormMethod.post) {

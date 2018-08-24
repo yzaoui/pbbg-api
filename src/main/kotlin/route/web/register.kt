@@ -16,6 +16,7 @@ import miner.ApplicationSession
 import miner.domain.usecase.UserUC
 import miner.href
 import miner.interceptGuestOnly
+import miner.view.GuestPageVM
 import miner.view.registerPage
 
 @Location("/register")
@@ -28,7 +29,8 @@ fun Route.register(userUC: UserUC) = route("/register") {
         call.respondHtmlTemplate(registerPage(
             registerURL = href(RegisterLocation()),
             homeURL = href(IndexLocation()),
-            loginURL = href(LoginLocation())
+            loginURL = href(LoginLocation()),
+            guestPageVM = GuestPageVM()
         )) {}
     }
 

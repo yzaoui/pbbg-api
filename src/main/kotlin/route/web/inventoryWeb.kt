@@ -9,6 +9,7 @@ import io.ktor.routing.route
 import miner.domain.usecase.UserUC
 import miner.href
 import miner.interceptSetUserOrRedirect
+import miner.memberPageVM
 import miner.view.inventoryPage
 import route.web.IndexLocation
 
@@ -19,6 +20,11 @@ fun Route.inventoryWeb(userUC: UserUC) = route("/inventory") {
     interceptSetUserOrRedirect(userUC)
 
     get {
-        call.respondHtmlTemplate(inventoryPage(href(IndexLocation()))) {}
+        call.respondHtmlTemplate(
+            inventoryPage(
+                homeURL = href(IndexLocation()),
+                memberPageVM = call.attributes[memberPageVM]
+            )
+        ) {}
     }
 }

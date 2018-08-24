@@ -5,25 +5,25 @@ let equippedPickaxe;
 let mineActionSubmitting = false;
 
 window.onload = async () => {
-    const container = document.getElementById("container");
+    const main = document.getElementById("main");
 
     const statusMessage = document.createElement("div");
     statusMessage.innerText = "Loading...";
-    container.appendChild(statusMessage);
+    main.appendChild(statusMessage);
 
     const { status, data } = await (await fetch("/api/mine")).json();
 
     statusMessage.parentNode.removeChild(statusMessage);
-    container.appendChild(document.createElement("br"));
+    main.appendChild(document.createElement("br"));
 
     if (data !== null) {
         const mine = createMiningGrid("mining-grid", data);
-        container.appendChild(mine);
+        main.appendChild(mine);
 
         setupPickaxeAndResultsList();
     } else {
-        container.appendChild(document.createElement("br"));
-        container.appendChild(generateMineButton());
+        main.appendChild(document.createElement("br"));
+        main.appendChild(generateMineButton());
     }
 };
 
@@ -145,7 +145,7 @@ const createMiningGrid = (id, { width, height, cells }) => {
 
 const setupPickaxeAndResultsList = async () => {
     const { status, data } = await (await fetch("/api/pickaxe")).json();
-    const container = document.getElementById("container");
+    const main = document.getElementById("main");
 
     if (data !== null) {
         const miningGrid = document.getElementById("mining-grid");
@@ -153,11 +153,11 @@ const setupPickaxeAndResultsList = async () => {
 
         const equippedPickaxeDisplay = document.createElement("div");
         equippedPickaxeDisplay.innerText = "Equipped pickaxe: " + equippedPickaxe.type;
-        container.appendChild(equippedPickaxeDisplay);
+        main.appendChild(equippedPickaxeDisplay);
 
         const resultsList = document.createElement("ul");
         resultsList.id = "results-list";
-        container.appendChild(resultsList);
+        main.appendChild(resultsList);
 
         grid = [...miningGrid.firstElementChild.children].map(row => [...row.children]);
 
@@ -173,6 +173,6 @@ const setupPickaxeAndResultsList = async () => {
     } else {
         const noPickaxe = document.createElement("div");
         noPickaxe.innerText = "No pickaxe equipped. Go to your inventory and generate one.";
-        container.appendChild(noPickaxe);
+        main.appendChild(noPickaxe);
     }
 };

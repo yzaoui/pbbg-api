@@ -11,6 +11,8 @@ import miner.getUserUsingSession
 import miner.href
 import miner.route.web.EquipmentLocation
 import miner.route.web.InventoryLocation
+import miner.view.GuestPageVM
+import miner.view.MemberPageVM
 import miner.view.homeGuestPage
 import miner.view.homeMemberPage
 
@@ -27,14 +29,16 @@ fun Route.index(userUC: UserUC) = route("/") {
                     mineURL = href(MineWebLocation()),
                     inventoryURL = href(InventoryLocation()),
                     equipmentURL = href(EquipmentLocation()),
-                    logoutURL = href(LogoutLocation())
+                    logoutURL = href(LogoutLocation()),
+                    memberPageVM = MemberPageVM(loggedInUser)
                 )
             ) {}
         } else {
             call.respondHtmlTemplate(
                 homeGuestPage(
                     registerURL = href(RegisterLocation()),
-                    loginURL = href(LoginLocation())
+                    loginURL = href(LoginLocation()),
+                    guestPageVM = GuestPageVM()
                 )
             ) {}
         }

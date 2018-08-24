@@ -1,9 +1,9 @@
 window.onload = async () => {
-    const container = document.getElementById("container");
+    const main = document.getElementById("main");
 
     const loadingMessage = document.createElement("div");
     loadingMessage.innerText = "Loading...";
-    container.appendChild(loadingMessage);
+    main.appendChild(loadingMessage);
 
     const { status, data } = await (await fetch("/api/inventory")).json();
 
