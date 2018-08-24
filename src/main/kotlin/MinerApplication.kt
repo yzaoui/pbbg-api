@@ -110,7 +110,8 @@ fun PipelineContext<Unit, ApplicationCall>.getUserUsingSession(userUC: UserUC): 
 fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPageVM {
     return MemberPageVM(
         user = user,
-        home = ActionVM("Home", href(IndexLocation()))
+        home = ActionVM("Home", href(IndexLocation())),
+        logout = ActionVM("Log out", href(LogoutLocation()))
     )
 }
 

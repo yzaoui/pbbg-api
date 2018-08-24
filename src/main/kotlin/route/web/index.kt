@@ -30,7 +30,6 @@ fun Route.index(userUC: UserUC) = route("/") {
                     mineURL = href(MineWebLocation()),
                     inventoryURL = href(InventoryLocation()),
                     equipmentURL = href(EquipmentLocation()),
-                    logoutURL = href(LogoutLocation()),
                     memberPageVM = getMemberPageVM(loggedInUser)
                 )
             ) {}

@@ -28,6 +28,11 @@ open class MemberTemplate(private val pageTitle: String, private val memberPageV
                                 +memberPageVM.home.label
                             }
                         }
+                        div {
+                            form(action = memberPageVM.logout.url, method = FormMethod.post) {
+                                button(type = ButtonType.submit) { +memberPageVM.logout.label }
+                            }
+                        }
                     }
                     main {
                         id = "main"

@@ -26,9 +26,12 @@ body {
     text-align: center;
 }
 
+.sidebar > * {
+    padding: 6px;
+}
+
 .sidebar > .username {
     font-weight: bold;
-    width: 100%;
     border-bottom: grey 1px solid;
 }
 
