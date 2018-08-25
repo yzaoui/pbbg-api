@@ -141,6 +141,13 @@ const createMiningGrid = (id, { width, height, cells }) => {
     return table;
 };
 
+const createEquippedPickaxeDisplay = (pickaxeName) => {
+    const div = document.createElement("div");
+    div.innerText = "Equipped pickaxe: " + pickaxeName;
+
+    return div;
+};
+
 const setupPickaxeAndResultsList = async () => {
     const { status, data } = await (await fetch("/api/pickaxe")).json();
     const main = document.getElementById("main");
@@ -149,9 +156,7 @@ const setupPickaxeAndResultsList = async () => {
         const miningGrid = document.getElementById("mining-grid");
         equippedPickaxe = data;
 
-        const equippedPickaxeDisplay = document.createElement("div");
-        equippedPickaxeDisplay.innerText = "Equipped pickaxe: " + equippedPickaxe.type;
-        main.appendChild(equippedPickaxeDisplay);
+        main.appendChild(createEquippedPickaxeDisplay(equippedPickaxe.type));
 
         const resultsList = document.createElement("ul");
         resultsList.id = "results-list";
