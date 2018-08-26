@@ -1,3 +1,5 @@
 package miner
 
+const val USERNAME_MIN_LENGTH = 1
 const val USERNAME_MAX_LENGTH = 15
+const val USERNAME_REGEX = "[A-Za-z0-9_]{$USERNAME_MIN_LENGTH,$USERNAME_MAX_LENGTH}"
