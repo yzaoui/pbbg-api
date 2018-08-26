@@ -12,10 +12,8 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
-import miner.ApplicationSession
+import miner.*
 import miner.domain.usecase.UserUC
-import miner.href
-import miner.interceptGuestOnly
 import miner.view.GuestPageVM
 import miner.view.registerPage
 
@@ -36,20 +34,40 @@ fun Route.register(userUC: UserUC) = route("/register") {
     post {
         val params = call.receiveParameters()
 
-        val usernameParam = params["username"]
-        val passwordParam = params["password"]
+        val errors = mutableListOf<String>()
 
-        if (usernameParam != null && passwordParam != null) {
+        val usernameParam = params["username"]
+        if (usernameParam != null) {
+            if (!usernameParam.matches(USERNAME_REGEX.toRegex())) errors.add(USERNAME_REGEX_DESCRIPTION)
+            else if (!userUC.usernameAvailable(usernameParam)) errors.add("Username is unavailable")
+        } else {
+            errors.add("Username is missing.")
+        }
+
+        val passwordParam = params["password"]
+        if (passwordParam != null) {
+            if (!passwordParam.matches(PASSWORD_REGEX.toRegex())) errors.add(PASSWORD_REGEX_DESCRIPTION)
+        } else {
+            errors.add("Password is missing")
+        }
+
+        if (errors.isEmpty()) {
+            // Relying on the fact that if either the username or password is null, the list of errors would not be empty
             val userId = userUC.registerUser(
-                username = usernameParam,
-                passwordHash = BCrypt.withDefaults().hash(12, passwordParam.toByteArray())
+                username = usernameParam!!,
+                passwordHash = BCrypt.withDefaults().hash(12, passwordParam!!.toByteArray())
             )
 
             call.sessions.set(ApplicationSession(userId))
             call.respondRedirect(href(IndexLocation()))
         } else {
-            // TODO: Add errors here
-            call.respondRedirect(href(RegisterLocation()))
+            // TODO: Consider using PRG pattern to get rid of refresh-resubmitting-POST issue
+            call.respondHtmlTemplate(registerPage(
+                registerURL = href(RegisterLocation()),
+                loginURL = href(LoginLocation()),
+                guestPageVM = GuestPageVM(),
+                errors = errors
+            )) {}
         }
     }
 }

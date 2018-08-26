@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 interface UserUC {
     fun getUserById(userId: Int): User?
     fun getUserByUsername(username: String): User?
+    fun usernameAvailable(username: String): Boolean
     fun registerUser(username: String, passwordHash: ByteArray): Int
 }
 
@@ -25,6 +26,10 @@ class UserUCImpl : UserUC {
         UserTable.select { UserTable.username.eq(username) }
             .mapNotNull { User(it[UserTable.id].value, it[UserTable.username], it[UserTable.passwordHash]) }
             .singleOrNull()
+    }
+
+    override fun usernameAvailable(username: String): Boolean {
+        return getUserByUsername(username) == null
     }
 
     override fun registerUser(username: String, passwordHash: ByteArray): Int = transaction {

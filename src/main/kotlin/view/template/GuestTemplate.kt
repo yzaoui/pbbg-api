@@ -20,7 +20,9 @@ open class GuestTemplate(private val pageTitle: String, private val member: Gues
             div(classes = "container") {
                 div(classes = "content") {
                     nav(classes = "sidebar") {
-                        +("[guest]")
+                        a(href = "/") {
+                            +"Index"
+                        }
                     }
                     main {
                         id = "main"
