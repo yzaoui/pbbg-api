@@ -1,6 +1,5 @@
 package route.web
 
-import at.favre.lib.crypto.bcrypt.BCrypt
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location
@@ -55,7 +54,7 @@ fun Route.register(userUC: UserUC) = route("/register") {
             // Relying on the fact that if either the username or password is null, the list of errors would not be empty
             val userId = userUC.registerUser(
                 username = usernameParam!!,
-                passwordHash = BCrypt.withDefaults().hash(12, passwordParam!!.toByteArray())
+                password = passwordParam!!
             )
 
             call.sessions.set(ApplicationSession(userId))

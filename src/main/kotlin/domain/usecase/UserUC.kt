@@ -1,5 +1,6 @@
 package miner.domain.usecase
 
+import at.favre.lib.crypto.bcrypt.BCrypt
 import miner.data.UserTable
 import miner.data.model.User
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -10,7 +11,8 @@ interface UserUC {
     fun getUserById(userId: Int): User?
     fun getUserByUsername(username: String): User?
     fun usernameAvailable(username: String): Boolean
-    fun registerUser(username: String, passwordHash: ByteArray): Int
+    fun registerUser(username: String, password: String): Int
+    fun getUserIdByCredentials(username: String, password: String): Int?
 }
 
 class UserUCImpl : UserUC {
@@ -32,10 +34,19 @@ class UserUCImpl : UserUC {
         return getUserByUsername(username) == null
     }
 
-    override fun registerUser(username: String, passwordHash: ByteArray): Int = transaction {
+    override fun registerUser(username: String, password: String): Int = transaction {
         UserTable.insertAndGetId {
             it[UserTable.username] = username
-            it[UserTable.passwordHash] = passwordHash
+            it[UserTable.passwordHash] = BCrypt.withDefaults().hash(12, password.toByteArray())
         }.value
+    }
+
+    override fun getUserIdByCredentials(username: String, password: String): Int? {
+        val user = getUserByUsername(username)
+        return if (user != null && BCrypt.verifyer().verify(password.toByteArray(), user.passwordHash).verified) {
+            user.id
+        } else {
+            null
+        }
     }
 }

@@ -1,6 +1,5 @@
 package route.web
 
-import at.favre.lib.crypto.bcrypt.BCrypt
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location
@@ -42,10 +41,10 @@ fun Route.login(userUC: UserUC) = route("/login") {
         val passwordParam = params["password"]
 
         if (usernameParam != null && passwordParam != null) {
-            val user = userUC.getUserByUsername(usernameParam)
+            val userId = userUC.getUserIdByCredentials(usernameParam, passwordParam)
 
-            if (user != null && BCrypt.verifyer().verify(passwordParam.toByteArray(), user.passwordHash).verified) {
-                call.sessions.set(ApplicationSession(user.id))
+            if (userId != null) {
+                call.sessions.set(ApplicationSession(userId))
                 call.respondRedirect(href(IndexLocation()))
             } else {
                 // TODO: Add errors here
