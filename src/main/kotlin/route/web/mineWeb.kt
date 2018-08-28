@@ -8,13 +8,13 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
-import miner.domain.usecase.MiningUC
-import miner.domain.usecase.UserUC
-import miner.href
-import miner.interceptSetUserOrRedirect
-import miner.loggedInUserKey
-import miner.memberPageVM
-import miner.view.minePage
+import pbbg.domain.usecase.MiningUC
+import pbbg.domain.usecase.UserUC
+import pbbg.href
+import pbbg.interceptSetUserOrRedirect
+import pbbg.loggedInUserKey
+import pbbg.memberPageVM
+import pbbg.view.minePage
 
 @Location("/mine")
 class MineWebLocation

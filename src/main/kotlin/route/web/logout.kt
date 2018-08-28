@@ -8,8 +8,8 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.sessions.clear
 import io.ktor.sessions.sessions
-import miner.ApplicationSession
-import miner.href
+import pbbg.ApplicationSession
+import pbbg.href
 
 @Location("/logout")
 class LogoutLocation

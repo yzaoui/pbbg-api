@@ -1,11 +1,11 @@
-package miner.domain.usecase
+package pbbg.domain.usecase
 
 import data.model.MineResultItem
-import miner.data.EquipmentTable
-import miner.data.MineContentsTable
-import miner.data.MineSessionTable
-import miner.data.UserTable
-import miner.data.model.*
+import pbbg.data.EquipmentTable
+import pbbg.data.MineContentsTable
+import pbbg.data.MineSessionTable
+import pbbg.data.UserTable
+import pbbg.data.model.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction

@@ -1,3 +1,3 @@
-package miner.view
+package pbbg.view
 
 class GuestPageVM()

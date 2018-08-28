@@ -1,9 +1,9 @@
-package miner.domain.usecase
+package pbbg.domain.usecase
 
 import data.model.Pickaxe
-import miner.data.EquipmentTable
-import miner.data.UserTable
-import miner.route.api.toItem
+import pbbg.data.EquipmentTable
+import pbbg.data.UserTable
+import pbbg.route.api.toItem
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.insert

@@ -11,12 +11,12 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
-import miner.ApplicationSession
-import miner.domain.usecase.UserUC
-import miner.href
-import miner.interceptGuestOnly
-import miner.view.GuestPageVM
-import miner.view.loginPage
+import pbbg.ApplicationSession
+import pbbg.domain.usecase.UserUC
+import pbbg.href
+import pbbg.interceptGuestOnly
+import pbbg.view.GuestPageVM
+import pbbg.view.loginPage
 
 @Location("/login")
 class LoginLocation

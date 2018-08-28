@@ -1,4 +1,4 @@
-package miner.data.model
+package pbbg.data.model
 
 /**
  * Represents the contents of a mine cell.

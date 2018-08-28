@@ -1,4 +1,4 @@
-package miner.view.model
+package pbbg.view.model
 
 data class MineVM(
     val width: Int,

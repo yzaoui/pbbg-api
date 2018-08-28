@@ -1,9 +1,8 @@
-package miner.view
+package pbbg.view
 
 import io.ktor.html.Template
 import kotlinx.html.*
-import miner.view.template.GuestTemplate
-import miner.view.template.MemberTemplate
+import pbbg.view.template.GuestTemplate
 
 fun loginPage(loginURL: String, registerURL: String, guestPageVM: GuestPageVM): Template<HTML> = GuestTemplate("Log in", guestPageVM).apply {
     content {

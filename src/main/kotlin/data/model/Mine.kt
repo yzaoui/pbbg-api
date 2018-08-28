@@ -1,4 +1,4 @@
-package miner.data.model
+package pbbg.data.model
 
 /**
  * Represents a mine entity.

@@ -1,12 +1,12 @@
-package miner.view
+package pbbg.view
 
 import io.ktor.html.Template
 import kotlinx.html.*
-import miner.PASSWORD_REGEX
-import miner.PASSWORD_REGEX_DESCRIPTION
-import miner.USERNAME_REGEX
-import miner.USERNAME_REGEX_DESCRIPTION
-import miner.view.template.GuestTemplate
+import pbbg.PASSWORD_REGEX
+import pbbg.PASSWORD_REGEX_DESCRIPTION
+import pbbg.USERNAME_REGEX
+import pbbg.USERNAME_REGEX_DESCRIPTION
+import pbbg.view.template.GuestTemplate
 
 fun registerPage(registerURL: String, loginURL: String, guestPageVM: GuestPageVM, errors: List<String>? = null): Template<HTML> = GuestTemplate("Register", guestPageVM).apply {
     content {

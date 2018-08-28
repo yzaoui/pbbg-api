@@ -1,10 +1,10 @@
-package miner.domain.usecase
+package pbbg.domain.usecase
 
-import miner.data.InventoryTable
-import miner.data.UserTable
-import miner.data.model.Inventory
-import miner.data.model.InventoryItem
-import miner.data.model.Item
+import pbbg.data.InventoryTable
+import pbbg.data.UserTable
+import pbbg.data.model.Inventory
+import pbbg.data.model.InventoryItem
+import pbbg.data.model.Item
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction

@@ -1,4 +1,4 @@
-package miner.route.api
+package pbbg.route.api
 
 import data.model.MineResultItem
 import io.ktor.application.call
@@ -11,13 +11,13 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
-import miner.*
-import miner.data.model.Mine
-import miner.data.model.MineEntity
-import miner.domain.usecase.MiningUC
-import miner.domain.usecase.UserUC
-import miner.view.model.MineItemVM
-import miner.view.model.MineVM
+import pbbg.*
+import pbbg.data.model.Mine
+import pbbg.data.model.MineEntity
+import pbbg.domain.usecase.MiningUC
+import pbbg.domain.usecase.UserUC
+import pbbg.view.model.MineItemVM
+import pbbg.view.model.MineVM
 
 @Location("/mine")
 class MineAPILocation

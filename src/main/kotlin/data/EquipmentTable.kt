@@ -1,4 +1,4 @@
-package miner.data
+package pbbg.data
 
 import data.model.Pickaxe
 import org.jetbrains.exposed.sql.Table

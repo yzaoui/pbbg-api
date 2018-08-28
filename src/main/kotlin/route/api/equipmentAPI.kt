@@ -1,18 +1,17 @@
-package miner.route.api
+package pbbg.route.api
 
 import com.google.gson.annotations.SerializedName
 import data.model.Pickaxe
 import io.ktor.application.call
-import io.ktor.locations.Location
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
-import miner.data.model.Item
-import miner.domain.usecase.EquipmentUC
-import miner.domain.usecase.UserUC
-import miner.interceptSetUserOr401
-import miner.loggedInUserKey
+import pbbg.data.model.Item
+import pbbg.domain.usecase.EquipmentUC
+import pbbg.domain.usecase.UserUC
+import pbbg.interceptSetUserOr401
+import pbbg.loggedInUserKey
 
 fun Route.equipmentAPI(userUC: UserUC, equipmentUC: EquipmentUC) = route("/equipment") {
     interceptSetUserOr401(userUC)

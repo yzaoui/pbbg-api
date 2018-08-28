@@ -1,6 +1,6 @@
-package miner.data
+package pbbg.data
 
-import miner.data.model.Item
+import pbbg.data.model.Item
 import org.jetbrains.exposed.sql.Table
 
 object InventoryTable : Table() {

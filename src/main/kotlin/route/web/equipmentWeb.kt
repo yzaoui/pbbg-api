@@ -1,4 +1,4 @@
-package miner.route.web
+package pbbg.route.web
 
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
@@ -6,12 +6,10 @@ import io.ktor.locations.Location
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
-import miner.domain.usecase.UserUC
-import miner.href
-import miner.interceptSetUserOrRedirect
-import miner.memberPageVM
-import miner.view.equipmentPage
-import route.web.IndexLocation
+import pbbg.domain.usecase.UserUC
+import pbbg.interceptSetUserOrRedirect
+import pbbg.memberPageVM
+import pbbg.view.equipmentPage
 
 @Location("/equipment")
 class EquipmentLocation

@@ -1,20 +1,19 @@
-package miner.route.api
+package pbbg.route.api
 
 import data.model.Pickaxe
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
-import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
-import miner.domain.usecase.EquipmentUC
-import miner.domain.usecase.UserUC
-import miner.interceptSetUserOr401
-import miner.loggedInUserKey
-import miner.respondError
-import miner.respondSuccess
+import pbbg.domain.usecase.EquipmentUC
+import pbbg.domain.usecase.UserUC
+import pbbg.interceptSetUserOr401
+import pbbg.loggedInUserKey
+import pbbg.respondError
+import pbbg.respondSuccess
 
 const val PICKAXE_PATH = "/pickaxe"
 @Location(PICKAXE_PATH)

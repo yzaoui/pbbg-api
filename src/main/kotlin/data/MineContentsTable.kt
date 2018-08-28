@@ -1,6 +1,6 @@
-package miner.data
+package pbbg.data
 
-import miner.data.model.MineEntity
+import pbbg.data.model.MineEntity
 import org.jetbrains.exposed.dao.IntIdTable
 
 object MineContentsTable : IntIdTable() {

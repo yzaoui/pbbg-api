@@ -1,6 +1,6 @@
-package miner.data.model
+package pbbg.data.model
 
-import miner.data.model.ItemType.*
+import pbbg.data.model.ItemType.*
 
 /**
  * Items that can go in the inventory.

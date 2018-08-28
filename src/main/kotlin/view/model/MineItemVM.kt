@@ -1,3 +1,3 @@
-package miner.view.model
+package pbbg.view.model
 
 data class MineItemVM(val imageURL: String)

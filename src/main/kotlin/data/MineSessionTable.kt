@@ -1,4 +1,4 @@
-package miner.data
+package pbbg.data
 
 import org.jetbrains.exposed.dao.IntIdTable
 

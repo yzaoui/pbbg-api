@@ -1,4 +1,4 @@
-package miner
+package pbbg
 
 const val USERNAME_MIN_LENGTH = 1
 const val USERNAME_MAX_LENGTH = 15

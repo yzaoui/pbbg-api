@@ -1,6 +1,6 @@
-package miner.data
+package pbbg.data
 
-import miner.USERNAME_MAX_LENGTH
+import pbbg.USERNAME_MAX_LENGTH
 import org.jetbrains.exposed.dao.IntIdTable
 
 object UserTable : IntIdTable() {

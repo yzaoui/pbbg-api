@@ -1,8 +1,8 @@
-package miner.domain.usecase
+package pbbg.domain.usecase
 
 import at.favre.lib.crypto.bcrypt.BCrypt
-import miner.data.UserTable
-import miner.data.model.User
+import pbbg.data.UserTable
+import pbbg.data.model.User
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select

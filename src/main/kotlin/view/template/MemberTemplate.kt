@@ -1,10 +1,10 @@
-package miner.view.template
+package pbbg.view.template
 
 import io.ktor.html.Placeholder
 import io.ktor.html.Template
 import io.ktor.html.insert
 import kotlinx.html.*
-import miner.view.MemberPageVM
+import pbbg.view.MemberPageVM
 
 open class MemberTemplate(private val pageTitle: String, private val memberPageVM: MemberPageVM) : Template<HTML> {
     val headContent = Placeholder<HEAD>()

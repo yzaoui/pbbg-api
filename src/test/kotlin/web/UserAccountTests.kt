@@ -1,16 +1,16 @@
-package miner.route.web
+package pbbg.route.web
 
 import io.ktor.http.*
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
-import miner.data.*
-import miner.domain.usecase.EquipmentUCImpl
-import miner.domain.usecase.InventoryUCImpl
-import miner.domain.usecase.MiningUCImpl
-import miner.domain.usecase.UserUCImpl
-import miner.mainWithDependencies
+import pbbg.data.*
+import pbbg.domain.usecase.EquipmentUCImpl
+import pbbg.domain.usecase.InventoryUCImpl
+import pbbg.domain.usecase.MiningUCImpl
+import pbbg.domain.usecase.UserUCImpl
+import pbbg.mainWithDependencies
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -47,7 +47,7 @@ class UserAccountTests {
         }
 
         val sessionCookie = parseServerSetCookieHeader(registerRequest.response.headers[HttpHeaders.SetCookie]!!)
-        assertEquals("miner_session", sessionCookie.name,"Register should return session cookie")
+        assertEquals("pbbg_session", sessionCookie.name,"Register should return session cookie")
 
         handleRequest(HttpMethod.Get, "/") {
             sessionCookie.toString()

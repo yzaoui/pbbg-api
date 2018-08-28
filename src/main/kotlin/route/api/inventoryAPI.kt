@@ -1,16 +1,16 @@
-package miner.route.api
+package pbbg.route.api
 
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
-import miner.data.model.Inventory
-import miner.data.model.InventoryItem
-import miner.domain.usecase.InventoryUC
-import miner.domain.usecase.UserUC
-import miner.interceptSetUserOr401
-import miner.loggedInUserKey
-import miner.respondSuccess
+import pbbg.data.model.Inventory
+import pbbg.data.model.InventoryItem
+import pbbg.domain.usecase.InventoryUC
+import pbbg.domain.usecase.UserUC
+import pbbg.interceptSetUserOr401
+import pbbg.loggedInUserKey
+import pbbg.respondSuccess
 
 fun Route.inventoryAPI(userUC: UserUC, inventoryUC: InventoryUC) = route("/inventory") {
     interceptSetUserOr401(userUC)

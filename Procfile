@@ -1,1 +1,1 @@
-web: java -jar build/libs/miner.jar
+web: java -jar build/libs/pbbg.jar

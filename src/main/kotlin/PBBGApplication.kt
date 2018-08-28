@@ -1,4 +1,4 @@
-package miner
+package pbbg
 
 import io.ktor.application.*
 import io.ktor.content.resources
@@ -21,17 +21,17 @@ import io.ktor.sessions.cookie
 import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import io.ktor.util.AttributeKey
-import miner.data.*
-import miner.data.model.User
-import miner.domain.usecase.*
-import miner.route.api.equipmentAPI
-import miner.route.api.inventoryAPI
-import miner.route.api.mine
-import miner.route.api.pickaxe
-import miner.route.web.equipmentWeb
-import miner.route.web.inventoryWeb
-import miner.view.ActionVM
-import miner.view.MemberPageVM
+import pbbg.data.*
+import pbbg.data.model.User
+import pbbg.domain.usecase.*
+import pbbg.route.api.equipmentAPI
+import pbbg.route.api.inventoryAPI
+import pbbg.route.api.mine
+import pbbg.route.api.pickaxe
+import pbbg.route.web.equipmentWeb
+import pbbg.route.web.inventoryWeb
+import pbbg.view.ActionVM
+import pbbg.view.MemberPageVM
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -63,7 +63,7 @@ fun Application.main() {
 
 fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC) {
     install(Sessions) {
-        cookie<ApplicationSession>("miner_session") {
+        cookie<ApplicationSession>("pbbg_session") {
             cookie.path = "/"
         }
     }

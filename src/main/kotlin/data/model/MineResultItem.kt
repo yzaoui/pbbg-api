@@ -1,6 +1,6 @@
 package data.model
 
-import miner.data.model.Item
+import pbbg.data.model.Item
 
 /**
  * Represents the result of a mining operation.

@@ -11,10 +11,10 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
-import miner.*
-import miner.domain.usecase.UserUC
-import miner.view.GuestPageVM
-import miner.view.registerPage
+import pbbg.*
+import pbbg.domain.usecase.UserUC
+import pbbg.view.GuestPageVM
+import pbbg.view.registerPage
 
 @Location("/register")
 class RegisterLocation

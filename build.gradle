@@ -65,7 +65,7 @@ kotlin {
 }
 
 shadowJar {
-    baseName = 'miner'
+    baseName = 'pbbg'
     classifier = null
     version = null
 }

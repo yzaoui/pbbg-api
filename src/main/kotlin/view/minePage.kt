@@ -1,10 +1,10 @@
-package miner.view
+package pbbg.view
 
 import io.ktor.html.Template
 import kotlinx.html.HTML
 import kotlinx.html.link
 import kotlinx.html.script
-import miner.view.template.MemberTemplate
+import pbbg.view.template.MemberTemplate
 
 fun minePage(memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Mine", memberPageVM).apply {
     headContent {

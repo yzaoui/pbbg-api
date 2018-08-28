@@ -6,16 +6,15 @@ import io.ktor.locations.Location
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
-import miner.domain.usecase.UserUC
-import miner.getMemberPageVM
-import miner.getUserUsingSession
-import miner.href
-import miner.route.web.EquipmentLocation
-import miner.route.web.InventoryLocation
-import miner.view.GuestPageVM
-import miner.view.MemberPageVM
-import miner.view.homeGuestPage
-import miner.view.homeMemberPage
+import pbbg.domain.usecase.UserUC
+import pbbg.getMemberPageVM
+import pbbg.getUserUsingSession
+import pbbg.href
+import pbbg.route.web.EquipmentLocation
+import pbbg.route.web.InventoryLocation
+import pbbg.view.GuestPageVM
+import pbbg.view.homeGuestPage
+import pbbg.view.homeMemberPage
 
 @Location("/")
 class IndexLocation
