@@ -17,10 +17,10 @@ interface MiningUC {
     fun mine(userId: Int, x: Int, y: Int): List<MineResultItem>?
 }
 
-class MiningUCImpl(private val inventoryUC: InventoryUC) : MiningUC {
+class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryUC) : MiningUC {
     private val random = Random()
 
-    override fun getMine(userId: Int): Mine? = transaction {
+    override fun getMine(userId: Int): Mine? = transaction(db) {
         val mineSession = MineSessionTable.select { MineSessionTable.userId.eq(userId) }
             .map { it.toMineSession() }
             .singleOrNull() ?: return@transaction null
@@ -40,7 +40,7 @@ class MiningUCImpl(private val inventoryUC: InventoryUC) : MiningUC {
             }
         }
 
-        transaction {
+        transaction(db) {
             val mineSessionId = MineSessionTable.insertAndGetId {
                 it[MineSessionTable.userId] = EntityID(userId, UserTable)
                 it[MineSessionTable.width] = width
@@ -58,7 +58,7 @@ class MiningUCImpl(private val inventoryUC: InventoryUC) : MiningUC {
         return Mine(width, height, itemEntries)
     }
 
-    override fun mine(userId: Int, x: Int, y: Int): List<MineResultItem>? = transaction {
+    override fun mine(userId: Int, x: Int, y: Int): List<MineResultItem>? = transaction(db) {
         val pickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
             .singleOrNull() ?: return@transaction null

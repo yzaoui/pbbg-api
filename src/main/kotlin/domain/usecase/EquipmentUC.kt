@@ -5,6 +5,7 @@ import miner.data.EquipmentTable
 import miner.data.UserTable
 import miner.route.api.toItem
 import org.jetbrains.exposed.dao.EntityID
+import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -16,8 +17,8 @@ interface EquipmentUC {
     fun generatePickaxe(userId: Int): Pickaxe?
 }
 
-class EquipmentUCImpl(private val inventoryUC: InventoryUC) : EquipmentUC {
-    override fun getPickaxe(userId: Int): Pickaxe? = transaction {
+class EquipmentUCImpl(private val db: Database, private val inventoryUC: InventoryUC) : EquipmentUC {
+    override fun getPickaxe(userId: Int): Pickaxe? = transaction(db) {
         EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
             .singleOrNull()
@@ -27,7 +28,7 @@ class EquipmentUCImpl(private val inventoryUC: InventoryUC) : EquipmentUC {
         return Pickaxe.values()
     }
 
-    override fun generatePickaxe(userId: Int): Pickaxe? = transaction {
+    override fun generatePickaxe(userId: Int): Pickaxe? = transaction(db) {
         // TODO: Do something if this user already has a pickaxe
         val pickaxe = Pickaxe.values()[Random().nextInt(Pickaxe.values().size)]
 

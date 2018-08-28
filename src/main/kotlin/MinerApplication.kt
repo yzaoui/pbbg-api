@@ -1,12 +1,10 @@
 package miner
 
-import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
 import io.ktor.content.resources
 import io.ktor.content.static
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
-import io.ktor.freemarker.FreeMarker
 import io.ktor.gson.gson
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Locations
@@ -47,27 +45,29 @@ val loggedInUserKey = AttributeKey<User>("loggedInUser")
 val memberPageVM = AttributeKey<MemberPageVM>("memberPageVM")
 
 fun Application.main() {
-    Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
+    val db = Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
     transaction {
         addLogger(Slf4jSqlDebugLogger)
         SchemaUtils.create(UserTable, MineSessionTable, MineContentsTable, EquipmentTable, InventoryTable)
     }
 
-    val userUC = UserUCImpl()
-    val inventoryUC = InventoryUCImpl()
-    val miningUC = MiningUCImpl(inventoryUC)
-    val equipmentUC = EquipmentUCImpl(inventoryUC)
-
     install(CallLogging)
-    install(Locations)
-    install(FreeMarker) {
-        templateLoader = ClassTemplateLoader(this::class.java.classLoader, "")
-    }
+
+    val userUC = UserUCImpl(db)
+    val inventoryUC = InventoryUCImpl(db)
+    val miningUC = MiningUCImpl(db, inventoryUC)
+    val equipmentUC = EquipmentUCImpl(db, inventoryUC)
+
+    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC)
+}
+
+fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC) {
     install(Sessions) {
         cookie<ApplicationSession>("miner_session") {
             cookie.path = "/"
         }
     }
+    install(Locations)
     install(ContentNegotiation) {
         gson {
             serializeNulls()

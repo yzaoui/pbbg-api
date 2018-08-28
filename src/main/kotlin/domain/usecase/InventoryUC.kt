@@ -14,8 +14,8 @@ interface InventoryUC {
     fun storeInInventory(userId: Int, item: Item, quantity: Int)
 }
 
-class InventoryUCImpl : InventoryUC {
-    override fun getInventory(userId: Int): Inventory = transaction {
+class InventoryUCImpl(private val db: Database) : InventoryUC {
+    override fun getInventory(userId: Int): Inventory = transaction(db) {
         // TODO: Consider checking if user exists
         val items = InventoryTable.select { InventoryTable.userId.eq(userId) }
             .map { it.toInventoryItem() }
@@ -23,7 +23,7 @@ class InventoryUCImpl : InventoryUC {
         Inventory(items)
     }
 
-    override fun storeInInventory(userId: Int, item: Item, quantity: Int): Unit = transaction {
+    override fun storeInInventory(userId: Int, item: Item, quantity: Int): Unit = transaction(db) {
         // TODO: Consider checking if user exists
         val entry = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.item.eq(item) }
             .map { it.toInventoryItem() }
