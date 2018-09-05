@@ -5,7 +5,8 @@ import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
-import com.google.gson.annotations.SerializedName
+import com.bitwiserain.pbbg.view.model.EquipmentJSON
+import com.bitwiserain.pbbg.view.model.ItemJSON
 import io.ktor.application.call
 import io.ktor.response.respond
 import io.ktor.routing.Route
@@ -24,15 +25,7 @@ fun Route.equipmentAPI(userUC: UserUC, equipmentUC: EquipmentUC) = route("/equip
     }
 }
 
-data class EquipmentJSON(
-    @SerializedName("pickaxe") val pickaxe: ItemJSON?
-)
-data class ItemJSON(
-    @SerializedName("typeId") val typeId: Int,
-    @SerializedName("friendlyName") val friendlyName: String,
-    @SerializedName("imgURL") val imgURL: String
-)
-
+// TODO: Find appropriate place for this adapter
 fun Item.toJSON() = ItemJSON(
     typeId = ordinal,
     friendlyName = friendlyName,

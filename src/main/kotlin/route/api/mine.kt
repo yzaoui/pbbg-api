@@ -2,11 +2,11 @@ package com.bitwiserain.pbbg.route.api
 
 import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.model.mine.Mine
-import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.view.model.mine.MineItemVM
+import com.bitwiserain.pbbg.view.model.mine.MineActionResultVM
 import com.bitwiserain.pbbg.view.model.mine.MineVM
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -43,7 +43,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
             val results = miningUC.submitMineAction(loggedInUser.id, x, y)
             if (results != null) {
-                call.respondSuccess(MineResultItemsJSON(results))
+                call.respondSuccess(MineActionResultVM(results))
             } else {
                 call.respond(HttpStatusCode.Accepted)
             }
@@ -65,14 +65,14 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
     }
 }
 
-data class MineResultItemsJSON(val results: List<MineActionResult>)
-
+// TODO: Find appropriate place for this adapter
 private fun Mine.toVM() = MineVM(
     width = width,
     height = height,
     cells = List(height) { y -> List(width) { x -> grid[x to y]?.toVM() } }
 )
 
+// TODO: Find appropriate place for this adapter
 private fun MineEntity.toVM() = MineItemVM(
     imageURL = when (this) {
         MineEntity.ROCK -> "/img/mine/rock.png"

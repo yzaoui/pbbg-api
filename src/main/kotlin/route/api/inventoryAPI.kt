@@ -7,6 +7,8 @@ import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondSuccess
+import com.bitwiserain.pbbg.view.model.InventoryItemJSON
+import com.bitwiserain.pbbg.view.model.InventoryJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get
@@ -24,12 +26,12 @@ fun Route.inventoryAPI(userUC: UserUC, inventoryUC: InventoryUC) = route("/inven
     }
 }
 
-private data class InventoryJSON(val inventoryEntries: List<InventoryItemJSON>)
+// TODO: Find appropriate place for this adapter
 private fun Inventory.toJSON() = InventoryJSON(
     inventoryEntries = this.entries.map { it.toJSON() }
 )
 
-private data class InventoryItemJSON(val item: ItemJSON, val quantity: Int)
+// TODO: Find appropriate place for this adapter
 private fun InventoryEntry.toJSON() = InventoryItemJSON(
     item = item.toJSON(),
     quantity = quantity

@@ -7,6 +7,7 @@ import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondError
 import com.bitwiserain.pbbg.respondSuccess
+import com.bitwiserain.pbbg.view.model.mine.PickaxeJSON
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
@@ -56,5 +57,9 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
     }
 }
 
-data class PickaxeJSON(val id: Int, val type: String, val cells: List<IntArray>)
-fun Pickaxe.toJSON() = PickaxeJSON(this.ordinal, type, cells.map { kotlin.intArrayOf(it.first, it.second) })
+// TODO: Find appropriate place for this adapter
+fun Pickaxe.toJSON() = PickaxeJSON(
+    id = this.ordinal,
+    type = type,
+    cells = cells.map { intArrayOf(it.first, it.second) }
+)
