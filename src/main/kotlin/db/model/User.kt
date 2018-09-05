@@ -1,8 +1,15 @@
-package pbbg.data.model
+package com.bitwiserain.pbbg.db.model
 
 import java.util.*
 
-data class User(
+/**
+ * Represents user account.
+ *
+ * @property id Unique identifier for this user.
+ * @property username Unique name chosen by the user.
+ * @property passwordHash The user's password hashed to be stored.
+ */
+data class User( // TODO: This class is being used across multiple layers
     val id: Int,
     val username: String,
     val passwordHash: ByteArray

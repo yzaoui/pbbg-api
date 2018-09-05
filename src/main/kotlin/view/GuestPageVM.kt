@@ -1,3 +1,3 @@
-package pbbg.view
+package com.bitwiserain.pbbg.view
 
-class GuestPageVM()
+class GuestPageVM

@@ -1,10 +1,10 @@
-package pbbg.view
+package com.bitwiserain.pbbg.view
 
+import com.bitwiserain.pbbg.view.template.GuestTemplate
 import io.ktor.html.Template
 import kotlinx.html.HTML
 import kotlinx.html.a
 import kotlinx.html.br
-import pbbg.view.template.GuestTemplate
 
 fun homeGuestPage(registerURL: String, loginURL: String, guestPageVM: GuestPageVM): Template<HTML> = GuestTemplate("Home", guestPageVM).apply {
     content {

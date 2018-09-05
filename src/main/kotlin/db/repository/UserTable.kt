@@ -1,6 +1,6 @@
-package pbbg.data
+package com.bitwiserain.pbbg.db.repository
 
-import pbbg.USERNAME_MAX_LENGTH
+import com.bitwiserain.pbbg.USERNAME_MAX_LENGTH
 import org.jetbrains.exposed.dao.IntIdTable
 
 object UserTable : IntIdTable() {

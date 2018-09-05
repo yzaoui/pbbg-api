@@ -1,8 +1,8 @@
-package pbbg.view
+package com.bitwiserain.pbbg.view
 
+import com.bitwiserain.pbbg.view.template.GuestTemplate
 import io.ktor.html.Template
 import kotlinx.html.*
-import pbbg.view.template.GuestTemplate
 
 fun loginPage(loginURL: String, registerURL: String, guestPageVM: GuestPageVM): Template<HTML> = GuestTemplate("Log in", guestPageVM).apply {
     content {

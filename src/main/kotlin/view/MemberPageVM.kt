@@ -1,5 +1,5 @@
-package pbbg.view
+package com.bitwiserain.pbbg.view
 
-import pbbg.data.model.User
+import com.bitwiserain.pbbg.db.model.User
 
 data class MemberPageVM(val user: User, val home: ActionVM, val logout: ActionVM)

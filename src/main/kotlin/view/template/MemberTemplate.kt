@@ -1,10 +1,10 @@
-package pbbg.view.template
+package com.bitwiserain.pbbg.view.template
 
+import com.bitwiserain.pbbg.view.MemberPageVM
 import io.ktor.html.Placeholder
 import io.ktor.html.Template
 import io.ktor.html.insert
 import kotlinx.html.*
-import pbbg.view.MemberPageVM
 
 open class MemberTemplate(private val pageTitle: String, private val memberPageVM: MemberPageVM) : Template<HTML> {
     val headContent = Placeholder<HEAD>()

@@ -1,4 +1,4 @@
-package pbbg.data
+package com.bitwiserain.pbbg.db.repository
 
 import org.jetbrains.exposed.dao.IntIdTable
 

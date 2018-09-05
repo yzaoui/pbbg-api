@@ -1,6 +1,6 @@
-package pbbg.data
+package com.bitwiserain.pbbg.db.repository
 
-import pbbg.data.model.Item
+import com.bitwiserain.pbbg.domain.model.Item
 import org.jetbrains.exposed.sql.Table
 
 object InventoryTable : Table() {

@@ -1,6 +1,13 @@
-package pbbg.route.api
+package com.bitwiserain.pbbg.route.api
 
-import data.model.MineResultItem
+import com.bitwiserain.pbbg.*
+import com.bitwiserain.pbbg.domain.model.mine.Mine
+import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
+import com.bitwiserain.pbbg.domain.model.mine.MineEntity
+import com.bitwiserain.pbbg.domain.usecase.MiningUC
+import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.view.model.MineItemVM
+import com.bitwiserain.pbbg.view.model.MineVM
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
@@ -11,13 +18,6 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
-import pbbg.*
-import pbbg.data.model.Mine
-import pbbg.data.model.MineEntity
-import pbbg.domain.usecase.MiningUC
-import pbbg.domain.usecase.UserUC
-import pbbg.view.model.MineItemVM
-import pbbg.view.model.MineVM
 
 @Location("/mine")
 class MineAPILocation
@@ -41,7 +41,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
             val (x: Int, y: Int)= call.receive(MinePositionParams::class)
 
-            val results = miningUC.mine(loggedInUser.id, x, y)
+            val results = miningUC.submitMineAction(loggedInUser.id, x, y)
             if (results != null) {
                 call.respondSuccess(MineResultItemsJSON(results))
             } else {
@@ -65,7 +65,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
     }
 }
 
-data class MineResultItemsJSON(val results: List<MineResultItem>)
+data class MineResultItemsJSON(val results: List<MineActionResult>)
 
 private fun Mine.toVM() = MineVM(
     width = width,

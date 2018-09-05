@@ -1,17 +1,16 @@
-package pbbg.route.api
+package com.bitwiserain.pbbg.route.api
 
+import com.bitwiserain.pbbg.domain.model.Item
+import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
+import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.interceptSetUserOr401
+import com.bitwiserain.pbbg.loggedInUserKey
 import com.google.gson.annotations.SerializedName
-import data.model.Pickaxe
 import io.ktor.application.call
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
-import pbbg.data.model.Item
-import pbbg.domain.usecase.EquipmentUC
-import pbbg.domain.usecase.UserUC
-import pbbg.interceptSetUserOr401
-import pbbg.loggedInUserKey
 
 fun Route.equipmentAPI(userUC: UserUC, equipmentUC: EquipmentUC) = route("/equipment") {
     interceptSetUserOr401(userUC)
@@ -33,12 +32,6 @@ data class ItemJSON(
     @SerializedName("friendlyName") val friendlyName: String,
     @SerializedName("imgURL") val imgURL: String
 )
-
-fun Pickaxe.toItem() = when (this) {
-    Pickaxe.PLUS -> Item.PLUS_PICKAXE
-    Pickaxe.CROSS -> Item.CROSS_PICKAXE
-    Pickaxe.SQUARE -> Item.SQUARE_PICKAXE
-}
 
 fun Item.toJSON() = ItemJSON(
     typeId = ordinal,

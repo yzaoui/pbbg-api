@@ -1,16 +1,16 @@
 package pbbg.route.web
 
+import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
+import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
+import com.bitwiserain.pbbg.db.usecase.MiningUCImpl
+import com.bitwiserain.pbbg.db.usecase.UserUCImpl
+import com.bitwiserain.pbbg.mainWithDependencies
 import io.ktor.http.*
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
-import pbbg.data.*
-import pbbg.domain.usecase.EquipmentUCImpl
-import pbbg.domain.usecase.InventoryUCImpl
-import pbbg.domain.usecase.MiningUCImpl
-import pbbg.domain.usecase.UserUCImpl
-import pbbg.mainWithDependencies
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -30,7 +30,7 @@ class UserAccountTests {
 
     init {
         transaction(db) {
-            SchemaUtils.create(UserTable, MineSessionTable, MineContentsTable, EquipmentTable, InventoryTable)
+            SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable)
         }
     }
 

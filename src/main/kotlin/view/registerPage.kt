@@ -1,12 +1,12 @@
-package pbbg.view
+package com.bitwiserain.pbbg.view
 
+import com.bitwiserain.pbbg.PASSWORD_REGEX
+import com.bitwiserain.pbbg.PASSWORD_REGEX_DESCRIPTION
+import com.bitwiserain.pbbg.USERNAME_REGEX
+import com.bitwiserain.pbbg.USERNAME_REGEX_DESCRIPTION
+import com.bitwiserain.pbbg.view.template.GuestTemplate
 import io.ktor.html.Template
 import kotlinx.html.*
-import pbbg.PASSWORD_REGEX
-import pbbg.PASSWORD_REGEX_DESCRIPTION
-import pbbg.USERNAME_REGEX
-import pbbg.USERNAME_REGEX_DESCRIPTION
-import pbbg.view.template.GuestTemplate
 
 fun registerPage(registerURL: String, loginURL: String, guestPageVM: GuestPageVM, errors: List<String>? = null): Template<HTML> = GuestTemplate("Register", guestPageVM).apply {
     content {

@@ -1,8 +1,8 @@
-package pbbg.view
+package com.bitwiserain.pbbg.view
 
+import com.bitwiserain.pbbg.view.template.MemberTemplate
 import io.ktor.html.Template
 import kotlinx.html.*
-import pbbg.view.template.MemberTemplate
 
 fun equipmentPage(memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Equipment", memberPageVM).apply {
     headContent {

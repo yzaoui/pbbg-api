@@ -1,5 +1,9 @@
-package route.web
+package com.bitwiserain.pbbg.route.web
 
+import com.bitwiserain.pbbg.*
+import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.view.GuestPageVM
+import com.bitwiserain.pbbg.view.registerPage
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location
@@ -11,10 +15,6 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
-import pbbg.*
-import pbbg.domain.usecase.UserUC
-import pbbg.view.GuestPageVM
-import pbbg.view.registerPage
 
 @Location("/register")
 class RegisterLocation

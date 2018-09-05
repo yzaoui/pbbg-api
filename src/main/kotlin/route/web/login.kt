@@ -1,5 +1,11 @@
-package route.web
+package com.bitwiserain.pbbg.route.web
 
+import com.bitwiserain.pbbg.ApplicationSession
+import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.href
+import com.bitwiserain.pbbg.interceptGuestOnly
+import com.bitwiserain.pbbg.view.GuestPageVM
+import com.bitwiserain.pbbg.view.loginPage
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location
@@ -11,12 +17,6 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
-import pbbg.ApplicationSession
-import pbbg.domain.usecase.UserUC
-import pbbg.href
-import pbbg.interceptGuestOnly
-import pbbg.view.GuestPageVM
-import pbbg.view.loginPage
 
 @Location("/login")
 class LoginLocation

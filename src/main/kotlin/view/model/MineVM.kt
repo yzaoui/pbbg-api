@@ -1,4 +1,4 @@
-package pbbg.view.model
+package com.bitwiserain.pbbg.view.model
 
 data class MineVM(
     val width: Int,

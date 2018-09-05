@@ -1,5 +1,22 @@
-package pbbg
+package com.bitwiserain.pbbg
 
+import com.bitwiserain.pbbg.db.model.User
+import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
+import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
+import com.bitwiserain.pbbg.db.usecase.MiningUCImpl
+import com.bitwiserain.pbbg.db.usecase.UserUCImpl
+import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
+import com.bitwiserain.pbbg.domain.usecase.InventoryUC
+import com.bitwiserain.pbbg.domain.usecase.MiningUC
+import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.route.api.equipmentAPI
+import com.bitwiserain.pbbg.route.api.inventoryAPI
+import com.bitwiserain.pbbg.route.api.mine
+import com.bitwiserain.pbbg.route.api.pickaxe
+import com.bitwiserain.pbbg.route.web.*
+import com.bitwiserain.pbbg.view.ActionVM
+import com.bitwiserain.pbbg.view.MemberPageVM
 import io.ktor.application.*
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
@@ -21,24 +38,12 @@ import io.ktor.sessions.cookie
 import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import io.ktor.util.AttributeKey
-import pbbg.data.*
-import pbbg.data.model.User
-import pbbg.domain.usecase.*
-import pbbg.route.api.equipmentAPI
-import pbbg.route.api.inventoryAPI
-import pbbg.route.api.mine
-import pbbg.route.api.pickaxe
-import pbbg.route.web.equipmentWeb
-import pbbg.route.web.inventoryWeb
-import pbbg.view.ActionVM
-import pbbg.view.MemberPageVM
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Slf4jSqlDebugLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
-import route.web.*
 
 data class ApplicationSession(val userId: Int)
 val loggedInUserKey = AttributeKey<User>("loggedInUser")
@@ -48,7 +53,7 @@ fun Application.main() {
     val db = Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
     transaction {
         addLogger(Slf4jSqlDebugLogger)
-        SchemaUtils.create(UserTable, MineSessionTable, MineContentsTable, EquipmentTable, InventoryTable)
+        SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable)
     }
 
     install(CallLogging)

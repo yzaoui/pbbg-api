@@ -1,6 +1,12 @@
-package pbbg.route.api
+package com.bitwiserain.pbbg.route.api
 
-import data.model.Pickaxe
+import com.bitwiserain.pbbg.domain.model.Pickaxe
+import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
+import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.interceptSetUserOr401
+import com.bitwiserain.pbbg.loggedInUserKey
+import com.bitwiserain.pbbg.respondError
+import com.bitwiserain.pbbg.respondSuccess
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
@@ -8,12 +14,6 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
-import pbbg.domain.usecase.EquipmentUC
-import pbbg.domain.usecase.UserUC
-import pbbg.interceptSetUserOr401
-import pbbg.loggedInUserKey
-import pbbg.respondError
-import pbbg.respondSuccess
 
 const val PICKAXE_PATH = "/pickaxe"
 @Location(PICKAXE_PATH)
