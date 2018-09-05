@@ -76,5 +76,6 @@ private fun Mine.toVM() = MineVM(
 private fun MineEntity.toVM() = MineItemVM(
     imageURL = when (this) {
         MineEntity.ROCK -> "/img/mine/rock.png"
+        MineEntity.COAL -> "/img/mine/coal.png"
     }
 )

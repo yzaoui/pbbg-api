@@ -101,6 +101,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         val roll = random.nextFloat()
         return when {
             roll <= 0.05 -> MineEntity.ROCK
+            roll <= 0.06 -> MineEntity.COAL
             else -> null
         }
     }
@@ -108,6 +109,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
     private fun MineEntity.toItem(): Item {
         return when (this) {
             MineEntity.ROCK -> Item.STONE
+            MineEntity.COAL -> Item.COAL
         }
     }
 

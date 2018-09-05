@@ -7,6 +7,7 @@ import pbbg.data.model.ItemType.*
  */
 enum class Item(val type: ItemType, val friendlyName: String, val spriteName: String) {
     STONE(MATERIAL, "Stone", "stone"),
+    COAL(MATERIAL, "Coal", "coal"),
     PLUS_PICKAXE(PICKAXE, "Plus-shaped Pickaxe", "plus_pickaxe"),
     CROSS_PICKAXE(PICKAXE, "Cross-shaped Pickaxe", "cross_pickaxe"),
     SQUARE_PICKAXE(PICKAXE, "Square-shaped Pickaxe", "square_pickaxe")
