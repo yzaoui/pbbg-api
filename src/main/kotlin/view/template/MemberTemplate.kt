@@ -40,7 +40,7 @@ open class MemberTemplate(private val pageTitle: String, private val memberPageV
                     }
                 }
                 footer {
-                    +"Some copyright-like text"
+                    +"BitwiseRain © 2018"
                 }
             }
             insert(endOfBody)
