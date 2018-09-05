@@ -1,12 +1,12 @@
 package pbbg
 
 import io.ktor.application.*
-import io.ktor.content.resources
-import io.ktor.content.static
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.gson.gson
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.resources
+import io.ktor.http.content.static
 import io.ktor.locations.Locations
 import io.ktor.locations.locations
 import io.ktor.pipeline.PipelineContext
