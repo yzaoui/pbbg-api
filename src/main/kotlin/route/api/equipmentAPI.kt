@@ -36,5 +36,5 @@ data class ItemJSON(
 fun Item.toJSON() = ItemJSON(
     typeId = ordinal,
     friendlyName = friendlyName,
-    imgURL = "/img/item/$spriteName.png"
+    imgURL = "/img/item/$spriteName-64.png"
 )

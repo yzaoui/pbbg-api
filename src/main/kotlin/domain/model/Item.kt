@@ -8,7 +8,7 @@ import com.bitwiserain.pbbg.domain.model.ItemCategory.*
 enum class Item(val category: ItemCategory, val friendlyName: String, val spriteName: String) {
     STONE(MATERIAL, "Stone", "stone"),
     COAL(MATERIAL, "Coal", "coal"),
-    PLUS_PICKAXE(PICKAXE, "Plus-shaped Pickaxe", "plus_pickaxe"),
-    CROSS_PICKAXE(PICKAXE, "Cross-shaped Pickaxe", "cross_pickaxe"),
-    SQUARE_PICKAXE(PICKAXE, "Square-shaped Pickaxe", "square_pickaxe")
+    PLUS_PICKAXE(PICKAXE, "Plus-shaped Pickaxe", "plus-pickaxe"),
+    CROSS_PICKAXE(PICKAXE, "Cross-shaped Pickaxe", "cross-pickaxe"),
+    SQUARE_PICKAXE(PICKAXE, "Square-shaped Pickaxe", "square-pickaxe")
 }
