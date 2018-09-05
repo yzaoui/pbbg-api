@@ -14,6 +14,12 @@ open class GuestTemplate(private val pageTitle: String, private val member: Gues
         head {
             title { +pageTitle }
             link(href = "/css/common.css", rel = "stylesheet")
+            link(rel = "icon", href = "/img/favicon-16.png", type = "image/png") {
+                sizes = "16x16"
+            }
+            link(rel = "icon", href = "/img/favicon-32.png", type = "image/png") {
+                sizes = "32x32"
+            }
             insert(headContent)
         }
         body {

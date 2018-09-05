@@ -14,6 +14,12 @@ open class MemberTemplate(private val pageTitle: String, private val memberPageV
         head {
             title { +pageTitle }
             link(href = "/css/common.css", rel = "stylesheet")
+            link(rel = "icon", href = "/img/favicon-16.png", type = "image/png") {
+                sizes = "16x16"
+            }
+            link(rel = "icon", href = "/img/favicon-32.png", type = "image/png") {
+                sizes = "32x32"
+            }
             insert(headContent)
         }
         body {
