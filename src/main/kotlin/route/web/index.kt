@@ -5,8 +5,8 @@ import com.bitwiserain.pbbg.getMemberPageVM
 import com.bitwiserain.pbbg.getUserUsingSession
 import com.bitwiserain.pbbg.href
 import com.bitwiserain.pbbg.view.GuestPageVM
-import com.bitwiserain.pbbg.view.homeGuestPage
-import com.bitwiserain.pbbg.view.homeMemberPage
+import com.bitwiserain.pbbg.view.page.homeGuestPage
+import com.bitwiserain.pbbg.view.page.homeMemberPage
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location

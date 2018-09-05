@@ -6,7 +6,7 @@ import com.bitwiserain.pbbg.href
 import com.bitwiserain.pbbg.interceptSetUserOrRedirect
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.memberPageVM
-import com.bitwiserain.pbbg.view.minePage
+import com.bitwiserain.pbbg.view.page.minePage
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location
