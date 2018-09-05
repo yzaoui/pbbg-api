@@ -1,0 +1,27 @@
+.inventory-list {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    border: 1px solid black;
+}
+
+.inventory-list-item {
+    margin: 2px;
+    list-style-type: none;
+}
+
+.inventory-list-item > img {
+    width: 32px;
+    height: 32px;
+    border: 1px solid black;
+}
+
+.inventory-list-item > div {
+    display: none;
+    position: absolute;
+    background: white;
+}
+
+.inventory-list-item:hover > div {
+    display: block;
+}

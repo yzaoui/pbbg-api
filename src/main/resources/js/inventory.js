@@ -15,15 +15,18 @@ window.onload = async () => {
         loadingMessage.parentNode.replaceChild(noItems, loadingMessage)
     } else {
         const itemList = document.createElement("ul");
+        itemList.className = "inventory-list";
         loadingMessage.parentNode.replaceChild(itemList, loadingMessage);
 
         inventoryEntries.forEach(({ item, quantity }) => {
             const itemImg = document.createElement("img");
             itemImg.src = item.imgURL;
 
-            const itemInfo = document.createTextNode(`${item.friendlyName} ×${quantity}`);
+            const itemInfo = document.createElement("div");
+            itemInfo.innerText = `${item.friendlyName} ×${quantity}`;
 
             const li = document.createElement("li");
+            li.className = "inventory-list-item";
             li.appendChild(itemImg);
             li.appendChild(itemInfo);
 
