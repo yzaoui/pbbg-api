@@ -13,7 +13,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 class EquipmentUCImpl(private val db: Database, private val inventoryUC: InventoryUC) : EquipmentUC {
-    override fun getPickaxe(userId: Int): Pickaxe? = transaction(db) {
+    override fun getEquippedPickaxe(userId: Int): Pickaxe? = transaction(db) {
         EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
             .singleOrNull()

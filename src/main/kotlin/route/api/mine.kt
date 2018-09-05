@@ -5,8 +5,8 @@ import com.bitwiserain.pbbg.domain.model.mine.Mine
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.view.model.mine.MineItemJSON
-import com.bitwiserain.pbbg.view.model.mine.MineActionResultJSON
+import com.bitwiserain.pbbg.view.model.mine.MineEntityJSON
+import com.bitwiserain.pbbg.view.model.mine.MineActionResultsJSON
 import com.bitwiserain.pbbg.view.model.mine.MineJSON
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -43,7 +43,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
             val results = miningUC.submitMineAction(loggedInUser.id, x, y)
             if (results != null) {
-                call.respondSuccess(MineActionResultJSON(results))
+                call.respondSuccess(MineActionResultsJSON(results))
             } else {
                 call.respond(HttpStatusCode.Accepted)
             }
@@ -73,7 +73,7 @@ private fun Mine.toVM() = MineJSON(
 )
 
 // TODO: Find appropriate place for this adapter
-private fun MineEntity.toVM() = MineItemJSON(
+private fun MineEntity.toVM() = MineEntityJSON(
     imageURL = when (this) {
         MineEntity.ROCK -> "/img/mine/rock.png"
         MineEntity.COAL -> "/img/mine/coal.png"

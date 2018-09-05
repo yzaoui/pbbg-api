@@ -156,7 +156,7 @@ const setupPickaxeAndResultsList = async () => {
         const miningGrid = document.getElementById("mining-grid");
         equippedPickaxe = data;
 
-        main.appendChild(createEquippedPickaxeDisplay(equippedPickaxe.type));
+        main.appendChild(createEquippedPickaxeDisplay(equippedPickaxe.pickaxeKind));
 
         const resultsList = document.createElement("ul");
         resultsList.id = "results-list";

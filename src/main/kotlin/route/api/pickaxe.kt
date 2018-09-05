@@ -31,7 +31,7 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
         get {
             val loggedInUser = call.attributes[loggedInUserKey]
 
-            val pickaxe = equipmentUC.getPickaxe(loggedInUser.id)
+            val pickaxe = equipmentUC.getEquippedPickaxe(loggedInUser.id)
 
             call.respondSuccess(pickaxe?.toJSON())
         }
@@ -49,6 +49,7 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
         }
     }
 
+    //TODO: Unused so far
     route(PICKAXE_ALL_PATH) {
         get {
             val pickaxes = equipmentUC.getAllPickaxes().map { it.toJSON() }
@@ -59,7 +60,6 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
 
 // TODO: Find appropriate place for this adapter
 fun Pickaxe.toJSON() = PickaxeJSON(
-    id = this.ordinal,
-    type = type,
+    pickaxeKind = type,
     cells = cells.map { intArrayOf(it.first, it.second) }
 )

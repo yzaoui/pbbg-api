@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.domain.model
 
 /**
- * Represents possible categories of items.
+ * Category that an item belongs to.
  */
 enum class ItemCategory {
     MATERIAL,
