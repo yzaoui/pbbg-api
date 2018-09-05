@@ -6,8 +6,8 @@ import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.view.model.MineItemVM
-import com.bitwiserain.pbbg.view.model.MineVM
+import com.bitwiserain.pbbg.view.model.mine.MineItemVM
+import com.bitwiserain.pbbg.view.model.mine.MineVM
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
