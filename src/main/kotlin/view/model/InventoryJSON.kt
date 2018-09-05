@@ -1,3 +1,7 @@
 package com.bitwiserain.pbbg.view.model
 
-data class InventoryJSON(val inventoryEntries: List<InventoryItemJSON>)
+import com.google.gson.annotations.SerializedName
+
+data class InventoryJSON(
+    @SerializedName("inventoryEntries") val inventoryEntries: List<InventoryItemJSON>
+)

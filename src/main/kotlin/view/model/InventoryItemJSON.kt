@@ -1,6 +1,8 @@
 package com.bitwiserain.pbbg.view.model
 
+import com.google.gson.annotations.SerializedName
+
 data class InventoryItemJSON(
-    val item: ItemJSON,
-    val quantity: Int
+    @SerializedName("item") val item: ItemJSON,
+    @SerializedName("quantity") val quantity: Int
 )

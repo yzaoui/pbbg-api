@@ -1,3 +1,7 @@
 package com.bitwiserain.pbbg.view.model.mine
 
-data class MineItemVM(val imageURL: String)
+import com.google.gson.annotations.SerializedName
+
+data class MineItemVM(
+    @SerializedName("imageURL") val imageURL: String
+)
