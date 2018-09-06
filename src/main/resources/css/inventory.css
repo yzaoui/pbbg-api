@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     display: flex;
-    border: 1px solid black;
+    border: 1px solid #717171;
 }
 
 .inventory-list-item {
@@ -11,15 +11,19 @@
 }
 
 .inventory-list-item > img {
+    display: block;
+    padding: 1px;
     width: 32px;
     height: 32px;
     border: 1px solid black;
+    border-left: 3px solid black;
 }
 
 .inventory-list-item > div {
+    width: 180px;
     display: none;
     position: absolute;
-    background: white;
+    background: rgba(255, 255, 255, 0.65);
 }
 
 .inventory-list-item:hover > div {
