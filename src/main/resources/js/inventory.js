@@ -5,11 +5,9 @@ window.onload = async () => {
     loadingMessage.innerText = "Loading...";
     main.appendChild(loadingMessage);
 
-    const { status, data } = await (await fetch("/api/inventory")).json();
+    const { status, data: items } = await (await fetch("/api/inventory")).json();
 
-    const { inventoryEntries } = data;
-
-    if (inventoryEntries.length === 0) {
+    if (items.length === 0) {
         const noItems = document.createElement("div");
         noItems.innerText = "You have no items. Try looking around for some!";
         loadingMessage.parentNode.replaceChild(noItems, loadingMessage)
@@ -18,12 +16,11 @@ window.onload = async () => {
         itemList.className = "inventory-list";
         loadingMessage.parentNode.replaceChild(itemList, loadingMessage);
 
-        inventoryEntries.forEach(({ item, quantity }) => {
+        items.forEach((item) => {
             const itemImg = document.createElement("img");
             itemImg.src = item.imgURL;
 
-            const itemInfo = document.createElement("div");
-            itemInfo.innerText = `${item.friendlyName} ×${quantity}`;
+            const itemInfo = createItemInfoBox(item);
 
             const li = document.createElement("li");
             li.className = "inventory-list-item";
@@ -33,4 +30,28 @@ window.onload = async () => {
             itemList.appendChild(li);
         });
     }
+};
+
+const createItemInfoBox = ({ description, friendlyName, quantity }) => {
+    const container = document.createElement("div");
+
+    const itemName = document.createElement("div");
+    itemName.innerText = friendlyName;
+    container.appendChild(itemName);
+
+    if (quantity !== null) {
+        container.appendChild(document.createElement("hr"));
+
+        const quantityDiv = document.createElement("div");
+        quantityDiv.innerText = `Quantity: ${quantity}`;
+        container.appendChild(quantityDiv);
+    }
+
+    container.appendChild(document.createElement("hr"));
+
+    const descriptionDiv = document.createElement("div");
+    descriptionDiv.innerText = description;
+    container.appendChild(descriptionDiv);
+
+    return container;
 };

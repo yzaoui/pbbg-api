@@ -8,10 +8,8 @@ import com.bitwiserain.pbbg.db.repository.MineSessionTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.mine.Mine
-import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
-import com.bitwiserain.pbbg.domain.usecase.InventoryUC
-import com.bitwiserain.pbbg.domain.usecase.MiningUC
+import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -58,30 +56,35 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         return Mine(width, height, itemEntries)
     }
 
-    override fun submitMineAction(userId: Int, x: Int, y: Int): List<MineActionResult>? = transaction(db) {
+    override fun submitMineAction(userId: Int, x: Int, y: Int): List<Item> = transaction(db) {
         val pickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
-            .singleOrNull() ?: return@transaction null
+            .singleOrNull() ?: throw NoEquippedPickaxeException()
 
         val mineSession = MineSessionTable.select { MineSessionTable.userId.eq(userId) }
             .map { it.toMineSession() }
-            .singleOrNull() ?: return@transaction null
+            .singleOrNull() ?: throw NotInMineSessionException()
 
         val reacheableCells = reachableCells(x, y, mineSession.width, mineSession.height, pickaxe.cells)
         val cellsWithContent = MineCellTable.select { MineCellTable.mineId.eq(mineSession.id) }
             .map { it.toMineContent() }
         val reachableCellsWithContent = cellsWithContent.filter { reacheableCells.contains(it.x to it.y) }
-        val obtainedItems = reachableCellsWithContent.map { it.mineEntity.toItem() }
-        val obtainedItemsGroupWithCount = obtainedItems.groupingBy { it }.eachCount()
+        val mappedMineEntitiesToCount = reachableCellsWithContent.map { it.mineEntity }.groupingBy { it }.eachCount()
+        val obtainedItems = mappedMineEntitiesToCount.flatMap { mineEntityToItem(it.key, it.value) }
 
         MineCellTable.deleteWhere { MineCellTable.id.inList(reachableCellsWithContent.map { it.id }) }
 
         //TODO: Store in batch
-        obtainedItemsGroupWithCount.forEach {
-            inventoryUC.storeInInventory(userId, it.key, it.value)
+        obtainedItems.forEach {
+            inventoryUC.storeInInventory(userId, it)
         }
 
-        obtainedItemsGroupWithCount.map { MineActionResult(it.key, it.value) }
+        obtainedItems
+    }
+
+    private fun mineEntityToItem(entity: MineEntity, quantity: Int): List<Item> = when (entity) {
+        MineEntity.ROCK -> listOf(Item.Material.Stone(quantity))
+        MineEntity.COAL -> listOf(Item.Material.Coal(quantity))
     }
 
     private fun ResultRow.toMineSession() = MineSession(
@@ -103,13 +106,6 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
             roll <= 0.05 -> MineEntity.ROCK
             roll <= 0.06 -> MineEntity.COAL
             else -> null
-        }
-    }
-
-    private fun MineEntity.toItem(): Item {
-        return when (this) {
-            MineEntity.ROCK -> Item.STONE
-            MineEntity.COAL -> Item.COAL
         }
     }
 

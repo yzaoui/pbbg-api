@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.route.api
 
 import com.bitwiserain.pbbg.domain.model.Item
+import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.interceptSetUserOr401
@@ -27,7 +28,9 @@ fun Route.equipmentAPI(userUC: UserUC, equipmentUC: EquipmentUC) = route("/equip
 
 // TODO: Find appropriate place for this adapter
 fun Item.toJSON() = ItemJSON(
-    typeId = ordinal,
+    baseId = this.enum.ordinal,
     friendlyName = friendlyName,
-    imgURL = "/img/item/$spriteName-64.png"
+    imgURL = "/img/item/$spriteName-64.png",
+    quantity = if (this is Stackable) quantity else null,
+    description = description
 )

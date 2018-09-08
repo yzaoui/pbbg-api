@@ -4,16 +4,16 @@ import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.model.mine.Mine
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
+import com.bitwiserain.pbbg.domain.usecase.NoEquippedPickaxeException
+import com.bitwiserain.pbbg.domain.usecase.NotInMineSessionException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.view.model.mine.MineEntityJSON
-import com.bitwiserain.pbbg.view.model.mine.MineActionResultsJSON
 import com.bitwiserain.pbbg.view.model.mine.MineJSON
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
 import io.ktor.request.ContentTransformationException
 import io.ktor.request.receive
-import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
@@ -41,14 +41,15 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
             val (x: Int, y: Int)= call.receive(MinePositionParams::class)
 
-            val results = miningUC.submitMineAction(loggedInUser.id, x, y)
-            if (results != null) {
-                call.respondSuccess(MineActionResultsJSON(results))
-            } else {
-                call.respond(HttpStatusCode.Accepted)
-            }
+            val items = miningUC.submitMineAction(loggedInUser.id, x, y).map { it.toJSON() }
+
+            call.respondSuccess(items)
         } catch (e: ContentTransformationException) {
             call.respondFail(HttpStatusCode.BadRequest, "Missing or invalid parameters.")
+        } catch (e: NoEquippedPickaxeException) {
+            call.respondFail(HttpStatusCode.Forbidden, "A pickaxe must be equipped in order to perform a mining operation.")
+        } catch (e: NotInMineSessionException) {
+            call.respondFail(HttpStatusCode.Forbidden, "A mine session must be in progress in order to perform a mining operation.")
         } catch (e: Exception) {
             call.respondError(HttpStatusCode.InternalServerError, e.message.orEmpty())
         }

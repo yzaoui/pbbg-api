@@ -62,7 +62,7 @@ const clickedCell = async (x, y) => {
     if (!mineActionSubmitting) {
         mineActionSubmitting = true;
 
-        const {status, data} = await (await fetch("/api/mine", {
+        const {status, data: items} = await (await fetch("/api/mine", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json; charset=utf-8"
@@ -75,9 +75,9 @@ const clickedCell = async (x, y) => {
 
         const resultsList = document.getElementById("results-list");
 
-        data.results.forEach(result => {
+        items.forEach(({ friendlyName, quantity }) => {
             const li = document.createElement("li");
-            li.textContent = `Obtained ${result.item} ×${result.quantity}`;
+            li.textContent = "Obtained " + (quantity !== null ? `${friendlyName} ×${quantity}` : friendlyName);
             resultsList.appendChild(li);
         });
 

@@ -5,5 +5,5 @@ import com.bitwiserain.pbbg.domain.model.Item
 
 interface InventoryUC {
     fun getInventory(userId: Int): Inventory
-    fun storeInInventory(userId: Int, item: Item, quantity: Int)
+    fun storeInInventory(userId: Int, item: Item)
 }

@@ -27,7 +27,7 @@ class EquipmentUCImpl(private val db: Database, private val inventoryUC: Invento
         // TODO: Do something if this user already has a pickaxe
         val pickaxe = Pickaxe.values()[Random().nextInt(Pickaxe.values().size)]
 
-        inventoryUC.storeInInventory(userId, pickaxe.toItem(), 1)
+        inventoryUC.storeInInventory(userId, pickaxe.toItem())
 
         EquipmentTable.insert {
             it[EquipmentTable.userId] = EntityID(userId, UserTable)
