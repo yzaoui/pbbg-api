@@ -52,3 +52,7 @@ body {
 .content main > input {
     padding: 4px;
 }
+
+.form-errors > li {
+    color: red;
+}

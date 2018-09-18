@@ -12,7 +12,7 @@ import kotlinx.html.*
 fun registerPage(registerURL: String, loginURL: String, guestPageVM: GuestPageVM, errors: List<String>? = null): Template<HTML> = GuestTemplate("Register", guestPageVM).apply {
     content {
         if (errors != null) {
-            ul {
+            ul(classes = "form-errors") {
                 errors.forEach {
                     li { +it }
                 }
