@@ -29,12 +29,12 @@ open class MemberTemplate(private val pageTitle: String, private val memberPageV
                         div(classes = "username") {
                             +memberPageVM.user.username
                         }
-                        div {
+                        div(classes = "sidebar-home") {
                             a(href = memberPageVM.home.url) {
                                 +memberPageVM.home.label
                             }
                         }
-                        div {
+                        div(classes = "sidebar-logout") {
                             form(action = memberPageVM.logout.url, method = FormMethod.post) {
                                 button(type = ButtonType.submit) { +memberPageVM.logout.label }
                             }

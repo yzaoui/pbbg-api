@@ -20,6 +20,9 @@ body {
 }
 
 .sidebar {
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
     border: black 1px solid;
     flex: 0 0 150px;
     order: -1;
@@ -55,4 +58,13 @@ body {
 
 .form-errors > li {
     color: red;
+}
+
+.sidebar-home::before {
+    content: "🏠";
+}
+
+.sidebar-logout {
+    margin-top: auto;
+    margin-bottom: 0;
 }
