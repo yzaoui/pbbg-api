@@ -34,6 +34,11 @@ open class MemberTemplate(private val pageTitle: String, private val memberPageV
                                 +memberPageVM.home.label
                             }
                         }
+                        div(classes = "sidebar-mine") {
+                            a(href = memberPageVM.mine.url) {
+                                +memberPageVM.mine.label
+                            }
+                        }
                         div(classes = "sidebar-logout") {
                             form(action = memberPageVM.logout.url, method = FormMethod.post) {
                                 button(type = ButtonType.submit) { +memberPageVM.logout.label }

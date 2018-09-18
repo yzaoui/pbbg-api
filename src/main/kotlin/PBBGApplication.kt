@@ -116,6 +116,7 @@ fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPa
     return MemberPageVM(
         user = user,
         home = ActionVM("Home", href(IndexLocation())),
+        mine = ActionVM("Mine", href(MineWebLocation())),
         logout = ActionVM("Log out", href(LogoutLocation()))
     )
 }

@@ -64,6 +64,10 @@ body {
     content: "🏠";
 }
 
+.sidebar-mine::before {
+    content: "⛏";
+}
+
 .sidebar-logout {
     margin-top: auto;
     margin-bottom: 0;
