@@ -7,10 +7,8 @@ import kotlinx.html.HTML
 import kotlinx.html.a
 import kotlinx.html.br
 
-fun homeMemberPage(mineURL: String, inventoryURL: String, equipmentURL: String, memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Home", memberPageVM).apply {
+fun homeMemberPage(equipmentURL: String, memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Home", memberPageVM).apply {
     content {
-        a(href = inventoryURL) { +"> Inventory" }
-        br { }
         a(href = equipmentURL) { +"> Equipment" }
     }
 }

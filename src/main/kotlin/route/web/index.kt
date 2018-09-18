@@ -24,8 +24,6 @@ fun Route.index(userUC: UserUC) = route("/") {
         if (loggedInUser != null) {
             call.respondHtmlTemplate(
                 homeMemberPage(
-                    mineURL = href(MineWebLocation()),
-                    inventoryURL = href(InventoryLocation()),
                     equipmentURL = href(EquipmentLocation()),
                     memberPageVM = getMemberPageVM(loggedInUser)
                 )

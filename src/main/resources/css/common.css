@@ -64,6 +64,10 @@ body {
     content: "🏠";
 }
 
+.sidebar-inventory::before {
+    content: "🎒";
+}
+
 .sidebar-mine::before {
     content: "⛏";
 }

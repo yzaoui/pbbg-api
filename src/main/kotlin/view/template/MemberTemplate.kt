@@ -34,6 +34,11 @@ open class MemberTemplate(private val pageTitle: String, private val memberPageV
                                 +memberPageVM.home.label
                             }
                         }
+                        div(classes = "sidebar-inventory") {
+                            a(href = memberPageVM.inventory.url) {
+                                +memberPageVM.inventory.label
+                            }
+                        }
                         div(classes = "sidebar-mine") {
                             a(href = memberPageVM.mine.url) {
                                 +memberPageVM.mine.label
