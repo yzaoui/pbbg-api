@@ -17,14 +17,19 @@ window.onload = async () => {
         loadingMessage.parentNode.replaceChild(itemList, loadingMessage);
 
         items.forEach((item) => {
-            const itemImg = document.createElement("img");
-            itemImg.src = item.imgURL;
-
-            const itemInfo = createItemInfoBox(item);
-
             const li = document.createElement("li");
             li.className = "inventory-list-item";
+
+            const itemImg = document.createElement("img");
+            itemImg.src = item.imgURL;
             li.appendChild(itemImg);
+
+            if (item.quantity !== null) {
+                const itemQuantity = createItemQuantityDisplay(item.quantity);
+                li.appendChild(itemQuantity);
+            }
+
+            const itemInfo = createItemInfoBox(item);
             li.appendChild(itemInfo);
 
             itemList.appendChild(li);
@@ -54,4 +59,12 @@ const createItemInfoBox = ({ description, friendlyName, quantity }) => {
     container.appendChild(descriptionDiv);
 
     return container;
+};
+
+const createItemQuantityDisplay = (quantity) => {
+    const span = document.createElement("span");
+    span.className = "inventory-list-item-quantity";
+    span.innerText = quantity.toString();
+
+    return span
 };
