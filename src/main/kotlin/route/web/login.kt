@@ -47,8 +47,14 @@ fun Route.login(userUC: UserUC) = route("/login") {
                 call.sessions.set(ApplicationSession(userId))
                 call.respondRedirect(href(IndexLocation()))
             } else {
-                // TODO: Add errors here
-                call.respondRedirect(href(LoginLocation()))
+                // TODO: Consider adding artificial delay to hide user's existence
+                // TODO: Consider using PRG pattern to get rid of refresh-resubmitting-POST issue
+                call.respondHtmlTemplate(loginPage(
+                    loginURL = href(LoginLocation()),
+                    registerURL = href(RegisterLocation()),
+                    guestPageVM = GuestPageVM(),
+                    errors = listOf("Credentials do not match an existing account.")
+                )) {}
             }
         }
     }

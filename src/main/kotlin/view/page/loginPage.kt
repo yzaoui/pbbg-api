@@ -5,8 +5,15 @@ import com.bitwiserain.pbbg.view.template.GuestTemplate
 import io.ktor.html.Template
 import kotlinx.html.*
 
-fun loginPage(loginURL: String, registerURL: String, guestPageVM: GuestPageVM): Template<HTML> = GuestTemplate("Log in", guestPageVM).apply {
+fun loginPage(loginURL: String, registerURL: String, guestPageVM: GuestPageVM, errors: List<String>? = null): Template<HTML> = GuestTemplate("Log in", guestPageVM).apply {
     content {
+        if (errors != null) {
+            ul(classes = "form-errors") {
+                errors.forEach {
+                    li { +it }
+                }
+            }
+        }
         form(action = loginURL, method = FormMethod.post) {
             input(type = InputType.text, name = "username") {
                 required = true
