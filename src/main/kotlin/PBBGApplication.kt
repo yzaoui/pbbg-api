@@ -18,6 +18,7 @@ import com.bitwiserain.pbbg.route.web.*
 import com.bitwiserain.pbbg.view.ActionVM
 import com.bitwiserain.pbbg.view.MemberPageVM
 import io.ktor.application.*
+import io.ktor.application.ApplicationCallPipeline.ApplicationPhase
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.gson.gson
@@ -123,7 +124,7 @@ fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPa
 }
 
 fun Route.interceptSetUserOrRedirect(userUC: UserUC) {
-    intercept(ApplicationCallPipeline.Infrastructure) {
+    intercept(ApplicationCallPipeline.Features) {
         val user = getUserUsingSession(userUC)
         if (user == null) {
             call.respondRedirect(href(LoginLocation()))
@@ -136,7 +137,7 @@ fun Route.interceptSetUserOrRedirect(userUC: UserUC) {
 }
 
 fun Route.interceptSetUserOr401(userUC: UserUC) {
-    intercept(ApplicationCallPipeline.Infrastructure) {
+    intercept(ApplicationCallPipeline.Features) {
         val user = getUserUsingSession(userUC)
         if (user == null) {
             call.respondFail(HttpStatusCode.Unauthorized)
@@ -148,7 +149,7 @@ fun Route.interceptSetUserOr401(userUC: UserUC) {
 }
 
 fun Route.interceptGuestOnly(userUC: UserUC) {
-    intercept(ApplicationCallPipeline.Infrastructure) {
+    intercept(ApplicationCallPipeline.Features) {
         if (getUserUsingSession(userUC) != null) {
             call.respondRedirect(href(IndexLocation()))
             finish()
