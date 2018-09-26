@@ -18,7 +18,6 @@ import com.bitwiserain.pbbg.route.web.*
 import com.bitwiserain.pbbg.view.ActionVM
 import com.bitwiserain.pbbg.view.MemberPageVM
 import io.ktor.application.*
-import io.ktor.application.ApplicationCallPipeline.ApplicationPhase
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.gson.gson

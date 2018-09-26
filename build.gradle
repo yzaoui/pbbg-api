@@ -31,7 +31,7 @@ repositories {
 dependencies {
     compile "com.h2database:h2:1.4.197"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.jetbrains.exposed:exposed:0.10.4"
+    compile "org.jetbrains.exposed:exposed:0.10.5"
     compile "at.favre.lib:bcrypt:0.4.1"
     compile "io.ktor:ktor-freemarker:$ktor_version"
     compile "io.ktor:ktor-locations:$ktor_version"

@@ -5,7 +5,6 @@ import com.bitwiserain.pbbg.view.template.MemberTemplate
 import io.ktor.html.Template
 import kotlinx.html.HTML
 import kotlinx.html.a
-import kotlinx.html.br
 
 fun homeMemberPage(equipmentURL: String, memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Home", memberPageVM).apply {
     content {

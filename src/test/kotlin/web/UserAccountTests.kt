@@ -1,4 +1,4 @@
-package pbbg.route.web
+package com.bitwiserain.pbbg.test.web
 
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl

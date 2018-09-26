@@ -7,5 +7,5 @@ object MineCellTable : IntIdTable() {
     val mineId = reference("mine_id", MineSessionTable)
     val x = integer("x")
     val y = integer("y")
-    val mineEntity = enumeration("mine_entity", MineEntity::class.java)
+    val mineEntity = enumeration("mine_entity", MineEntity::class)
 }
