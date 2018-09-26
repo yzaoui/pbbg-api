@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.domain.usecase
 
 import com.bitwiserain.pbbg.db.model.User
+import com.bitwiserain.pbbg.domain.model.UserStats
 
 interface UserUC {
     fun getUserById(userId: Int): User?
@@ -8,4 +9,5 @@ interface UserUC {
     fun usernameAvailable(username: String): Boolean
     fun registerUser(username: String, password: String): Int
     fun getUserIdByCredentials(username: String, password: String): Int?
+    fun getUserStatsByUserId(userId: Int): UserStats
 }

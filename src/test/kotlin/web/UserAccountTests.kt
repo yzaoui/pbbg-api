@@ -30,7 +30,7 @@ class UserAccountTests {
 
     init {
         transaction(db) {
-            SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable)
+            SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable)
         }
     }
 

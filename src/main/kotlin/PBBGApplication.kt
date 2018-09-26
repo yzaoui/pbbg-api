@@ -6,6 +6,7 @@ import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
 import com.bitwiserain.pbbg.db.usecase.MiningUCImpl
 import com.bitwiserain.pbbg.db.usecase.UserUCImpl
+import com.bitwiserain.pbbg.domain.model.UserStats
 import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
@@ -17,6 +18,7 @@ import com.bitwiserain.pbbg.route.api.pickaxe
 import com.bitwiserain.pbbg.route.web.*
 import com.bitwiserain.pbbg.view.ActionVM
 import com.bitwiserain.pbbg.view.MemberPageVM
+import com.bitwiserain.pbbg.view.model.UserStatsVM
 import io.ktor.application.*
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
@@ -53,7 +55,7 @@ fun Application.main() {
     val db = Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
     transaction {
         addLogger(Slf4jSqlDebugLogger)
-        SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable)
+        SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable)
     }
 
     install(CallLogging)
@@ -182,4 +184,21 @@ suspend inline fun ApplicationCall.respondError(message: String = "") {
 
 suspend inline fun ApplicationCall.respondError(status: HttpStatusCode, message: String = "") {
     respond(status, mapOf("status" to "error", "message" to message))
+}
+
+/* TODO: Temp */
+fun createUserStatsVM(userStats: UserStats): UserStatsVM {
+    val levels = listOf(20, 55, 85)
+    val exp = userStats.miningExp
+
+    var prevLevelExpCap = 0
+    for ((i, cap) in levels.withIndex()) {
+        if (exp < cap) {
+            return UserStatsVM(i + 1, exp - prevLevelExpCap, cap)
+        }
+
+        prevLevelExpCap = cap
+    }
+
+    return UserStatsVM(levels.size + 1, 0, 0)
 }
