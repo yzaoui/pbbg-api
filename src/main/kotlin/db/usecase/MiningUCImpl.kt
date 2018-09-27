@@ -2,12 +2,11 @@ package com.bitwiserain.pbbg.db.usecase
 
 import com.bitwiserain.pbbg.db.model.MineCell
 import com.bitwiserain.pbbg.db.model.MineSession
-import com.bitwiserain.pbbg.db.repository.EquipmentTable
-import com.bitwiserain.pbbg.db.repository.MineCellTable
-import com.bitwiserain.pbbg.db.repository.MineSessionTable
-import com.bitwiserain.pbbg.db.repository.UserTable
+import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.domain.model.Item
+import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.model.mine.Mine
+import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
@@ -56,7 +55,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         return Mine(width, height, itemEntries)
     }
 
-    override fun submitMineAction(userId: Int, x: Int, y: Int): List<Item> = transaction(db) {
+    override fun submitMineAction(userId: Int, x: Int, y: Int): List<MineActionResult> = transaction(db) {
         val pickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
             .singleOrNull() ?: throw NoEquippedPickaxeException()
@@ -69,17 +68,36 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         val cellsWithContent = MineCellTable.select { MineCellTable.mineId.eq(mineSession.id) }
             .map { it.toMineContent() }
         val reachableCellsWithContent = cellsWithContent.filter { reacheableCells.contains(it.x to it.y) }
-        val mappedMineEntitiesToCount = reachableCellsWithContent.map { it.mineEntity }.groupingBy { it }.eachCount()
-        val obtainedItems = mappedMineEntitiesToCount.flatMap { mineEntityToItem(it.key, it.value) }
+        val mineEntitiesAndCount = reachableCellsWithContent.map { it.mineEntity }.groupingBy { it }.eachCount()
+
+        val results = mutableListOf<MineActionResult>()
+        var totalExp = 0
+        for ((mineEntity, count) in mineEntitiesAndCount) {
+            val items = mineEntityToItem(mineEntity, count)
+            for (item in items) {
+                val exp = mineEntity.exp * (if (item is Stackable) item.quantity else 1)
+
+                results.add(MineActionResult(item, exp))
+                totalExp += exp
+            }
+        }
+
+//        val obtainedItems = mineEntitiesAndCount.flatMap { mineEntityToItem(it.key, it.value) }
 
         MineCellTable.deleteWhere { MineCellTable.id.inList(reachableCellsWithContent.map { it.id }) }
 
         //TODO: Store in batch
-        obtainedItems.forEach {
-            inventoryUC.storeInInventory(userId, it)
+        for (result in results) {
+            inventoryUC.storeInInventory(userId, result.item)
         }
 
-        obtainedItems
+        UserStatsTable.update({ UserStatsTable.userId.eq(userId) }) { updateStatement ->
+            with (SqlExpressionBuilder) {
+                updateStatement.update(UserStatsTable.miningExp, UserStatsTable.miningExp + totalExp)
+            }
+        }
+
+        results
     }
 
     private fun mineEntityToItem(entity: MineEntity, quantity: Int): List<Item> = when (entity) {

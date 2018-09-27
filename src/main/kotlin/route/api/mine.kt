@@ -41,7 +41,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
             val (x: Int, y: Int)= call.receive(MinePositionParams::class)
 
-            val items = miningUC.submitMineAction(loggedInUser.id, x, y).map { it.toJSON() }
+            val items = miningUC.submitMineAction(loggedInUser.id, x, y).map { it.item.toJSON() } // TODO: Show exp as well
 
             call.respondSuccess(items)
         } catch (e: ContentTransformationException) {
