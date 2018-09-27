@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.route.web
 
+import com.bitwiserain.pbbg.createUserStatsVM
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.getMemberPageVM
 import com.bitwiserain.pbbg.getUserUsingSession
@@ -25,6 +26,7 @@ fun Route.index(userUC: UserUC) = route("/") {
             call.respondHtmlTemplate(
                 homeMemberPage(
                     equipmentURL = href(EquipmentLocation()),
+                    userStatsVM = createUserStatsVM(userUC.getUserStatsByUserId(loggedInUser.id)),
                     memberPageVM = getMemberPageVM(loggedInUser)
                 )
             ) {}
