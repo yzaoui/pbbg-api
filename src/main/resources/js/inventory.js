@@ -5,7 +5,7 @@ window.onload = async () => {
     loadingMessage.innerText = "Loading...";
     main.appendChild(loadingMessage);
 
-    const { status, data: items } = await (await fetch("/api/inventory")).json();
+    const { status, data: { items, equipment } } = await (await fetch("/api/inventory")).json();
 
     if (items.length === 0) {
         const noItems = document.createElement("div");

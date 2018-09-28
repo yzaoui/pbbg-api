@@ -11,6 +11,8 @@ interface Stackable {
     val quantity: Int
 }
 
+interface Equippable
+
 sealed class Item {
     abstract val enum: ItemEnum
     abstract val friendlyName: String
@@ -32,7 +34,7 @@ sealed class Item {
         }
     }
 
-    sealed class Pickaxe : Item() {
+    sealed class Pickaxe : Item(), Equippable {
         class PlusPickaxe : Pickaxe() {
             override val enum = ItemEnum.PLUS_PICKAXE
             override val friendlyName = "Plus-shaped Pickaxe"

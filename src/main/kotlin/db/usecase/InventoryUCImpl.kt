@@ -1,10 +1,14 @@
 package com.bitwiserain.pbbg.db.usecase
 
+import com.bitwiserain.pbbg.db.repository.EquipmentTable
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.UserTable
-import com.bitwiserain.pbbg.domain.model.*
+import com.bitwiserain.pbbg.domain.model.Inventory
+import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.ItemEnum.*
+import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
+import domain.model.Equipment
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -13,8 +17,14 @@ class InventoryUCImpl(private val db: Database) : InventoryUC {
     override fun getInventory(userId: Int): Inventory = transaction(db) {
         // TODO: Consider checking if user exists
 
-        InventoryTable.select { InventoryTable.userId.eq(userId) }
+        val items = InventoryTable.select { InventoryTable.userId.eq(userId) }
             .map { it.toItem() }
+
+        val equippedPickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
+            .singleOrNull()
+            ?.get(EquipmentTable.pickaxe)
+
+        Inventory(items, Equipment(equippedPickaxe?.toItem()))
     }
 
     override fun storeInInventory(userId: Int, item: Item): Unit = transaction(db) {

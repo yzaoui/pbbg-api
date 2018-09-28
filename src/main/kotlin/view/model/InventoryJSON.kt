@@ -1,3 +1,6 @@
 package com.bitwiserain.pbbg.view.model
 
-typealias InventoryJSON = List<ItemJSON>
+class InventoryJSON(
+    val items: List<ItemJSON>,
+    val equipment: EquipmentJSON
+)

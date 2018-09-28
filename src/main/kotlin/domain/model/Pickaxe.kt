@@ -33,7 +33,7 @@ enum class Pickaxe(val type: String, val cells: Set<Pair<Int, Int>>) {
     ));
 
     // TODO: Not sure if this belongs here
-    fun toItem(): Item = when(this) {
+    fun toItem(): Item.Pickaxe = when(this) {
         Pickaxe.PLUS -> Item.Pickaxe.PlusPickaxe()
         Pickaxe.CROSS -> Item.Pickaxe.CrossPickaxe()
         Pickaxe.SQUARE -> Item.Pickaxe.SquarePickaxe()

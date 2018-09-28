@@ -16,6 +16,10 @@ import io.ktor.routing.route
 
 fun Route.equipmentAPI(userUC: UserUC, equipmentUC: EquipmentUC) = route("/equipment") {
     interceptSetUserOr401(userUC)
+
+    /**
+     * Responds with [EquipmentJSON]
+     */
     get {
         val loggedInUser = call.attributes[loggedInUserKey]
 
