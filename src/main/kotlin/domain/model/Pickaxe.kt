@@ -32,7 +32,7 @@ enum class Pickaxe(val type: String, val cells: Set<Pair<Int, Int>>) {
         1 to 1
     ));
 
-    //TODO: Not sure if this belongs here
+    // TODO: Not sure if this belongs here
     fun toItem(): Item = when(this) {
         Pickaxe.PLUS -> Item.Pickaxe.PlusPickaxe()
         Pickaxe.CROSS -> Item.Pickaxe.CrossPickaxe()

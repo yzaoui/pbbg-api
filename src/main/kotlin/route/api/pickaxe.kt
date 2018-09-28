@@ -36,7 +36,7 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
             call.respondSuccess(pickaxe?.toJSON())
         }
 
-        //TODO: Remove this, only temporarily randomly generating a pickaxe
+        // TODO: Remove this, only temporarily randomly generating a pickaxe
         post {
             val loggedInUser = call.attributes[loggedInUserKey]
 
@@ -49,7 +49,7 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
         }
     }
 
-    //TODO: Unused so far
+    // TODO: Unused so far
     route(PICKAXE_ALL_PATH) {
         get {
             val pickaxes = equipmentUC.getAllPickaxes().map { it.toJSON() }

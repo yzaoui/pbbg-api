@@ -19,7 +19,7 @@ fun Route.equipmentAPI(userUC: UserUC, equipmentUC: EquipmentUC) = route("/equip
     get {
         val loggedInUser = call.attributes[loggedInUserKey]
 
-        //TODO: Return whole inventory, not just pickaxe
+        // TODO: Return whole inventory, not just pickaxe
         val pickaxe = equipmentUC.getEquippedPickaxe(loggedInUser.id)
 
         call.respond(EquipmentJSON(pickaxe?.let { it.toItem().toJSON() } ))

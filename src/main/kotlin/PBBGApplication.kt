@@ -186,7 +186,7 @@ suspend inline fun ApplicationCall.respondError(status: HttpStatusCode, message:
     respond(status, mapOf("status" to "error", "message" to message))
 }
 
-/* TODO: Temporary, find better location for this logic */
+// TODO: Temporary, find better location for this logic
 fun createUserStatsVM(userStats: UserStats): UserStatsVM {
     val levels = listOf(20, 55, 85)
     val exp = userStats.miningExp

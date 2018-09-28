@@ -36,6 +36,9 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
         call.respondSuccess(mine?.toVM())
     }
 
+    /**
+     * Responds with [MineActionResultJSON]
+     */
     post {
         try {
             // TODO: Remove cookie dependency

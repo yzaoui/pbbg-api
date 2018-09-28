@@ -56,18 +56,26 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
     }
 
     override fun submitMineAction(userId: Int, x: Int, y: Int): List<MineActionResult> = transaction(db) {
+        // Currently equipped picakxe
         val pickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
             .singleOrNull() ?: throw NoEquippedPickaxeException()
 
+        // Currently running mine session
         val mineSession = MineSessionTable.select { MineSessionTable.userId.eq(userId) }
             .map { it.toMineSession() }
             .singleOrNull() ?: throw NotInMineSessionException()
 
+        // Cells that the currently equipped pickaxe at this location can reach
         val reacheableCells = reachableCells(x, y, mineSession.width, mineSession.height, pickaxe.cells)
-        val cellsWithContent = MineCellTable.select { MineCellTable.mineId.eq(mineSession.id) }
-            .map { it.toMineContent() }
-        val reachableCellsWithContent = cellsWithContent.filter { reacheableCells.contains(it.x to it.y) }
+
+        // The mine cells of this mine, filtered to only get those that are reachable with this pickaxe and location
+        // TODO: Exposed isn't likely to support tuples in `WHERE IN` expressions, consider using raw SQL
+        val reachableCellsWithContent = MineCellTable.select { MineCellTable.mineId.eq(mineSession.id) }
+            .map { it.toMineCell() }
+            .filter { reacheableCells.contains(it.x to it.y) }
+
+        // Mine entities with the quantity hit
         val mineEntitiesAndCount = reachableCellsWithContent.map { it.mineEntity }.groupingBy { it }.eachCount()
 
         val results = mutableListOf<MineActionResult>()
@@ -82,13 +90,16 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
             }
         }
 
+        // Remove mined cells from database
         MineCellTable.deleteWhere { MineCellTable.id.inList(reachableCellsWithContent.map { it.id }) }
 
-        //TODO: Store in batch
+        // TODO: Store in batch
         for (result in results) {
             inventoryUC.storeInInventory(userId, result.item)
         }
 
+        // Increase user's mining experience from this mining operation
+        // TODO: Cap experience gain at maximum level
         UserStatsTable.update({ UserStatsTable.userId.eq(userId) }) { updateStatement ->
             with (SqlExpressionBuilder) {
                 updateStatement.update(UserStatsTable.miningExp, UserStatsTable.miningExp + totalExp)
@@ -109,7 +120,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         height = this[MineSessionTable.height]
     )
 
-    private fun ResultRow.toMineContent() = MineCell(
+    private fun ResultRow.toMineCell() = MineCell(
         id = this[MineCellTable.id].value,
         x = this[MineCellTable.x],
         y = this[MineCellTable.y],
