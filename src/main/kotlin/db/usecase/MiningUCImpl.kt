@@ -77,12 +77,10 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
             for (item in items) {
                 val exp = mineEntity.exp * (if (item is Stackable) item.quantity else 1)
 
-                results.add(MineActionResult(item, exp))
+                results.add(MineActionResult(item, mineEntity.exp))
                 totalExp += exp
             }
         }
-
-//        val obtainedItems = mineEntitiesAndCount.flatMap { mineEntityToItem(it.key, it.value) }
 
         MineCellTable.deleteWhere { MineCellTable.id.inList(reachableCellsWithContent.map { it.id }) }
 

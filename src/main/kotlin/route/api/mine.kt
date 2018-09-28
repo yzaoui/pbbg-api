@@ -2,11 +2,13 @@ package com.bitwiserain.pbbg.route.api
 
 import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.model.mine.Mine
+import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.domain.usecase.NoEquippedPickaxeException
 import com.bitwiserain.pbbg.domain.usecase.NotInMineSessionException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.view.model.mine.MineActionResultJSON
 import com.bitwiserain.pbbg.view.model.mine.MineEntityJSON
 import com.bitwiserain.pbbg.view.model.mine.MineJSON
 import io.ktor.application.call
@@ -41,9 +43,9 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
             val (x: Int, y: Int)= call.receive(MinePositionParams::class)
 
-            val items = miningUC.submitMineAction(loggedInUser.id, x, y).map { it.item.toJSON() } // TODO: Show exp as well
+            val mineActionResult = miningUC.submitMineAction(loggedInUser.id, x, y).map { it.toJSON() }
 
-            call.respondSuccess(items)
+            call.respondSuccess(mineActionResult)
         } catch (e: ContentTransformationException) {
             call.respondFail(HttpStatusCode.BadRequest, "Missing or invalid parameters.")
         } catch (e: NoEquippedPickaxeException) {
@@ -79,4 +81,9 @@ private fun MineEntity.toVM() = MineEntityJSON(
         MineEntity.ROCK -> "/img/mine/rock.png"
         MineEntity.COAL -> "/img/mine/coal.png"
     }
+)
+
+private fun MineActionResult.toJSON() = MineActionResultJSON(
+    item = item.toJSON(),
+    expPerIndividualItem = expPerIndividualItem
 )
