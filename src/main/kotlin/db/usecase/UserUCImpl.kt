@@ -2,11 +2,12 @@ package com.bitwiserain.pbbg.db.usecase
 
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.bitwiserain.pbbg.db.model.User
+import com.bitwiserain.pbbg.db.repository.InventoryTable
+import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.UserTable
+import com.bitwiserain.pbbg.domain.model.UserStats
 import com.bitwiserain.pbbg.domain.usecase.UserUC
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserUCImpl(private val db: Database) : UserUC {
@@ -29,10 +30,16 @@ class UserUCImpl(private val db: Database) : UserUC {
     }
 
     override fun registerUser(username: String, password: String): Int = transaction(db) {
-        UserTable.insertAndGetId {
+        val userId = UserTable.insertAndGetId {
             it[UserTable.username] = username
             it[UserTable.passwordHash] = BCrypt.withDefaults().hash(12, password.toByteArray())
-        }.value
+        }
+
+        UserStatsTable.insert {
+            it[UserStatsTable.userId] = userId
+        }
+
+        userId.value
     }
 
     override fun getUserIdByCredentials(username: String, password: String): Int? {
@@ -43,4 +50,13 @@ class UserUCImpl(private val db: Database) : UserUC {
             null
         }
     }
+
+    override fun getUserStatsByUserId(userId: Int): UserStats = transaction(db) {
+        // TODO: Consider checking if user exists
+        UserStatsTable.select { UserStatsTable.userId.eq(userId) }
+            .single()
+            .toUserStats()
+    }
+
+    private fun ResultRow.toUserStats(): UserStats = UserStats(this[UserStatsTable.miningExp])
 }

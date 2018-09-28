@@ -2,14 +2,18 @@ package com.bitwiserain.pbbg.db.usecase
 
 import com.bitwiserain.pbbg.db.model.MineCell
 import com.bitwiserain.pbbg.db.model.MineSession
-import com.bitwiserain.pbbg.db.repository.EquipmentTable
-import com.bitwiserain.pbbg.db.repository.MineCellTable
-import com.bitwiserain.pbbg.db.repository.MineSessionTable
-import com.bitwiserain.pbbg.db.repository.UserTable
+import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.Item
+import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.model.mine.Mine
+import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
-import com.bitwiserain.pbbg.domain.usecase.*
+import com.bitwiserain.pbbg.domain.model.mine.MinedItemResult
+import com.bitwiserain.pbbg.domain.usecase.InventoryUC
+import com.bitwiserain.pbbg.domain.usecase.MiningUC
+import com.bitwiserain.pbbg.domain.usecase.NoEquippedPickaxeException
+import com.bitwiserain.pbbg.domain.usecase.NotInMineSessionException
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -56,30 +60,64 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         return Mine(width, height, itemEntries)
     }
 
-    override fun submitMineAction(userId: Int, x: Int, y: Int): List<Item> = transaction(db) {
+    override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction(db) {
+        // Currently equipped picakxe
         val pickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
             .singleOrNull() ?: throw NoEquippedPickaxeException()
 
+        // Currently running mine session
         val mineSession = MineSessionTable.select { MineSessionTable.userId.eq(userId) }
             .map { it.toMineSession() }
             .singleOrNull() ?: throw NotInMineSessionException()
 
+        // Cells that the currently equipped pickaxe at this location can reach
         val reacheableCells = reachableCells(x, y, mineSession.width, mineSession.height, pickaxe.cells)
-        val cellsWithContent = MineCellTable.select { MineCellTable.mineId.eq(mineSession.id) }
-            .map { it.toMineContent() }
-        val reachableCellsWithContent = cellsWithContent.filter { reacheableCells.contains(it.x to it.y) }
-        val mappedMineEntitiesToCount = reachableCellsWithContent.map { it.mineEntity }.groupingBy { it }.eachCount()
-        val obtainedItems = mappedMineEntitiesToCount.flatMap { mineEntityToItem(it.key, it.value) }
 
-        MineCellTable.deleteWhere { MineCellTable.id.inList(reachableCellsWithContent.map { it.id }) }
+        // The mine cells of this mine, filtered to only get those that are reachable with this pickaxe and location
+        // TODO: Exposed isn't likely to support tuples in `WHERE IN` expressions, consider using raw SQL
+        val reachableCellsWithContent = MineCellTable.select { MineCellTable.mineId.eq(mineSession.id) }
+            .map { it.toMineCell() }
+            .filter { reacheableCells.contains(it.x to it.y) }
 
-        //TODO: Store in batch
-        obtainedItems.forEach {
-            inventoryUC.storeInInventory(userId, it)
+        // Mine entities with the quantity hit
+        val mineEntitiesAndCount = reachableCellsWithContent.map { it.mineEntity }.groupingBy { it }.eachCount()
+
+        val minedItemResults = mutableListOf<MinedItemResult>()
+        var totalExp = 0
+        for ((mineEntity, count) in mineEntitiesAndCount) {
+            val items = mineEntityToItem(mineEntity, count)
+            for (item in items) {
+                val exp = mineEntity.exp * (if (item is Stackable) item.quantity else 1)
+
+                minedItemResults.add(MinedItemResult(item, mineEntity.exp))
+                totalExp += exp
+            }
         }
 
-        obtainedItems
+        // Remove mined cells from database
+        MineCellTable.deleteWhere { MineCellTable.id.inList(reachableCellsWithContent.map { it.id }) }
+
+        // TODO: Store in batch
+        for (result in minedItemResults) {
+            inventoryUC.storeInInventory(userId, result.item)
+        }
+
+        val userCurrentMiningExp = UserStatsTable.select { UserStatsTable.userId.eq(userId) }
+            .single()
+            .get(UserStatsTable.miningExp)
+
+        val currentLevelProgress = MiningExperienceManager.getLevelProgress(userCurrentMiningExp)
+        val newLevelProgress = MiningExperienceManager.getLevelProgress(userCurrentMiningExp + totalExp)
+
+        // Increase user's mining experience from this mining operation if progress was made
+        if (currentLevelProgress != newLevelProgress) {
+            UserStatsTable.update({ UserStatsTable.userId.eq(userId) }) {
+                it[UserStatsTable.miningExp] = newLevelProgress.absoluteExp
+            }
+        }
+
+        MineActionResult(minedItemResults, MiningExperienceManager.getLevelUpResults(currentLevelProgress.level, newLevelProgress.level))
     }
 
     private fun mineEntityToItem(entity: MineEntity, quantity: Int): List<Item> = when (entity) {
@@ -93,7 +131,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         height = this[MineSessionTable.height]
     )
 
-    private fun ResultRow.toMineContent() = MineCell(
+    private fun ResultRow.toMineCell() = MineCell(
         id = this[MineCellTable.id].value,
         x = this[MineCellTable.x],
         y = this[MineCellTable.y],
