@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.db.usecase
 
+import com.bitwiserain.pbbg.MiningExperienceManager
 import com.bitwiserain.pbbg.db.model.MineCell
 import com.bitwiserain.pbbg.db.model.MineSession
 import com.bitwiserain.pbbg.db.repository.*
@@ -8,6 +9,7 @@ import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.model.mine.Mine
 import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
+import com.bitwiserain.pbbg.domain.model.mine.MinedItemResult
 import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
@@ -55,7 +57,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         return Mine(width, height, itemEntries)
     }
 
-    override fun submitMineAction(userId: Int, x: Int, y: Int): List<MineActionResult> = transaction(db) {
+    override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction(db) {
         // Currently equipped picakxe
         val pickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
@@ -78,14 +80,14 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         // Mine entities with the quantity hit
         val mineEntitiesAndCount = reachableCellsWithContent.map { it.mineEntity }.groupingBy { it }.eachCount()
 
-        val results = mutableListOf<MineActionResult>()
+        val minedItemResults = mutableListOf<MinedItemResult>()
         var totalExp = 0
         for ((mineEntity, count) in mineEntitiesAndCount) {
             val items = mineEntityToItem(mineEntity, count)
             for (item in items) {
                 val exp = mineEntity.exp * (if (item is Stackable) item.quantity else 1)
 
-                results.add(MineActionResult(item, mineEntity.exp))
+                minedItemResults.add(MinedItemResult(item, mineEntity.exp))
                 totalExp += exp
             }
         }
@@ -94,19 +96,25 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         MineCellTable.deleteWhere { MineCellTable.id.inList(reachableCellsWithContent.map { it.id }) }
 
         // TODO: Store in batch
-        for (result in results) {
+        for (result in minedItemResults) {
             inventoryUC.storeInInventory(userId, result.item)
         }
 
-        // Increase user's mining experience from this mining operation
-        // TODO: Cap experience gain at maximum level
-        UserStatsTable.update({ UserStatsTable.userId.eq(userId) }) { updateStatement ->
-            with (SqlExpressionBuilder) {
-                updateStatement.update(UserStatsTable.miningExp, UserStatsTable.miningExp + totalExp)
+        val userCurrentMiningExp = UserStatsTable.select { UserStatsTable.userId.eq(userId) }
+            .single()
+            .get(UserStatsTable.miningExp)
+
+        val currentLevelProgress = MiningExperienceManager.getLevelProgress(userCurrentMiningExp)
+        val newLevelProgress = MiningExperienceManager.getLevelProgress(userCurrentMiningExp + totalExp)
+
+        // Increase user's mining experience from this mining operation if progress was made
+        if (currentLevelProgress != newLevelProgress) {
+            UserStatsTable.update({ UserStatsTable.userId.eq(userId) }) {
+                it[UserStatsTable.miningExp] = newLevelProgress.absoluteExp
             }
         }
 
-        results
+        MineActionResult(minedItemResults, MiningExperienceManager.getLevelUpResults(currentLevelProgress.level, newLevelProgress.level))
     }
 
     private fun mineEntityToItem(entity: MineEntity, quantity: Int): List<Item> = when (entity) {

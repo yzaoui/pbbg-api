@@ -75,7 +75,9 @@ const clickedCell = async (x, y) => {
 
         const resultsList = document.getElementById("results-list");
 
-        results.forEach(({ item: { friendlyName, quantity }, expPerIndividualItem}) => {
+        const { minedItemResults, levelUps } = results;
+
+        minedItemResults.forEach(({ item: { friendlyName, quantity }, expPerIndividualItem}) => {
             const li = document.createElement("li");
             if (quantity !== null) {
                 li.textContent = `Obtained ${friendlyName} ×${quantity} (+${expPerIndividualItem * quantity} exp)`;
@@ -83,6 +85,12 @@ const clickedCell = async (x, y) => {
                 li.textContent = `Obtained ${friendlyName} (+${expPerIndividualItem} exp)`;
             }
 
+            resultsList.appendChild(li);
+        });
+
+        levelUps.forEach(({ newLevel }) => {
+            const li = document.createElement("li");
+            li.textContent = `Mining levelled up to level ${newLevel}!`;
             resultsList.appendChild(li);
         });
 

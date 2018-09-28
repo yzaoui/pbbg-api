@@ -4,13 +4,12 @@ import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.model.mine.Mine
 import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
+import com.bitwiserain.pbbg.domain.model.mine.MinedItemResult
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.domain.usecase.NoEquippedPickaxeException
 import com.bitwiserain.pbbg.domain.usecase.NotInMineSessionException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.view.model.mine.MineActionResultJSON
-import com.bitwiserain.pbbg.view.model.mine.MineEntityJSON
-import com.bitwiserain.pbbg.view.model.mine.MineJSON
+import com.bitwiserain.pbbg.view.model.mine.*
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
@@ -46,7 +45,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
             val (x: Int, y: Int)= call.receive(MinePositionParams::class)
 
-            val mineActionResult = miningUC.submitMineAction(loggedInUser.id, x, y).map { it.toJSON() }
+            val mineActionResult = miningUC.submitMineAction(loggedInUser.id, x, y).toJSON()
 
             call.respondSuccess(mineActionResult)
         } catch (e: ContentTransformationException) {
@@ -87,6 +86,11 @@ private fun MineEntity.toVM() = MineEntityJSON(
 )
 
 private fun MineActionResult.toJSON() = MineActionResultJSON(
-    item = item.toJSON(),
-    expPerIndividualItem = expPerIndividualItem
+    minedItemResults = minedItemResults.map {
+        MinedItemResultJSON(
+            item = it.item.toJSON(),
+            expPerIndividualItem = it.expPerIndividualItem
+        )
+    },
+    levelUps = levelUps.map { LevelUpJSON(it.newLevel) }
 )
