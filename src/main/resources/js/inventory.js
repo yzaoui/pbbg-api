@@ -7,14 +7,18 @@ window.onload = async () => {
 
     const { status, data: { items, equipment } } = await (await fetch("/api/inventory")).json();
 
+    /* Show equipment */
+    const equipmentDisplay = createEquipmentDisplay(equipment);
+    main.appendChild(equipmentDisplay);
+
     if (items.length === 0) {
         const noItems = document.createElement("div");
         noItems.innerText = "You have no items. Try looking around for some!";
-        loadingMessage.parentNode.replaceChild(noItems, loadingMessage)
+        main.appendChild(noItems);
     } else {
         const itemList = document.createElement("ul");
         itemList.className = "inventory-list";
-        loadingMessage.parentNode.replaceChild(itemList, loadingMessage);
+        main.appendChild(itemList);
 
         items.forEach((item) => {
             const li = document.createElement("li");
@@ -35,6 +39,8 @@ window.onload = async () => {
             itemList.appendChild(li);
         });
     }
+
+    main.removeChild(loadingMessage);
 };
 
 const createItemInfoBox = ({ description, friendlyName, quantity }) => {
@@ -67,4 +73,25 @@ const createItemQuantityDisplay = (quantity) => {
     span.innerText = quantity.toString();
 
     return span
+};
+
+const createEquipmentDisplay = (equipment) => {
+    const container = document.createElement("div");
+    container.className = "equipment-display";
+
+    const playerImg = document.createElement("img");
+    playerImg.src = "/img/inventory/player.png";
+    container.appendChild(playerImg);
+
+    const equippedPickaxeImg = document.createElement("img");
+    if (equipment.pickaxe !== null) {
+        equippedPickaxeImg.src = equipment.pickaxe.imgURL;
+        equippedPickaxeImg.className = "equipped-pickaxe";
+    } else {
+        equippedPickaxeImg.src = "/img/inventory/no-pickaxe.png";
+        equippedPickaxeImg.className = "equipped-pickaxe-none";
+    }
+    container.appendChild(equippedPickaxeImg);
+
+    return container;
 };

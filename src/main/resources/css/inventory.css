@@ -40,3 +40,25 @@
     padding: 1px;
     font-size: 12px;
 }
+
+.equipment-display {
+    position: relative;
+}
+
+.equipped-pickaxe {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    top: 90px;
+    left: 100px;
+    background-color: white;
+}
+
+.equipped-pickaxe-none {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    top: 90px;
+    left: 100px;
+    background-color: grey;
+}
