@@ -4,11 +4,11 @@ import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.model.mine.Mine
 import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
-import com.bitwiserain.pbbg.domain.model.mine.MinedItemResult
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.domain.usecase.NoEquippedPickaxeException
 import com.bitwiserain.pbbg.domain.usecase.NotInMineSessionException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.view.model.LevelUpJSON
 import com.bitwiserain.pbbg.view.model.mine.*
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -32,7 +32,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
         val loggedInUser = call.attributes[loggedInUserKey]
         val mine = miningUC.getMine(loggedInUser.id)
 
-        call.respondSuccess(mine?.toVM())
+        call.respondSuccess(mine?.toJSON())
     }
 
     /**
@@ -60,18 +60,21 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
     }
 
     route("/generate") {
+        /**
+         * Responds with [MineJSON]
+         */
         post {
             val loggedInUser = call.attributes[loggedInUserKey]
 
             val mine = miningUC.generateMine(loggedInUser.id, 30, 20)
 
-            call.respondSuccess(mine.toVM())
+            call.respondSuccess(mine.toJSON())
         }
     }
 }
 
 // TODO: Find appropriate place for this adapter
-private fun Mine.toVM() = MineJSON(
+private fun Mine.toJSON() = MineJSON(
     width = width,
     height = height,
     cells = List(height) { y -> List(width) { x -> grid[x to y]?.toVM() } }

@@ -185,31 +185,3 @@ suspend inline fun ApplicationCall.respondError(message: String = "") {
 suspend inline fun ApplicationCall.respondError(status: HttpStatusCode, message: String = "") {
     respond(status, mapOf("status" to "error", "message" to message))
 }
-
-class LevelUp(val newLevel: Int)
-
-object MiningExperienceManager {
-    private val levels = listOf(20, 55, 85)
-
-    fun getLevelProgress(absoluteExp: Int): LevelProgress {
-        var prevLevelAbsoluteExp = 0
-        for ((i, cap) in levels.withIndex()) {
-            if (absoluteExp < cap) {
-                return LevelProgress(i + 1, absoluteExp - prevLevelAbsoluteExp, cap, absoluteExp)
-            }
-
-            prevLevelAbsoluteExp = cap
-        }
-
-        return LevelProgress(levels.size + 1, 0, 0, levels.last())
-    }
-
-    fun getLevelUpResults(prevLevel: Int, newLevel: Int): List<LevelUp> {
-        return ((prevLevel + 1)..newLevel).map { LevelUp(it) }
-    }
-}
-
-// TODO: Temporary, find better location for this logic
-fun createUserStatsVM(userStats: UserStats): UserStatsVM = UserStatsVM(
-    miningLevelProgress = MiningExperienceManager.getLevelProgress(userStats.miningExp)
-)

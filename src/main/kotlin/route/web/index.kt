@@ -1,11 +1,12 @@
 package com.bitwiserain.pbbg.route.web
 
-import com.bitwiserain.pbbg.createUserStatsVM
+import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.getMemberPageVM
 import com.bitwiserain.pbbg.getUserUsingSession
 import com.bitwiserain.pbbg.href
 import com.bitwiserain.pbbg.view.GuestPageVM
+import com.bitwiserain.pbbg.view.model.UserStatsVM
 import com.bitwiserain.pbbg.view.page.homeGuestPage
 import com.bitwiserain.pbbg.view.page.homeMemberPage
 import io.ktor.application.call
@@ -26,7 +27,7 @@ fun Route.index(userUC: UserUC) = route("/") {
             call.respondHtmlTemplate(
                 homeMemberPage(
                     equipmentURL = href(EquipmentLocation()),
-                    userStatsVM = createUserStatsVM(userUC.getUserStatsByUserId(loggedInUser.id)),
+                    userStatsVM = UserStatsVM(MiningExperienceManager.getLevelProgress(userUC.getUserStatsByUserId(loggedInUser.id).miningExp)),
                     memberPageVM = getMemberPageVM(loggedInUser)
                 )
             ) {}

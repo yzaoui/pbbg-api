@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg
+package com.bitwiserain.pbbg.domain.model
 
 data class LevelProgress(
     val level: Int,
