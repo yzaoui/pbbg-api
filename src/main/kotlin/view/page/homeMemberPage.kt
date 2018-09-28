@@ -11,7 +11,7 @@ import kotlinx.html.p
 fun homeMemberPage(equipmentURL: String, userStatsVM: UserStatsVM, memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Home", memberPageVM).apply {
     content {
         p {
-            +"Mining Level ${userStatsVM.miningLevel}: ${userStatsVM.miningExpSinceLastLevel} / ${userStatsVM.miningExpToNextLevel} exp"
+            +"Mining Level ${userStatsVM.miningLevelProgress.level}: ${userStatsVM.miningLevelProgress.expThisLevel} / ${userStatsVM.miningLevelProgress.totalExpToNextLevel} exp"
         }
         a(href = equipmentURL) { +"> Equipment" }
     }

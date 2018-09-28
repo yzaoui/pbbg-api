@@ -194,11 +194,11 @@ fun createUserStatsVM(userStats: UserStats): UserStatsVM {
     var prevLevelExpCap = 0
     for ((i, cap) in levels.withIndex()) {
         if (exp < cap) {
-            return UserStatsVM(i + 1, exp - prevLevelExpCap, cap)
+            return UserStatsVM(LevelProgress(i + 1, exp - prevLevelExpCap, cap))
         }
 
         prevLevelExpCap = cap
     }
 
-    return UserStatsVM(levels.size, prevLevelExpCap, prevLevelExpCap)
+    return UserStatsVM(LevelProgress(levels.size, prevLevelExpCap, prevLevelExpCap))
 }

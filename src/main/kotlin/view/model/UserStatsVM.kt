@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.view.model
 
+import com.bitwiserain.pbbg.LevelProgress
+
 class UserStatsVM(
-    val miningLevel: Int,
-    val miningExpSinceLastLevel: Int,
-    val miningExpToNextLevel: Int
+    val miningLevelProgress: LevelProgress
 )
