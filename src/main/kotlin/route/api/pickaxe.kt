@@ -38,8 +38,7 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
 
             val pickaxe = equipmentUC.generatePickaxe(loggedInUser.id)
             if (pickaxe != null) {
-                // TODO: equipped?
-                call.respondSuccess(pickaxe.toItem(equipped = true).toJSON())
+                call.respondSuccess(pickaxe.toJSON())
             } else {
                 call.respondError(HttpStatusCode.InternalServerError)
             }
