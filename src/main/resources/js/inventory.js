@@ -33,6 +33,11 @@ window.onload = async () => {
                 li.appendChild(itemQuantity);
             }
 
+            if (item.equipped !== null) {
+                const itemEquipped = createItemEquippedDisplay();
+                li.appendChild(itemEquipped);
+            }
+
             const itemInfo = createItemInfoBox(item);
             li.appendChild(itemInfo);
 
@@ -73,6 +78,15 @@ const createItemQuantityDisplay = (quantity) => {
     span.innerText = quantity.toString();
 
     return span
+};
+
+const createItemEquippedDisplay = () => {
+    const span = document.createElement("span");
+    span.className = "inventory-list-item-equipped";
+    span.innerText = "E";
+    span.title = "Currently equipped";
+
+    return span;
 };
 
 const createEquipmentDisplay = (equipment) => {

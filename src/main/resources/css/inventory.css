@@ -41,6 +41,15 @@
     font-size: 12px;
 }
 
+.inventory-list-item-equipped {
+    position: absolute;
+    background-color: #f5ffe8;
+    top: 1px;
+    left: 1px;
+    padding: 1px;
+    font-size: 12px;
+}
+
 .equipment-display {
     position: relative;
 }
