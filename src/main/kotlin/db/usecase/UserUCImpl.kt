@@ -2,7 +2,6 @@ package com.bitwiserain.pbbg.db.usecase
 
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.bitwiserain.pbbg.db.model.User
-import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.UserStats

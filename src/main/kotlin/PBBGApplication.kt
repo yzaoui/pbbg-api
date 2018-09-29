@@ -6,19 +6,16 @@ import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
 import com.bitwiserain.pbbg.db.usecase.MiningUCImpl
 import com.bitwiserain.pbbg.db.usecase.UserUCImpl
-import com.bitwiserain.pbbg.domain.model.UserStats
 import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.route.api.equipmentAPI
 import com.bitwiserain.pbbg.route.api.inventoryAPI
 import com.bitwiserain.pbbg.route.api.mine
 import com.bitwiserain.pbbg.route.api.pickaxe
 import com.bitwiserain.pbbg.route.web.*
 import com.bitwiserain.pbbg.view.ActionVM
 import com.bitwiserain.pbbg.view.MemberPageVM
-import com.bitwiserain.pbbg.view.model.UserStatsVM
 import io.ktor.application.*
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
@@ -86,11 +83,9 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         logout()
         register(userUC)
         mineWeb(userUC, miningUC)
-        equipmentWeb(userUC)
         inventoryWeb(userUC)
         route("/api") {
             pickaxe(userUC, equipmentUC)
-            equipmentAPI(userUC, equipmentUC)
             mine(userUC, miningUC)
             inventoryAPI(userUC, inventoryUC)
         }

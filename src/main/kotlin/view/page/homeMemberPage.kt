@@ -5,14 +5,16 @@ import com.bitwiserain.pbbg.view.model.UserStatsVM
 import com.bitwiserain.pbbg.view.template.MemberTemplate
 import io.ktor.html.Template
 import kotlinx.html.HTML
-import kotlinx.html.a
 import kotlinx.html.p
+import kotlinx.html.script
 
-fun homeMemberPage(equipmentURL: String, userStatsVM: UserStatsVM, memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Home", memberPageVM).apply {
+fun homeMemberPage(userStatsVM: UserStatsVM, memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Home", memberPageVM).apply {
     content {
         p {
             +"Mining Level ${userStatsVM.miningLevelProgress.level}: ${userStatsVM.miningLevelProgress.expThisLevel} / ${userStatsVM.miningLevelProgress.totalExpToNextLevel} exp"
         }
-        a(href = equipmentURL) { +"> Equipment" }
+    }
+    endOfBody {
+        script(src = "/js/home.js") {}
     }
 }

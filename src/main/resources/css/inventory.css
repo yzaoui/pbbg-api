@@ -40,3 +40,34 @@
     padding: 1px;
     font-size: 12px;
 }
+
+.inventory-list-item-equipped {
+    position: absolute;
+    background-color: #f5ffe8;
+    top: 1px;
+    left: 1px;
+    padding: 1px;
+    font-size: 12px;
+}
+
+.equipment-display {
+    position: relative;
+}
+
+.equipped-pickaxe {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    top: 90px;
+    left: 100px;
+    background-color: white;
+}
+
+.equipped-pickaxe-none {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    top: 90px;
+    left: 100px;
+    background-color: grey;
+}

@@ -1,12 +1,16 @@
 package com.bitwiserain.pbbg.route.api
 
-import com.bitwiserain.pbbg.domain.model.Inventory
+import com.bitwiserain.pbbg.domain.model.Equippable
+import com.bitwiserain.pbbg.domain.model.Item
+import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondSuccess
+import com.bitwiserain.pbbg.view.model.EquipmentJSON
 import com.bitwiserain.pbbg.view.model.InventoryJSON
+import com.bitwiserain.pbbg.view.model.ItemJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get
@@ -15,14 +19,29 @@ import io.ktor.routing.route
 fun Route.inventoryAPI(userUC: UserUC, inventoryUC: InventoryUC) = route("/inventory") {
     interceptSetUserOr401(userUC)
 
+    /**
+     * Responds with [InventoryJSON]
+     */
     get {
         val loggedInUser = call.attributes[loggedInUserKey]
 
         val inventory = inventoryUC.getInventory(loggedInUser.id)
 
-        call.respondSuccess(inventory.toJSON())
+        call.respondSuccess(InventoryJSON(
+            items = inventory.items.map { it.toJSON() },
+            equipment = EquipmentJSON(
+                pickaxe = inventory.equipment.pickaxe?.toJSON()
+            )
+        ))
     }
 }
 
 // TODO: Find appropriate place for this adapter
-private fun Inventory.toJSON(): InventoryJSON = map { it.toJSON() }
+fun Item.toJSON() = ItemJSON(
+    baseId = this.enum.ordinal,
+    friendlyName = friendlyName,
+    imgURL = "/img/item/$spriteName-64.png",
+    quantity = if (this is Stackable) quantity else null,
+    description = description,
+    equipped = if (this is Equippable) equipped else null
+)

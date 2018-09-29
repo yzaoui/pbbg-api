@@ -2,6 +2,7 @@ package com.bitwiserain.pbbg.db.usecase
 
 import com.bitwiserain.pbbg.db.repository.EquipmentTable
 import com.bitwiserain.pbbg.db.repository.UserTable
+import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.Pickaxe
 import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
@@ -19,21 +20,18 @@ class EquipmentUCImpl(private val db: Database, private val inventoryUC: Invento
             .singleOrNull()
     }
 
-    override fun getAllPickaxes(): Array<Pickaxe> {
-        return Pickaxe.values()
-    }
-
-    override fun generatePickaxe(userId: Int): Pickaxe? = transaction(db) {
+    override fun generatePickaxe(userId: Int): Item.Pickaxe? = transaction(db) {
         // TODO: Do something if this user already has a pickaxe
-        val pickaxe = Pickaxe.values()[Random().nextInt(Pickaxe.values().size)]
+        val pickaxeEnum = Pickaxe.values()[Random().nextInt(Pickaxe.values().size)]
+        val pickaxeItem = pickaxeEnum.toItem(equipped = true)
 
-        inventoryUC.storeInInventory(userId, pickaxe.toItem())
+        inventoryUC.storeInInventory(userId, pickaxeItem)
 
         EquipmentTable.insert {
             it[EquipmentTable.userId] = EntityID(userId, UserTable)
-            it[EquipmentTable.pickaxe] = pickaxe
+            it[EquipmentTable.pickaxe] = pickaxeEnum
         }
 
-        pickaxe
+        pickaxeItem
     }
 }

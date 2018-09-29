@@ -33,9 +33,9 @@ enum class Pickaxe(val type: String, val cells: Set<Pair<Int, Int>>) {
     ));
 
     // TODO: Not sure if this belongs here
-    fun toItem(): Item = when(this) {
-        Pickaxe.PLUS -> Item.Pickaxe.PlusPickaxe()
-        Pickaxe.CROSS -> Item.Pickaxe.CrossPickaxe()
-        Pickaxe.SQUARE -> Item.Pickaxe.SquarePickaxe()
+    fun toItem(equipped: Boolean): Item.Pickaxe = when(this) {
+        Pickaxe.PLUS -> Item.Pickaxe.PlusPickaxe(equipped)
+        Pickaxe.CROSS -> Item.Pickaxe.CrossPickaxe(equipped)
+        Pickaxe.SQUARE -> Item.Pickaxe.SquarePickaxe(equipped)
     }
 }

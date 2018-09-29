@@ -7,5 +7,6 @@ data class ItemJSON(
     @SerializedName("friendlyName") val friendlyName: String,
     @SerializedName("imgURL") val imgURL: String,
     @SerializedName("quantity") val quantity: Int?,
-    @SerializedName("description") val description: String
+    @SerializedName("description") val description: String,
+    @SerializedName("equipped") val equipped: Boolean?
 )
