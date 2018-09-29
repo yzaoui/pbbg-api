@@ -10,7 +10,6 @@ import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.route.api.equipmentAPI
 import com.bitwiserain.pbbg.route.api.inventoryAPI
 import com.bitwiserain.pbbg.route.api.mine
 import com.bitwiserain.pbbg.route.api.pickaxe
@@ -87,7 +86,6 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         inventoryWeb(userUC)
         route("/api") {
             pickaxe(userUC, equipmentUC)
-            equipmentAPI(userUC, equipmentUC)
             mine(userUC, miningUC)
             inventoryAPI(userUC, inventoryUC)
         }

@@ -9,12 +9,12 @@ window.onload = async () => {
     loadingMessage.innerText = "Loading pickaxe generate button...";
     equippedPickaxeDisplay.appendChild(loadingMessage);
 
-    const res = await fetch("/api/equipment");
-    const { pickaxe } = await res.json();
+    const res = await fetch("/api/inventory");
+    const { status, data: { equipment } } = await res.json();
 
     equippedPickaxeDisplay.removeChild(loadingMessage);
 
-    if (pickaxe === null) {
+    if (equipment.pickaxe === null) {
         const generatePickaxeButton = document.createElement("button");
         generatePickaxeButton.id = "generate-pickaxe";
         generatePickaxeButton.innerText = "Click here to generate a pickaxe";

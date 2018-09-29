@@ -1,12 +1,5 @@
 package com.bitwiserain.pbbg.domain.model
 
-/**
- * Item that can go in the inventory.
- *
- * @property category The category this item fits in for common behavior. TODO: Unused
- * @property friendlyName Human-friendly name to be displayed to the user.
- * @property spriteName The base sprite name which can be used to retrieve the corresponding image file at a desired resolution.
- */
 interface Stackable {
     val quantity: Int
 }
@@ -15,6 +8,14 @@ interface Equippable {
     val equipped: Boolean
 }
 
+/**
+ * Item that can go in the inventory.
+ *
+ * @property enum The enum counterpart to this item.
+ * @property friendlyName Human-friendly name to be displayed to the user.
+ * @property spriteName The base sprite name which can be used to retrieve the corresponding image file at a desired resolution.
+ * @property description The description of this item.
+ */
 sealed class Item {
     abstract val enum: ItemEnum
     abstract val friendlyName: String
