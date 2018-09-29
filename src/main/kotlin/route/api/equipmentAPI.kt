@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.route.api
 
+import com.bitwiserain.pbbg.domain.model.Equippable
 import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
@@ -14,6 +15,7 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 
+// TODO: Remove this route
 fun Route.equipmentAPI(userUC: UserUC, equipmentUC: EquipmentUC) = route("/equipment") {
     interceptSetUserOr401(userUC)
 
@@ -26,7 +28,7 @@ fun Route.equipmentAPI(userUC: UserUC, equipmentUC: EquipmentUC) = route("/equip
         // TODO: Return whole inventory, not just pickaxe
         val pickaxe = equipmentUC.getEquippedPickaxe(loggedInUser.id)
 
-        call.respond(EquipmentJSON(pickaxe?.let { it.toItem().toJSON() } ))
+        call.respond(EquipmentJSON(pickaxe?.let { it.toItem(equipped = true).toJSON() } ))
     }
 }
 
@@ -36,5 +38,6 @@ fun Item.toJSON() = ItemJSON(
     friendlyName = friendlyName,
     imgURL = "/img/item/$spriteName-64.png",
     quantity = if (this is Stackable) quantity else null,
-    description = description
+    description = description,
+    equipped = if (this is Equippable) equipped else null
 )

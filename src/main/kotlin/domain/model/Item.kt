@@ -11,7 +11,9 @@ interface Stackable {
     val quantity: Int
 }
 
-interface Equippable
+interface Equippable {
+    val equipped: Boolean
+}
 
 sealed class Item {
     abstract val enum: ItemEnum
@@ -35,19 +37,19 @@ sealed class Item {
     }
 
     sealed class Pickaxe : Item(), Equippable {
-        class PlusPickaxe : Pickaxe() {
+        class PlusPickaxe(override val equipped: Boolean) : Pickaxe() {
             override val enum = ItemEnum.PLUS_PICKAXE
             override val friendlyName = "Plus-shaped Pickaxe"
             override val spriteName = "plus-pickaxe"
             override val description = "Plus I can't even think about a description for this."
         }
-        class CrossPickaxe : Pickaxe() {
+        class CrossPickaxe(override val equipped: Boolean) : Pickaxe() {
             override val enum = ItemEnum.CROSS_PICKAXE
             override val friendlyName = "Cross-shaped Pickaxe"
             override val spriteName = "cross-pickaxe"
             override val description = "\"You'd better not cross me when I'm holding this!\"."
         }
-        class SquarePickaxe : Pickaxe() {
+        class SquarePickaxe(override val equipped: Boolean) : Pickaxe() {
             override val enum = ItemEnum.SQUARE_PICKAXE
             override val friendlyName = "Square-shaped Pickaxe"
             override val spriteName = "square-pickaxe"
