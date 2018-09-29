@@ -26,7 +26,6 @@ fun Route.index(userUC: UserUC) = route("/") {
         if (loggedInUser != null) {
             call.respondHtmlTemplate(
                 homeMemberPage(
-                    equipmentURL = href(EquipmentLocation()),
                     userStatsVM = UserStatsVM(MiningExperienceManager.getLevelProgress(userUC.getUserStatsByUserId(loggedInUser.id).miningExp)),
                     memberPageVM = getMemberPageVM(loggedInUser)
                 )

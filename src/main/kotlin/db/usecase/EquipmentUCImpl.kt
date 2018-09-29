@@ -19,10 +19,6 @@ class EquipmentUCImpl(private val db: Database, private val inventoryUC: Invento
             .singleOrNull()
     }
 
-    override fun getAllPickaxes(): Array<Pickaxe> {
-        return Pickaxe.values()
-    }
-
     override fun generatePickaxe(userId: Int): Pickaxe? = transaction(db) {
         // TODO: Do something if this user already has a pickaxe
         val pickaxe = Pickaxe.values()[Random().nextInt(Pickaxe.values().size)]

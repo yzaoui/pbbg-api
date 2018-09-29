@@ -20,10 +20,6 @@ const val PICKAXE_PATH = "/pickaxe"
 @Location(PICKAXE_PATH)
 class PickaxeLocation
 
-const val PICKAXE_ALL_PATH = "$PICKAXE_PATH/all"
-@Location(PICKAXE_ALL_PATH)
-class PickaxeAllLocation
-
 fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
     interceptSetUserOr401(userUC)
 
@@ -46,14 +42,6 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
             } else {
                 call.respondError(HttpStatusCode.InternalServerError)
             }
-        }
-    }
-
-    // TODO: Unused so far
-    route(PICKAXE_ALL_PATH) {
-        get {
-            val pickaxes = equipmentUC.getAllPickaxes().map { it.toJSON() }
-            call.respondSuccess(pickaxes)
         }
     }
 }

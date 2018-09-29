@@ -4,6 +4,5 @@ import com.bitwiserain.pbbg.domain.model.Pickaxe
 
 interface EquipmentUC {
     fun getEquippedPickaxe(userId: Int): Pickaxe?
-    fun getAllPickaxes(): Array<Pickaxe>
     fun generatePickaxe(userId: Int): Pickaxe?
 }
