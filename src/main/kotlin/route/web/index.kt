@@ -5,10 +5,10 @@ import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.getMemberPageVM
 import com.bitwiserain.pbbg.getUserUsingSession
 import com.bitwiserain.pbbg.href
-import com.bitwiserain.pbbg.view.GuestPageVM
 import com.bitwiserain.pbbg.view.model.UserStatsVM
 import com.bitwiserain.pbbg.view.page.homeGuestPage
 import com.bitwiserain.pbbg.view.page.homeMemberPage
+import com.bitwiserain.pbbg.view.template.GuestPageVM
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location

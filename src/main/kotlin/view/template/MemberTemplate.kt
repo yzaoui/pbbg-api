@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.view.template
 
-import com.bitwiserain.pbbg.view.MemberPageVM
 import io.ktor.html.Placeholder
 import io.ktor.html.Template
 import io.ktor.html.insert
@@ -30,23 +29,25 @@ open class MemberTemplate(private val pageTitle: String, private val memberPageV
                             +memberPageVM.user.username
                         }
                         div(classes = "sidebar-home") {
-                            a(href = memberPageVM.home.url) {
-                                +memberPageVM.home.label
+                            a(href = memberPageVM.homeUrl) {
+                                +"Home"
                             }
                         }
                         div(classes = "sidebar-inventory") {
-                            a(href = memberPageVM.inventory.url) {
-                                +memberPageVM.inventory.label
+                            a(href = memberPageVM.inventoryUrl) {
+                                +"Inventory"
                             }
                         }
                         div(classes = "sidebar-mine") {
-                            a(href = memberPageVM.mine.url) {
-                                +memberPageVM.mine.label
+                            a(href = memberPageVM.mineUrl) {
+                                +"Mine"
                             }
                         }
                         div(classes = "sidebar-logout") {
-                            form(action = memberPageVM.logout.url, method = FormMethod.post) {
-                                button(type = ButtonType.submit) { +memberPageVM.logout.label }
+                            form(action = memberPageVM.logoutUrl, method = FormMethod.post) {
+                                button(type = ButtonType.submit) {
+                                    +"Log out"
+                                }
                             }
                         }
                     }

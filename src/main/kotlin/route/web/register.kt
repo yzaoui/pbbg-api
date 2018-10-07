@@ -2,8 +2,8 @@ package com.bitwiserain.pbbg.route.web
 
 import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.view.GuestPageVM
 import com.bitwiserain.pbbg.view.page.registerPage
+import com.bitwiserain.pbbg.view.template.GuestPageVM
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location

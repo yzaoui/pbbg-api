@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.view.page
 
-import com.bitwiserain.pbbg.view.GuestPageVM
+import com.bitwiserain.pbbg.view.template.GuestPageVM
 import com.bitwiserain.pbbg.view.template.GuestTemplate
 import io.ktor.html.Template
 import kotlinx.html.HTML

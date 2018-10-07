@@ -14,8 +14,7 @@ import com.bitwiserain.pbbg.route.api.inventoryAPI
 import com.bitwiserain.pbbg.route.api.mine
 import com.bitwiserain.pbbg.route.api.pickaxe
 import com.bitwiserain.pbbg.route.web.*
-import com.bitwiserain.pbbg.view.ActionVM
-import com.bitwiserain.pbbg.view.MemberPageVM
+import com.bitwiserain.pbbg.view.template.MemberPageVM
 import io.ktor.application.*
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
@@ -112,10 +111,10 @@ fun PipelineContext<Unit, ApplicationCall>.getUserUsingSession(userUC: UserUC): 
 fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPageVM {
     return MemberPageVM(
         user = user,
-        home = ActionVM("Home", href(IndexLocation())),
-        inventory = ActionVM("Inventory", href(InventoryLocation())),
-        mine = ActionVM("Mine", href(MineWebLocation())),
-        logout = ActionVM("Log out", href(LogoutLocation()))
+        homeUrl = href(IndexLocation()),
+        inventoryUrl = href(InventoryLocation()),
+        mineUrl = href(MineWebLocation()),
+        logoutUrl = href(LogoutLocation())
     )
 }
 

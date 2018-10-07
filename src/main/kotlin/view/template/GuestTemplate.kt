@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.view.template
 
-import com.bitwiserain.pbbg.view.GuestPageVM
 import io.ktor.html.Placeholder
 import io.ktor.html.Template
 import io.ktor.html.insert

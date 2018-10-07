@@ -4,8 +4,8 @@ import com.bitwiserain.pbbg.ApplicationSession
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.href
 import com.bitwiserain.pbbg.interceptGuestOnly
-import com.bitwiserain.pbbg.view.GuestPageVM
 import com.bitwiserain.pbbg.view.page.loginPage
+import com.bitwiserain.pbbg.view.template.GuestPageVM
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location

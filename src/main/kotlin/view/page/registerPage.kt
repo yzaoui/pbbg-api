@@ -4,7 +4,7 @@ import com.bitwiserain.pbbg.PASSWORD_REGEX
 import com.bitwiserain.pbbg.PASSWORD_REGEX_DESCRIPTION
 import com.bitwiserain.pbbg.USERNAME_REGEX
 import com.bitwiserain.pbbg.USERNAME_REGEX_DESCRIPTION
-import com.bitwiserain.pbbg.view.GuestPageVM
+import com.bitwiserain.pbbg.view.template.GuestPageVM
 import com.bitwiserain.pbbg.view.template.GuestTemplate
 import io.ktor.html.Template
 import kotlinx.html.*
