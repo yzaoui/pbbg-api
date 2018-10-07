@@ -102,6 +102,7 @@ const clickedCell = async (x, y) => {
 
         levelUps.forEach(({ newLevel }) => {
             const li = document.createElement("li");
+            li.className = "mining-results-level-up";
             li.textContent = `Mining levelled up to level ${newLevel}!`;
             resultsList.appendChild(li);
         });
@@ -146,9 +147,9 @@ const generateMine = async () => {
 const createExitMineButton = () => {
     const button = document.createElement("button");
     button.id = EXIT_MINE_BUTTON_ID;
+    button.className = "mining-exit-mine-button";
     button.innerText = "Exit mine";
     button.onclick = () => exitMine();
-    button.style.display = "block";
 
     return button;
 };
@@ -215,6 +216,7 @@ const setupPickaxeAndResultsList = async () => {
 
         const resultsList = document.createElement("ul");
         resultsList.id = "results-list";
+        resultsList.className = "mining-results-list";
         main.appendChild(resultsList);
 
         grid = [...miningGrid.firstElementChild.children].map(row => [...row.children]);
