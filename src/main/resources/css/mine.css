@@ -26,7 +26,7 @@
 }
 
 .mining-results-list {
-    font-size: 14px;
+    font-size: 13px;
     min-height: 140px;
     overflow-y: scroll;
     flex: 1;
@@ -37,8 +37,8 @@
 }
 
 .mining-results-list > li {
-    height: 34px;
-    padding: 8px;
+    height: 26px;
+    padding: 4px;
     box-sizing: border-box;
 }
 
@@ -48,7 +48,8 @@
 
 .mining-results-list > li > img {
     max-height: 100%;
-    vertical-align: text-bottom;
+    box-sizing: border-box;
+    vertical-align: middle;
 }
 
 .mining-results-level-up {
