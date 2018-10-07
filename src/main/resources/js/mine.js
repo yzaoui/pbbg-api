@@ -138,6 +138,7 @@ const generateMine = async () => {
     const generateMineButton = document.getElementById(GENERATE_MINE_BUTTON_ID);
     generateMineButton.innerText += " (Loading...)";
     generateMineButton.disabled = true;
+    generateMineButton.classList.add("loading");
 
     /* Get mine from API */
     const { status, data } = await (await fetch("/api/mine/generate", { method: "POST" })).json();
@@ -164,6 +165,7 @@ const exitMine = async() => {
     const exitMineButton = document.getElementById(EXIT_MINE_BUTTON_ID);
     exitMineButton.innerText += " (Loading...)";
     exitMineButton.disabled = true;
+    exitMineButton.classList.add("loading");
 
     const { status, data } = await (await fetch("/api/mine/exit", { method: "POST" })).json();
     if (status === "success") {

@@ -58,3 +58,7 @@
 .mining-exit-mine-button {
     align-self: center;
 }
+
+button.loading {
+    cursor: wait;
+}
