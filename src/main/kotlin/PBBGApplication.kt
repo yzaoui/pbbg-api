@@ -14,6 +14,7 @@ import com.bitwiserain.pbbg.route.api.inventoryAPI
 import com.bitwiserain.pbbg.route.api.mine
 import com.bitwiserain.pbbg.route.api.pickaxe
 import com.bitwiserain.pbbg.route.web.*
+import com.bitwiserain.pbbg.view.template.GuestPageVM
 import com.bitwiserain.pbbg.view.template.MemberPageVM
 import io.ktor.application.*
 import io.ktor.features.CallLogging
@@ -115,6 +116,12 @@ fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPa
         inventoryUrl = href(InventoryLocation()),
         mineUrl = href(MineWebLocation()),
         logoutUrl = href(LogoutLocation())
+    )
+}
+
+fun PipelineContext<Unit, ApplicationCall>.getGuestPageVM(): GuestPageVM {
+    return GuestPageVM(
+        loginURL = href(LoginLocation())
     )
 }
 

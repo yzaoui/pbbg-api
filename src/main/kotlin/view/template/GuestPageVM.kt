@@ -1,3 +1,3 @@
 package com.bitwiserain.pbbg.view.template
 
-class GuestPageVM
+data class GuestPageVM(val loginURL: String)

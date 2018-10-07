@@ -25,6 +25,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 500px;
+    width: 150px;
     border: black 1px solid;
     flex: 0 0 150px;
     order: -1;
@@ -79,6 +80,11 @@ body {
 .sidebar-logout {
     margin-top: auto;
     margin-bottom: 0;
+}
+
+.sidebar-login-form > * {
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 button {

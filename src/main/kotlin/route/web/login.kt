@@ -2,6 +2,7 @@ package com.bitwiserain.pbbg.route.web
 
 import com.bitwiserain.pbbg.ApplicationSession
 import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.getGuestPageVM
 import com.bitwiserain.pbbg.href
 import com.bitwiserain.pbbg.interceptGuestOnly
 import com.bitwiserain.pbbg.view.page.loginPage
@@ -29,7 +30,7 @@ fun Route.login(userUC: UserUC) = route("/login") {
             loginPage(
                 loginURL = href(LoginLocation()),
                 registerURL = href(RegisterLocation()),
-                guestPageVM = GuestPageVM()
+                guestPageVM = getGuestPageVM()
             )
         ) {}
     }
@@ -52,7 +53,7 @@ fun Route.login(userUC: UserUC) = route("/login") {
                 call.respondHtmlTemplate(loginPage(
                     loginURL = href(LoginLocation()),
                     registerURL = href(RegisterLocation()),
-                    guestPageVM = GuestPageVM(),
+                    guestPageVM = getGuestPageVM(),
                     errors = listOf("Credentials do not match an existing account.")
                 )) {}
             }

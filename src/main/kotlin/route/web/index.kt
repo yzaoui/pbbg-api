@@ -2,6 +2,7 @@ package com.bitwiserain.pbbg.route.web
 
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.getGuestPageVM
 import com.bitwiserain.pbbg.getMemberPageVM
 import com.bitwiserain.pbbg.getUserUsingSession
 import com.bitwiserain.pbbg.href
@@ -35,7 +36,7 @@ fun Route.index(userUC: UserUC) = route("/") {
                 homeGuestPage(
                     registerURL = href(RegisterLocation()),
                     loginURL = href(LoginLocation()),
-                    guestPageVM = GuestPageVM()
+                    guestPageVM = getGuestPageVM()
                 )
             ) {}
         }

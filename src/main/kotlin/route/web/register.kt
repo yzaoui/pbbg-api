@@ -26,7 +26,7 @@ fun Route.register(userUC: UserUC) = route("/register") {
         call.respondHtmlTemplate(registerPage(
             registerURL = href(RegisterLocation()),
             loginURL = href(LoginLocation()),
-            guestPageVM = GuestPageVM()
+            guestPageVM = getGuestPageVM()
         )) {}
     }
 
@@ -64,7 +64,7 @@ fun Route.register(userUC: UserUC) = route("/register") {
             call.respondHtmlTemplate(registerPage(
                 registerURL = href(RegisterLocation()),
                 loginURL = href(LoginLocation()),
-                guestPageVM = GuestPageVM(),
+                guestPageVM = getGuestPageVM(),
                 errors = errors
             )) {}
         }

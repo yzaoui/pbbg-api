@@ -5,7 +5,7 @@ import io.ktor.html.Template
 import io.ktor.html.insert
 import kotlinx.html.*
 
-open class GuestTemplate(private val pageTitle: String, private val member: GuestPageVM) : Template<HTML> {
+open class GuestTemplate(private val pageTitle: String, private val guestPageVM: GuestPageVM) : Template<HTML> {
     val headContent = Placeholder<HEAD>()
     val content = Placeholder<MAIN>()
     val endOfBody = Placeholder<BODY>()
@@ -27,6 +27,17 @@ open class GuestTemplate(private val pageTitle: String, private val member: Gues
                     nav(classes = "sidebar") {
                         a(href = "/") {
                             +"Index"
+                        }
+                        form(action = guestPageVM.loginURL, method = FormMethod.post, classes = "sidebar-login-form") {
+                            input(type = InputType.text, name = "username") {
+                                required = true
+                                placeholder = "Username"
+                            }
+                            input(type = InputType.password, name = "password") {
+                                required = true
+                                placeholder = "Password"
+                            }
+                            button(type = ButtonType.submit) { +"Log in" }
                         }
                     }
                     main {
