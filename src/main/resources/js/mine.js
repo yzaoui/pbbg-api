@@ -86,14 +86,18 @@ const clickedCell = async (x, y) => {
             })
         })).json();
 
-        const resultsList = document.getElementById(MINING_RESULTS_LIST_ID);
-
         const { minedItemResults, levelUps } = results;
 
-        minedItemResults.forEach(({ item: { friendlyName, quantity }, expPerIndividualItem}) => {
+        minedItemResults.forEach(({ item: { friendlyName, imgURL, quantity }, expPerIndividualItem}) => {
             const li = document.createElement("li");
             if (quantity !== null) {
-                li.textContent = `Obtained ${friendlyName} ×${quantity} (+${expPerIndividualItem * quantity} exp)`;
+                li.appendChild(document.createTextNode("Obtained "));
+
+                const itemImg = document.createElement("img");
+                itemImg.src = imgURL;
+                li.appendChild(itemImg);
+
+                li.appendChild(document.createTextNode(` [${friendlyName}] ×${quantity} (+${expPerIndividualItem * quantity} exp)`));
             } else {
                 li.textContent = `Obtained ${friendlyName} (+${expPerIndividualItem} exp)`;
             }
