@@ -71,6 +71,16 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
             call.respondSuccess(mine.toJSON())
         }
     }
+
+    route("/exit") {
+        post {
+            val loggedInUser = call.attributes[loggedInUserKey]
+
+            miningUC.exitMine(loggedInUser.id)
+
+            call.respondSuccess()
+        }
+    }
 }
 
 // TODO: Find appropriate place for this adapter
