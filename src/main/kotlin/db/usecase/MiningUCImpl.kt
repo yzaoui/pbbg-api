@@ -60,6 +60,10 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         return Mine(width, height, itemEntries)
     }
 
+    override fun exitMine(userId: Int): Unit = transaction(db) {
+        MineSessionTable.deleteWhere { MineSessionTable.userId.eq(userId) }
+    }
+
     override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction(db) {
         // Currently equipped picakxe
         val pickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
