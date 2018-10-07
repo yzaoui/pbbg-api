@@ -19,7 +19,7 @@ window.onload = async () => {
     statusMessage.parentNode.removeChild(statusMessage);
 
     if (data !== null) {
-        setupMiningInterface();
+        setupMiningInterface(data);
     } else {
         main.appendChild(createGenerateMineButton());
     }
@@ -129,18 +129,17 @@ const createGenerateMineButton = () => {
 const generateMine = async () => {
     /* Replace button with loading message */
     const generateMineButton = document.getElementById(GENERATE_MINE_BUTTON_ID);
-    const statusMessage = document.createElement("div");
-    statusMessage.innerText = "Loading...";
-    generateMineButton.parentNode.replaceChild(statusMessage, generateMineButton);
+    generateMineButton.innerText += " (Loading...)";
+    generateMineButton.disabled = true;
 
     /* Get mine from API */
     const { status, data } = await (await fetch("/api/mine/generate", { method: "POST" })).json();
     if (status === "success") {
-        statusMessage.parentNode.removeChild(statusMessage);
+        generateMineButton.parentNode.removeChild(generateMineButton);
 
         setupMiningInterface(data);
     } else {
-        statusMessage.innerText = "Error occurred. Try refreshing."
+        //TODO: Display error
     }
 };
 
@@ -149,13 +148,14 @@ const createExitMineButton = () => {
     button.id = EXIT_MINE_BUTTON_ID;
     button.innerText = "Exit mine";
     button.onclick = () => exitMine();
+    button.style.display = "block";
 
     return button;
 };
 
 const exitMine = async() => {
     const exitMineButton = document.getElementById(EXIT_MINE_BUTTON_ID);
-    exitMineButton.innerText = "Exit mine (Loading...)";
+    exitMineButton.innerText += " (Loading...)";
     exitMineButton.disabled = true;
 
     const { status, data } = await (await fetch("/api/mine/exit", { method: "POST" })).json();
@@ -167,6 +167,7 @@ const exitMine = async() => {
         // Replace button with success message
         const message = document.createElement("div");
         message.innerText = "Successfully exited mine";
+        message.style.display = "block";
 
         exitMineButton.parentNode.replaceChild(message, exitMineButton);
     } else {
