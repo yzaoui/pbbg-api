@@ -4,6 +4,7 @@ const GRID_HEIGHT = 20;
 const MINING_GRID_ID = "mining-grid";
 const GENERATE_MINE_BUTTON_ID = "generate-mine";
 const EXIT_MINE_BUTTON_ID = "exit-mine";
+const MINING_RESULTS_LIST_ID = "mining-results-list";
 let equippedPickaxe;
 let mineActionSubmitting = false;
 
@@ -85,7 +86,7 @@ const clickedCell = async (x, y) => {
             })
         })).json();
 
-        const resultsList = document.getElementById("results-list");
+        const resultsList = document.getElementById(MINING_RESULTS_LIST_ID);
 
         const { minedItemResults, levelUps } = results;
 
@@ -97,14 +98,15 @@ const clickedCell = async (x, y) => {
                 li.textContent = `Obtained ${friendlyName} (+${expPerIndividualItem} exp)`;
             }
 
-            resultsList.appendChild(li);
+            appendListItemToResultsList(li);
         });
 
         levelUps.forEach(({ newLevel }) => {
             const li = document.createElement("li");
             li.className = "mining-results-level-up";
             li.textContent = `Mining levelled up to level ${newLevel}!`;
-            resultsList.appendChild(li);
+
+            appendListItemToResultsList(li);
         });
 
         const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.cells);
@@ -215,7 +217,7 @@ const setupPickaxeAndResultsList = async () => {
         main.appendChild(createEquippedPickaxeDisplay(equippedPickaxe.pickaxeKind));
 
         const resultsList = document.createElement("ul");
-        resultsList.id = "results-list";
+        resultsList.id = MINING_RESULTS_LIST_ID;
         resultsList.className = "mining-results-list";
         main.appendChild(resultsList);
 
@@ -234,5 +236,17 @@ const setupPickaxeAndResultsList = async () => {
         const noPickaxe = document.createElement("div");
         noPickaxe.innerText = "No pickaxe equipped. Go to your inventory and generate one.";
         main.appendChild(noPickaxe);
+    }
+};
+
+const appendListItemToResultsList = (li) => {
+    const list = document.getElementById(MINING_RESULTS_LIST_ID);
+
+    let needToScroll = (list.scrollTop + list.clientHeight) === list.scrollHeight;
+
+    list.appendChild(li);
+
+    if (needToScroll) {
+        list.scrollTop = list.scrollHeight;
     }
 };
