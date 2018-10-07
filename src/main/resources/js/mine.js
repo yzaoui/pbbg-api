@@ -1,6 +1,9 @@
 let grid;
 const GRID_WIDTH = 30;
 const GRID_HEIGHT = 20;
+const MINING_GRID_ID = "mining-grid";
+const GENERATE_MINE_BUTTON_ID = "generate-mine";
+const EXIT_MINE_BUTTON_ID = "exit-mine";
 let equippedPickaxe;
 let mineActionSubmitting = false;
 
@@ -16,13 +19,22 @@ window.onload = async () => {
     statusMessage.parentNode.removeChild(statusMessage);
 
     if (data !== null) {
-        const mine = createMiningGrid("mining-grid", data);
-        main.appendChild(mine);
-
-        setupPickaxeAndResultsList();
+        setupMiningInterface();
     } else {
-        main.appendChild(generateMineButton());
+        main.appendChild(createGenerateMineButton());
     }
+};
+
+const setupMiningInterface = (miningData) => {
+    const main = document.getElementById("main");
+
+    const mine = createMiningGrid(miningData);
+    main.appendChild(mine);
+
+    const exitMineButton = createExitMineButton();
+    main.appendChild(exitMineButton);
+
+    setupPickaxeAndResultsList();
 };
 
 const reachableCells = (x, y, gridWidth, gridHeight, targets) => {
@@ -105,9 +117,9 @@ const clickedCell = async (x, y) => {
     }
 };
 
-const generateMineButton = () => {
+const createGenerateMineButton = () => {
     const button = document.createElement("button");
-    button.id = "generate-mine";
+    button.id = GENERATE_MINE_BUTTON_ID;
     button.innerText = "Generate new mine";
     button.onclick = () => generateMine();
 
@@ -116,7 +128,7 @@ const generateMineButton = () => {
 
 const generateMine = async () => {
     /* Replace button with loading message */
-    const generateMineButton = document.getElementById("generate-mine");
+    const generateMineButton = document.getElementById(GENERATE_MINE_BUTTON_ID);
     const statusMessage = document.createElement("div");
     statusMessage.innerText = "Loading...";
     generateMineButton.parentNode.replaceChild(statusMessage, generateMineButton);
@@ -124,18 +136,47 @@ const generateMine = async () => {
     /* Get mine from API */
     const { status, data } = await (await fetch("/api/mine/generate", { method: "POST" })).json();
     if (status === "success") {
-        const mine = createMiningGrid("mining-grid", data);
-        statusMessage.parentNode.replaceChild(mine, statusMessage);
+        statusMessage.parentNode.removeChild(statusMessage);
+
+        setupMiningInterface(data);
     } else {
         statusMessage.innerText = "Error occurred. Try refreshing."
     }
-
-    setupPickaxeAndResultsList();
 };
 
-const createMiningGrid = (id, { width, height, cells }) => {
+const createExitMineButton = () => {
+    const button = document.createElement("button");
+    button.id = EXIT_MINE_BUTTON_ID;
+    button.innerText = "Exit mine";
+    button.onclick = () => exitMine();
+
+    return button;
+};
+
+const exitMine = async() => {
+    const exitMineButton = document.getElementById(EXIT_MINE_BUTTON_ID);
+    exitMineButton.innerText = "Exit mine (Loading...)";
+    exitMineButton.disabled = true;
+
+    const { status, data } = await (await fetch("/api/mine/exit", { method: "POST" })).json();
+    if (status === "success") {
+        // Remove mining grid
+        const miningGrid = document.getElementById(MINING_GRID_ID);
+        miningGrid.parentNode.removeChild(miningGrid);
+
+        // Replace button with success message
+        const message = document.createElement("div");
+        message.innerText = "Successfully exited mine";
+
+        exitMineButton.parentNode.replaceChild(message, exitMineButton);
+    } else {
+        //TODO: Display error
+    }
+};
+
+const createMiningGrid = ({ width, height, cells }) => {
     const table = document.createElement("table");
-    table.id = id;
+    table.id = MINING_GRID_ID;
     table.classList.add("mining-grid");
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
