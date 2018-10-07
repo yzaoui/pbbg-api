@@ -8,6 +8,11 @@ interface MiningUC {
     fun generateMine(userId: Int, width: Int, height: Int): Mine
 
     /**
+     * Exit the mine currently in session, if any.
+     */
+    fun exitMine(userId: Int)
+
+    /**
      * @throws NoEquippedPickaxeException when mining cannot occur due to the lack of an equipped pickaxe.
      * @throws NotInMineSessionException when mining cannot occur due to the lack of an existing mining session.
      */
