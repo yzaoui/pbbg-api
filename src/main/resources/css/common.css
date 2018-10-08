@@ -50,14 +50,6 @@ body {
     padding: 6px;
 }
 
-.content main > a, .content main > div, .content main > form {
-    margin: 4px;
-}
-
-.content main > a, .content main > div {
-    display: inline-block;
-}
-
 .content main > input {
     padding: 4px;
 }
