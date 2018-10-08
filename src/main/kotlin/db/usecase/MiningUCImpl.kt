@@ -6,10 +6,7 @@ import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.Stackable
-import com.bitwiserain.pbbg.domain.model.mine.Mine
-import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
-import com.bitwiserain.pbbg.domain.model.mine.MineEntity
-import com.bitwiserain.pbbg.domain.model.mine.MinedItemResult
+import com.bitwiserain.pbbg.domain.model.mine.*
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.domain.usecase.NoEquippedPickaxeException
@@ -34,11 +31,13 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         Mine(mineSession.width, mineSession.height, grid)
     }
 
-    override fun generateMine(userId: Int, width: Int, height: Int): Mine {
+    override fun generateMine(userId: Int, mineType: MineType, width: Int, height: Int): Mine {
         val itemEntries = mutableMapOf<Pair<Int, Int>, MineEntity>()
         (0 until height).forEach { y ->
             (0 until width).forEach { x ->
-                rollForRandomMineItem()?.let { itemEntries.put(x to y, it) }
+                mineType.rollForMineEntity(random.nextFloat())?.let {
+                    itemEntries.put(x to y, it)
+                }
             }
         }
 

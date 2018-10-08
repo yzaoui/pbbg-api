@@ -56,7 +56,7 @@
     color: #04b104;
 }
 
-.mining-exit-mine-button {
+.mining-generate-mine-button, .mining-exit-mine-button {
     align-self: center;
 }
 

@@ -29,11 +29,11 @@ window.onload = async () => {
 const setupMiningInterface = (miningData) => {
     const main = document.getElementById("main");
 
-    const mine = createMiningGrid(miningData);
-    main.appendChild(mine);
-
     const exitMineButton = createExitMineButton();
     main.appendChild(exitMineButton);
+
+    const mine = createMiningGrid(miningData);
+    main.appendChild(mine);
 
     setupPickaxeAndResultsList();
 };
@@ -127,6 +127,7 @@ const clickedCell = async (x, y) => {
 const createGenerateMineButton = () => {
     const button = document.createElement("button");
     button.id = GENERATE_MINE_BUTTON_ID;
+    button.className = "mining-generate-mine-button";
     button.innerText = "Generate new mine";
     button.onclick = () => generateMine();
 

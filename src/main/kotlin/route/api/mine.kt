@@ -4,12 +4,13 @@ import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.model.mine.Mine
 import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
-import com.bitwiserain.pbbg.domain.usecase.MiningUC
-import com.bitwiserain.pbbg.domain.usecase.NoEquippedPickaxeException
-import com.bitwiserain.pbbg.domain.usecase.NotInMineSessionException
-import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.domain.model.mine.MineType
+import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.view.model.LevelUpJSON
-import com.bitwiserain.pbbg.view.model.mine.*
+import com.bitwiserain.pbbg.view.model.mine.MineActionResultJSON
+import com.bitwiserain.pbbg.view.model.mine.MineEntityJSON
+import com.bitwiserain.pbbg.view.model.mine.MineJSON
+import com.bitwiserain.pbbg.view.model.mine.MinedItemResultJSON
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
@@ -36,7 +37,15 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
     }
 
     /**
-     * Responds with [MineActionResultJSON]
+     * Expects:
+     *   [MinePositionParams]
+     *
+     * On success:
+     *   [MineActionResultJSON]
+     *
+     * Error situations:
+     *   [NoEquippedPickaxeException] Must have a pickaxe equipped to mine.
+     *   [NotInMineSessionException] Must be in a mine to mine.
      */
     post {
         try {
@@ -61,12 +70,19 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
     route("/generate") {
         /**
-         * Responds with [MineJSON]
+         * Expects:
+         *   []
+         *
+         * On success:
+         *   [MineJSON]
+         *
+         * Error situations:
+         *   [UnfulfilledLevelRequirementException] Must have minimum required level.
          */
         post {
             val loggedInUser = call.attributes[loggedInUserKey]
 
-            val mine = miningUC.generateMine(loggedInUser.id, 30, 20)
+            val mine = miningUC.generateMine(loggedInUser.id, MineType.BEGINNER, 30, 20)
 
             call.respondSuccess(mine.toJSON())
         }
