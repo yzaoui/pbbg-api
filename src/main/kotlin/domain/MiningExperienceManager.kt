@@ -10,13 +10,23 @@ object MiningExperienceManager {
         var prevLevelAbsoluteExp = 0
         for ((i, cap) in levels.withIndex()) {
             if (absoluteExp < cap) {
-                return LevelProgress(i + 1, absoluteExp - prevLevelAbsoluteExp, cap, absoluteExp)
+                return LevelProgress(
+                    level = i + 1,
+                    absoluteExp = absoluteExp,
+                    absoluteExpCurrentLevel = prevLevelAbsoluteExp,
+                    absoluteExpNextLevel = prevLevelAbsoluteExp + cap
+                )
             }
 
             prevLevelAbsoluteExp = cap
         }
 
-        return LevelProgress(levels.size + 1, 0, 0, levels.last())
+        return LevelProgress(
+            level = levels.size + 1,
+            absoluteExp = levels.last(),
+            absoluteExpCurrentLevel = levels.last(),
+            absoluteExpNextLevel = levels.last()
+        )
     }
 
     fun getLevelUpResults(prevLevel: Int, newLevel: Int): List<LevelUp> {
