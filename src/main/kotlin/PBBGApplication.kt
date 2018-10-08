@@ -82,7 +82,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         login(userUC)
         logout()
         register(userUC)
-        mineWeb(userUC, miningUC)
+        mineWeb(userUC)
         inventoryWeb(userUC)
         route("/api") {
             pickaxe(userUC, equipmentUC)
