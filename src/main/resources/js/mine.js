@@ -2,7 +2,7 @@ let grid;
 const GRID_WIDTH = 30;
 const GRID_HEIGHT = 20;
 const MINING_GRID_ID = "mining-grid";
-const GENERATE_MINE_BUTTON_ID = "generate-mine";
+const GENERATE_MINE_INTERFACE_ID = "generate-mine";
 const EXIT_MINE_BUTTON_ID = "exit-mine";
 const MINING_RESULTS_LIST_ID = "mining-results-list";
 let equippedPickaxe;
@@ -20,9 +20,11 @@ window.onload = async () => {
     statusMessage.parentNode.removeChild(statusMessage);
 
     if (data !== null) {
+        // Currently in mine session
         setupMiningInterface(data);
     } else {
-        main.appendChild(createGenerateMineButton());
+        // No mine session in progress
+        setupGenerateMineInterface();
     }
 };
 
@@ -36,6 +38,43 @@ const setupMiningInterface = (miningData) => {
     main.appendChild(mine);
 
     setupPickaxeAndResultsList();
+};
+
+const setupGenerateMineInterface = async () => {
+    const main = document.getElementById("main");
+
+    const container = document.createElement("div");
+    container.id = GENERATE_MINE_INTERFACE_ID;
+    container.innerText = "Loading list of mines...";
+    main.appendChild(container);
+
+    const { status, data } = await (await fetch("/api/mine/types")).json();
+
+    container.innerText = "";
+
+    if (status === "success") {
+        for (let i = 0; i < data.types.length; i++) {
+            const type = data.types[i];
+
+            const div = document.createElement("div");
+
+            const nameSpan = document.createElement("span");
+            nameSpan.innerText = `Explore new mine: ${type.name} `;
+            div.appendChild(nameSpan);
+
+            const button = document.createElement("button");
+            button.className = "mining-generate-mine";
+            button.innerText = "Generate";
+            button.onclick = () => generateMine(type.id);
+            div.appendChild(button);
+
+            const minimumLvlSpan = document.createElement("span");
+            minimumLvlSpan.innerText = ` (minimum mining level: ${type.minLevel})`;
+            div.appendChild(minimumLvlSpan);
+
+            container.appendChild(div);
+        }
+    }
 };
 
 const reachableCells = (x, y, gridWidth, gridHeight, targets) => {
@@ -124,27 +163,27 @@ const clickedCell = async (x, y) => {
     }
 };
 
-const createGenerateMineButton = () => {
-    const button = document.createElement("button");
-    button.id = GENERATE_MINE_BUTTON_ID;
-    button.className = "mining-generate-mine-button";
-    button.innerText = "Generate new mine";
-    button.onclick = () => generateMine();
+const generateMine = async (mineTypeId) => {
+    const mineListContainer = document.getElementById(GENERATE_MINE_INTERFACE_ID);
 
-    return button;
-};
+    while (mineListContainer.hasChildNodes()) {
+        mineListContainer.removeChild(mineListContainer.firstChild);
+    }
 
-const generateMine = async () => {
-    /* Replace button with loading message */
-    const generateMineButton = document.getElementById(GENERATE_MINE_BUTTON_ID);
-    generateMineButton.innerText += " (Loading...)";
-    generateMineButton.disabled = true;
-    generateMineButton.classList.add("loading");
+    mineListContainer.innerText = "Loading mine...";
 
-    /* Get mine from API */
-    const { status, data } = await (await fetch("/api/mine/generate", { method: "POST" })).json();
+    const { status, data } = await (await fetch("/api/mine/generate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify({
+            mineTypeId: mineTypeId
+        })
+    })).json();
+
     if (status === "success") {
-        generateMineButton.parentNode.removeChild(generateMineButton);
+        mineListContainer.parentNode.removeChild(mineListContainer);
 
         setupMiningInterface(data);
     } else {
@@ -155,7 +194,7 @@ const generateMine = async () => {
 const createExitMineButton = () => {
     const button = document.createElement("button");
     button.id = EXIT_MINE_BUTTON_ID;
-    button.className = "mining-exit-mine-button";
+    button.className = "mining-exit-mine";
     button.innerText = "Exit mine";
     button.onclick = () => exitMine();
 

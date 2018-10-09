@@ -23,6 +23,8 @@ class MineAPILocation
 
 data class MinePositionParams(val x: Int, val y: Int)
 
+data class MineGenerateParams(val mineTypeId: Int)
+
 fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
     interceptSetUserOr401(userUC)
 
@@ -74,6 +76,9 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
     route("/generate") {
         /**
+         * Expects:
+         *   [MineGenerateParams]
+         *
          * On success:
          *   [MineJSON]
          *
@@ -83,7 +88,11 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
         post {
             val loggedInUser = call.attributes[loggedInUserKey]
 
-            val mine = miningUC.generateMine(loggedInUser.id, MineType.BEGINNER, 30, 20)
+            val (mineTypeId: Int) = call.receive(MineGenerateParams::class) // TODO: Respond with error on illegal ID
+
+            val mineType = MineType.values()[mineTypeId]
+
+            val mine = miningUC.generateMine(loggedInUser.id, mineType, 30, 20)
 
             call.respondSuccess(mine.toJSON())
         }

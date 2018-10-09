@@ -79,22 +79,3 @@ body {
     max-width: 100%;
     box-sizing: border-box;
 }
-
-button {
-    text-transform: uppercase;
-    padding: 3px 15px;
-    color: white;
-    height: 32px;
-    background-color: #00bcd4;
-    border: none;
-    border-radius: 2px;
-    box-shadow: rgba(0, 0, 0, 0.12) 0 1px 6px, rgba(0, 0, 0, 0.12) 0 1px 4px;
-    transition: all 150ms ease-in;
-}
-
-button:disabled {
-    background-color: #cccccc;
-    color: #8a8a8a;
-    border: 1px solid #999999;
-    box-shadow: initial;
-}
