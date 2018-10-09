@@ -29,42 +29,49 @@ data class MinePositionParams(val x: Int, val y: Int)
 fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
     interceptSetUserOr401(userUC)
 
+    /**
+     * On success:
+     *   [MineJSON]
+     */
     get {
         val loggedInUser = call.attributes[loggedInUserKey]
+
         val mine = miningUC.getMine(loggedInUser.id)
 
         call.respondSuccess(mine?.toJSON())
     }
 
-    /**
-     * Expects:
-     *   [MinePositionParams]
-     *
-     * On success:
-     *   [MineActionResultJSON]
-     *
-     * Error situations:
-     *   [NoEquippedPickaxeException] Must have a pickaxe equipped to mine.
-     *   [NotInMineSessionException] Must be in a mine to mine.
-     */
-    post {
-        try {
-            // TODO: Remove cookie dependency
-            val loggedInUser = call.attributes[loggedInUserKey]
+    route("/perform") {
+        /**
+         * Expects:
+         *   [MinePositionParams]
+         *
+         * On success:
+         *   [MineActionResultJSON]
+         *
+         * Error situations:
+         *   [NoEquippedPickaxeException] Must have a pickaxe equipped to mine.
+         *   [NotInMineSessionException] Must be in a mine to mine.
+         */
+        post {
+            try {
+                // TODO: Remove cookie dependency
+                val loggedInUser = call.attributes[loggedInUserKey]
 
-            val (x: Int, y: Int)= call.receive(MinePositionParams::class)
+                val (x: Int, y: Int)= call.receive(MinePositionParams::class)
 
-            val mineActionResult = miningUC.submitMineAction(loggedInUser.id, x, y).toJSON()
+                val mineActionResult = miningUC.submitMineAction(loggedInUser.id, x, y).toJSON()
 
-            call.respondSuccess(mineActionResult)
-        } catch (e: ContentTransformationException) {
-            call.respondFail(HttpStatusCode.BadRequest, "Missing or invalid parameters.")
-        } catch (e: NoEquippedPickaxeException) {
-            call.respondFail(HttpStatusCode.Forbidden, "A pickaxe must be equipped in order to perform a mining operation.")
-        } catch (e: NotInMineSessionException) {
-            call.respondFail(HttpStatusCode.Forbidden, "A mine session must be in progress in order to perform a mining operation.")
-        } catch (e: Exception) {
-            call.respondError(HttpStatusCode.InternalServerError, e.message.orEmpty())
+                call.respondSuccess(mineActionResult)
+            } catch (e: ContentTransformationException) {
+                call.respondFail(HttpStatusCode.BadRequest, "Missing or invalid parameters.")
+            } catch (e: NoEquippedPickaxeException) {
+                call.respondFail(HttpStatusCode.Forbidden, "A pickaxe must be equipped in order to perform a mining operation.")
+            } catch (e: NotInMineSessionException) {
+                call.respondFail(HttpStatusCode.Forbidden, "A mine session must be in progress in order to perform a mining operation.")
+            } catch (e: Exception) {
+                call.respondError(HttpStatusCode.InternalServerError, e.message.orEmpty())
+            }
         }
     }
 
@@ -103,17 +110,18 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 private fun Mine.toJSON() = MineJSON(
     width = width,
     height = height,
-    cells = List(height) { y -> List(width) { x -> grid[x to y]?.toVM() } }
+    cells = List(height) { y -> List(width) { x -> grid[x to y]?.toJSON() } }
 )
 
 // TODO: Find appropriate place for this adapter
-private fun MineEntity.toVM() = MineEntityJSON(
+private fun MineEntity.toJSON() = MineEntityJSON(
     imageURL = when (this) {
         MineEntity.ROCK -> "/img/mine/rock.png"
         MineEntity.COAL -> "/img/mine/coal.png"
     }
 )
 
+// TODO: Find appropriate place for this adapter
 private fun MineActionResult.toJSON() = MineActionResultJSON(
     minedItemResults = minedItemResults.map {
         MinedItemResultJSON(

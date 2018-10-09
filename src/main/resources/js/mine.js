@@ -75,7 +75,7 @@ const clickedCell = async (x, y) => {
     if (!mineActionSubmitting) {
         mineActionSubmitting = true;
 
-        const {status, data: results} = await (await fetch("/api/mine", {
+        const {status, data: results} = await (await fetch("/api/mine/perform", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json; charset=utf-8"
