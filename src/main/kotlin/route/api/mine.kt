@@ -7,10 +7,7 @@ import com.bitwiserain.pbbg.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.domain.model.mine.MineType
 import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.view.model.LevelUpJSON
-import com.bitwiserain.pbbg.view.model.mine.MineActionResultJSON
-import com.bitwiserain.pbbg.view.model.mine.MineEntityJSON
-import com.bitwiserain.pbbg.view.model.mine.MineJSON
-import com.bitwiserain.pbbg.view.model.mine.MinedItemResultJSON
+import com.bitwiserain.pbbg.view.model.mine.*
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
@@ -58,7 +55,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
                 // TODO: Remove cookie dependency
                 val loggedInUser = call.attributes[loggedInUserKey]
 
-                val (x: Int, y: Int)= call.receive(MinePositionParams::class)
+                val (x: Int, y: Int) = call.receive(MinePositionParams::class)
 
                 val mineActionResult = miningUC.submitMineAction(loggedInUser.id, x, y).toJSON()
 
@@ -77,9 +74,6 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
     route("/generate") {
         /**
-         * Expects:
-         *   []
-         *
          * On success:
          *   [MineJSON]
          *
@@ -102,6 +96,22 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
             miningUC.exitMine(loggedInUser.id)
 
             call.respondSuccess()
+        }
+    }
+
+    route("/types") {
+        /**
+         * On success:
+         *   [MineTypeListJSON]
+         */
+        get {
+            val typesList = MineTypeListJSON(
+                types = MineType.values().map {
+                    MineTypeListJSON.MineTypeJSON(id = it.ordinal, name = it.friendlyName, minLevel = it.minLevel)
+                }
+            )
+
+            call.respondSuccess(typesList)
         }
     }
 }
