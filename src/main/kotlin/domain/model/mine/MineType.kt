@@ -12,7 +12,11 @@ enum class MineType(val friendlyName: String, val minLevel: Int, private val min
     MODERATE(
         "Grown heron's mine",
         5,
-        mapOf()
+        mapOf(
+            0.05f to MineEntity.ROCK,
+            0.002f to MineEntity.COAL,
+            0.01f to MineEntity.COPPER
+        )
     );
 
     fun rollForMineEntity(roll: Float): MineEntity? {
