@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.view.model
 
-class UserStatsVM(
+// TODO: Use JSON variant
+data class UserStatsVM(
     val miningLevelProgress: LevelProgressVM
 )

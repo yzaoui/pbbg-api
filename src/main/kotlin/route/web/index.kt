@@ -9,7 +9,6 @@ import com.bitwiserain.pbbg.href
 import com.bitwiserain.pbbg.view.model.UserStatsVM
 import com.bitwiserain.pbbg.view.page.homeGuestPage
 import com.bitwiserain.pbbg.view.page.homeMemberPage
-import com.bitwiserain.pbbg.view.template.GuestPageVM
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location
@@ -27,6 +26,7 @@ fun Route.index(userUC: UserUC) = route("/") {
         if (loggedInUser != null) {
             call.respondHtmlTemplate(
                 homeMemberPage(
+                    // TODO: Temp, get stats from JSON API
                     userStatsVM = UserStatsVM(MiningExperienceManager.getLevelProgress(userUC.getUserStatsByUserId(loggedInUser.id).miningExp)),
                     memberPageVM = getMemberPageVM(loggedInUser)
                 )

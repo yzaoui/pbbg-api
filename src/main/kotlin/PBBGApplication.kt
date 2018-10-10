@@ -13,6 +13,7 @@ import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.route.api.inventoryAPI
 import com.bitwiserain.pbbg.route.api.mine
 import com.bitwiserain.pbbg.route.api.pickaxe
+import com.bitwiserain.pbbg.route.api.user
 import com.bitwiserain.pbbg.route.web.*
 import com.bitwiserain.pbbg.view.template.GuestPageVM
 import com.bitwiserain.pbbg.view.template.MemberPageVM
@@ -85,6 +86,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         mineWeb(userUC)
         inventoryWeb(userUC)
         route("/api") {
+            user(userUC)
             pickaxe(userUC, equipmentUC)
             mine(userUC, miningUC)
             inventoryAPI(userUC, inventoryUC)
