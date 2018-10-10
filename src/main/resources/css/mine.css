@@ -96,3 +96,7 @@ table.mining-mine-info > thead th {
     background-color: #7924da;
     color: white;
 }
+
+table.mining-mine-info > tbody > tr.unmet-minimum-level {
+    background-color: #ff040426;
+}

@@ -56,6 +56,9 @@ const setupGenerateMineInterface = async () => {
     const userStatsResponse = await (await userStatsRequest).json();
 
     if (mineTypesResponse.status === "success" && userStatsResponse.status === "success") {
+        const mineTypes = mineTypesResponse.data.types;
+        const userMiningStats = userStatsResponse.data.mining;
+
         table.innerText = "";
 
         const thead = document.createElement("thead");
@@ -79,30 +82,32 @@ const setupGenerateMineInterface = async () => {
         const tbody = document.createElement("tbody");
         table.appendChild(tbody);
 
-        const mineTypes = mineTypesResponse.data.types;
-
         for (let i = 0; i < mineTypes.length; i++) {
-            const type = mineTypes[i];
+            const mineType = mineTypes[i];
 
             const tr = document.createElement("tr");
+            tbody.appendChild(tr);
 
             const nameTd = document.createElement("td");
-            nameTd.innerText = type.name;
+            nameTd.innerText = mineType.name;
             tr.appendChild(nameTd);
 
             const minimumLvlTd = document.createElement("td");
-            minimumLvlTd.innerText = type.minLevel;
+            minimumLvlTd.innerText = mineType.minLevel;
             tr.appendChild(minimumLvlTd);
 
             const button = document.createElement("button");
             button.className = "mining-generate-mine";
             button.innerText = "Generate";
-            button.onclick = () => generateMine(type.id);
+            button.onclick = () => generateMine(mineType.id);
             const generateTd = document.createElement("td");
             generateTd.appendChild(button);
             tr.appendChild(generateTd);
 
-            tbody.appendChild(tr);
+            if (userMiningStats.level < mineType.minLevel) {
+                tr.classList.add("unmet-minimum-level");
+                button.disabled = true;
+            }
         }
     }
 };
