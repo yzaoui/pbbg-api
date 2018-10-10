@@ -49,9 +49,13 @@ const setupGenerateMineInterface = async () => {
     table.innerText = "Loading list of mines...";
     main.appendChild(table);
 
-    const { status, data } = await (await fetch("/api/mine/types")).json();
+    const mineTypesRequest = fetch("/api/mine/types");
+    const userStatsRequest = fetch("/api/user");
 
-    if (status === "success") {
+    const mineTypesResponse = await (await mineTypesRequest).json();
+    const userStatsResponse = await (await userStatsRequest).json();
+
+    if (mineTypesResponse.status === "success" && userStatsResponse.status === "success") {
         table.innerText = "";
 
         const thead = document.createElement("thead");
@@ -75,8 +79,10 @@ const setupGenerateMineInterface = async () => {
         const tbody = document.createElement("tbody");
         table.appendChild(tbody);
 
-        for (let i = 0; i < data.types.length; i++) {
-            const type = data.types[i];
+        const mineTypes = mineTypesResponse.data.types;
+
+        for (let i = 0; i < mineTypes.length; i++) {
+            const type = mineTypes[i];
 
             const tr = document.createElement("tr");
 
