@@ -79,3 +79,20 @@ button.mining-exit-mine:disabled {
 button.mining-exit-mine.loading {
     cursor: wait;
 }
+
+table.mining-mine-info {
+    border-collapse: collapse;
+    text-align: left;
+}
+
+table.mining-mine-info > thead th, table.mining-mine-info > tbody td {
+    border: 1px solid #909090;
+    padding: 8px;
+}
+
+table.mining-mine-info > thead th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #7924da;
+    color: white;
+}

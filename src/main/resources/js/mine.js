@@ -2,7 +2,7 @@ let grid;
 const GRID_WIDTH = 30;
 const GRID_HEIGHT = 20;
 const MINING_GRID_ID = "mining-grid";
-const GENERATE_MINE_INTERFACE_ID = "generate-mine";
+const GENERATE_MINE_INTERFACE_ID = "generate-mine-container";
 const EXIT_MINE_BUTTON_ID = "exit-mine";
 const MINING_RESULTS_LIST_ID = "mining-results-list";
 let equippedPickaxe;
@@ -43,36 +43,60 @@ const setupMiningInterface = (miningData) => {
 const setupGenerateMineInterface = async () => {
     const main = document.getElementById("main");
 
-    const container = document.createElement("div");
-    container.id = GENERATE_MINE_INTERFACE_ID;
-    container.innerText = "Loading list of mines...";
-    main.appendChild(container);
+    const table = document.createElement("table");
+    table.id = GENERATE_MINE_INTERFACE_ID;
+    table.className = "mining-mine-info";
+    table.innerText = "Loading list of mines...";
+    main.appendChild(table);
 
     const { status, data } = await (await fetch("/api/mine/types")).json();
 
-    container.innerText = "";
-
     if (status === "success") {
+        table.innerText = "";
+
+        const thead = document.createElement("thead");
+        table.appendChild(thead);
+
+        const headerRow = document.createElement("tr");
+        thead.appendChild(headerRow);
+
+        const nameHeader = document.createElement("th");
+        nameHeader.innerText = "Mine name";
+        headerRow.appendChild(nameHeader);
+
+        const minLevelHeader = document.createElement("th");
+        minLevelHeader.innerText = "Minimum lvl.";
+        headerRow.appendChild(minLevelHeader);
+
+        const generateHeader = document.createElement("th");
+        generateHeader.innerText = "Generate mine";
+        headerRow.appendChild(generateHeader);
+
+        const tbody = document.createElement("tbody");
+        table.appendChild(tbody);
+
         for (let i = 0; i < data.types.length; i++) {
             const type = data.types[i];
 
-            const div = document.createElement("div");
+            const tr = document.createElement("tr");
 
-            const nameSpan = document.createElement("span");
-            nameSpan.innerText = `Explore new mine: ${type.name} `;
-            div.appendChild(nameSpan);
+            const nameTd = document.createElement("td");
+            nameTd.innerText = type.name;
+            tr.appendChild(nameTd);
+
+            const minimumLvlTd = document.createElement("td");
+            minimumLvlTd.innerText = type.minLevel;
+            tr.appendChild(minimumLvlTd);
 
             const button = document.createElement("button");
             button.className = "mining-generate-mine";
             button.innerText = "Generate";
             button.onclick = () => generateMine(type.id);
-            div.appendChild(button);
+            const generateTd = document.createElement("td");
+            generateTd.appendChild(button);
+            tr.appendChild(generateTd);
 
-            const minimumLvlSpan = document.createElement("span");
-            minimumLvlSpan.innerText = ` (minimum mining level: ${type.minLevel})`;
-            div.appendChild(minimumLvlSpan);
-
-            container.appendChild(div);
+            tbody.appendChild(tr);
         }
     }
 };
