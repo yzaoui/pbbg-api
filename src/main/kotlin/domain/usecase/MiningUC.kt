@@ -14,13 +14,14 @@ interface MiningUC {
      * Generate a new mine and enter it.
      *
      * @param userId The user's ID.
-     * @param mineType The kind of mine to generate.
+     * @param mineTypeId The kind of mine to generate.
      * @param width The width in cells of the mine to generate.
-     * @param height The height in cells of the mine to generate
+     * @param height The height in cells of the mine to generate.
      *
-     * @throws UnfulfilledLevelRequirementException when
+     * @throws InvalidMineTypeIdException when [mineTypeId] does not map to a valid [MineType].
+     * @throws UnfulfilledLevelRequirementException when minimum mining level requirement is not met.
      */
-    fun generateMine(userId: Int, mineType: MineType, width: Int, height: Int): Mine
+    fun generateMine(userId: Int, mineTypeId: Int, width: Int, height: Int): Mine
 
     /**
      * Exit the mine currently in session, if any.
@@ -34,7 +35,8 @@ interface MiningUC {
     fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult
 }
 
-class UnfulfilledLevelRequirementException : IllegalStateException()
+class InvalidMineTypeIdException(val id: Int) : Exception()
+class UnfulfilledLevelRequirementException : Exception()
 
-class NoEquippedPickaxeException : IllegalStateException()
-class NotInMineSessionException : IllegalStateException()
+class NoEquippedPickaxeException : Exception()
+class NotInMineSessionException : Exception()

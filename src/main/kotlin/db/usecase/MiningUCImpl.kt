@@ -7,10 +7,7 @@ import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.model.mine.*
-import com.bitwiserain.pbbg.domain.usecase.InventoryUC
-import com.bitwiserain.pbbg.domain.usecase.MiningUC
-import com.bitwiserain.pbbg.domain.usecase.NoEquippedPickaxeException
-import com.bitwiserain.pbbg.domain.usecase.NotInMineSessionException
+import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -31,7 +28,14 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         Mine(mineSession.width, mineSession.height, grid)
     }
 
-    override fun generateMine(userId: Int, mineType: MineType, width: Int, height: Int): Mine {
+    override fun generateMine(userId: Int, mineTypeId: Int, width: Int, height: Int): Mine {
+        val mineType: MineType
+        try {
+            mineType = MineType.values()[mineTypeId]
+        } catch (e: ArrayIndexOutOfBoundsException) {
+            throw InvalidMineTypeIdException(id = mineTypeId)
+        }
+
         val itemEntries = mutableMapOf<Pair<Int, Int>, MineEntity>()
         (0 until height).forEach { y ->
             (0 until width).forEach { x ->

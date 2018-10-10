@@ -86,15 +86,19 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
          *   [UnfulfilledLevelRequirementException] Must have minimum required level.
          */
         post {
-            val loggedInUser = call.attributes[loggedInUserKey]
+            try {
+                val loggedInUser = call.attributes[loggedInUserKey]
 
-            val (mineTypeId: Int) = call.receive(MineGenerateParams::class) // TODO: Respond with error on illegal ID
+                val (mineTypeId: Int) = call.receive<MineGenerateParams>() // TODO: Respond with error on illegal ID
 
-            val mineType = MineType.values()[mineTypeId]
+                val mine = miningUC.generateMine(loggedInUser.id, mineTypeId, 30, 20)
 
-            val mine = miningUC.generateMine(loggedInUser.id, mineType, 30, 20)
-
-            call.respondSuccess(mine.toJSON())
+                call.respondSuccess(mine.toJSON())
+            } catch (e: InvalidMineTypeIdException) {
+                call.respondFail("There is no mine with ID: ${e.id}.")
+            } catch (e: UnfulfilledLevelRequirementException) {
+                call.respondFail("Minimum mining level requirement not met to generate this type of mine.")
+            }
         }
     }
 
