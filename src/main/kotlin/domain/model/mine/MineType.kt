@@ -2,7 +2,7 @@ package com.bitwiserain.pbbg.domain.model.mine
 
 enum class MineType(val friendlyName: String, val minLevel: Int, private val mineEntityOdds: Map<Float, MineEntity>) {
     BEGINNER(
-        "Young worm's mine",
+        "Young Worm's Mine",
         1,
         mapOf(
             0.05f to MineEntity.ROCK,
@@ -10,10 +10,10 @@ enum class MineType(val friendlyName: String, val minLevel: Int, private val min
         )
     ),
     MODERATE(
-        "Grown heron's mine",
+        "Grown Heron's Mine",
         5,
         mapOf(
-            0.05f to MineEntity.ROCK,
+            0.048f to MineEntity.ROCK,
             0.002f to MineEntity.COAL,
             0.01f to MineEntity.COPPER
         )

@@ -179,10 +179,10 @@ const clickedCell = async (x, y) => {
             appendListItemToResultsList(li);
         });
 
-        levelUps.forEach(({ newLevel }) => {
+        levelUps.forEach(({ newLevel, additionalMessage }) => {
             const li = document.createElement("li");
             li.className = "mining-results-level-up";
-            li.textContent = `Mining levelled up to level ${newLevel}!`;
+            li.textContent = `Mining levelled up to level ${newLevel}!` + (additionalMessage !== null ? ` ${additionalMessage}` : "");
 
             appendListItemToResultsList(li);
         });
