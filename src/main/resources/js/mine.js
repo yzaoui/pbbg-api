@@ -2,7 +2,7 @@ let grid;
 const GRID_WIDTH = 30;
 const GRID_HEIGHT = 20;
 const MINING_GRID_ID = "mining-grid";
-const GENERATE_MINE_BUTTON_ID = "generate-mine";
+const GENERATE_MINE_INTERFACE_ID = "generate-mine-container";
 const EXIT_MINE_BUTTON_ID = "exit-mine";
 const MINING_RESULTS_LIST_ID = "mining-results-list";
 let equippedPickaxe;
@@ -20,22 +20,96 @@ window.onload = async () => {
     statusMessage.parentNode.removeChild(statusMessage);
 
     if (data !== null) {
+        // Currently in mine session
         setupMiningInterface(data);
     } else {
-        main.appendChild(createGenerateMineButton());
+        // No mine session in progress
+        setupGenerateMineInterface();
     }
 };
 
 const setupMiningInterface = (miningData) => {
     const main = document.getElementById("main");
 
-    const mine = createMiningGrid(miningData);
-    main.appendChild(mine);
-
     const exitMineButton = createExitMineButton();
     main.appendChild(exitMineButton);
 
+    const mine = createMiningGrid(miningData);
+    main.appendChild(mine);
+
     setupPickaxeAndResultsList();
+};
+
+const setupGenerateMineInterface = async () => {
+    const main = document.getElementById("main");
+
+    const table = document.createElement("table");
+    table.id = GENERATE_MINE_INTERFACE_ID;
+    table.className = "mining-mine-info";
+    table.innerText = "Loading list of mines...";
+    main.appendChild(table);
+
+    const mineTypesRequest = fetch("/api/mine/types");
+    const userStatsRequest = fetch("/api/user");
+
+    const mineTypesResponse = await (await mineTypesRequest).json();
+    const userStatsResponse = await (await userStatsRequest).json();
+
+    if (mineTypesResponse.status === "success" && userStatsResponse.status === "success") {
+        const mineTypes = mineTypesResponse.data.types;
+        const userMiningStats = userStatsResponse.data.mining;
+
+        table.innerText = "";
+
+        const thead = document.createElement("thead");
+        table.appendChild(thead);
+
+        const headerRow = document.createElement("tr");
+        thead.appendChild(headerRow);
+
+        const nameHeader = document.createElement("th");
+        nameHeader.innerText = "Mine name";
+        headerRow.appendChild(nameHeader);
+
+        const minLevelHeader = document.createElement("th");
+        minLevelHeader.innerText = "Minimum lvl.";
+        headerRow.appendChild(minLevelHeader);
+
+        const generateHeader = document.createElement("th");
+        generateHeader.innerText = "Generate mine";
+        headerRow.appendChild(generateHeader);
+
+        const tbody = document.createElement("tbody");
+        table.appendChild(tbody);
+
+        for (let i = 0; i < mineTypes.length; i++) {
+            const mineType = mineTypes[i];
+
+            const tr = document.createElement("tr");
+            tbody.appendChild(tr);
+
+            const nameTd = document.createElement("td");
+            nameTd.innerText = mineType.name;
+            tr.appendChild(nameTd);
+
+            const minimumLvlTd = document.createElement("td");
+            minimumLvlTd.innerText = mineType.minLevel;
+            tr.appendChild(minimumLvlTd);
+
+            const button = document.createElement("button");
+            button.className = "mining-generate-mine";
+            button.innerText = "Generate";
+            button.onclick = () => generateMine(mineType.id);
+            const generateTd = document.createElement("td");
+            generateTd.appendChild(button);
+            tr.appendChild(generateTd);
+
+            if (userMiningStats.level < mineType.minLevel) {
+                tr.classList.add("unmet-minimum-level");
+                button.disabled = true;
+            }
+        }
+    }
 };
 
 const reachableCells = (x, y, gridWidth, gridHeight, targets) => {
@@ -75,7 +149,7 @@ const clickedCell = async (x, y) => {
     if (!mineActionSubmitting) {
         mineActionSubmitting = true;
 
-        const {status, data: results} = await (await fetch("/api/mine", {
+        const {status, data: results} = await (await fetch("/api/mine/perform", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json; charset=utf-8"
@@ -105,10 +179,10 @@ const clickedCell = async (x, y) => {
             appendListItemToResultsList(li);
         });
 
-        levelUps.forEach(({ newLevel }) => {
+        levelUps.forEach(({ newLevel, additionalMessage }) => {
             const li = document.createElement("li");
             li.className = "mining-results-level-up";
-            li.textContent = `Mining levelled up to level ${newLevel}!`;
+            li.textContent = `Mining levelled up to level ${newLevel}!` + (additionalMessage !== null ? ` ${additionalMessage}` : "");
 
             appendListItemToResultsList(li);
         });
@@ -124,26 +198,27 @@ const clickedCell = async (x, y) => {
     }
 };
 
-const createGenerateMineButton = () => {
-    const button = document.createElement("button");
-    button.id = GENERATE_MINE_BUTTON_ID;
-    button.innerText = "Generate new mine";
-    button.onclick = () => generateMine();
+const generateMine = async (mineTypeId) => {
+    const mineListContainer = document.getElementById(GENERATE_MINE_INTERFACE_ID);
 
-    return button;
-};
+    while (mineListContainer.hasChildNodes()) {
+        mineListContainer.removeChild(mineListContainer.firstChild);
+    }
 
-const generateMine = async () => {
-    /* Replace button with loading message */
-    const generateMineButton = document.getElementById(GENERATE_MINE_BUTTON_ID);
-    generateMineButton.innerText += " (Loading...)";
-    generateMineButton.disabled = true;
-    generateMineButton.classList.add("loading");
+    mineListContainer.innerText = "Loading mine...";
 
-    /* Get mine from API */
-    const { status, data } = await (await fetch("/api/mine/generate", { method: "POST" })).json();
+    const { status, data } = await (await fetch("/api/mine/generate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify({
+            mineTypeId: mineTypeId
+        })
+    })).json();
+
     if (status === "success") {
-        generateMineButton.parentNode.removeChild(generateMineButton);
+        mineListContainer.parentNode.removeChild(mineListContainer);
 
         setupMiningInterface(data);
     } else {
@@ -154,7 +229,7 @@ const generateMine = async () => {
 const createExitMineButton = () => {
     const button = document.createElement("button");
     button.id = EXIT_MINE_BUTTON_ID;
-    button.className = "mining-exit-mine-button";
+    button.className = "mining-exit-mine";
     button.innerText = "Exit mine";
     button.onclick = () => exitMine();
 

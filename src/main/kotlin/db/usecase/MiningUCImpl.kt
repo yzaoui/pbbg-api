@@ -6,14 +6,8 @@ import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.Stackable
-import com.bitwiserain.pbbg.domain.model.mine.Mine
-import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
-import com.bitwiserain.pbbg.domain.model.mine.MineEntity
-import com.bitwiserain.pbbg.domain.model.mine.MinedItemResult
-import com.bitwiserain.pbbg.domain.usecase.InventoryUC
-import com.bitwiserain.pbbg.domain.usecase.MiningUC
-import com.bitwiserain.pbbg.domain.usecase.NoEquippedPickaxeException
-import com.bitwiserain.pbbg.domain.usecase.NotInMineSessionException
+import com.bitwiserain.pbbg.domain.model.mine.*
+import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -34,15 +28,35 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         Mine(mineSession.width, mineSession.height, grid)
     }
 
-    override fun generateMine(userId: Int, width: Int, height: Int): Mine {
+    override fun generateMine(userId: Int, mineTypeId: Int, width: Int, height: Int): Mine {
+        val mineType: MineType
+        try {
+            mineType = MineType.values()[mineTypeId]
+        } catch (e: ArrayIndexOutOfBoundsException) {
+            throw InvalidMineTypeIdException(id = mineTypeId)
+        }
+
         val itemEntries = mutableMapOf<Pair<Int, Int>, MineEntity>()
         (0 until height).forEach { y ->
             (0 until width).forEach { x ->
-                rollForRandomMineItem()?.let { itemEntries.put(x to y, it) }
+                mineType.rollForMineEntity(random.nextFloat())?.let {
+                    itemEntries.put(x to y, it)
+                }
             }
         }
 
         transaction(db) {
+            val userMiningExp = UserStatsTable.select { UserStatsTable.userId.eq(userId) }
+                .single()
+                .get(UserStatsTable.miningExp)
+
+            val userMiningProgress = MiningExperienceManager.getLevelProgress(userMiningExp)
+
+            if (userMiningProgress.level < mineType.minLevel) throw UnfulfilledLevelRequirementException(
+                currentLevel = userMiningProgress.level,
+                requiredMinimumLevel = mineType.minLevel
+            )
+
             val mineSessionId = MineSessionTable.insertAndGetId {
                 it[MineSessionTable.userId] = EntityID(userId, UserTable)
                 it[MineSessionTable.width] = width
@@ -127,6 +141,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
     private fun mineEntityToItem(entity: MineEntity, quantity: Int): List<Item> = when (entity) {
         MineEntity.ROCK -> listOf(Item.Material.Stone(quantity))
         MineEntity.COAL -> listOf(Item.Material.Coal(quantity))
+        MineEntity.COPPER -> listOf(Item.Material.CopperOre(quantity))
     }
 
     private fun ResultRow.toMineSession() = MineSession(

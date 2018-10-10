@@ -2,6 +2,7 @@ package com.bitwiserain.pbbg.domain
 
 import com.bitwiserain.pbbg.domain.model.LevelProgress
 import com.bitwiserain.pbbg.domain.model.LevelUp
+import com.bitwiserain.pbbg.domain.model.mine.MineType
 
 object MiningExperienceManager {
     private val levels = listOf(20, 55, 85, 120, 160, 205, 255, 310, 370, 435, 505, 580)
@@ -30,6 +31,13 @@ object MiningExperienceManager {
     }
 
     fun getLevelUpResults(prevLevel: Int, newLevel: Int): List<LevelUp> {
-        return ((prevLevel + 1)..newLevel).map { LevelUp(it) }
+        return ((prevLevel + 1)..newLevel).map {
+            // TODO: Make this more robust
+            if (it == MineType.MODERATE.minLevel) {
+                LevelUp(it, "Gained access to ${MineType.MODERATE.friendlyName}.")
+            } else {
+                LevelUp(it)
+            }
+        }
     }
 }

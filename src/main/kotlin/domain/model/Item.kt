@@ -35,6 +35,12 @@ sealed class Item {
             override val spriteName = "coal"
             override val description = "Check this out, coal description."
         }
+        class CopperOre(override val quantity: Int) : Material() {
+            override val enum = ItemEnum.COPPER_ORE
+            override val friendlyName = "Copper Ore"
+            override val spriteName = "copper-ore"
+            override val description = "I love orange!"
+        }
     }
 
     sealed class Pickaxe : Item(), Equippable {
@@ -62,6 +68,7 @@ sealed class Item {
 enum class ItemEnum {
     STONE,
     COAL,
+    COPPER_ORE,
     PLUS_PICKAXE,
     CROSS_PICKAXE,
     SQUARE_PICKAXE

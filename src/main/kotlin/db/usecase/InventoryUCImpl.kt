@@ -68,6 +68,7 @@ class InventoryUCImpl(private val db: Database) : InventoryUC {
         return when (itemEnum) {
             STONE -> Item.Material.Stone(quantity!!)
             COAL -> Item.Material.Coal(quantity!!)
+            COPPER_ORE -> Item.Material.CopperOre(quantity!!)
             PLUS_PICKAXE -> Item.Pickaxe.PlusPickaxe(equipped!!)
             CROSS_PICKAXE -> Item.Pickaxe.CrossPickaxe(equipped!!)
             SQUARE_PICKAXE -> Item.Pickaxe.SquarePickaxe(equipped!!)
