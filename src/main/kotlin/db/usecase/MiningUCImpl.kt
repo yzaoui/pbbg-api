@@ -46,6 +46,17 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         }
 
         transaction(db) {
+            val userMiningExp = UserStatsTable.select { UserStatsTable.userId.eq(userId) }
+                .single()
+                .get(UserStatsTable.miningExp)
+
+            val userMiningProgress = MiningExperienceManager.getLevelProgress(userMiningExp)
+
+            if (userMiningProgress.level < mineType.minLevel) throw UnfulfilledLevelRequirementException(
+                currentLevel = userMiningProgress.level,
+                requiredMinimumLevel = mineType.minLevel
+            )
+
             val mineSessionId = MineSessionTable.insertAndGetId {
                 it[MineSessionTable.userId] = EntityID(userId, UserTable)
                 it[MineSessionTable.width] = width

@@ -36,7 +36,7 @@ interface MiningUC {
 }
 
 class InvalidMineTypeIdException(val id: Int) : Exception()
-class UnfulfilledLevelRequirementException : Exception()
+class UnfulfilledLevelRequirementException(val currentLevel: Int, val requiredMinimumLevel: Int) : Exception()
 
 class NoEquippedPickaxeException : Exception()
 class NotInMineSessionException : Exception()

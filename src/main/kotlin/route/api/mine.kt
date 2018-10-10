@@ -97,7 +97,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
             } catch (e: InvalidMineTypeIdException) {
                 call.respondFail("There is no mine with ID: ${e.id}.")
             } catch (e: UnfulfilledLevelRequirementException) {
-                call.respondFail("Minimum mining level requirement not met to generate this type of mine.")
+                call.respondFail("Current mining level (level ${e.currentLevel}) does not meet minimum mining level requirement (level ${e.requiredMinimumLevel}) to generate this type of mine.")
             }
         }
     }
