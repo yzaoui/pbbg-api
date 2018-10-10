@@ -141,6 +141,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
     private fun mineEntityToItem(entity: MineEntity, quantity: Int): List<Item> = when (entity) {
         MineEntity.ROCK -> listOf(Item.Material.Stone(quantity))
         MineEntity.COAL -> listOf(Item.Material.Coal(quantity))
+        MineEntity.COPPER -> listOf(Item.Material.CopperOre(quantity))
     }
 
     private fun ResultRow.toMineSession() = MineSession(

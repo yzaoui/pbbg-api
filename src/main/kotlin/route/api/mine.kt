@@ -138,10 +138,7 @@ private fun Mine.toJSON() = MineJSON(
 
 // TODO: Find appropriate place for this adapter
 private fun MineEntity.toJSON() = MineEntityJSON(
-    imageURL = when (this) {
-        MineEntity.ROCK -> "/img/mine/rock.png"
-        MineEntity.COAL -> "/img/mine/coal.png"
-    }
+    imageURL = "/img/mine/$spriteName.png"
 )
 
 // TODO: Find appropriate place for this adapter
