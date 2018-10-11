@@ -97,15 +97,18 @@ const createEquipmentDisplay = (equipment) => {
     playerImg.src = "/img/inventory/player.png";
     container.appendChild(playerImg);
 
+    const equippedPickaxeContainer = document.createElement("div");
+    equippedPickaxeContainer.className = "equipment-pickaxe-slot";
+    container.appendChild(equippedPickaxeContainer);
+
     const equippedPickaxeImg = document.createElement("img");
+    equippedPickaxeContainer.appendChild(equippedPickaxeImg);
     if (equipment.pickaxe !== null) {
         equippedPickaxeImg.src = equipment.pickaxe.imgURL;
-        equippedPickaxeImg.className = "equipped-pickaxe";
+        equippedPickaxeContainer.classList.add("equipped");
     } else {
         equippedPickaxeImg.src = "/img/inventory/no-pickaxe.png";
-        equippedPickaxeImg.className = "equipped-pickaxe-none";
     }
-    container.appendChild(equippedPickaxeImg);
 
     return container;
 };
