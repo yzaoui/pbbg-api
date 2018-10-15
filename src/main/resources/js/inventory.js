@@ -34,8 +34,10 @@ window.onload = async () => {
             }
 
             if (item.equipped !== null) {
-                const itemEquipped = createItemEquippedDisplay();
-                li.appendChild(itemEquipped);
+                if (item.equipped === true) {
+                    const itemEquipped = createItemEquippedDisplay();
+                    li.appendChild(itemEquipped);
+                }
             }
 
             const itemInfo = createItemInfoBox(item);
