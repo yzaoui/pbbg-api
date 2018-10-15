@@ -29,31 +29,29 @@ class InventoryUCImpl(private val db: Database) : InventoryUC {
         Inventory(items, Equipment(equippedPickaxe?.toItem(equipped = true)))
     }
 
-    override fun storeInInventory(userId: Int, item: Item): Unit = transaction(db) {
+    override fun storeInInventory(userId: Int, itemToStore: Item): Unit = transaction(db) {
         // TODO: Consider checking if user exists
-        val storedItem = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.item.eq(item.enum) }
+        val storedItem = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.item.eq(itemToStore.enum) }
             .map { it.toItem() }
             .singleOrNull()
 
-        if (storedItem != null) {
+        if (storedItem != null && itemToStore is Stackable) {
             // If this kind of item is already stored, and it can be stacked, increase its quantity
-            if (item is Stackable) {
-                InventoryTable.update({ InventoryTable.userId.eq(userId) and InventoryTable.item.eq(item.enum) }) { updateStatement ->
-                    with (SqlExpressionBuilder) {
-                        updateStatement.update(InventoryTable.quantity, InventoryTable.quantity + item.quantity)
-                    }
+            InventoryTable.update({ InventoryTable.userId.eq(userId) and InventoryTable.item.eq(itemToStore.enum) }) { updateStatement ->
+                with (SqlExpressionBuilder) {
+                    updateStatement.update(InventoryTable.quantity, InventoryTable.quantity + itemToStore.quantity)
                 }
             }
         } else {
-            // If this item isn't already stored, create an entry for it
+            // If this item isn't already stored, or it can't be stacked, create a new row for it
             InventoryTable.insert {
                 it[InventoryTable.userId] = EntityID(userId, UserTable)
-                it[InventoryTable.item] = item.enum
-                if (item is Stackable) {
-                    it[InventoryTable.quantity] = item.quantity
+                it[InventoryTable.item] = itemToStore.enum
+                if (itemToStore is Stackable) {
+                    it[InventoryTable.quantity] = itemToStore.quantity
                 }
-                if (item is Equippable) {
-                    it[InventoryTable.equipped] = item.equipped
+                if (itemToStore is Equippable) {
+                    it[InventoryTable.equipped] = itemToStore.equipped
                 }
             }
         }
