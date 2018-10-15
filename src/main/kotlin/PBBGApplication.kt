@@ -89,7 +89,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
             user(userUC)
             pickaxe(userUC, equipmentUC)
             mine(userUC, miningUC)
-            inventoryAPI(userUC, inventoryUC)
+            inventoryAPI(userUC, inventoryUC, equipmentUC)
         }
         static("css") {
             resources("css")

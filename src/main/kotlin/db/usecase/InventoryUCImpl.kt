@@ -58,20 +58,20 @@ class InventoryUCImpl(private val db: Database) : InventoryUC {
             }
         }
     }
+}
 
-    private fun ResultRow.toItem(): Item {
-        val itemEnum = this[InventoryTable.item]
-        val quantity = this[InventoryTable.quantity]
-        val equipped = this[InventoryTable.equipped]
+fun ResultRow.toItem(): Item {
+    val itemEnum = this[InventoryTable.item]
+    val quantity = this[InventoryTable.quantity]
+    val equipped = this[InventoryTable.equipped]
 
-        // TODO: Find a way to preserve a single source of truth, so that quantity and equipped status aren't asserted separately here
-        return when (itemEnum) {
-            STONE -> Item.Material.Stone(quantity!!)
-            COAL -> Item.Material.Coal(quantity!!)
-            COPPER_ORE -> Item.Material.CopperOre(quantity!!)
-            PLUS_PICKAXE -> Item.Pickaxe.PlusPickaxe(equipped!!)
-            CROSS_PICKAXE -> Item.Pickaxe.CrossPickaxe(equipped!!)
-            SQUARE_PICKAXE -> Item.Pickaxe.SquarePickaxe(equipped!!)
-        }
+    // TODO: Find a way to preserve a single source of truth, so that quantity and equipped status aren't asserted separately here
+    return when (itemEnum) {
+        STONE -> Item.Material.Stone(quantity!!)
+        COAL -> Item.Material.Coal(quantity!!)
+        COPPER_ORE -> Item.Material.CopperOre(quantity!!)
+        PLUS_PICKAXE -> Item.Pickaxe.PlusPickaxe(equipped!!)
+        CROSS_PICKAXE -> Item.Pickaxe.CrossPickaxe(equipped!!)
+        SQUARE_PICKAXE -> Item.Pickaxe.SquarePickaxe(equipped!!)
     }
 }
