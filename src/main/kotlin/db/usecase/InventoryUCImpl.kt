@@ -19,7 +19,7 @@ class InventoryUCImpl(private val db: Database) : InventoryUC {
         // TODO: Consider checking if user exists
 
         val items = InventoryTable.select { InventoryTable.userId.eq(userId) }
-            .map { it.toItem() }
+            .associate { it[InventoryTable.id].value to it.toItem() }
 
         val equippedPickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .singleOrNull()

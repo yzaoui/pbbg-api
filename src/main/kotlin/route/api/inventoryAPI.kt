@@ -11,6 +11,7 @@ import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.view.model.EquipmentJSON
 import com.bitwiserain.pbbg.view.model.inventory.InventoryJSON
 import com.bitwiserain.pbbg.view.model.ItemJSON
+import com.bitwiserain.pbbg.view.model.inventory.InventoryItemJSON
 import io.ktor.application.call
 import io.ktor.routing.*
 
@@ -18,7 +19,8 @@ fun Route.inventoryAPI(userUC: UserUC, inventoryUC: InventoryUC) = route("/inven
     interceptSetUserOr401(userUC)
 
     /**
-     * Responds with [InventoryJSON]
+     * On success:
+     *   [InventoryJSON]
      */
     get {
         val loggedInUser = call.attributes[loggedInUserKey]
@@ -27,7 +29,7 @@ fun Route.inventoryAPI(userUC: UserUC, inventoryUC: InventoryUC) = route("/inven
 
         call.respondSuccess(
             InventoryJSON(
-                items = inventory.items.map { it.toJSON() },
+                items = inventory.items.map { InventoryItemJSON(it.key, it.value.toJSON()) },
                 equipment = EquipmentJSON(
                     pickaxe = inventory.equipment.pickaxe?.toJSON()
                 )

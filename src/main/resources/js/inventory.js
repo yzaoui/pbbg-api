@@ -20,7 +20,7 @@ window.onload = async () => {
         itemList.className = "inventory-list";
         main.appendChild(itemList);
 
-        items.forEach((item) => {
+        items.forEach(({ id, item }) => {
             const li = document.createElement("li");
             li.className = "inventory-list-item";
 
