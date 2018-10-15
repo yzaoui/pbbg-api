@@ -56,6 +56,10 @@
     line-height: 12px;
 }
 
+.inventory-list-item-tooltip {
+    border: 1px solid black;
+}
+
 .equipment-display {
     position: relative;
 }

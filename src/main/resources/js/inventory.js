@@ -40,7 +40,7 @@ window.onload = async () => {
                 }
             }
 
-            const itemInfo = createItemInfoBox(item);
+            const itemInfo = createItemTooltip(item);
             li.appendChild(itemInfo);
 
             itemList.appendChild(li);
@@ -50,8 +50,9 @@ window.onload = async () => {
     main.removeChild(loadingMessage);
 };
 
-const createItemInfoBox = ({ description, friendlyName, quantity }) => {
+const createItemTooltip = ({ description, friendlyName, quantity }) => {
     const container = document.createElement("div");
+    container.className = "inventory-list-item-tooltip";
 
     const itemName = document.createElement("div");
     itemName.innerText = friendlyName;
