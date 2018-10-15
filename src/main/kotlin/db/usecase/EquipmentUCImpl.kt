@@ -74,8 +74,7 @@ class EquipmentUCImpl(private val db: Database, private val inventoryUC: Invento
 
         inventoryUC.storeInInventory(userId, pickaxeItem)
 
-        EquipmentTable.insert {
-            it[EquipmentTable.userId] = EntityID(userId, UserTable)
+        EquipmentTable.update({ EquipmentTable.userId.eq(userId) }) {
             it[EquipmentTable.pickaxe] = pickaxeEnum
         }
 

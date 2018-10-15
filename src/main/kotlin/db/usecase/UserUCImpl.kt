@@ -2,6 +2,7 @@ package com.bitwiserain.pbbg.db.usecase
 
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.bitwiserain.pbbg.db.model.User
+import com.bitwiserain.pbbg.db.repository.EquipmentTable
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.UserStats
@@ -36,6 +37,10 @@ class UserUCImpl(private val db: Database) : UserUC {
 
         UserStatsTable.insert {
             it[UserStatsTable.userId] = userId
+        }
+
+        EquipmentTable.insert {
+            it[EquipmentTable.userId] = userId
         }
 
         userId.value
