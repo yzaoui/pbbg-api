@@ -9,7 +9,7 @@ import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.view.model.EquipmentJSON
-import com.bitwiserain.pbbg.view.model.InventoryJSON
+import com.bitwiserain.pbbg.view.model.inventory.InventoryJSON
 import com.bitwiserain.pbbg.view.model.ItemJSON
 import io.ktor.application.call
 import io.ktor.routing.*
@@ -25,12 +25,14 @@ fun Route.inventoryAPI(userUC: UserUC, inventoryUC: InventoryUC) = route("/inven
 
         val inventory = inventoryUC.getInventory(loggedInUser.id)
 
-        call.respondSuccess(InventoryJSON(
-            items = inventory.items.map { it.toJSON() },
-            equipment = EquipmentJSON(
-                pickaxe = inventory.equipment.pickaxe?.toJSON()
+        call.respondSuccess(
+            InventoryJSON(
+                items = inventory.items.map { it.toJSON() },
+                equipment = EquipmentJSON(
+                    pickaxe = inventory.equipment.pickaxe?.toJSON()
+                )
             )
-        ))
+        )
     }
 
     route("/equipment") {
