@@ -3,10 +3,13 @@ package com.bitwiserain.pbbg.db.usecase
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.EquipmentTable
+import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.UserTable
+import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.UserStats
 import com.bitwiserain.pbbg.domain.usecase.UserUC
+import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -41,6 +44,17 @@ class UserUCImpl(private val db: Database) : UserUC {
 
         EquipmentTable.insert {
             it[EquipmentTable.userId] = userId
+        }
+
+        // TODO: Temporarily giving user all three pickaxes on account creation
+        listOf(Item.Pickaxe.PlusPickaxe(equipped = false), Item.Pickaxe.CrossPickaxe(equipped = false), Item.Pickaxe.SquarePickaxe(equipped = false)).forEach { pickaxe ->
+            InventoryTable.insert {
+                it[InventoryTable.userId] = userId
+                it[InventoryTable.item] = pickaxe.enum
+                it[InventoryTable.equipped] = false
+            }
+
+            Unit
         }
 
         userId.value
