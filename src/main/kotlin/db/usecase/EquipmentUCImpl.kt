@@ -6,10 +6,7 @@ import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.Equippable
 import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.Pickaxe
-import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
-import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotEquippable
-import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotFoundException
-import com.bitwiserain.pbbg.domain.usecase.InventoryUC
+import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -22,9 +19,12 @@ class EquipmentUCImpl(private val db: Database, private val inventoryUC: Invento
             .singleOrNull()
             ?.toItem()
 
-        /* Make sure item exists and is equippable */
+        /* Make sure item exists */
         if (item == null) throw InventoryItemNotFoundException(inventoryItemId)
+        /* Make sure item is equippable */
         if (item !is Equippable) throw InventoryItemNotEquippable(inventoryItemId)
+        /* Make sure item is not already equipped */
+        if (item.equipped) throw InventoryItemAlreadyEquipped(inventoryItemId)
 
         /* Add item to equipment table */
         EquipmentTable.update({ EquipmentTable.userId.eq(userId) }) {
@@ -43,9 +43,12 @@ class EquipmentUCImpl(private val db: Database, private val inventoryUC: Invento
             .singleOrNull()
             ?.toItem()
 
-        /* Make sure item exists and is equippable */
+        /* Make sure item exists */
         if (item == null) throw InventoryItemNotFoundException(inventoryItemId)
+        /* Make sure item is equippable */
         if (item !is Equippable) throw InventoryItemNotEquippable(inventoryItemId)
+        /* Make sure item is not already equipped */
+        if (!item.equipped) throw InventoryItemAlreadyUnequipped(inventoryItemId)
 
         /* Remove item from equipment table */
         EquipmentTable.update({ EquipmentTable.userId.eq(userId) }) {
