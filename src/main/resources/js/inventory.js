@@ -40,7 +40,7 @@ window.onload = async () => {
                 }
             }
 
-            const itemInfo = createItemTooltip(item);
+            const itemInfo = createItemTooltip(id, item);
             li.appendChild(itemInfo);
 
             itemList.appendChild(li);
@@ -50,7 +50,7 @@ window.onload = async () => {
     main.removeChild(loadingMessage);
 };
 
-const createItemTooltip = ({ description, friendlyName, quantity }) => {
+const createItemTooltip = (itemId, { description, friendlyName, quantity, equipped }) => {
     const container = document.createElement("div");
     container.className = "inventory-list-item-tooltip";
 
@@ -66,6 +66,22 @@ const createItemTooltip = ({ description, friendlyName, quantity }) => {
         container.appendChild(quantityDiv);
     }
 
+    if (equipped !== null) {
+        container.appendChild(document.createElement("hr"));
+
+        const equipActionButton = document.createElement("button");
+
+        if (equipped === true) {
+            equipActionButton.innerText = "Unequip";
+            equipActionButton.onclick = () => unequip(itemId);
+        } else if (equipped === false) {
+            equipActionButton.innerText = "Equip";
+            equipActionButton.onclick = () => equip(itemId);
+        }
+
+        container.appendChild(equipActionButton);
+    }
+
     container.appendChild(document.createElement("hr"));
 
     const descriptionDiv = document.createElement("div");
@@ -73,6 +89,30 @@ const createItemTooltip = ({ description, friendlyName, quantity }) => {
     container.appendChild(descriptionDiv);
 
     return container;
+};
+
+const unequip = async (itemId) => {
+    const {status, data} = await (await fetch("/api/inventory/equipment?action=unequip", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify({
+            inventoryItemId: itemId
+        })
+    })).json();
+};
+
+const equip = async (itemId) => {
+    const {status, data} = await (await fetch("/api/inventory/equipment?action=equip", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify({
+            inventoryItemId: itemId
+        })
+    })).json();
 };
 
 const createItemQuantityDisplay = (quantity) => {
