@@ -20,7 +20,7 @@ window.onload = async () => {
         itemList.className = "inventory-list";
         main.appendChild(itemList);
 
-        items.forEach((item) => {
+        items.forEach(({ id, item }) => {
             const li = document.createElement("li");
             li.className = "inventory-list-item";
 
@@ -34,11 +34,13 @@ window.onload = async () => {
             }
 
             if (item.equipped !== null) {
-                const itemEquipped = createItemEquippedDisplay();
-                li.appendChild(itemEquipped);
+                if (item.equipped === true) {
+                    const itemEquipped = createItemEquippedDisplay();
+                    li.appendChild(itemEquipped);
+                }
             }
 
-            const itemInfo = createItemInfoBox(item);
+            const itemInfo = createItemTooltip(id, item);
             li.appendChild(itemInfo);
 
             itemList.appendChild(li);
@@ -48,8 +50,9 @@ window.onload = async () => {
     main.removeChild(loadingMessage);
 };
 
-const createItemInfoBox = ({ description, friendlyName, quantity }) => {
+const createItemTooltip = (itemId, { description, friendlyName, quantity, equipped }) => {
     const container = document.createElement("div");
+    container.className = "inventory-list-item-tooltip";
 
     const itemName = document.createElement("div");
     itemName.innerText = friendlyName;
@@ -63,6 +66,22 @@ const createItemInfoBox = ({ description, friendlyName, quantity }) => {
         container.appendChild(quantityDiv);
     }
 
+    if (equipped !== null) {
+        container.appendChild(document.createElement("hr"));
+
+        const equipActionButton = document.createElement("button");
+
+        if (equipped === true) {
+            equipActionButton.innerText = "Unequip";
+            equipActionButton.onclick = () => unequip(itemId);
+        } else if (equipped === false) {
+            equipActionButton.innerText = "Equip";
+            equipActionButton.onclick = () => equip(itemId);
+        }
+
+        container.appendChild(equipActionButton);
+    }
+
     container.appendChild(document.createElement("hr"));
 
     const descriptionDiv = document.createElement("div");
@@ -70,6 +89,34 @@ const createItemInfoBox = ({ description, friendlyName, quantity }) => {
     container.appendChild(descriptionDiv);
 
     return container;
+};
+
+const equip = async (itemId) => {
+    const {status, data} = await (await fetch("/api/inventory/equipment?action=equip", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify({
+            inventoryItemId: itemId
+        })
+    })).json();
+
+    if (status === "success") location.reload();
+};
+
+const unequip = async (itemId) => {
+    const {status, data} = await (await fetch("/api/inventory/equipment?action=unequip", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify({
+            inventoryItemId: itemId
+        })
+    })).json();
+
+    if (status === "success") location.reload();
 };
 
 const createItemQuantityDisplay = (quantity) => {
@@ -97,15 +144,18 @@ const createEquipmentDisplay = (equipment) => {
     playerImg.src = "/img/inventory/player.png";
     container.appendChild(playerImg);
 
+    const equippedPickaxeContainer = document.createElement("div");
+    equippedPickaxeContainer.className = "equipment-pickaxe-slot";
+    container.appendChild(equippedPickaxeContainer);
+
     const equippedPickaxeImg = document.createElement("img");
+    equippedPickaxeContainer.appendChild(equippedPickaxeImg);
     if (equipment.pickaxe !== null) {
         equippedPickaxeImg.src = equipment.pickaxe.imgURL;
-        equippedPickaxeImg.className = "equipped-pickaxe";
+        equippedPickaxeContainer.classList.add("equipped");
     } else {
         equippedPickaxeImg.src = "/img/inventory/no-pickaxe.png";
-        equippedPickaxeImg.className = "equipped-pickaxe-none";
     }
-    container.appendChild(equippedPickaxeImg);
 
     return container;
 };

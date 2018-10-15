@@ -4,6 +4,25 @@ import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.Pickaxe
 
 interface EquipmentUC {
+    /**
+     * @throws InventoryItemNotFoundException when this user-item combination is not found
+     * @throws InventoryItemNotEquippable when this item is not equippable
+     * @throws InventoryItemAlreadyEquipped when this item is already equipped
+     */
+    fun equip(userId: Int, inventoryItemId: Int)
+
+    /**
+     * @throws InventoryItemNotFoundException when this user-item combination is not found
+     * @throws InventoryItemNotEquippable when this item is not equippable
+     * @throws InventoryItemAlreadyUnequipped when this item is already unequipped
+     */
+    fun unequip(userId: Int, inventoryItemId: Int)
+
     fun getEquippedPickaxe(userId: Int): Pickaxe?
     fun generatePickaxe(userId: Int): Item.Pickaxe? // TODO: Temporary use case until proper way to obtain pickaxe is implemented
 }
+
+class InventoryItemNotFoundException(val itemId: Int) : Exception()
+class InventoryItemNotEquippable(val itemId: Int) : Exception()
+class InventoryItemAlreadyEquipped(val itemId: Int) : Exception()
+class InventoryItemAlreadyUnequipped(val itemId: Int) : Exception()

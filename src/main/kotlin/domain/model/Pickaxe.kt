@@ -38,4 +38,12 @@ enum class Pickaxe(val type: String, val cells: Set<Pair<Int, Int>>) {
         Pickaxe.CROSS -> Item.Pickaxe.CrossPickaxe(equipped)
         Pickaxe.SQUARE -> Item.Pickaxe.SquarePickaxe(equipped)
     }
+
+    companion object {
+        fun fromItem(item: Item.Pickaxe): Pickaxe = when(item) {
+            is Item.Pickaxe.PlusPickaxe -> Pickaxe.PLUS
+            is Item.Pickaxe.CrossPickaxe -> Pickaxe.CROSS
+            is Item.Pickaxe.SquarePickaxe -> Pickaxe.SQUARE
+        }
+    }
 }

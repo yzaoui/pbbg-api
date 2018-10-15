@@ -157,15 +157,6 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         mineEntity = this[MineCellTable.mineEntity]
     )
 
-    private fun rollForRandomMineItem(): MineEntity? {
-        val roll = random.nextFloat()
-        return when {
-            roll <= 0.05 -> MineEntity.ROCK
-            roll <= 0.06 -> MineEntity.COAL
-            else -> null
-        }
-    }
-
     private fun reachableCells(x: Int, y: Int, width: Int, height: Int, tiles: Set<Pair<Int, Int>>): Set<Pair<Int, Int>> {
         val cells = mutableSetOf<Pair<Int, Int>>()
 

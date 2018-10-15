@@ -22,7 +22,4 @@ fun homeMemberPage(userStatsVM: UserStatsVM, memberPageVM: MemberPageVM): Templa
             }
         }
     }
-    endOfBody {
-        script(src = "/js/home.js") {}
-    }
 }

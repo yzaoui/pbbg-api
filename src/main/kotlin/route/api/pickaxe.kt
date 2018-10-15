@@ -31,18 +31,6 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
 
             call.respondSuccess(pickaxe?.toJSON())
         }
-
-        // TODO: Remove this, only temporarily randomly generating a pickaxe
-        post {
-            val loggedInUser = call.attributes[loggedInUserKey]
-
-            val pickaxe = equipmentUC.generatePickaxe(loggedInUser.id)
-            if (pickaxe != null) {
-                call.respondSuccess(pickaxe.toJSON())
-            } else {
-                call.respondError(HttpStatusCode.InternalServerError)
-            }
-        }
     }
 }
 

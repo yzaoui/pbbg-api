@@ -19,7 +19,7 @@ class InventoryUCImpl(private val db: Database) : InventoryUC {
         // TODO: Consider checking if user exists
 
         val items = InventoryTable.select { InventoryTable.userId.eq(userId) }
-            .map { it.toItem() }
+            .associate { it[InventoryTable.id].value to it.toItem() }
 
         val equippedPickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .singleOrNull()
@@ -29,49 +29,47 @@ class InventoryUCImpl(private val db: Database) : InventoryUC {
         Inventory(items, Equipment(equippedPickaxe?.toItem(equipped = true)))
     }
 
-    override fun storeInInventory(userId: Int, item: Item): Unit = transaction(db) {
+    override fun storeInInventory(userId: Int, itemToStore: Item): Unit = transaction(db) {
         // TODO: Consider checking if user exists
-        val storedItem = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.item.eq(item.enum) }
+        val storedItem = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.item.eq(itemToStore.enum) }
             .map { it.toItem() }
             .singleOrNull()
 
-        if (storedItem != null) {
+        if (storedItem != null && itemToStore is Stackable) {
             // If this kind of item is already stored, and it can be stacked, increase its quantity
-            if (item is Stackable) {
-                InventoryTable.update({ InventoryTable.userId.eq(userId) and InventoryTable.item.eq(item.enum) }) { updateStatement ->
-                    with (SqlExpressionBuilder) {
-                        updateStatement.update(InventoryTable.quantity, InventoryTable.quantity + item.quantity)
-                    }
+            InventoryTable.update({ InventoryTable.userId.eq(userId) and InventoryTable.item.eq(itemToStore.enum) }) { updateStatement ->
+                with (SqlExpressionBuilder) {
+                    updateStatement.update(InventoryTable.quantity, InventoryTable.quantity + itemToStore.quantity)
                 }
             }
         } else {
-            // If this item isn't already stored, create an entry for it
+            // If this item isn't already stored, or it can't be stacked, create a new row for it
             InventoryTable.insert {
                 it[InventoryTable.userId] = EntityID(userId, UserTable)
-                it[InventoryTable.item] = item.enum
-                if (item is Stackable) {
-                    it[InventoryTable.quantity] = item.quantity
+                it[InventoryTable.item] = itemToStore.enum
+                if (itemToStore is Stackable) {
+                    it[InventoryTable.quantity] = itemToStore.quantity
                 }
-                if (item is Equippable) {
-                    it[InventoryTable.equipped] = item.equipped
+                if (itemToStore is Equippable) {
+                    it[InventoryTable.equipped] = itemToStore.equipped
                 }
             }
         }
     }
+}
 
-    private fun ResultRow.toItem(): Item {
-        val itemEnum = this[InventoryTable.item]
-        val quantity = this[InventoryTable.quantity]
-        val equipped = this[InventoryTable.equipped]
+fun ResultRow.toItem(): Item {
+    val itemEnum = this[InventoryTable.item]
+    val quantity = this[InventoryTable.quantity]
+    val equipped = this[InventoryTable.equipped]
 
-        // TODO: Find a way to preserve a single source of truth, so that quantity and equipped status aren't asserted separately here
-        return when (itemEnum) {
-            STONE -> Item.Material.Stone(quantity!!)
-            COAL -> Item.Material.Coal(quantity!!)
-            COPPER_ORE -> Item.Material.CopperOre(quantity!!)
-            PLUS_PICKAXE -> Item.Pickaxe.PlusPickaxe(equipped!!)
-            CROSS_PICKAXE -> Item.Pickaxe.CrossPickaxe(equipped!!)
-            SQUARE_PICKAXE -> Item.Pickaxe.SquarePickaxe(equipped!!)
-        }
+    // TODO: Find a way to preserve a single source of truth, so that quantity and equipped status aren't asserted separately here
+    return when (itemEnum) {
+        STONE -> Item.Material.Stone(quantity!!)
+        COAL -> Item.Material.Coal(quantity!!)
+        COPPER_ORE -> Item.Material.CopperOre(quantity!!)
+        PLUS_PICKAXE -> Item.Pickaxe.PlusPickaxe(equipped!!)
+        CROSS_PICKAXE -> Item.Pickaxe.CrossPickaxe(equipped!!)
+        SQUARE_PICKAXE -> Item.Pickaxe.SquarePickaxe(equipped!!)
     }
 }

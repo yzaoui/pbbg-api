@@ -6,7 +6,7 @@ enum class MineType(val friendlyName: String, val minLevel: Int, private val min
         1,
         mapOf(
             0.05f to MineEntity.ROCK,
-            0.01f to MineEntity.COAL
+            0.008f to MineEntity.COAL
         )
     ),
     MODERATE(
@@ -14,8 +14,8 @@ enum class MineType(val friendlyName: String, val minLevel: Int, private val min
         5,
         mapOf(
             0.048f to MineEntity.ROCK,
-            0.002f to MineEntity.COAL,
-            0.01f to MineEntity.COPPER
+            0.005f to MineEntity.COAL,
+            0.012f to MineEntity.COPPER
         )
     );
 
