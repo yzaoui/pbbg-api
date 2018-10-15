@@ -91,18 +91,6 @@ const createItemTooltip = (itemId, { description, friendlyName, quantity, equipp
     return container;
 };
 
-const unequip = async (itemId) => {
-    const {status, data} = await (await fetch("/api/inventory/equipment?action=unequip", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        },
-        body: JSON.stringify({
-            inventoryItemId: itemId
-        })
-    })).json();
-};
-
 const equip = async (itemId) => {
     const {status, data} = await (await fetch("/api/inventory/equipment?action=equip", {
         method: "POST",
@@ -113,6 +101,22 @@ const equip = async (itemId) => {
             inventoryItemId: itemId
         })
     })).json();
+
+    if (status === "success") location.reload();
+};
+
+const unequip = async (itemId) => {
+    const {status, data} = await (await fetch("/api/inventory/equipment?action=unequip", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify({
+            inventoryItemId: itemId
+        })
+    })).json();
+
+    if (status === "success") location.reload();
 };
 
 const createItemQuantityDisplay = (quantity) => {
