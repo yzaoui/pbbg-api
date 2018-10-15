@@ -16,8 +16,25 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.Random
 
 class EquipmentUCImpl(private val db: Database, private val inventoryUC: InventoryUC) : EquipmentUC {
-    override fun equip(userId: Int, inventoryItemId: Int) {
-        TODO("not implemented")
+    override fun equip(userId: Int, inventoryItemId: Int): Unit = transaction(db) {
+        /* Get item from inventory table */
+        val item = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.id.eq(inventoryItemId) }
+            .singleOrNull()
+            ?.toItem()
+
+        /* Make sure item exists and is equippable */
+        if (item == null) throw InventoryItemNotFoundException(inventoryItemId)
+        if (item !is Equippable) throw InventoryItemNotEquippable(inventoryItemId)
+
+        /* Add item to equipment table */
+        EquipmentTable.update({ EquipmentTable.userId.eq(userId) }) {
+            if (item is Item.Pickaxe) it[EquipmentTable.pickaxe] = Pickaxe.fromItem(item)
+        }
+
+        /* Mark item as equipped in inventory table */
+        InventoryTable.update({ (InventoryTable.userId eq userId) and (InventoryTable.id eq inventoryItemId) }) {
+            it[InventoryTable.equipped] = true
+        }
     }
 
     override fun unequip(userId: Int, inventoryItemId: Int): Unit = transaction(db) {
