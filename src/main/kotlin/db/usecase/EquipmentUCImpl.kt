@@ -26,6 +26,21 @@ class EquipmentUCImpl(private val db: Database, private val inventoryUC: Invento
         /* Make sure item is not already equipped */
         if (item.equipped) throw InventoryItemAlreadyEquipped(inventoryItemId)
 
+        /* Get all equipped items */
+        val equippedItems = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.equipped.eq(true) }
+            .associate { it[InventoryTable.id].value to it.toItem() as Equippable }
+
+        /* Unequip item currently in this equipment slot if any */
+        for (equippedItem in equippedItems) {
+            if (item is Item.Pickaxe && equippedItem.value is Item.Pickaxe) {
+                InventoryTable.update({ (InventoryTable.userId eq userId) and (InventoryTable.id eq equippedItem.key) }) {
+                    it[InventoryTable.equipped] = false
+                }
+
+                break
+            }
+        }
+
         /* Add item to equipment table */
         EquipmentTable.update({ EquipmentTable.userId.eq(userId) }) {
             if (item is Item.Pickaxe) it[EquipmentTable.pickaxe] = Pickaxe.fromItem(item)
