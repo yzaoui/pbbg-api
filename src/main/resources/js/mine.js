@@ -315,7 +315,7 @@ const setupPickaxeAndResultsList = async () => {
         miningGrid.classList.add("enabled");
     } else {
         const noPickaxe = document.createElement("div");
-        noPickaxe.innerText = "No pickaxe equipped. Go to your inventory and generate one.";
+        noPickaxe.innerText = "No pickaxe equipped. Go to your inventory and equip one.";
         main.appendChild(noPickaxe);
     }
 };

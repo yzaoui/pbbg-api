@@ -2,15 +2,15 @@ package com.bitwiserain.pbbg.db.usecase
 
 import com.bitwiserain.pbbg.db.repository.EquipmentTable
 import com.bitwiserain.pbbg.db.repository.InventoryTable
-import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.Equippable
 import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.Pickaxe
 import com.bitwiserain.pbbg.domain.usecase.*
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.Random
+import org.jetbrains.exposed.sql.update
 
 class EquipmentUCImpl(private val db: Database, private val inventoryUC: InventoryUC) : EquipmentUC {
     override fun equip(userId: Int, inventoryItemId: Int): Unit = transaction(db) {
@@ -80,19 +80,5 @@ class EquipmentUCImpl(private val db: Database, private val inventoryUC: Invento
         EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
             .singleOrNull()
-    }
-
-    override fun generatePickaxe(userId: Int): Item.Pickaxe? = transaction(db) {
-        // TODO: Do something if this user already has a pickaxe
-        val pickaxeEnum = Pickaxe.values()[Random().nextInt(Pickaxe.values().size)]
-        val pickaxeItem = pickaxeEnum.toItem(equipped = true)
-
-        inventoryUC.storeInInventory(userId, pickaxeItem)
-
-        EquipmentTable.update({ EquipmentTable.userId.eq(userId) }) {
-            it[EquipmentTable.pickaxe] = pickaxeEnum
-        }
-
-        pickaxeItem
     }
 }

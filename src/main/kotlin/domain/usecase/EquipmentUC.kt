@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.Pickaxe
 
 interface EquipmentUC {
@@ -19,7 +18,6 @@ interface EquipmentUC {
     fun unequip(userId: Int, inventoryItemId: Int)
 
     fun getEquippedPickaxe(userId: Int): Pickaxe?
-    fun generatePickaxe(userId: Int): Item.Pickaxe? // TODO: Temporary use case until proper way to obtain pickaxe is implemented
 }
 
 class InventoryItemNotFoundException(val itemId: Int) : Exception()
