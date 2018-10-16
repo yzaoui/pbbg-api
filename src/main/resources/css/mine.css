@@ -98,5 +98,10 @@ table.mining-mine-info > thead th {
 }
 
 table.mining-mine-info > tbody > tr.unmet-minimum-level {
-    background-color: #ff040426;
+    background-color: #38383826;
+    color: #797979;
+}
+
+table.mining-mine-info > tbody > tr.unmet-minimum-level button.mining-generate-mine:disabled {
+    cursor: not-allowed;
 }
