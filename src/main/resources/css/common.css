@@ -70,6 +70,10 @@ body {
     content: "⛏";
 }
 
+.sidebar-settings::before {
+    content: "⚙";
+}
+
 .sidebar-logout {
     margin-top: auto;
     margin-bottom: 0;
