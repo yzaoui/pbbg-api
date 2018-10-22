@@ -16,15 +16,13 @@ import org.jetbrains.exposed.sql.transactions.transaction
 class UserUCImpl(private val db: Database) : UserUC {
     override fun getUserById(userId: Int): User? = transaction(db) {
         UserTable.select { UserTable.id.eq(userId) }
-            .mapNotNull {
-                User(it[UserTable.id].value, it[UserTable.username], it[UserTable.passwordHash])
-            }
+            .map { User(it[UserTable.id].value, it[UserTable.username], it[UserTable.passwordHash]) }
             .singleOrNull()
     }
 
     override fun getUserByUsername(username: String): User? = transaction(db) {
         UserTable.select { UserTable.username.eq(username) }
-            .mapNotNull { User(it[UserTable.id].value, it[UserTable.username], it[UserTable.passwordHash]) }
+            .map { User(it[UserTable.id].value, it[UserTable.username], it[UserTable.passwordHash]) }
             .singleOrNull()
     }
 
