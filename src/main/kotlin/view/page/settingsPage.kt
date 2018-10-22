@@ -9,9 +9,9 @@ const val currentPasswordId = "current-password"
 const val newPasswordId = "new-password"
 const val confirmNewPasswordId = "confirm-new-password"
 
-fun settingsPage(memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Settings", memberPageVM).apply {
+fun settingsPage(memberPageVM: MemberPageVM, changePasswordUrl: String): Template<HTML> = MemberTemplate("Settings", memberPageVM).apply {
     content {
-        form() {
+        form(action = changePasswordUrl, method = FormMethod.post) {
             fieldSet {
                 legend { +"Change password" }
 
@@ -19,7 +19,7 @@ fun settingsPage(memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("S
                     htmlFor = currentPasswordId
                     +"Current Password:"
                 }
-                input(type = InputType.password) {
+                input(type = InputType.password, name = "currentPassword") {
                     id = currentPasswordId
                 }
 
@@ -29,7 +29,7 @@ fun settingsPage(memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("S
                     htmlFor = newPasswordId
                     +"New Password:"
                 }
-                input(type = InputType.password) {
+                input(type = InputType.password, name = "newPassword") {
                     id = newPasswordId
                 }
 
@@ -39,7 +39,7 @@ fun settingsPage(memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("S
                     htmlFor = confirmNewPasswordId
                     +"Confirm New Password:"
                 }
-                input(type = InputType.password) {
+                input(type = InputType.password, name = "confirmNewPassword") {
                     id = confirmNewPasswordId
                 }
 

@@ -1,18 +1,27 @@
 package com.bitwiserain.pbbg.route.web
 
 import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.href
 import com.bitwiserain.pbbg.interceptSetUserOrRedirect
 import com.bitwiserain.pbbg.memberPageVM
 import com.bitwiserain.pbbg.view.page.settingsPage
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location
+import io.ktor.request.receiveParameters
+import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import io.ktor.routing.get
+import io.ktor.routing.post
 import io.ktor.routing.route
 
+const val CHANGE_PASSWORD_PATH = "/change-password"
+
 @Location("/settings")
-class SettingsLocation
+class SettingsLocation {
+    @Location(CHANGE_PASSWORD_PATH)
+    class ChangePasswordLocation
+}
 
 fun Route.settings(userUC: UserUC) = route("/settings") {
     interceptSetUserOrRedirect(userUC)
@@ -20,8 +29,25 @@ fun Route.settings(userUC: UserUC) = route("/settings") {
     get {
         call.respondHtmlTemplate(
             settingsPage(
-                memberPageVM = call.attributes[memberPageVM]
+                memberPageVM = call.attributes[memberPageVM],
+                changePasswordUrl = href(SettingsLocation.ChangePasswordLocation())
             )
         ) {}
+    }
+
+    route(CHANGE_PASSWORD_PATH) {
+        post {
+            val params = call.receiveParameters()
+            val currentPassword: String? = params["currentPassword"]
+            val newPassword: String? = params["newPassword"]
+            val confirmNewPassword: String? = params["confirmNewPassword"]
+
+            if (currentPassword == null || newPassword == null || confirmNewPassword == null) {
+                // TODO: Add errors
+                return@post call.respondRedirect(href(SettingsLocation()))
+            }
+
+            call.respondRedirect(href(SettingsLocation()))
+        }
     }
 }
