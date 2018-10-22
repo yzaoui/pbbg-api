@@ -85,6 +85,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         register(userUC)
         mineWeb(userUC)
         inventoryWeb(userUC)
+        settings(userUC)
         route("/api") {
             user(userUC)
             pickaxe(userUC, equipmentUC)
@@ -117,6 +118,7 @@ fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPa
         homeUrl = href(IndexLocation()),
         inventoryUrl = href(InventoryLocation()),
         mineUrl = href(MineWebLocation()),
+        settingsUrl = href(SettingsLocation()),
         logoutUrl = href(LogoutLocation())
     )
 }
