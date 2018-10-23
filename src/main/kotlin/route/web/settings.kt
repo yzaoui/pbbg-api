@@ -9,9 +9,11 @@ import com.bitwiserain.pbbg.interceptSetUserOrRedirect
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.memberPageVM
 import com.bitwiserain.pbbg.view.page.settingsPage
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location
+import io.ktor.pipeline.PipelineContext
 import io.ktor.request.receiveParameters
 import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
@@ -31,12 +33,7 @@ fun Route.settings(userUC: UserUC) = route("/settings") {
     interceptSetUserOrRedirect(userUC)
 
     get {
-        call.respondHtmlTemplate(
-            settingsPage(
-                memberPageVM = call.attributes[memberPageVM],
-                changePasswordUrl = href(SettingsLocation.ChangePasswordLocation())
-            )
-        ) {}
+        respondSettingsPage()
     }
 
     route(CHANGE_PASSWORD_PATH) {
@@ -58,15 +55,22 @@ fun Route.settings(userUC: UserUC) = route("/settings") {
 
                 call.respondRedirect(href(SettingsLocation()))
             } catch (e: WrongCurrentPasswordException) {
-                // TODO: Add error
-                call.respondRedirect(href(SettingsLocation()))
+                respondSettingsPage(error = "Wrong current password.")
             } catch (e: UnconfirmedNewPasswordException) {
-                // TODO: Add error
-                call.respondRedirect(href(SettingsLocation()))
+                respondSettingsPage(error = "New passwords do not match.")
             } catch (e: IllegalPasswordException) {
-                // TODO: Add error
-                call.respondRedirect(href(SettingsLocation()))
+                respondSettingsPage(error = "New password does not fit requirements.")
             }
         }
     }
+}
+
+private suspend inline fun PipelineContext<Unit, ApplicationCall>.respondSettingsPage(error: String? = null) {
+    call.respondHtmlTemplate(
+        settingsPage(
+            memberPageVM = call.attributes[memberPageVM],
+            changePasswordUrl = href(SettingsLocation.ChangePasswordLocation()),
+            error = error
+        )
+    ) {}
 }
