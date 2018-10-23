@@ -24,7 +24,7 @@ open class GuestTemplate(private val pageTitle: String, private val guestPageVM:
         body {
             div(classes = "container") {
                 div(classes = "content") {
-                    nav(classes = "sidebar") {
+                    nav(classes = "sidebar sidebar-guest") {
                         a(href = "/") {
                             +"Index"
                         }

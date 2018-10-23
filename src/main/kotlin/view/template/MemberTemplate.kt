@@ -28,25 +28,21 @@ open class MemberTemplate(private val pageTitle: String, private val memberPageV
                         div(classes = "username") {
                             +memberPageVM.user.username
                         }
-                        div(classes = "sidebar-home") {
-                            a(href = memberPageVM.homeUrl) {
-                                +"Home"
-                            }
+                        a(href = memberPageVM.homeUrl, classes = "sidebar-item sidebar-home") {
+                            span(classes = "sidebar-item-icon") { +"""🏠""" }
+                            span { +"Home" }
                         }
-                        div(classes = "sidebar-inventory") {
-                            a(href = memberPageVM.inventoryUrl) {
-                                +"Inventory"
-                            }
+                        a(href = memberPageVM.inventoryUrl, classes = "sidebar-item sidebar-inventory") {
+                            span(classes = "sidebar-item-icon") { +"""🎒""" }
+                            span { +"Inventory" }
                         }
-                        div(classes = "sidebar-mine") {
-                            a(href = memberPageVM.mineUrl) {
-                                +"Mine"
-                            }
+                        a(href = memberPageVM.mineUrl, classes = "sidebar-item sidebar-mine") {
+                            span(classes = "sidebar-item-icon") { +"""⛏""" }
+                            span { +"Mine" }
                         }
-                        div(classes = "sidebar-settings") {
-                            a(href = memberPageVM.settingsUrl) {
-                                +"Settings"
-                            }
+                        a(href = memberPageVM.settingsUrl, classes = "sidebar-item sidebar-settings") {
+                            span(classes = "sidebar-item-icon") { +"""⚙""" }
+                            span { +"Settings" }
                         }
                         div(classes = "sidebar-logout") {
                             form(action = memberPageVM.logoutUrl, method = FormMethod.post) {

@@ -3,6 +3,10 @@ body {
     background-image: url("/img/background.png");
 }
 
+a {
+    color: #0070ff;
+}
+
 .container {
     width: 992px;
     height: 640px;
@@ -13,7 +17,7 @@ body {
 
 .container > footer {
     text-align: center;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .content {
@@ -30,16 +34,18 @@ body {
     border: 1px solid black;
     flex: 0 0 150px;
     order: -1;
-    text-align: center;
 }
 
-.sidebar > * {
+.sidebar-guest > * {
+    text-align: center;
     padding: 6px;
 }
 
 .sidebar > .username {
+    text-align: center;
     font-weight: bold;
     border-bottom: grey 1px solid;
+    padding: 10px;
 }
 
 .content main {
@@ -50,28 +56,22 @@ body {
     padding: 6px;
 }
 
-.content main > input {
-    padding: 4px;
+a.sidebar-item {
+    position: relative;
+    text-decoration: none;
+    padding: 10px 10px 10px 40px;
 }
 
-.form-errors > li {
-    color: red;
+a.sidebar-item:hover {
+    background-color: #0390f9;
+    color: white;
 }
 
-.sidebar-home::before {
-    content: "🏠";
-}
-
-.sidebar-inventory::before {
-    content: "🎒";
-}
-
-.sidebar-mine::before {
-    content: "⛏";
-}
-
-.sidebar-settings::before {
-    content: "⚙";
+span.sidebar-item-icon {
+    position: absolute;
+    font-size: 20px;
+    top: 4px;
+    left: 10px;
 }
 
 .sidebar-logout {
@@ -79,9 +79,22 @@ body {
     margin-bottom: 0;
 }
 
+.sidebar-logout button {
+    width: 100%;
+    padding: 6px
+}
+
 .sidebar-login-form > * {
     max-width: 100%;
     box-sizing: border-box;
+}
+
+.content main > input {
+    padding: 4px;
+}
+
+.form-errors > li {
+    color: red;
 }
 
 .alert-error {
