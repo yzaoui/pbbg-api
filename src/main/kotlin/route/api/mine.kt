@@ -118,13 +118,18 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
          *   [MineTypeListJSON]
          */
         get {
-            val typesList = MineTypeListJSON(
-                types = MineType.values().map {
-                    MineTypeListJSON.MineTypeJSON(id = it.ordinal, name = it.friendlyName, minLevel = it.minLevel)
-                }
-            )
+            val loggedInUser = call.attributes[loggedInUserKey]
 
-            call.respondSuccess(typesList)
+            val result = miningUC.getAvailableMines(loggedInUser.id).let {
+                MineTypeListJSON(
+                    types = it.mines.map {
+                        MineTypeListJSON.MineTypeJSON(id = it.ordinal, name = it.friendlyName, minLevel = it.minLevel)
+                    },
+                    nextUnlockLevel = it.nextUnlockLevel
+                )
+            }
+
+            call.respondSuccess(result)
         }
     }
 }
