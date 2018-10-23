@@ -1,8 +1,12 @@
 package com.bitwiserain.pbbg.route.web
 
+import com.bitwiserain.pbbg.domain.usecase.IllegalPasswordException
+import com.bitwiserain.pbbg.domain.usecase.UnconfirmedNewPasswordException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.domain.usecase.WrongCurrentPasswordException
 import com.bitwiserain.pbbg.href
 import com.bitwiserain.pbbg.interceptSetUserOrRedirect
+import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.memberPageVM
 import com.bitwiserain.pbbg.view.page.settingsPage
 import io.ktor.application.call
@@ -37,17 +41,32 @@ fun Route.settings(userUC: UserUC) = route("/settings") {
 
     route(CHANGE_PASSWORD_PATH) {
         post {
-            val params = call.receiveParameters()
-            val currentPassword: String? = params["currentPassword"]
-            val newPassword: String? = params["newPassword"]
-            val confirmNewPassword: String? = params["confirmNewPassword"]
+            try {
+                val params = call.receiveParameters()
+                val currentPassword: String? = params["currentPassword"]
+                val newPassword: String? = params["newPassword"]
+                val confirmNewPassword: String? = params["confirmNewPassword"]
 
-            if (currentPassword == null || newPassword == null || confirmNewPassword == null) {
-                // TODO: Add errors
-                return@post call.respondRedirect(href(SettingsLocation()))
+                if (currentPassword == null || newPassword == null || confirmNewPassword == null) {
+                    // TODO: Add errors
+                    return@post call.respondRedirect(href(SettingsLocation()))
+                }
+
+                val loggedInUser = call.attributes[loggedInUserKey]
+
+                userUC.changePassword(loggedInUser.id, currentPassword, newPassword, confirmNewPassword)
+
+                call.respondRedirect(href(SettingsLocation()))
+            } catch (e: WrongCurrentPasswordException) {
+                // TODO: Add error
+                call.respondRedirect(href(SettingsLocation()))
+            } catch (e: UnconfirmedNewPasswordException) {
+                // TODO: Add error
+                call.respondRedirect(href(SettingsLocation()))
+            } catch (e: IllegalPasswordException) {
+                // TODO: Add error
+                call.respondRedirect(href(SettingsLocation()))
             }
-
-            call.respondRedirect(href(SettingsLocation()))
         }
     }
 }
