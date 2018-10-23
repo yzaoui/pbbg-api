@@ -5,13 +5,11 @@ import com.bitwiserain.pbbg.view.template.GuestTemplate
 import io.ktor.html.Template
 import kotlinx.html.*
 
-fun loginPage(loginURL: String, registerURL: String, guestPageVM: GuestPageVM, errors: List<String>? = null): Template<HTML> = GuestTemplate("Log in", guestPageVM).apply {
+fun loginPage(loginURL: String, registerURL: String, guestPageVM: GuestPageVM, error: String? = null): Template<HTML> = GuestTemplate("Log in", guestPageVM).apply {
     content {
-        if (errors != null) {
-            ul(classes = "form-errors") {
-                for (error in errors) {
-                    li { +error }
-                }
+        if (error != null) {
+            div(classes = "alert-error") {
+                +error
             }
         }
         form(action = loginURL, method = FormMethod.post) {
