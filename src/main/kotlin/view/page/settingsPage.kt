@@ -1,5 +1,7 @@
 package com.bitwiserain.pbbg.view.page
 
+import com.bitwiserain.pbbg.PASSWORD_REGEX
+import com.bitwiserain.pbbg.PASSWORD_REGEX_DESCRIPTION
 import com.bitwiserain.pbbg.view.template.MemberPageVM
 import com.bitwiserain.pbbg.view.template.MemberTemplate
 import io.ktor.html.Template
@@ -26,6 +28,7 @@ fun settingsPage(memberPageVM: MemberPageVM, changePasswordUrl: String, error: S
                 }
                 input(type = InputType.password, name = "currentPassword") {
                     id = currentPasswordId
+                    required = true
                 }
 
                 br { }
@@ -36,6 +39,9 @@ fun settingsPage(memberPageVM: MemberPageVM, changePasswordUrl: String, error: S
                 }
                 input(type = InputType.password, name = "newPassword") {
                     id = newPasswordId
+                    required = true
+                    pattern = PASSWORD_REGEX
+                    title = PASSWORD_REGEX_DESCRIPTION
                 }
 
                 br { }
@@ -46,6 +52,9 @@ fun settingsPage(memberPageVM: MemberPageVM, changePasswordUrl: String, error: S
                 }
                 input(type = InputType.password, name = "confirmNewPassword") {
                     id = confirmNewPasswordId
+                    required = true
+                    pattern = PASSWORD_REGEX
+                    title = PASSWORD_REGEX_DESCRIPTION
                 }
 
                 br { }
