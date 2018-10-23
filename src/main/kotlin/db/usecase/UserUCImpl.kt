@@ -9,7 +9,6 @@ import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.UserStats
 import com.bitwiserain.pbbg.domain.usecase.UserUC
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -72,6 +71,10 @@ class UserUCImpl(private val db: Database) : UserUC {
         UserStatsTable.select { UserStatsTable.userId.eq(userId) }
             .single()
             .toUserStats()
+    }
+
+    override fun changePassword(userId: Int, currentPassword: String, newPassword: String, confirmNewPassword: String) {
+
     }
 
     private fun ResultRow.toUserStats(): UserStats = UserStats(this[UserStatsTable.miningExp])

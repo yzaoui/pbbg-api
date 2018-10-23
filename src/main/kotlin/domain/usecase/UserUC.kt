@@ -10,4 +10,5 @@ interface UserUC {
     fun registerUser(username: String, password: String): Int
     fun getUserIdByCredentials(username: String, password: String): Int?
     fun getUserStatsByUserId(userId: Int): UserStats
+    fun changePassword(userId: Int, currentPassword: String, newPassword: String, confirmNewPassword: String)
 }
