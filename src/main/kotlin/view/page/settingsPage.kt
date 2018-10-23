@@ -9,8 +9,13 @@ const val currentPasswordId = "current-password"
 const val newPasswordId = "new-password"
 const val confirmNewPasswordId = "confirm-new-password"
 
-fun settingsPage(memberPageVM: MemberPageVM, changePasswordUrl: String): Template<HTML> = MemberTemplate("Settings", memberPageVM).apply {
+fun settingsPage(memberPageVM: MemberPageVM, changePasswordUrl: String, error: String? = null): Template<HTML> = MemberTemplate("Settings", memberPageVM).apply {
     content {
+        if (error != null) {
+            div(classes = "alert-error") {
+                +error
+            }
+        }
         form(action = changePasswordUrl, method = FormMethod.post) {
             fieldSet {
                 legend { +"Change password" }
