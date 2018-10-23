@@ -45,8 +45,7 @@ fun Route.settings(userUC: UserUC) = route("/settings") {
                 val confirmNewPassword: String? = params["confirmNewPassword"]
 
                 if (currentPassword == null || newPassword == null || confirmNewPassword == null) {
-                    // TODO: Add errors
-                    return@post call.respondRedirect(href(SettingsLocation()))
+                    return@post respondSettingsPage(error = "Missing parameter(s).")
                 }
 
                 val loggedInUser = call.attributes[loggedInUserKey]
