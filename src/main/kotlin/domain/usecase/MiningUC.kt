@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.domain.usecase
 
+import com.bitwiserain.pbbg.domain.model.mine.AvailableMines
 import com.bitwiserain.pbbg.domain.model.mine.Mine
 import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineType
@@ -33,6 +34,8 @@ interface MiningUC {
      * @throws NotInMineSessionException when mining cannot occur due to the lack of an existing mining session.
      */
     fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult
+
+    fun getAvailableMines(userId: Int): AvailableMines
 }
 
 class InvalidMineTypeIdException(val id: Int) : Exception()
