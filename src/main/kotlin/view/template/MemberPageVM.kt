@@ -7,5 +7,6 @@ data class MemberPageVM(
     val homeUrl: String,
     val inventoryUrl: String,
     val mineUrl: String,
+    val settingsUrl: String,
     val logoutUrl: String
 )

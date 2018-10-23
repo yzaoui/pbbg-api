@@ -70,6 +70,10 @@ body {
     content: "⛏";
 }
 
+.sidebar-settings::before {
+    content: "⚙";
+}
+
 .sidebar-logout {
     margin-top: auto;
     margin-bottom: 0;
@@ -78,4 +82,13 @@ body {
 .sidebar-login-form > * {
     max-width: 100%;
     box-sizing: border-box;
+}
+
+.alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    padding: .75rem 1.25rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #f5c6cb;
+    border-radius: .25rem;
 }
