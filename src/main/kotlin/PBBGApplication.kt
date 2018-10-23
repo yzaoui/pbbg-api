@@ -74,6 +74,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
     }
     install(Locations)
     install(ContentNegotiation) {
+        // Handles "application/json" content type
         gson {
             serializeNulls()
         }

@@ -9,8 +9,8 @@ fun loginPage(loginURL: String, registerURL: String, guestPageVM: GuestPageVM, e
     content {
         if (errors != null) {
             ul(classes = "form-errors") {
-                errors.forEach {
-                    li { +it }
+                for (error in errors) {
+                    li { +error }
                 }
             }
         }
