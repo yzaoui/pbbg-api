@@ -56,7 +56,7 @@ const setupGenerateMineInterface = async () => {
     const userStatsResponse = await (await userStatsRequest).json();
 
     if (mineTypesResponse.status === "success" && userStatsResponse.status === "success") {
-        const mineTypes = mineTypesResponse.data.types;
+        const { types: mineTypes, nextUnlockLevel } = mineTypesResponse.data;
         const userMiningStats = userStatsResponse.data.mining;
 
         table.innerText = "";
@@ -82,34 +82,59 @@ const setupGenerateMineInterface = async () => {
         const tbody = document.createElement("tbody");
         table.appendChild(tbody);
 
-        for (let i = 0; i < mineTypes.length; i++) {
-            const mineType = mineTypes[i];
+        mineTypes.forEach(mine => {
+            tbody.appendChild(createAvailableMineRow(mine));
+        });
 
-            const tr = document.createElement("tr");
-            tbody.appendChild(tr);
-
-            const nameTd = document.createElement("td");
-            nameTd.innerText = mineType.name;
-            tr.appendChild(nameTd);
-
-            const minimumLvlTd = document.createElement("td");
-            minimumLvlTd.innerText = mineType.minLevel;
-            tr.appendChild(minimumLvlTd);
-
-            const button = document.createElement("button");
-            button.className = "mining-generate-mine";
-            button.innerText = "Generate";
-            button.onclick = () => generateMine(mineType.id);
-            const generateTd = document.createElement("td");
-            generateTd.appendChild(button);
-            tr.appendChild(generateTd);
-
-            if (userMiningStats.level < mineType.minLevel) {
-                tr.classList.add("unmet-minimum-level");
-                button.disabled = true;
-            }
+        if (nextUnlockLevel !== null) {
+            tbody.appendChild(createMineToUnlockRow(nextUnlockLevel))
         }
     }
+};
+
+const createAvailableMineRow = ({ id, name, minLevel }) => {
+    const tr = document.createElement("tr");
+
+    const nameTd = document.createElement("td");
+    nameTd.innerText = name;
+    tr.appendChild(nameTd);
+
+    const minimumLvlTd = document.createElement("td");
+    minimumLvlTd.innerText = minLevel;
+    tr.appendChild(minimumLvlTd);
+
+    const button = document.createElement("button");
+    button.className = "mining-generate-mine";
+    button.innerText = "Generate";
+    button.onclick = () => generateMine(id);
+    const generateTd = document.createElement("td");
+    generateTd.appendChild(button);
+    tr.appendChild(generateTd);
+
+    return tr;
+};
+
+const createMineToUnlockRow = (nextUnlockLevel) => {
+    const tr = document.createElement("tr");
+    tr.className = "unmet-minimum-level";
+
+    const nameTd = document.createElement("td");
+    nameTd.innerText = "???";
+    tr.appendChild(nameTd);
+
+    const minimumLvlTd = document.createElement("td");
+    minimumLvlTd.innerText = nextUnlockLevel;
+    tr.appendChild(minimumLvlTd);
+
+    const button = document.createElement("button");
+    button.className = "mining-generate-mine";
+    button.innerText = "Need to unlock";
+    button.disabled = true;
+    const generateTd = document.createElement("td");
+    generateTd.appendChild(button);
+    tr.appendChild(generateTd);
+
+    return tr;
 };
 
 const reachableCells = (x, y, gridWidth, gridHeight, targets) => {

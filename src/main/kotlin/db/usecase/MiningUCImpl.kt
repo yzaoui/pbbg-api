@@ -5,6 +5,7 @@ import com.bitwiserain.pbbg.db.model.MineSession
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.Item
+import com.bitwiserain.pbbg.domain.model.LevelProgress
 import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.model.mine.*
 import com.bitwiserain.pbbg.domain.usecase.*
@@ -136,6 +137,30 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         }
 
         MineActionResult(minedItemResults, MiningExperienceManager.getLevelUpResults(currentLevelProgress.level, newLevelProgress.level))
+    }
+
+    override fun getAvailableMines(userId: Int): AvailableMines {
+        val userMiningLevel = transaction(db) {
+            UserStatsTable.select { UserStatsTable.userId.eq(userId) }
+                .single()
+                .get(UserStatsTable.miningExp)
+        }.let { exp ->
+            MiningExperienceManager.getLevelProgress(exp)
+        }.level
+
+        val mines = mutableListOf<MineType>()
+        var nextUnlockLevel: Int? = null
+
+        for (mine in MineType.values()) {
+            if (userMiningLevel >= mine.minLevel) {
+                mines.add(mine)
+            } else {
+                nextUnlockLevel = mine.minLevel
+                break
+            }
+        }
+
+        return AvailableMines(mines, nextUnlockLevel)
     }
 
     private fun mineEntityToItem(entity: MineEntity, quantity: Int): List<Item> = when (entity) {
