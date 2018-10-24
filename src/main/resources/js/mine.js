@@ -50,14 +50,11 @@ const setupGenerateMineInterface = async () => {
     main.appendChild(table);
 
     const mineTypesRequest = fetch("/api/mine/types");
-    const userStatsRequest = fetch("/api/user");
 
     const mineTypesResponse = await (await mineTypesRequest).json();
-    const userStatsResponse = await (await userStatsRequest).json();
 
-    if (mineTypesResponse.status === "success" && userStatsResponse.status === "success") {
+    if (mineTypesResponse.status === "success") {
         const { types: mineTypes, nextUnlockLevel } = mineTypesResponse.data;
-        const userMiningStats = userStatsResponse.data.mining;
 
         table.innerText = "";
 
