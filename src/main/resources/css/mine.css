@@ -81,6 +81,7 @@ button.mining-exit-mine.loading {
 }
 
 table.mining-mine-info {
+    width: 100%;
     border-collapse: collapse;
     text-align: left;
 }
