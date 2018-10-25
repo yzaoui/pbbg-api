@@ -119,7 +119,9 @@ fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPa
     return MemberPageVM(
         user = user,
         homeUrl = href(IndexLocation()),
+        squadUrl = href(SquadLocation()),
         inventoryUrl = href(InventoryLocation()),
+        battleUrl = href(BattleLocation()),
         mineUrl = href(MineWebLocation()),
         settingsUrl = href(SettingsLocation()),
         logoutUrl = href(LogoutLocation())
