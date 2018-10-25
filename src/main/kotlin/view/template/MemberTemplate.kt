@@ -28,19 +28,19 @@ open class MemberTemplate(private val pageTitle: String, private val memberPageV
                         div(classes = "username") {
                             +memberPageVM.user.username
                         }
-                        a(href = memberPageVM.homeUrl, classes = "sidebar-item sidebar-home") {
+                        a(href = memberPageVM.homeUrl, classes = "sidebar-item") {
                             span(classes = "sidebar-item-icon") { +"""🏠""" }
                             span { +"Home" }
                         }
-                        a(href = memberPageVM.inventoryUrl, classes = "sidebar-item sidebar-inventory") {
+                        a(href = memberPageVM.inventoryUrl, classes = "sidebar-item") {
                             span(classes = "sidebar-item-icon") { +"""🎒""" }
                             span { +"Inventory" }
                         }
-                        a(href = memberPageVM.mineUrl, classes = "sidebar-item sidebar-mine") {
+                        a(href = memberPageVM.mineUrl, classes = "sidebar-item") {
                             span(classes = "sidebar-item-icon") { +"""⛏""" }
                             span { +"Mine" }
                         }
-                        a(href = memberPageVM.settingsUrl, classes = "sidebar-item sidebar-settings") {
+                        a(href = memberPageVM.settingsUrl, classes = "sidebar-item") {
                             span(classes = "sidebar-item-icon") { +"""⚙""" }
                             span { +"Settings" }
                         }
