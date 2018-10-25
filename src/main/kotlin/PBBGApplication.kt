@@ -84,7 +84,9 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         login(userUC)
         logout()
         register(userUC)
+        squad(userUC)
         mineWeb(userUC)
+        battle(userUC)
         inventoryWeb(userUC)
         settings(userUC)
         route("/api") {
