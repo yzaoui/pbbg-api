@@ -84,7 +84,9 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         login(userUC)
         logout()
         register(userUC)
+        squad(userUC)
         mineWeb(userUC)
+        battle(userUC)
         inventoryWeb(userUC)
         settings(userUC)
         route("/api") {
@@ -117,7 +119,9 @@ fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPa
     return MemberPageVM(
         user = user,
         homeUrl = href(IndexLocation()),
+        squadUrl = href(SquadLocation()),
         inventoryUrl = href(InventoryLocation()),
+        battleUrl = href(BattleLocation()),
         mineUrl = href(MineWebLocation()),
         settingsUrl = href(SettingsLocation()),
         logoutUrl = href(LogoutLocation())
