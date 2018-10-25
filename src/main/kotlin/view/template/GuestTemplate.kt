@@ -5,7 +5,7 @@ import io.ktor.html.Template
 import io.ktor.html.insert
 import kotlinx.html.*
 
-open class GuestTemplate(private val pageTitle: String, private val guestPageVM: GuestPageVM) : Template<HTML> {
+class GuestTemplate(private val pageTitle: String, private val guestPageVM: GuestPageVM) : Template<HTML> {
     val headContent = Placeholder<HEAD>()
     val content = Placeholder<MAIN>()
     val endOfBody = Placeholder<BODY>()
