@@ -7,17 +7,15 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 
-fun Route.squadAPI(userUC: UserUC, unitUC: UnitUC) {
+fun Route.squadAPI(userUC: UserUC, unitUC: UnitUC) = route("/squad") {
     interceptSetUserOr401(userUC)
 
-    route("/squad") {
-        get {
-            val loggedInUser = call.attributes[loggedInUserKey]
+    get {
+        val loggedInUser = call.attributes[loggedInUserKey]
 
-            val squad = unitUC.getSquad(loggedInUser.id)
+        val squad = unitUC.getSquad(loggedInUser.id)
 
-            call.respondSuccess(squad.toJSON())
-        }
+        call.respondSuccess(squad.toJSON())
     }
 }
 
@@ -32,11 +30,11 @@ class CharUnitJSON(
 )
 
 fun Squad.toJSON() = SquadJSON(
-    units = units.map {
-        CharUnitJSON(
-            baseUnitId = it.enum.ordinal,
-            atk = it.atk,
-            def = it.def
-        )
-    }
+    units = units.map { it.toJSON() }
+)
+
+fun CharUnit.toJSON() = CharUnitJSON(
+    baseUnitId = enum.ordinal,
+    atk = atk,
+    def = def
 )
