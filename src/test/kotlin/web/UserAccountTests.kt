@@ -26,7 +26,7 @@ class UserAccountTests {
     private val userUC = UserUCImpl(db)
     private val inventoryUC = InventoryUCImpl(db)
     private val miningUC = MiningUCImpl(db, inventoryUC)
-    private val equipmentUC = EquipmentUCImpl(db, inventoryUC)
+    private val equipmentUC = EquipmentUCImpl(db)
 
     init {
         transaction(db) {

@@ -61,7 +61,7 @@ fun Application.main() {
     val userUC = UserUCImpl(db)
     val inventoryUC = InventoryUCImpl(db)
     val miningUC = MiningUCImpl(db, inventoryUC)
-    val equipmentUC = EquipmentUCImpl(db, inventoryUC)
+    val equipmentUC = EquipmentUCImpl(db)
 
     mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC)
 }

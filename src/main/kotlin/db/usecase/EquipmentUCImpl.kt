@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
-class EquipmentUCImpl(private val db: Database, private val inventoryUC: InventoryUC) : EquipmentUC {
+class EquipmentUCImpl(private val db: Database) : EquipmentUC {
     override fun equip(userId: Int, inventoryItemId: Int): Unit = transaction(db) {
         /* Get item from inventory table */
         val item = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.id.eq(inventoryItemId) }
