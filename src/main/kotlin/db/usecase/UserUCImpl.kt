@@ -1,7 +1,9 @@
 package com.bitwiserain.pbbg.db.usecase
 
 import at.favre.lib.crypto.bcrypt.BCrypt
+import com.bitwiserain.pbbg.CharUnit
 import com.bitwiserain.pbbg.PASSWORD_REGEX
+import com.bitwiserain.pbbg.addUnitToSquad
 import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.EquipmentTable
 import com.bitwiserain.pbbg.db.repository.InventoryTable
@@ -57,6 +59,9 @@ class UserUCImpl(private val db: Database) : UserUC {
 
             Unit
         }
+
+        // TODO: Temporarily give users a default unit
+        addUnitToSquad(userId, CharUnit.IceCreamWizard(1, 1))
 
         userId.value
     }

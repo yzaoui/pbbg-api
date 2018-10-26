@@ -10,10 +10,7 @@ import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
 import com.bitwiserain.pbbg.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.route.api.inventoryAPI
-import com.bitwiserain.pbbg.route.api.mine
-import com.bitwiserain.pbbg.route.api.pickaxe
-import com.bitwiserain.pbbg.route.api.user
+import com.bitwiserain.pbbg.route.api.*
 import com.bitwiserain.pbbg.route.web.*
 import com.bitwiserain.pbbg.view.template.GuestPageVM
 import com.bitwiserain.pbbg.view.template.MemberPageVM
@@ -53,7 +50,7 @@ fun Application.main() {
     val db = Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
     transaction {
         addLogger(Slf4jSqlDebugLogger)
-        SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable)
+        SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable, CharUnitTable)
     }
 
     install(CallLogging)
@@ -62,11 +59,12 @@ fun Application.main() {
     val inventoryUC = InventoryUCImpl(db)
     val miningUC = MiningUCImpl(db, inventoryUC)
     val equipmentUC = EquipmentUCImpl(db)
+    val unitUC = UnitUCImpl(db)
 
-    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC)
+    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC)
 }
 
-fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC) {
+fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC) {
     install(Sessions) {
         cookie<ApplicationSession>("pbbg_session") {
             cookie.path = "/"
@@ -93,6 +91,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
             user(userUC)
             pickaxe(userUC, equipmentUC)
             mine(userUC, miningUC)
+            squadAPI(userUC, unitUC)
             inventoryAPI(userUC, inventoryUC, equipmentUC)
         }
         static("css") {
