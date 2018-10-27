@@ -50,7 +50,7 @@ fun Application.main() {
     val db = Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
     transaction {
         addLogger(Slf4jSqlDebugLogger)
-        SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable, CharUnitTable)
+        SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable, SquadTable, BattleSessionTable, BattleEnemyTable)
     }
 
     install(CallLogging)
@@ -60,11 +60,12 @@ fun Application.main() {
     val miningUC = MiningUCImpl(db, inventoryUC)
     val equipmentUC = EquipmentUCImpl(db)
     val unitUC = UnitUCImpl(db)
+    val battleUC = BattleUCImpl(db)
 
-    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC)
+    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC)
 }
 
-fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC) {
+fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC) {
     install(Sessions) {
         cookie<ApplicationSession>("pbbg_session") {
             cookie.path = "/"
@@ -84,7 +85,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         register(userUC)
         squad(userUC)
         mineWeb(userUC)
-        battle(userUC)
+        battleWeb(userUC)
         inventoryWeb(userUC)
         settings(userUC)
         route("/api") {
@@ -93,6 +94,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
             mine(userUC, miningUC)
             squadAPI(userUC, unitUC)
             inventoryAPI(userUC, inventoryUC, equipmentUC)
+            battleAPI(userUC, battleUC)
         }
         static("css") {
             resources("css")

@@ -15,7 +15,7 @@ const val BATTLE_PATH = "/battle"
 @Location(BATTLE_PATH)
 class BattleLocation
 
-fun Route.battle(userUC: UserUC) = route(BATTLE_PATH) {
+fun Route.battleWeb(userUC: UserUC) = route(BATTLE_PATH) {
     interceptSetUserOrRedirect(userUC)
 
     get {
