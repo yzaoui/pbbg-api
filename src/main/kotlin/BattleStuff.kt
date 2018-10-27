@@ -14,11 +14,9 @@ object BattleSessionTable : LongIdTable() {
     val userId = reference("user_id", UserTable)
 }
 
-object BattleEnemyTable : LongIdTable() {
+object BattleEnemyTable : Table() {
     val battle = reference("battle_session_id", BattleSessionTable)
-    val unit = enumeration("unit", CharUnitEnum::class)
-    val atk = integer("atk")
-    val def = integer("def")
+    val unit = reference("unit_id", UnitTable)
 }
 
 interface BattleUC {
@@ -36,8 +34,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         val allies = SquadTable.getAllies(userId)
 
-        val enemies = BattleEnemyTable.select { BattleEnemyTable.battle.eq(battleSession) }
-            .map { it.toCharUnit() }
+        val enemies = BattleEnemyTable.getEnemies(battleSession)
 
         Battle(allies = allies, enemies = enemies)
     }
@@ -46,8 +43,8 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         // TODO: Forbid action if a battle is already in progress
 
         val enemies = listOf(
-            IceCreamWizard(2, 5),
-            Twolip(3, 1)
+            IceCreamWizard(10, 10, 2, 5),
+            Twolip(16, 16, 3, 1)
         )
 
         val battleSession = BattleSessionTable.insertAndGetId {
@@ -72,21 +69,23 @@ class BattleJSON(
     @SerializedName("enemies") val enemies: List<CharUnitJSON>
 )
 
-fun BattleEnemyTable.insertEnemies(battleSession: EntityID<Long>, enemies: List<CharUnit>) = batchInsert(enemies) {
-    this[BattleEnemyTable.battle] = battleSession
-    this[BattleEnemyTable.unit] = it.enum
-    this[BattleEnemyTable.atk] = it.atk
-    this[BattleEnemyTable.def] = it.def
+fun BattleEnemyTable.insertEnemies(battleSession: EntityID<Long>, enemies: List<CharUnit>) {
+    // TODO: There's gotta be a way to do this in batch :/
+    for (enemy in enemies) {
+        // Create enemy unit in unit table
+        val enemyId = UnitTable.insertUnitAndGetId(enemy)
+
+        // Connect newly created enemy to this battle session
+        insert {
+            it[BattleEnemyTable.battle] = battleSession
+            it[BattleEnemyTable.unit] = enemyId
+        }
+    }
 }
 
-private fun ResultRow.toCharUnit(): CharUnit {
-    val unitEnum = this[BattleEnemyTable.unit]
-    val atk = this[BattleEnemyTable.atk]
-    val def = this[BattleEnemyTable.def]
-
-    return when (unitEnum) {
-        ICE_CREAM_WIZARD -> IceCreamWizard(atk, def)
-        TWOLIP -> Twolip(atk, def)
-        CARPSHOOTER -> Carpshooter(atk, def)
-    }
+fun BattleEnemyTable.getEnemies(battleSession: EntityID<Long>): List<CharUnit> {
+    return innerJoin(UnitTable)
+        .slice(UnitTable.columns)
+        .select { BattleEnemyTable.battle.eq(battleSession) }
+        .map { it.toCharUnit() }
 }

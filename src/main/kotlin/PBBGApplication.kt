@@ -50,7 +50,10 @@ fun Application.main() {
     val db = Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
     transaction {
         addLogger(Slf4jSqlDebugLogger)
-        SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable, SquadTable, BattleSessionTable, BattleEnemyTable)
+        SchemaUtils.create(
+            UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable,
+            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable
+        )
     }
 
     install(CallLogging)

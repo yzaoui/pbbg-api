@@ -5,26 +5,25 @@ import com.bitwiserain.pbbg.CharUnitEnum.*
 import com.bitwiserain.pbbg.db.repository.UserTable
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.LongIdTable
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 sealed class CharUnit {
     abstract val enum: CharUnitEnum
+    abstract val hp: Int
+    abstract val maxHP: Int
     abstract val atk: Int
     abstract val def: Int
 
-    class IceCreamWizard(override val atk: Int, override val def: Int) : CharUnit() {
+    class IceCreamWizard(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
         override val enum get() = ICE_CREAM_WIZARD
     }
 
-    class Twolip(override val atk: Int, override val def: Int) : CharUnit() {
+    class Twolip(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
         override val enum get() = TWOLIP
     }
 
-    class Carpshooter(override val atk: Int, override val def: Int) : CharUnit() {
+    class Carpshooter(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
         override val enum get() = CARPSHOOTER
     }
 }
@@ -36,8 +35,14 @@ enum class CharUnitEnum {
 }
 
 object SquadTable : LongIdTable() {
-    val userId = reference("user_id", UserTable)
+    val user = reference("user_id", UserTable)
+    val unit = reference("unit_id", UnitTable)
+}
+
+object UnitTable : LongIdTable() {
     val unit = enumeration("unit", CharUnitEnum::class)
+    val hp = integer("hp")
+    val maxHP = integer("max_hp")
     val atk = integer("atk")
     val def = integer("def")
 }
@@ -57,27 +62,41 @@ class UnitUCImpl(private val db: Database) : UnitUC {
 class Squad(val units: List<CharUnit>)
 
 fun addUnitToSquad(user: EntityID<Int>, unit: CharUnit) {
+    val unitId = UnitTable.insertUnitAndGetId(unit)
+
     SquadTable.insert {
-        it[SquadTable.userId] = user
-        it[SquadTable.unit] = unit.enum
-        it[SquadTable.atk] = unit.atk
-        it[SquadTable.def] = unit.def
+        it[SquadTable.user] = user
+        it[SquadTable.unit] = unitId
     }
 }
 
-private fun ResultRow.toCharUnit(): CharUnit {
-    val unitEnum = this[SquadTable.unit]
-    val atk = this[SquadTable.atk]
-    val def = this[SquadTable.def]
+fun ResultRow.toCharUnit(): CharUnit {
+    val unitEnum = this[UnitTable.unit]
+    val hp = this[UnitTable.hp]
+    val maxHP = this[UnitTable.maxHP]
+    val atk = this[UnitTable.atk]
+    val def = this[UnitTable.def]
 
     return when (unitEnum) {
-        ICE_CREAM_WIZARD -> IceCreamWizard(atk, def)
-        TWOLIP -> Twolip(atk, def)
-        CARPSHOOTER -> Carpshooter(atk, def)
+        ICE_CREAM_WIZARD -> IceCreamWizard(hp, maxHP, atk, def)
+        TWOLIP -> Twolip(hp, maxHP, atk, def)
+        CARPSHOOTER -> Carpshooter(hp, maxHP, atk, def)
     }
 }
 
 fun SquadTable.getAllies(userId: Int): List<CharUnit> {
-    return select { SquadTable.userId.eq(userId) }
+    return innerJoin(UnitTable)
+        .slice(UnitTable.columns)
+        .select { SquadTable.user.eq(userId) }
         .map { it.toCharUnit() }
+}
+
+fun UnitTable.insertUnitAndGetId(unit: CharUnit): EntityID<Long> {
+    return insertAndGetId {
+        it[UnitTable.unit] = unit.enum
+        it[UnitTable.hp] = unit.hp
+        it[UnitTable.maxHP] = unit.maxHP
+        it[UnitTable.atk] = unit.atk
+        it[UnitTable.def] = unit.def
+    }
 }
