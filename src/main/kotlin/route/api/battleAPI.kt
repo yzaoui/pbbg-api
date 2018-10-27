@@ -9,6 +9,10 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
     interceptSetUserOr401(userUC)
 
     route("/session") {
+        /**
+         * On success:
+         *   [BattleJSON]
+         */
         get {
             val loggedInUser = call.attributes[loggedInUserKey]
 
@@ -21,6 +25,9 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
             /**
              * Expects query string:
              *   action = generate
+             *
+             * On success:
+             *   [BattleJSON]
              */
             post {
                 val loggedInUser = call.attributes[loggedInUserKey]
