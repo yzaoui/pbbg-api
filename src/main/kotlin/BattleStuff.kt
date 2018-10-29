@@ -22,13 +22,12 @@ object BattleEnemyTable : Table() {
 interface BattleUC {
     fun getCurrentBattle(userId: Int): Battle?
     fun generateBattle(userId: Int): Battle
+    fun attack(userId: Int, allyId: Long, enemyId: Long)
 }
 
 class BattleUCImpl(private val db: Database) : BattleUC {
     override fun getCurrentBattle(userId: Int): Battle? = transaction(db) {
-        val battleSession = BattleSessionTable.select { BattleSessionTable.userId.eq(userId) }
-            .singleOrNull()
-            ?.get(BattleSessionTable.id)
+        val battleSession = BattleSessionTable.getBattleSessionId(userId)
 
         if (battleSession == null) return@transaction null
 
@@ -56,6 +55,16 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         val allies = SquadTable.getAllies(userId)
 
         Battle(allies = allies, enemies = enemies)
+    }
+
+    override fun attack(userId: Int, allyId: Long, enemyId: Long) {
+        val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw Exception()
+
+        val ally = SquadTable.getAlly(userId, allyId) ?: throw Exception()
+        val enemy = BattleEnemyTable.getEnemy(battleSession, enemyId) ?: throw Exception()
+        val newEnemy = enemy.receiveDamage(ally.atk)
+
+        UnitTable.updateUnit(enemyId, newEnemy)
     }
 }
 
@@ -88,4 +97,18 @@ fun BattleEnemyTable.getEnemies(battleSession: EntityID<Long>): List<CharUnit> {
         .slice(UnitTable.columns)
         .select { BattleEnemyTable.battle.eq(battleSession) }
         .map { it.toCharUnit() }
+}
+
+fun BattleEnemyTable.getEnemy(battleSession: EntityID<Long>, enemyId: Long): CharUnit? {
+    return innerJoin(UnitTable)
+        .slice(UnitTable.columns)
+        .select { BattleEnemyTable.battle.eq(battleSession) and UnitTable.id.eq(enemyId) }
+        .singleOrNull()
+        ?.toCharUnit()
+}
+
+fun BattleSessionTable.getBattleSessionId(userId: Int): EntityID<Long>? {
+    return select { BattleSessionTable.userId.eq(userId) }
+        .singleOrNull()
+        ?.get(BattleSessionTable.id)
 }

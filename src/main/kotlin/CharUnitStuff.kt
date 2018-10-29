@@ -7,6 +7,7 @@ import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.LongIdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import kotlin.math.max
 
 sealed class CharUnit {
     abstract val enum: CharUnitEnum
@@ -15,15 +16,15 @@ sealed class CharUnit {
     abstract val atk: Int
     abstract val def: Int
 
-    class IceCreamWizard(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
+    data class IceCreamWizard(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
         override val enum get() = ICE_CREAM_WIZARD
     }
 
-    class Twolip(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
+    data class Twolip(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
         override val enum get() = TWOLIP
     }
 
-    class Carpshooter(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
+    data class Carpshooter(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
         override val enum get() = CARPSHOOTER
     }
 }
@@ -91,6 +92,14 @@ fun SquadTable.getAllies(userId: Int): List<CharUnit> {
         .map { it.toCharUnit() }
 }
 
+fun SquadTable.getAlly(userId: Int, allyId: Long): CharUnit? {
+    return innerJoin(UnitTable)
+        .slice(UnitTable.columns)
+        .select { SquadTable.user.eq(userId) and UnitTable.id.eq(allyId) }
+        .singleOrNull()
+        ?.toCharUnit()
+}
+
 fun UnitTable.insertUnitAndGetId(unit: CharUnit): EntityID<Long> {
     return insertAndGetId {
         it[UnitTable.unit] = unit.enum
@@ -98,5 +107,22 @@ fun UnitTable.insertUnitAndGetId(unit: CharUnit): EntityID<Long> {
         it[UnitTable.maxHP] = unit.maxHP
         it[UnitTable.atk] = unit.atk
         it[UnitTable.def] = unit.def
+    }
+}
+
+fun UnitTable.updateUnit(unitId: Long, unit: CharUnit) {
+    update({ UnitTable.id.eq(unitId) }) {
+        it[UnitTable.hp] = unit.hp
+        it[UnitTable.maxHP] = unit.maxHP
+        it[UnitTable.atk] = unit.atk
+        it[UnitTable.def] = unit.def
+    }
+}
+
+fun CharUnit.receiveDamage(damage: Int): CharUnit {
+    return when (this) {
+        is CharUnit.IceCreamWizard -> copy(hp = max(hp - damage, 0))
+        is CharUnit.Twolip -> copy(hp = max(hp - damage, 0))
+        is CharUnit.Carpshooter -> copy(hp = max(hp - damage, 0))
     }
 }
