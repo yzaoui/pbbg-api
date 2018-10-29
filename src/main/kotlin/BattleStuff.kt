@@ -1,22 +1,23 @@
 package com.bitwiserain.pbbg
 
 import com.bitwiserain.pbbg.CharUnit.*
-import com.bitwiserain.pbbg.CharUnitEnum.*
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.route.api.CharUnitJSON
 import com.google.gson.annotations.SerializedName
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.LongIdTable
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.sql.ResultSet
 
 object BattleSessionTable : LongIdTable() {
     val userId = reference("user_id", UserTable)
 }
 
 object BattleEnemyTable : Table() {
-    val battle = reference("battle_session_id", BattleSessionTable)
-    val unit = reference("unit_id", UnitTable)
+    val battle = reference("battle_session_id", BattleSessionTable, ReferenceOption.CASCADE)
+    val unit = reference("unit_id", UnitTable, ReferenceOption.CASCADE)
 }
 
 interface BattleUC {
@@ -41,18 +42,17 @@ class BattleUCImpl(private val db: Database) : BattleUC {
     override fun generateBattle(userId: Int): Battle = transaction(db) {
         // TODO: Forbid action if a battle is already in progress
 
-        val enemies = listOf(
-            IceCreamWizard(0, 10, 10, 2),
-            Twolip(0, 16, 16, 3)
-        )
-
         val battleSession = BattleSessionTable.insertAndGetId {
             it[BattleSessionTable.userId] = EntityID(userId, UserTable)
         }
 
-        BattleEnemyTable.insertEnemies(battleSession, enemies)
+        BattleEnemyTable.insertEnemies(battleSession, listOf(
+            IceCreamWizard(0, 10, 10, 2),
+            Twolip(0, 16, 16, 3)
+        ))
 
         val allies = SquadTable.getAllies(userId)
+        val enemies = BattleEnemyTable.getEnemies(battleSession)
 
         Battle(allies = allies, enemies = enemies)
     }
@@ -62,9 +62,28 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         val ally = SquadTable.getAlly(userId, allyId) ?: throw Exception()
         val enemy = BattleEnemyTable.getEnemy(battleSession, enemyId) ?: throw Exception()
+        if (enemy.hp == 0) throw Exception()
         val newEnemy = enemy.receiveDamage(ally.atk)
 
         UnitTable.updateUnit(enemyId, newEnemy)
+
+        checkBattleOver(battleSession)
+    }
+
+    fun checkBattleOver(battleSession: EntityID<Long>) = transaction(db) {
+        val enemies = BattleEnemyTable.getEnemies(battleSession)
+
+        val aliveEnemies = enemies.filter { it.hp > 0 }
+
+        if (aliveEnemies.isEmpty()) {
+            // All enemies are defeated
+
+            val enemyIdCSV = enemies.asSequence().map { it.id }.joinToString()
+
+            BattleSessionTable.deleteBattle(battleSession)
+
+            "DELETE FROM ${UnitTable.tableName} WHERE ${UnitTable.id.name} IN ($enemyIdCSV)".execAndMap {}
+        }
     }
 }
 
@@ -111,4 +130,18 @@ fun BattleSessionTable.getBattleSessionId(userId: Int): EntityID<Long>? {
     return select { BattleSessionTable.userId.eq(userId) }
         .singleOrNull()
         ?.get(BattleSessionTable.id)
+}
+
+fun BattleSessionTable.deleteBattle(battleSession: EntityID<Long>) {
+    deleteWhere { BattleSessionTable.id.eq(battleSession) }
+}
+
+fun <T:Any> String.execAndMap(transform : (ResultSet) -> T) : List<T> {
+    val result = arrayListOf<T>()
+    TransactionManager.current().exec(this) { rs ->
+        while (rs.next()) {
+            result += transform(rs)
+        }
+    }
+    return result
 }
