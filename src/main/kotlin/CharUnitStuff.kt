@@ -10,21 +10,21 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.math.max
 
 sealed class CharUnit {
+    abstract val id: Long
     abstract val enum: CharUnitEnum
     abstract val hp: Int
     abstract val maxHP: Int
     abstract val atk: Int
-    abstract val def: Int
 
-    data class IceCreamWizard(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
+    data class IceCreamWizard(override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int) : CharUnit() {
         override val enum get() = ICE_CREAM_WIZARD
     }
 
-    data class Twolip(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
+    data class Twolip(override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int) : CharUnit() {
         override val enum get() = TWOLIP
     }
 
-    data class Carpshooter(override val hp: Int, override val maxHP: Int, override val atk: Int, override val def: Int) : CharUnit() {
+    data class Carpshooter(override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int) : CharUnit() {
         override val enum get() = CARPSHOOTER
     }
 }
@@ -45,7 +45,6 @@ object UnitTable : LongIdTable() {
     val hp = integer("hp")
     val maxHP = integer("max_hp")
     val atk = integer("atk")
-    val def = integer("def")
 }
 
 interface UnitUC {
@@ -72,16 +71,16 @@ fun addUnitToSquad(user: EntityID<Int>, unit: CharUnit) {
 }
 
 fun ResultRow.toCharUnit(): CharUnit {
+    val id = this[UnitTable.id].value
     val unitEnum = this[UnitTable.unit]
     val hp = this[UnitTable.hp]
     val maxHP = this[UnitTable.maxHP]
     val atk = this[UnitTable.atk]
-    val def = this[UnitTable.def]
 
     return when (unitEnum) {
-        ICE_CREAM_WIZARD -> IceCreamWizard(hp, maxHP, atk, def)
-        TWOLIP -> Twolip(hp, maxHP, atk, def)
-        CARPSHOOTER -> Carpshooter(hp, maxHP, atk, def)
+        ICE_CREAM_WIZARD -> IceCreamWizard(id, hp, maxHP, atk)
+        TWOLIP -> Twolip(id, hp, maxHP, atk)
+        CARPSHOOTER -> Carpshooter(id, hp, maxHP, atk)
     }
 }
 
@@ -106,7 +105,6 @@ fun UnitTable.insertUnitAndGetId(unit: CharUnit): EntityID<Long> {
         it[UnitTable.hp] = unit.hp
         it[UnitTable.maxHP] = unit.maxHP
         it[UnitTable.atk] = unit.atk
-        it[UnitTable.def] = unit.def
     }
 }
 
@@ -115,7 +113,6 @@ fun UnitTable.updateUnit(unitId: Long, unit: CharUnit) {
         it[UnitTable.hp] = unit.hp
         it[UnitTable.maxHP] = unit.maxHP
         it[UnitTable.atk] = unit.atk
-        it[UnitTable.def] = unit.def
     }
 }
 

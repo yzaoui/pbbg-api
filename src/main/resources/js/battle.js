@@ -24,6 +24,21 @@ const setupBattle = (allies, enemies) => {
     main.appendChild(document.createElement("br"));
     main.appendChild(document.createTextNode("Enemies:"));
     main.appendChild(document.createTextNode(JSON.stringify(enemies)));
+
+    const allyInput = document.createElement("input");
+    allyInput.id = "ally-id";
+    allyInput.type = "number";
+    main.appendChild(allyInput);
+
+    const enemyInput = document.createElement("input");
+    enemyInput.id = "enemy-id";
+    enemyInput.type = "number";
+    main.appendChild(enemyInput);
+
+    const attackButton = document.createElement("button");
+    attackButton.innerText = "Attack";
+    attackButton.onclick = () => attack();
+    main.appendChild(attackButton);
 };
 
 const setupGenerateBattle = () => {
@@ -56,4 +71,22 @@ const generateBattle = async () => {
     } else {
         main.innerText = "Error";
     }
+};
+
+const attack = async () => {
+    const allyId = document.getElementById("ally-id").value;
+    const enemyId = document.getElementById("enemy-id").value;
+
+    const { status, data } = await (await fetch("/api/battle/attack", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify({
+            allyId: allyId,
+            enemyId: enemyId
+        })
+    })).json();
+
+    if (status === "success") location.reload();
 };

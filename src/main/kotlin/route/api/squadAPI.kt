@@ -24,11 +24,11 @@ class SquadJSON(
 )
 
 class CharUnitJSON(
+    val id: Long,
     val baseUnitId: Int,
     val hp: Int,
     val maxHP: Int,
-    val atk: Int,
-    val def: Int
+    val atk: Int
 )
 
 fun Squad.toJSON() = SquadJSON(
@@ -36,9 +36,9 @@ fun Squad.toJSON() = SquadJSON(
 )
 
 fun CharUnit.toJSON() = CharUnitJSON(
+    id = id,
     baseUnitId = enum.ordinal,
     hp = hp,
     maxHP = maxHP,
-    atk = atk,
-    def = def
+    atk = atk
 )

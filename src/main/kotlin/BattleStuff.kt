@@ -42,8 +42,8 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         // TODO: Forbid action if a battle is already in progress
 
         val enemies = listOf(
-            IceCreamWizard(10, 10, 2, 5),
-            Twolip(16, 16, 3, 1)
+            IceCreamWizard(0, 10, 10, 2),
+            Twolip(0, 16, 16, 3)
         )
 
         val battleSession = BattleSessionTable.insertAndGetId {
@@ -57,7 +57,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         Battle(allies = allies, enemies = enemies)
     }
 
-    override fun attack(userId: Int, allyId: Long, enemyId: Long) {
+    override fun attack(userId: Int, allyId: Long, enemyId: Long) = transaction(db) {
         val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw Exception()
 
         val ally = SquadTable.getAlly(userId, allyId) ?: throw Exception()
