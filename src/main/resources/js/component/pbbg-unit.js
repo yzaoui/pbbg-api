@@ -18,7 +18,8 @@ class PBBGUnit extends HTMLElement {
     display: inline-block;
     width: 18em;
     height: 5em;
-    border: 1px solid black;
+    box-sizing: border-box;
+    border: 1px solid #333333;
 }
 
 :host([hidden]) {

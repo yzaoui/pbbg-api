@@ -143,9 +143,33 @@ const attack = async () => {
 };
 
 const selectAlly = (allyId) => {
+    const allyUnitEls = document.getElementById("ally-list").querySelectorAll("pbbg-unit");
+
+    for (let i = 0; i < allyUnitEls.length; i++) {
+        const el = allyUnitEls[i];
+
+        if (allyId === Number(el.getAttribute("unit-id"))) {
+            el.setAttribute("selected", true);
+        } else {
+            el.removeAttribute("selected");
+        }
+    }
+
     document.getElementById("ally-id").value = allyId;
 };
 
 const selectEnemy = (enemyId) => {
+    const enemyUnitEls = document.getElementById("enemy-list").querySelectorAll("pbbg-unit");
+
+    for (let i = 0; i < enemyUnitEls.length; i++) {
+        const el = enemyUnitEls[i];
+
+        if (enemyId === Number(el.getAttribute("unit-id"))) {
+            el.setAttribute("selected", true);
+        } else {
+            el.removeAttribute("selected");
+        }
+    }
+
     document.getElementById("enemy-id").value = enemyId;
 };

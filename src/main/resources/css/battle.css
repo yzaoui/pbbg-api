@@ -1,0 +1,15 @@
+pbbg-unit {
+    cursor: pointer;
+}
+
+pbbg-unit:hover {
+    border-color: #1E768B;
+}
+
+pbbg-unit[selected] {
+    border: 2px solid #0087ff;
+}
+
+pbbg-unit[selected]:hover {
+    border-color: black;
+}
