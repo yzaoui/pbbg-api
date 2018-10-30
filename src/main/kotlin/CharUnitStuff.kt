@@ -15,6 +15,8 @@ sealed class CharUnit {
     abstract val hp: Int
     abstract val maxHP: Int
     abstract val atk: Int
+    val alive: Boolean
+        get() = hp > 0
 
     data class IceCreamWizard(override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int) : CharUnit() {
         override val enum get() = ICE_CREAM_WIZARD

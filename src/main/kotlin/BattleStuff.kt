@@ -60,12 +60,18 @@ class BattleUCImpl(private val db: Database) : BattleUC {
     override fun attack(userId: Int, allyId: Long, enemyId: Long) = transaction(db) {
         val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw Exception()
 
+        // Ally should exist
         val ally = SquadTable.getAlly(userId, allyId) ?: throw Exception()
-        val enemy = BattleEnemyTable.getEnemy(battleSession, enemyId) ?: throw Exception()
-        if (enemy.hp == 0) throw Exception()
-        val newEnemy = enemy.receiveDamage(ally.atk)
 
-        UnitTable.updateUnit(enemyId, newEnemy)
+        // Enemy should exist
+        val enemy = BattleEnemyTable.getEnemy(battleSession, enemyId) ?: throw Exception()
+
+        // Enemy should not already be dead
+        if (!enemy.alive) throw Exception()
+
+        val updatedEnemy = enemy.receiveDamage(ally.atk)
+
+        UnitTable.updateUnit(enemyId, updatedEnemy)
 
         checkBattleOver(battleSession)
     }
@@ -136,7 +142,7 @@ fun BattleSessionTable.deleteBattle(battleSession: EntityID<Long>) {
     deleteWhere { BattleSessionTable.id.eq(battleSession) }
 }
 
-fun <T:Any> String.execAndMap(transform : (ResultSet) -> T) : List<T> {
+fun <T : Any> String.execAndMap(transform: (ResultSet) -> T): List<T> {
     val result = arrayListOf<T>()
     TransactionManager.current().exec(this) { rs ->
         while (rs.next()) {

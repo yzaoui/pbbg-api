@@ -77,7 +77,7 @@ const CSS = `
 #inner {
     height: 100%;
     background: linear-gradient(#6de1ff, #00789c);
-    /*transition: width 0.8s cubic-bezier(.8,0,.2,1);*/
+    transition: width 0.8s cubic-bezier(.8,0,.2,1);
 }
 </style>
 `;

@@ -20,10 +20,23 @@ window.onload = async () => {
 
 const setupBattle = (allies, enemies) => {
     main.appendChild(document.createTextNode("Allies:"));
-    main.appendChild(document.createTextNode(JSON.stringify(allies)));
+
+    allies.forEach(ally => {
+        const unitEl = document.createElement("pbbg-unit");
+        unitEl.setAttribute("unit-id", ally.id);
+        unitEl.unit = ally;
+        main.appendChild(unitEl);
+    });
+
     main.appendChild(document.createElement("br"));
     main.appendChild(document.createTextNode("Enemies:"));
-    main.appendChild(document.createTextNode(JSON.stringify(enemies)));
+
+    enemies.forEach(enemy => {
+        const unitEl = document.createElement("pbbg-unit");
+        unitEl.setAttribute("unit-id", enemy.id);
+        unitEl.unit = enemy;
+        main.appendChild(unitEl);
+    });
 
     const allyInput = document.createElement("input");
     allyInput.id = "ally-id";
