@@ -25,6 +25,7 @@ const setupBattle = (allies, enemies) => {
         const unitEl = document.createElement("pbbg-unit");
         unitEl.setAttribute("unit-id", ally.id);
         unitEl.unit = ally;
+        unitEl.onclick = () => selectAlly(ally.id);
         main.appendChild(unitEl);
     });
 
@@ -35,6 +36,7 @@ const setupBattle = (allies, enemies) => {
         const unitEl = document.createElement("pbbg-unit");
         unitEl.setAttribute("unit-id", enemy.id);
         unitEl.unit = enemy;
+        unitEl.onclick = () => selectEnemy(enemy.id);
         main.appendChild(unitEl);
     });
 
@@ -102,4 +104,12 @@ const attack = async () => {
     })).json();
 
     if (status === "success") location.reload();
+};
+
+const selectAlly = (allyId) => {
+    document.getElementById("ally-id").value = allyId;
+};
+
+const selectEnemy = (enemyId) => {
+    document.getElementById("enemy-id").value = enemyId;
 };
