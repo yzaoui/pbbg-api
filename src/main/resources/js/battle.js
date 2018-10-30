@@ -19,41 +19,75 @@ window.onload = async () => {
 };
 
 const setupBattle = (allies, enemies) => {
-    main.appendChild(document.createTextNode("Allies:"));
+    const div = document.createElement("div");
+    main.appendChild(div);
+
+    div.insertAdjacentHTML("beforeend", `<span>Allies:</span>`);
+
+    const allyList = document.createElement("ul");
+    allyList.id = "ally-list";
+    div.appendChild(allyList);
 
     allies.forEach(ally => {
+        const li = document.createElement("li");
+        allyList.appendChild(li);
+
         const unitEl = document.createElement("pbbg-unit");
         unitEl.setAttribute("unit-id", ally.id);
         unitEl.unit = ally;
         unitEl.onclick = () => selectAlly(ally.id);
-        main.appendChild(unitEl);
+        li.appendChild(unitEl);
     });
 
-    main.appendChild(document.createElement("br"));
-    main.appendChild(document.createTextNode("Enemies:"));
+    div.insertAdjacentHTML("beforeend", `<br><span>Enemies:</span>`);
+
+    const enemyList = document.createElement("ul");
+    enemyList.id = "enemy-list";
+    div.appendChild(enemyList);
 
     enemies.forEach(enemy => {
+        const li = document.createElement("li");
+        enemyList.appendChild(li);
+
         const unitEl = document.createElement("pbbg-unit");
         unitEl.setAttribute("unit-id", enemy.id);
         unitEl.unit = enemy;
         unitEl.onclick = () => selectEnemy(enemy.id);
-        main.appendChild(unitEl);
+        li.appendChild(unitEl);
     });
 
-    const allyInput = document.createElement("input");
-    allyInput.id = "ally-id";
-    allyInput.type = "number";
-    main.appendChild(allyInput);
-
-    const enemyInput = document.createElement("input");
-    enemyInput.id = "enemy-id";
-    enemyInput.type = "number";
-    main.appendChild(enemyInput);
+    div.insertAdjacentHTML("beforeend", `
+<input id="ally-id" type="number">
+<input id="enemy-id" type="number">
+`);
 
     const attackButton = document.createElement("button");
     attackButton.innerText = "Attack";
     attackButton.onclick = () => attack();
-    main.appendChild(attackButton);
+    div.appendChild(attackButton);
+};
+
+const updateBattle = (allies, enemies) => {
+    const allyUnitEls = document.getElementById("ally-list").querySelectorAll("pbbg-unit");
+    const enemyUnitEls = document.getElementById("enemy-list").querySelectorAll("pbbg-unit");
+
+    const update = (unitObjs, unitEls) => {
+        for (let i = 0; i < unitEls.length; i++) {
+            const unitEl = unitEls[i];
+
+            for (let j = 0; j < unitObjs.length; j++) {
+                const unitElId = Number(unitEl.getAttribute("unit-id"));
+
+                if (unitElId === unitObjs[j].id) {
+                    unitEl.unit = unitObjs[j];
+                    break;
+                }
+            }
+        }
+    };
+
+    update(allies, allyUnitEls);
+    update(enemies, enemyUnitEls);
 };
 
 const setupGenerateBattle = () => {
@@ -103,7 +137,9 @@ const attack = async () => {
         })
     })).json();
 
-    if (status === "success") location.reload();
+    if (status === "success") {
+        updateBattle(data.allies, data.enemies);
+    }
 };
 
 const selectAlly = (allyId) => {

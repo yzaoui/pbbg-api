@@ -23,7 +23,7 @@ object BattleEnemyTable : Table() {
 interface BattleUC {
     fun getCurrentBattle(userId: Int): Battle?
     fun generateBattle(userId: Int): Battle
-    fun attack(userId: Int, allyId: Long, enemyId: Long): Battle?
+    fun attack(userId: Int, allyId: Long, enemyId: Long): Battle
 }
 
 class BattleUCImpl(private val db: Database) : BattleUC {
@@ -53,7 +53,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         Battle(allies = allies, enemies = enemies)
     }
 
-    override fun attack(userId: Int, allyId: Long, enemyId: Long): Battle? = transaction(db) {
+    override fun attack(userId: Int, allyId: Long, enemyId: Long): Battle = transaction(db) {
         val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw Exception()
 
         // Ally should exist
@@ -69,33 +69,29 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         UnitTable.updateUnit(enemyId, updatedEnemy)
 
-        if (checkBattleOver(battleSession)) return@transaction null
+        val updatedBattle = Battle(allies = SquadTable.getAllies(userId), enemies = BattleEnemyTable.getEnemies(battleSession))
 
-        return@transaction Battle(allies = SquadTable.getAllies(userId), enemies = BattleEnemyTable.getEnemies(battleSession))
+        deleteBattleIfOver(updatedBattle, battleSession)
+
+        return@transaction updatedBattle
     }
 
-    private fun checkBattleOver(battleSession: EntityID<Long>): Boolean = transaction(db) {
-        val enemies = BattleEnemyTable.getEnemies(battleSession)
-
-        val aliveEnemies = enemies.filter { it.hp > 0 }
+    private fun deleteBattleIfOver(battle: Battle, battleSession: EntityID<Long>) = transaction(db) {
+        val aliveEnemies = battle.enemies.filter { it.hp > 0 }
 
         if (aliveEnemies.isEmpty()) {
             // All enemies are defeated
 
-            val enemyIdCSV = enemies.asSequence().map { it.id }.joinToString()
+            val enemyIdCSV = battle.enemies.asSequence().map { it.id }.joinToString()
 
             BattleSessionTable.deleteBattle(battleSession)
 
             "DELETE FROM ${UnitTable.tableName} WHERE ${UnitTable.id.name} IN ($enemyIdCSV)".execAndMap {}
-
-            return@transaction true
         }
-
-        return@transaction false
     }
 }
 
-class Battle(
+data class Battle(
     val allies: List<CharUnit>,
     val enemies: List<CharUnit>
 )

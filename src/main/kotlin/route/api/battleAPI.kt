@@ -48,7 +48,7 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
 
             val battle = battleUC.attack(loggedInUser.id, allyId = params.allyId, enemyId = params.enemyId)
 
-            call.respondSuccess(battle?.toJSON())
+            call.respondSuccess(battle.toJSON())
         }
     }
 }
