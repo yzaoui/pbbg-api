@@ -46,9 +46,9 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
 
             val params = call.receive<AttackParams>()
 
-            battleUC.attack(loggedInUser.id, allyId = params.allyId, enemyId = params.enemyId)
+            val battle = battleUC.attack(loggedInUser.id, allyId = params.allyId, enemyId = params.enemyId)
 
-            call.respondSuccess()
+            call.respondSuccess(battle?.toJSON())
         }
     }
 }

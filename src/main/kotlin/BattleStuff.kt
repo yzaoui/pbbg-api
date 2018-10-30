@@ -23,7 +23,7 @@ object BattleEnemyTable : Table() {
 interface BattleUC {
     fun getCurrentBattle(userId: Int): Battle?
     fun generateBattle(userId: Int): Battle
-    fun attack(userId: Int, allyId: Long, enemyId: Long)
+    fun attack(userId: Int, allyId: Long, enemyId: Long): Battle?
 }
 
 class BattleUCImpl(private val db: Database) : BattleUC {
@@ -32,11 +32,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         if (battleSession == null) return@transaction null
 
-        val allies = SquadTable.getAllies(userId)
-
-        val enemies = BattleEnemyTable.getEnemies(battleSession)
-
-        Battle(allies = allies, enemies = enemies)
+        Battle(allies = SquadTable.getAllies(userId), enemies = BattleEnemyTable.getEnemies(battleSession))
     }
 
     override fun generateBattle(userId: Int): Battle = transaction(db) {
@@ -57,7 +53,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         Battle(allies = allies, enemies = enemies)
     }
 
-    override fun attack(userId: Int, allyId: Long, enemyId: Long) = transaction(db) {
+    override fun attack(userId: Int, allyId: Long, enemyId: Long): Battle? = transaction(db) {
         val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw Exception()
 
         // Ally should exist
@@ -73,10 +69,12 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         UnitTable.updateUnit(enemyId, updatedEnemy)
 
-        checkBattleOver(battleSession)
+        if (checkBattleOver(battleSession)) return@transaction null
+
+        return@transaction Battle(allies = SquadTable.getAllies(userId), enemies = BattleEnemyTable.getEnemies(battleSession))
     }
 
-    fun checkBattleOver(battleSession: EntityID<Long>) = transaction(db) {
+    private fun checkBattleOver(battleSession: EntityID<Long>): Boolean = transaction(db) {
         val enemies = BattleEnemyTable.getEnemies(battleSession)
 
         val aliveEnemies = enemies.filter { it.hp > 0 }
@@ -89,7 +87,11 @@ class BattleUCImpl(private val db: Database) : BattleUC {
             BattleSessionTable.deleteBattle(battleSession)
 
             "DELETE FROM ${UnitTable.tableName} WHERE ${UnitTable.id.name} IN ($enemyIdCSV)".execAndMap {}
+
+            return@transaction true
         }
+
+        return@transaction false
     }
 }
 

@@ -1,10 +1,18 @@
-window.customElements.define("pbbg-unit", class Unit extends HTMLElement {
+/**
+ * @typedef {Object} Unit
+ * @property {number} hp - Current HP.
+ * @property {number} maxHP - Maximum HP.
+ * @property {number} atk - Current ATK.
+ */
+
+class PBBGUnit extends HTMLElement {
     constructor() {
         super();
 
         this._shadowRoot = this.attachShadow({ mode: "open" });
 
-        this._shadowRoot.innerHTML = `
+        this._shadowRoot.innerHTML =
+`
 <style>
 :host {
     display: inline-block;
@@ -25,18 +33,31 @@ window.customElements.define("pbbg-unit", class Unit extends HTMLElement {
 <span id="atk-value"></span>
 `;
 
-        this._unit = null;
+        /**
+         * @type {Unit}
+         * @private
+         */
+        this._unit = undefined;
     }
 
+    /**
+     * @returns {Unit}
+     */
     get unit() {
         return this._unit;
     }
 
+    /**
+     * @param {Unit} value
+     */
     set unit(value) {
         this._unit = value;
         this.updateDisplay();
     }
 
+    /**
+     * @returns {number}
+     */
     get unitId() {
         return Number(this.getAttribute("unit-id"));
     }
@@ -45,6 +66,8 @@ window.customElements.define("pbbg-unit", class Unit extends HTMLElement {
         this._shadowRoot.getElementById("hp-bar").value = this._unit.hp;
         this._shadowRoot.getElementById("hp-bar").max = this._unit.maxHP;
         this._shadowRoot.getElementById("hp-value").innerText = `${this._unit.hp} / ${this._unit.maxHP}`;
-        this._shadowRoot.getElementById("atk-value").innerText = this._unit.atk;
+        this._shadowRoot.getElementById("atk-value").innerText = this._unit.atk.toString();
     }
-});
+}
+
+window.customElements.define("pbbg-unit", PBBGUnit);
