@@ -1,5 +1,7 @@
 const main = document.getElementById("main");
 const GENERATE_BATTLE_BUTTON_ID = "generate-battle";
+let selectedAllyId;
+let selectedEnemyId;
 
 window.onload = async () => {
     main.innerText = "Loading battle session...";
@@ -55,11 +57,6 @@ const setupBattle = (allies, enemies) => {
         unitEl.onclick = () => selectEnemy(enemy.id);
         li.appendChild(unitEl);
     });
-
-    div.insertAdjacentHTML("beforeend", `
-<input id="ally-id" type="number">
-<input id="enemy-id" type="number">
-`);
 
     const attackButton = document.createElement("button");
     attackButton.innerText = "Attack";
@@ -123,17 +120,14 @@ const generateBattle = async () => {
 };
 
 const attack = async () => {
-    const allyId = document.getElementById("ally-id").value;
-    const enemyId = document.getElementById("enemy-id").value;
-
     const { status, data } = await (await fetch("/api/battle/attack", {
         method: "POST",
         headers: {
             "Content-Type": "application/json; charset=utf-8"
         },
         body: JSON.stringify({
-            allyId: allyId,
-            enemyId: enemyId
+            allyId: selectedAllyId,
+            enemyId: selectedEnemyId
         })
     })).json();
 
@@ -155,7 +149,7 @@ const selectAlly = (allyId) => {
         }
     }
 
-    document.getElementById("ally-id").value = allyId;
+    selectedAllyId = allyId;
 };
 
 const selectEnemy = (enemyId) => {
@@ -171,5 +165,5 @@ const selectEnemy = (enemyId) => {
         }
     }
 
-    document.getElementById("enemy-id").value = enemyId;
+    selectedEnemyId = enemyId;
 };

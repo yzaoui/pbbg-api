@@ -8,6 +8,7 @@ pbbg-unit:hover {
 
 pbbg-unit[selected] {
     border: 2px solid #0087ff;
+    padding: 5px;
 }
 
 pbbg-unit[selected]:hover {

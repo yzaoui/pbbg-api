@@ -20,16 +20,23 @@ class PBBGUnit extends HTMLElement {
     height: 5em;
     box-sizing: border-box;
     border: 1px solid #333333;
+    padding: 6px;
 }
 
 :host([hidden]) {
     display: none;
 }
+
+#hp-bar {
+    width: 120px;
+    height: 11px;
+}
 </style>
-<span>HP: </span>
-<pbbg-progress-bar id="hp-bar"></pbbg-progress-bar>
-<span id="hp-value"></span>
-<br>
+<div>
+    <span>HP: </span>
+    <pbbg-progress-bar id="hp-bar"></pbbg-progress-bar>
+    <span id="hp-value"></span>
+</div>
 <span>ATK: </span>
 <span id="atk-value"></span>
 `;
