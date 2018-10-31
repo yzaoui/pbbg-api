@@ -61,7 +61,7 @@ class UserUCImpl(private val db: Database) : UserUC {
         }
 
         // TODO: Temporarily give users a default unit
-        addUnitToSquad(userId, CharUnit.IceCreamWizard(0L, 8, 8, 1))
+        addUnitToSquad(userId, CharUnit.IceCreamWizard(0L, 8, 8, 1, 0L))
 
         userId.value
     }

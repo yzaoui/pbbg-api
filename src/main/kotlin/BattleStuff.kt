@@ -43,8 +43,8 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         }
 
         BattleEnemyTable.insertEnemies(battleSession, listOf(
-            IceCreamWizard(0, 10, 10, 2),
-            Twolip(0, 16, 16, 3)
+            IceCreamWizard(0, 10, 10, 2, 0L),
+            Twolip(0, 16, 16, 3, 0L)
         ))
 
         val allies = SquadTable.getAllies(userId)
