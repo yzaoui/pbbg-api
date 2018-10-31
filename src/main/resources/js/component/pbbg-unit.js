@@ -1,5 +1,6 @@
 /**
  * @typedef {Object} Unit
+ * @property {string} name - Unit name.
  * @property {number} hp - Current HP.
  * @property {number} maxHP - Maximum HP.
  * @property {number} atk - Current ATK.
@@ -33,12 +34,16 @@ class PBBGUnit extends HTMLElement {
 }
 </style>
 <div>
+    <span id="name"></span>
+</div>
+<div>
     <span>HP: </span>
     <pbbg-progress-bar id="hp-bar"></pbbg-progress-bar>
     <span id="hp-value"></span>
 </div>
-<span>ATK: </span>
-<span id="atk-value"></span>
+<div>
+    <span>ATK: <span id="atk-value"></span></span>
+</div>
 `;
 
         /**
@@ -71,6 +76,7 @@ class PBBGUnit extends HTMLElement {
     }
 
     updateDisplay() {
+        this._shadowRoot.getElementById("name").innerText = this._unit.name;
         this._shadowRoot.getElementById("hp-bar").value = this._unit.hp;
         this._shadowRoot.getElementById("hp-bar").max = this._unit.maxHP;
         this._shadowRoot.getElementById("hp-value").innerText = `${this._unit.hp} / ${this._unit.maxHP}`;

@@ -11,6 +11,7 @@ import kotlin.math.max
 
 sealed class CharUnit {
     abstract val id: Long
+    abstract val name: String
     abstract val enum: CharUnitEnum
     abstract val hp: Int
     abstract val maxHP: Int
@@ -19,14 +20,17 @@ sealed class CharUnit {
         get() = hp > 0
 
     data class IceCreamWizard(override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int) : CharUnit() {
+        override val name: String get() = "Ice-Cream Wizard"
         override val enum get() = ICE_CREAM_WIZARD
     }
 
     data class Twolip(override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int) : CharUnit() {
+        override val name: String get() = "Twolip"
         override val enum get() = TWOLIP
     }
 
     data class Carpshooter(override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int) : CharUnit() {
+        override val name: String get() = "Carpshooter"
         override val enum get() = CARPSHOOTER
     }
 }
