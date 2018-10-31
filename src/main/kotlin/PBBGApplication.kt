@@ -26,7 +26,6 @@ import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.locations.Locations
 import io.ktor.locations.locations
-import io.ktor.pipeline.PipelineContext
 import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
@@ -38,6 +37,7 @@ import io.ktor.sessions.cookie
 import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import io.ktor.util.AttributeKey
+import io.ktor.util.pipeline.PipelineContext
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils

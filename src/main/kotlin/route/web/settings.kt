@@ -13,13 +13,13 @@ import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
 import io.ktor.locations.Location
-import io.ktor.pipeline.PipelineContext
 import io.ktor.request.receiveParameters
 import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
+import io.ktor.util.pipeline.PipelineContext
 
 const val CHANGE_PASSWORD_PATH = "/change-password"
 
