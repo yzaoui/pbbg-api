@@ -30,7 +30,7 @@ class CharUnitJSON(
     val hp: Int,
     val maxHP: Int,
     val atk: Int,
-    val exp: Long
+    val levelProgress: LevelProgressJSON
 )
 
 fun Squad.toJSON() = SquadJSON(
@@ -44,5 +44,5 @@ fun CharUnit.toJSON() = CharUnitJSON(
     hp = hp,
     maxHP = maxHP,
     atk = atk,
-    exp = exp
+    levelProgress = UnitExperienceManager.getLevelProgress(exp).toJSON()
 )

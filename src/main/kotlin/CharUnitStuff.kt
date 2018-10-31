@@ -3,6 +3,7 @@ package com.bitwiserain.pbbg
 import com.bitwiserain.pbbg.CharUnit.*
 import com.bitwiserain.pbbg.CharUnitEnum.*
 import com.bitwiserain.pbbg.db.repository.UserTable
+import com.bitwiserain.pbbg.domain.model.LevelProgress
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.LongIdTable
 import org.jetbrains.exposed.sql.*
@@ -17,8 +18,8 @@ sealed class CharUnit {
     abstract val maxHP: Int
     abstract val atk: Int
     abstract val exp: Long
-    val alive: Boolean
-        get() = hp > 0
+    val dead: Boolean
+        get() = hp == 0
 
     data class IceCreamWizard(
         override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
@@ -137,9 +138,60 @@ fun UnitTable.updateUnit(unitId: Long, unit: CharUnit) {
 }
 
 fun CharUnit.receiveDamage(damage: Int): CharUnit {
+    val newHp = max(hp - damage, 0)
+
     return when (this) {
-        is CharUnit.IceCreamWizard -> copy(hp = max(hp - damage, 0))
-        is CharUnit.Twolip -> copy(hp = max(hp - damage, 0))
-        is CharUnit.Carpshooter -> copy(hp = max(hp - damage, 0))
+        is CharUnit.IceCreamWizard -> copy(hp = newHp)
+        is CharUnit.Twolip -> copy(hp = newHp)
+        is CharUnit.Carpshooter -> copy(hp = newHp)
     }
+}
+
+fun CharUnit.gainExperience(gainedExp: Long): CharUnit {
+    val newExp = exp + gainedExp
+
+    return when (this) {
+        is CharUnit.IceCreamWizard -> copy(exp = newExp)
+        is CharUnit.Twolip -> copy(exp = newExp)
+        is CharUnit.Carpshooter -> copy(exp = newExp)
+    }
+}
+
+abstract class ExperienceManager {
+    /**
+     * A list where every value represents the minimum absolute amount of experience to reach the next level.
+     */
+    protected abstract val levels: List<Long>
+
+    fun getLevelProgress(absoluteExp: Long): LevelProgress {
+        // Previous threshold
+        var prevLevelAbsoluteExp = 0L
+
+        for ((i, absoluteExpToLevelUp) in levels.withIndex()) {
+            // Since levels start at 1 not 0
+            val level = i + 1
+
+            if (absoluteExp < absoluteExpToLevelUp) {
+                return LevelProgress(
+                    level = level,
+                    absoluteExp = absoluteExp,
+                    absoluteExpCurrentLevel = prevLevelAbsoluteExp,
+                    absoluteExpNextLevel = absoluteExpToLevelUp
+                )
+            }
+
+            prevLevelAbsoluteExp = absoluteExpToLevelUp
+        }
+
+        return LevelProgress(
+            level = levels.size + 1,
+            absoluteExp = levels.last(),
+            absoluteExpCurrentLevel = levels.last(),
+            absoluteExpNextLevel = levels.last()
+        )
+    }
+}
+
+object UnitExperienceManager : ExperienceManager() {
+    override val levels = listOf(10L, 24L)
 }

@@ -73,7 +73,7 @@ const updateBattle = (allies, enemies) => {
             const unitEl = unitEls[i];
 
             for (let j = 0; j < unitObjs.length; j++) {
-                const unitElId = Number(unitEl.getAttribute("unit-id"));
+                const unitElId = Number(unitEl.unitId);
 
                 if (unitElId === unitObjs[j].id) {
                     unitEl.unit = unitObjs[j];
@@ -142,7 +142,7 @@ const selectAlly = (allyId) => {
     for (let i = 0; i < allyUnitEls.length; i++) {
         const el = allyUnitEls[i];
 
-        if (allyId === Number(el.getAttribute("unit-id"))) {
+        if (allyId === Number(el.unitId)) {
             el.setAttribute("selected", true);
         } else {
             el.removeAttribute("selected");
@@ -158,7 +158,7 @@ const selectEnemy = (enemyId) => {
     for (let i = 0; i < enemyUnitEls.length; i++) {
         const el = enemyUnitEls[i];
 
-        if (enemyId === Number(el.getAttribute("unit-id"))) {
+        if (enemyId === Number(el.unitId)) {
             el.setAttribute("selected", true);
         } else {
             el.removeAttribute("selected");

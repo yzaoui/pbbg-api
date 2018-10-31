@@ -63,11 +63,17 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         val enemy = BattleEnemyTable.getEnemy(battleSession, enemyId) ?: throw Exception()
 
         // Enemy should not already be dead
-        if (!enemy.alive) throw Exception()
+        if (enemy.dead) throw Exception()
 
+        // Apply damage to attacked enemy and update unit
         val updatedEnemy = enemy.receiveDamage(ally.atk)
-
         UnitTable.updateUnit(enemyId, updatedEnemy)
+
+        // Gain experience if ally killed enemy
+        if (updatedEnemy.dead) {
+            val updatedAlly = ally.gainExperience(2L)
+            UnitTable.updateUnit(allyId, updatedAlly)
+        }
 
         val updatedBattle = Battle(allies = SquadTable.getAllies(userId), enemies = BattleEnemyTable.getEnemies(battleSession))
 

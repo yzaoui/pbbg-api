@@ -42,8 +42,8 @@ data class UserDetailsJSON(
 
 data class LevelProgressJSON(
     @SerializedName("level") val level: Int,
-    @SerializedName("relativeExp") val relativeExp: Int,
-    @SerializedName("relativeExpToNextLevel") val relativeExpToNextLevel: Int
+    @SerializedName("relativeExp") val relativeExp: Long,
+    @SerializedName("relativeExpToNextLevel") val relativeExpToNextLevel: Long
 )
 
 fun LevelProgress.toJSON() = LevelProgressJSON(

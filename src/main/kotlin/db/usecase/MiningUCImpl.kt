@@ -5,7 +5,6 @@ import com.bitwiserain.pbbg.db.model.MineSession
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.Item
-import com.bitwiserain.pbbg.domain.model.LevelProgress
 import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.model.mine.*
 import com.bitwiserain.pbbg.domain.usecase.*
