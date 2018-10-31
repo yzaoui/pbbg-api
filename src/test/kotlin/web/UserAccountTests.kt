@@ -62,7 +62,7 @@ class UserAccountTests {
         val username = "testUsername2"
         val password = "testPassword2"
         // Register and retrieve session cookie
-        val call = handleRequest(HttpMethod.Post, "/register") {
+        handleRequest(HttpMethod.Post, "/register") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.FormUrlEncoded.toString())
             setBody(listOf("username" to username, "password" to password).formUrlEncode())
         }
