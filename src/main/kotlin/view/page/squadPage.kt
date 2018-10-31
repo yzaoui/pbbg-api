@@ -9,5 +9,7 @@ import kotlinx.html.script
 fun squadPage(memberPageVM: MemberPageVM): Template<HTML> = MemberTemplate("Squad", memberPageVM).apply {
     endOfBody {
         script(src = "/js/squad.js") {}
+        script(src = "/js/component/pbbg-progress-bar.js") {}
+        script(src = "/js/component/pbbg-unit.js") {}
     }
 }
