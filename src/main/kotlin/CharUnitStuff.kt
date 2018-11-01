@@ -2,6 +2,8 @@ package com.bitwiserain.pbbg
 
 import com.bitwiserain.pbbg.CharUnit.*
 import com.bitwiserain.pbbg.CharUnitEnum.*
+import com.bitwiserain.pbbg.db.repository.SquadTable
+import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.LevelProgress
 import org.jetbrains.exposed.dao.EntityID
@@ -50,19 +52,6 @@ enum class CharUnitEnum {
     ICE_CREAM_WIZARD,
     TWOLIP,
     CARPSHOOTER
-}
-
-object SquadTable : LongIdTable() {
-    val user = reference("user_id", UserTable)
-    val unit = reference("unit_id", UnitTable)
-}
-
-object UnitTable : LongIdTable() {
-    val unit = enumeration("unit", CharUnitEnum::class)
-    val hp = integer("hp")
-    val maxHP = integer("max_hp")
-    val atk = integer("atk")
-    val exp = long("exp")
 }
 
 interface UnitUC {

@@ -1,24 +1,19 @@
 package com.bitwiserain.pbbg
 
-import com.bitwiserain.pbbg.CharUnit.*
+import com.bitwiserain.pbbg.CharUnit.IceCreamWizard
+import com.bitwiserain.pbbg.CharUnit.Twolip
+import com.bitwiserain.pbbg.db.repository.SquadTable
+import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.repository.UserTable
+import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
+import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
 import com.bitwiserain.pbbg.route.api.CharUnitJSON
 import com.google.gson.annotations.SerializedName
 import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.LongIdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.sql.ResultSet
-
-object BattleSessionTable : LongIdTable() {
-    val userId = reference("user_id", UserTable)
-}
-
-object BattleEnemyTable : Table() {
-    val battle = reference("battle_session_id", BattleSessionTable, ReferenceOption.CASCADE)
-    val unit = reference("unit_id", UnitTable, ReferenceOption.CASCADE)
-}
 
 interface BattleUC {
     fun getCurrentBattle(userId: Int): Battle?

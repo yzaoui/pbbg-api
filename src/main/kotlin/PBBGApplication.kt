@@ -2,6 +2,8 @@ package com.bitwiserain.pbbg
 
 import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
+import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
 import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
 import com.bitwiserain.pbbg.db.usecase.MiningUCImpl
