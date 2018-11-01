@@ -39,6 +39,7 @@ class PBBGUnit extends HTMLElement {
 #hp-bar {
     width: 120px;
     height: 11px;
+    --bar-background-color: linear-gradient(#53ff52, #0f9c16);
 }
 
 #exp-bar {
