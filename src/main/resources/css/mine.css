@@ -76,10 +76,6 @@ button.mining-exit-mine:disabled {
     box-shadow: initial;
 }
 
-button.mining-exit-mine.loading {
-    cursor: wait;
-}
-
 table.mining-mine-info {
     width: 100%;
     border-collapse: collapse;

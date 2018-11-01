@@ -59,6 +59,7 @@ const setupBattle = (allies, enemies) => {
     });
 
     const attackButton = document.createElement("button");
+    attackButton.id = "attack-button";
     attackButton.innerText = "Attack";
     attackButton.onclick = () => attack();
     div.appendChild(attackButton);
@@ -120,6 +121,10 @@ const generateBattle = async () => {
 };
 
 const attack = async () => {
+    const attackButton = document.getElementById("attack-button");
+    attackButton.classList.add("loading");
+    attackButton.disabled = true;
+
     const { status, data } = await (await fetch("/api/battle/attack", {
         method: "POST",
         headers: {
@@ -133,6 +138,9 @@ const attack = async () => {
 
     if (status === "success") {
         updateBattle(data.allies, data.enemies);
+
+        attackButton.classList.remove("loading");
+        attackButton.disabled = false;
     }
 };
 
