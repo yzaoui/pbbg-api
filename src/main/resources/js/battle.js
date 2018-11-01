@@ -21,14 +21,18 @@ window.onload = async () => {
 };
 
 const setupBattle = (allies, enemies) => {
-    const div = document.createElement("div");
-    main.appendChild(div);
+    const battleDiv = document.createElement("div");
+    battleDiv.className = "battle-interface";
+    main.appendChild(battleDiv);
 
-    div.insertAdjacentHTML("beforeend", `<span>Allies:</span>`);
+    const allyDiv = document.createElement("div");
+    battleDiv.appendChild(allyDiv);
+
+    allyDiv.insertAdjacentHTML("beforeend", `<h1>Allies</h1>`);
 
     const allyList = document.createElement("ul");
     allyList.id = "ally-list";
-    div.appendChild(allyList);
+    allyDiv.appendChild(allyList);
 
     allies.forEach(ally => {
         const li = document.createElement("li");
@@ -41,11 +45,14 @@ const setupBattle = (allies, enemies) => {
         li.appendChild(unitEl);
     });
 
-    div.insertAdjacentHTML("beforeend", `<br><span>Enemies:</span>`);
+    const enemyDiv = document.createElement("div");
+    battleDiv.appendChild(enemyDiv);
+
+    enemyDiv.insertAdjacentHTML("beforeend", `<h1>Enemies</h1>`);
 
     const enemyList = document.createElement("ul");
     enemyList.id = "enemy-list";
-    div.appendChild(enemyList);
+    enemyDiv.appendChild(enemyList);
 
     enemies.forEach(enemy => {
         const li = document.createElement("li");
@@ -62,7 +69,8 @@ const setupBattle = (allies, enemies) => {
     attackButton.id = "attack-button";
     attackButton.innerText = "Attack";
     attackButton.onclick = () => attack();
-    div.appendChild(attackButton);
+    attackButton.disabled = true;
+    main.appendChild(attackButton);
 };
 
 const updateBattle = (allies, enemies) => {
@@ -136,11 +144,11 @@ const attack = async () => {
         })
     })).json();
 
+    attackButton.classList.remove("loading");
+    attackButton.disabled = false;
+
     if (status === "success") {
         updateBattle(data.allies, data.enemies);
-
-        attackButton.classList.remove("loading");
-        attackButton.disabled = false;
     }
 };
 
@@ -150,14 +158,17 @@ const selectAlly = (allyId) => {
     for (let i = 0; i < allyUnitEls.length; i++) {
         const el = allyUnitEls[i];
 
-        if (allyId === Number(el.unitId)) {
-            el.setAttribute("selected", true);
+        if (!el.hasAttribute("dead") && allyId === Number(el.unitId)) {
+            el.setAttribute("selected", "");
+            selectedAllyId = allyId;
+            break;
         } else {
             el.removeAttribute("selected");
+            selectedAllyId = null;
         }
     }
 
-    selectedAllyId = allyId;
+    document.getElementById("attack-button").disabled = !(selectedAllyId && selectedEnemyId);
 };
 
 const selectEnemy = (enemyId) => {
@@ -166,12 +177,15 @@ const selectEnemy = (enemyId) => {
     for (let i = 0; i < enemyUnitEls.length; i++) {
         const el = enemyUnitEls[i];
 
-        if (enemyId === Number(el.unitId)) {
-            el.setAttribute("selected", true);
+        if (!el.hasAttribute("dead") && enemyId === Number(el.unitId)) {
+            el.setAttribute("selected", "");
+            selectedEnemyId = enemyId;
+            break;
         } else {
             el.removeAttribute("selected");
+            selectedEnemyId = null;
         }
     }
 
-    selectedEnemyId = enemyId;
+    document.getElementById("attack-button").disabled = !(selectedAllyId && selectedEnemyId);
 };

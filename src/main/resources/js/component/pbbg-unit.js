@@ -36,6 +36,14 @@ class PBBGUnit extends HTMLElement {
     display: none;
 }
 
+:host([dead]) {
+    background-color: #4e313114;
+}
+
+#name {
+    font-weight: bold;
+}
+
 #hp-bar {
     width: 120px;
     height: 11px;
@@ -104,6 +112,10 @@ class PBBGUnit extends HTMLElement {
         this._shadowRoot.getElementById("exp-bar").value = this._unit.levelProgress.relativeExp;
         this._shadowRoot.getElementById("exp-bar").max = this._unit.levelProgress.relativeExpToNextLevel;
         this._shadowRoot.getElementById("exp-value").innerText = `${this._unit.levelProgress.relativeExp} / ${this._unit.levelProgress.relativeExpToNextLevel}`;
+
+        if (this._unit.hp === 0) {
+            this.setAttribute("dead", "");
+        }
     }
 }
 
