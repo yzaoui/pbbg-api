@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.domain
 
-import com.bitwiserain.pbbg.ExperienceManager
 import com.bitwiserain.pbbg.domain.model.LevelUp
 import com.bitwiserain.pbbg.domain.model.mine.MineType
 

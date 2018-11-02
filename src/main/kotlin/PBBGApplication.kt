@@ -4,14 +4,8 @@ import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
-import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
-import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
-import com.bitwiserain.pbbg.db.usecase.MiningUCImpl
-import com.bitwiserain.pbbg.db.usecase.UserUCImpl
-import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
-import com.bitwiserain.pbbg.domain.usecase.InventoryUC
-import com.bitwiserain.pbbg.domain.usecase.MiningUC
-import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.db.usecase.*
+import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.route.api.*
 import com.bitwiserain.pbbg.route.web.*
 import com.bitwiserain.pbbg.view.template.GuestPageVM

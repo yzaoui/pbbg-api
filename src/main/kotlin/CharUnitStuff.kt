@@ -2,28 +2,12 @@ package com.bitwiserain.pbbg
 
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UnitTable
-import com.bitwiserain.pbbg.domain.model.LevelProgress
 import com.bitwiserain.pbbg.domain.model.MyUnit
 import com.bitwiserain.pbbg.domain.model.MyUnit.*
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.math.max
-
-interface UnitUC {
-    fun getSquad(userId: Int): Squad
-}
-
-class UnitUCImpl(private val db: Database) : UnitUC {
-    override fun getSquad(userId: Int): Squad = transaction(db) {
-        val allies = SquadTable.getAllies(userId)
-
-        Squad(allies)
-    }
-}
-
-class Squad(val units: List<MyUnit>)
 
 fun addUnitToSquad(user: EntityID<Int>, unit: MyUnit) {
     val unitId = UnitTable.insertUnitAndGetId(unit)
@@ -101,43 +85,4 @@ fun MyUnit.gainExperience(gainedExp: Long): MyUnit {
         is Twolip -> copy(exp = newExp)
         is Carpshooter -> copy(exp = newExp)
     }
-}
-
-abstract class ExperienceManager {
-    /**
-     * A list where every value represents the minimum absolute amount of experience to reach the next level.
-     */
-    protected abstract val levels: List<Long>
-
-    fun getLevelProgress(absoluteExp: Long): LevelProgress {
-        // Previous threshold
-        var prevLevelAbsoluteExp = 0L
-
-        for ((i, absoluteExpToLevelUp) in levels.withIndex()) {
-            // Since levels start at 1 not 0
-            val level = i + 1
-
-            if (absoluteExp < absoluteExpToLevelUp) {
-                return LevelProgress(
-                    level = level,
-                    absoluteExp = absoluteExp,
-                    absoluteExpCurrentLevel = prevLevelAbsoluteExp,
-                    absoluteExpNextLevel = absoluteExpToLevelUp
-                )
-            }
-
-            prevLevelAbsoluteExp = absoluteExpToLevelUp
-        }
-
-        return LevelProgress(
-            level = levels.size + 1,
-            absoluteExp = levels.last(),
-            absoluteExpCurrentLevel = levels.last(),
-            absoluteExpNextLevel = levels.last()
-        )
-    }
-}
-
-object UnitExperienceManager : ExperienceManager() {
-    override val levels = listOf(10L, 24L)
 }

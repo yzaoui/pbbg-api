@@ -1,5 +1,5 @@
 package com.bitwiserain.pbbg.domain.model
 
-class UserStats(
+data class UserStats(
     val miningExp: Long
 )
