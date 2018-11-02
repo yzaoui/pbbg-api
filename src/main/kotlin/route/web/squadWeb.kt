@@ -15,7 +15,7 @@ const val SQUAD_PATH = "/squad"
 @Location(SQUAD_PATH)
 class SquadLocation
 
-fun Route.squad(userUC: UserUC) = route(SQUAD_PATH) {
+fun Route.squadWeb(userUC: UserUC) = route(SQUAD_PATH) {
     interceptSetUserOrRedirect(userUC)
 
     get {

@@ -82,7 +82,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         login(userUC)
         logout()
         register(userUC)
-        squad(userUC)
+        squadWeb(userUC)
         mineWeb(userUC)
         battleWeb(userUC)
         inventoryWeb(userUC)
