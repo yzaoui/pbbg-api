@@ -1,4 +1,4 @@
-class ProgressBar extends HTMLElement {
+class PBBGProgressBar extends HTMLElement {
     static get observedAttributes() {
         return ["max", "value"];
     }
@@ -8,15 +8,34 @@ class ProgressBar extends HTMLElement {
 
         this._shadowRoot = this.attachShadow({ mode: "open" });
 
-        this._shadowRoot.innerHTML = CSS;
+        this._shadowRoot.innerHTML = `
+<style>
+:host {
+    display: inline-block;
+    width: 5em;
+    height: 1em;
+}
 
-        const progressBar = document.createElement("div");
-        progressBar.id = "outer";
-        this._shadowRoot.appendChild(progressBar);
+:host([hidden]) {
+    display: none;
+}
 
-        const progressBarInner = document.createElement("div");
-        progressBarInner.id = "inner";
-        progressBar.appendChild(progressBarInner);
+#outer {
+    height: 100%;
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+
+#inner {
+    height: 100%;
+    background: var(--bar-background-color, linear-gradient(#6de1ff, #00789c));
+    transition: width 0.8s cubic-bezier(.8,0,.2,1);
+}
+</style>
+<div id="outer">
+    <div id="inner"></div>
+</div>
+`;
     }
 
     connectedCallback() {
@@ -52,34 +71,8 @@ class ProgressBar extends HTMLElement {
     }
 
     updateProgress() {
-        this._shadowRoot.getElementById("inner").style.width = (this.progress * 100) + "%";
+        this._shadowRoot.getElementById("inner").style.width = `${this.progress * 100}%`;
     }
 }
 
-const CSS = `
-<style>
-:host {
-    display: inline-block;
-    width: 5em;
-    height: 1em;
-}
-
-:host([hidden]) {
-    display: none;
-}
-
-#outer {
-    height: 100%;
-    border: 1px solid black;
-    box-sizing: border-box;
-}
-
-#inner {
-    height: 100%;
-    background: linear-gradient(#6de1ff, #00789c);
-    /*transition: width 0.8s cubic-bezier(.8,0,.2,1);*/
-}
-</style>
-`;
-
-window.customElements.define("pbbg-progress-bar", ProgressBar);
+window.customElements.define("pbbg-progress-bar", PBBGProgressBar);

@@ -1,10 +1,9 @@
 package com.bitwiserain.pbbg.test.web
 
 import com.bitwiserain.pbbg.db.repository.*
-import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
-import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
-import com.bitwiserain.pbbg.db.usecase.MiningUCImpl
-import com.bitwiserain.pbbg.db.usecase.UserUCImpl
+import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
+import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
+import com.bitwiserain.pbbg.db.usecase.*
 import com.bitwiserain.pbbg.mainWithDependencies
 import io.ktor.http.*
 import io.ktor.server.testing.TestApplicationEngine
@@ -27,10 +26,15 @@ class UserAccountTests {
     private val inventoryUC = InventoryUCImpl(db)
     private val miningUC = MiningUCImpl(db, inventoryUC)
     private val equipmentUC = EquipmentUCImpl(db)
+    private val unitUC = UnitUCImpl(db)
+    private val battleUC = BattleUCImpl(db)
 
     init {
         transaction(db) {
-            SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable)
+            SchemaUtils.create(
+                UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable,
+                UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable
+            )
         }
     }
 
@@ -84,7 +88,7 @@ class UserAccountTests {
 
     private fun testApp(block: TestApplicationEngine.() -> Unit) {
         withTestApplication({
-            mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC)
+            mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC)
         }) { block() }
     }
 }

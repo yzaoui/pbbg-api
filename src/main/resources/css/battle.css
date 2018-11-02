@@ -1,0 +1,38 @@
+pbbg-unit {
+    cursor: pointer;
+}
+
+pbbg-unit:hover {
+    border-color: #1E768B;
+}
+
+pbbg-unit[selected] {
+    border: 2px solid #0087ff;
+    padding: 5px;
+}
+
+pbbg-unit[selected]:hover {
+    border-color: black;
+}
+
+.battle-interface {
+    display: flex;
+    flex-direction: row;
+}
+
+.battle-interface > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.battle-interface > div > h1 {
+    text-align: center;
+}
+
+.battle-interface ul {
+    display: inline-block;
+    list-style: none;
+    padding: 0;
+}

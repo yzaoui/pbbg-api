@@ -5,18 +5,15 @@ import com.bitwiserain.pbbg.db.model.MineSession
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.Item
-import com.bitwiserain.pbbg.domain.model.LevelProgress
 import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.model.mine.*
 import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.Random
+import kotlin.random.Random
 
 class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryUC) : MiningUC {
-    private val random = Random()
-
     override fun getMine(userId: Int): Mine? = transaction(db) {
         val mineSession = MineSessionTable.select { MineSessionTable.userId.eq(userId) }
             .map { it.toMineSession() }
@@ -40,7 +37,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         val itemEntries = mutableMapOf<Pair<Int, Int>, MineEntity>()
         (0 until height).forEach { y ->
             (0 until width).forEach { x ->
-                mineType.rollForMineEntity(random.nextFloat())?.let {
+                mineType.rollForMineEntity(Random.nextFloat())?.let {
                     itemEntries.put(x to y, it)
                 }
             }

@@ -2,18 +2,11 @@ package com.bitwiserain.pbbg
 
 import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
-import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
-import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
-import com.bitwiserain.pbbg.db.usecase.MiningUCImpl
-import com.bitwiserain.pbbg.db.usecase.UserUCImpl
-import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
-import com.bitwiserain.pbbg.domain.usecase.InventoryUC
-import com.bitwiserain.pbbg.domain.usecase.MiningUC
-import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.route.api.inventoryAPI
-import com.bitwiserain.pbbg.route.api.mine
-import com.bitwiserain.pbbg.route.api.pickaxe
-import com.bitwiserain.pbbg.route.api.user
+import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
+import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
+import com.bitwiserain.pbbg.db.usecase.*
+import com.bitwiserain.pbbg.domain.usecase.*
+import com.bitwiserain.pbbg.route.api.*
 import com.bitwiserain.pbbg.route.web.*
 import com.bitwiserain.pbbg.view.template.GuestPageVM
 import com.bitwiserain.pbbg.view.template.MemberPageVM
@@ -53,7 +46,10 @@ fun Application.main() {
     val db = Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
     transaction {
         addLogger(Slf4jSqlDebugLogger)
-        SchemaUtils.create(UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable)
+        SchemaUtils.create(
+            UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable,
+            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable
+        )
     }
 
     install(CallLogging)
@@ -62,11 +58,13 @@ fun Application.main() {
     val inventoryUC = InventoryUCImpl(db)
     val miningUC = MiningUCImpl(db, inventoryUC)
     val equipmentUC = EquipmentUCImpl(db)
+    val unitUC = UnitUCImpl(db)
+    val battleUC = BattleUCImpl(db)
 
-    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC)
+    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC)
 }
 
-fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC) {
+fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC) {
     install(Sessions) {
         cookie<ApplicationSession>("pbbg_session") {
             cookie.path = "/"
@@ -84,16 +82,18 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         login(userUC)
         logout()
         register(userUC)
-        squad(userUC)
+        squadWeb(userUC)
         mineWeb(userUC)
-        battle(userUC)
+        battleWeb(userUC)
         inventoryWeb(userUC)
         settings(userUC)
         route("/api") {
             user(userUC)
             pickaxe(userUC, equipmentUC)
             mine(userUC, miningUC)
+            squadAPI(userUC, unitUC)
             inventoryAPI(userUC, inventoryUC, equipmentUC)
+            battleAPI(userUC, battleUC)
         }
         static("css") {
             resources("css")

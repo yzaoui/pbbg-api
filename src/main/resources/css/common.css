@@ -105,3 +105,7 @@ span.sidebar-item-icon {
     border: 1px solid #f5c6cb;
     border-radius: .25rem;
 }
+
+button.loading {
+    cursor: wait;
+}
