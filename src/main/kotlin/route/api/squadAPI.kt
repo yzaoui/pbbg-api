@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.route.api
 
 import com.bitwiserain.pbbg.*
+import com.bitwiserain.pbbg.domain.model.MyUnit
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import io.ktor.application.call
 import io.ktor.routing.Route
@@ -37,7 +38,7 @@ fun Squad.toJSON() = SquadJSON(
     units = units.map { it.toJSON() }
 )
 
-fun CharUnit.toJSON() = CharUnitJSON(
+fun MyUnit.toJSON() = CharUnitJSON(
     id = id,
     name = name,
     baseUnitId = enum.ordinal,

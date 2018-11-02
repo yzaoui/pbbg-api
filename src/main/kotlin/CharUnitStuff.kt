@@ -1,58 +1,15 @@
 package com.bitwiserain.pbbg
 
-import com.bitwiserain.pbbg.CharUnit.*
-import com.bitwiserain.pbbg.CharUnitEnum.*
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UnitTable
-import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.LevelProgress
+import com.bitwiserain.pbbg.domain.model.MyUnit
+import com.bitwiserain.pbbg.domain.model.MyUnit.*
+import com.bitwiserain.pbbg.domain.model.MyUnitEnum.*
 import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.LongIdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.math.max
-
-sealed class CharUnit {
-    abstract val id: Long
-    abstract val name: String
-    abstract val enum: CharUnitEnum
-    abstract val hp: Int
-    abstract val maxHP: Int
-    abstract val atk: Int
-    abstract val exp: Long
-    val dead: Boolean
-        get() = hp == 0
-
-    data class IceCreamWizard(
-        override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
-        override val exp: Long
-    ) : CharUnit() {
-        override val name: String get() = "Ice-Cream Wizard"
-        override val enum get() = ICE_CREAM_WIZARD
-    }
-
-    data class Twolip(
-        override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
-        override val exp: Long
-    ) : CharUnit() {
-        override val name: String get() = "Twolip"
-        override val enum get() = TWOLIP
-    }
-
-    data class Carpshooter(
-        override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
-        override val exp: Long
-    ) : CharUnit() {
-        override val name: String get() = "Carpshooter"
-        override val enum get() = CARPSHOOTER
-    }
-}
-
-enum class CharUnitEnum {
-    ICE_CREAM_WIZARD,
-    TWOLIP,
-    CARPSHOOTER
-}
 
 interface UnitUC {
     fun getSquad(userId: Int): Squad
@@ -66,9 +23,9 @@ class UnitUCImpl(private val db: Database) : UnitUC {
     }
 }
 
-class Squad(val units: List<CharUnit>)
+class Squad(val units: List<MyUnit>)
 
-fun addUnitToSquad(user: EntityID<Int>, unit: CharUnit) {
+fun addUnitToSquad(user: EntityID<Int>, unit: MyUnit) {
     val unitId = UnitTable.insertUnitAndGetId(unit)
 
     SquadTable.insert {
@@ -77,7 +34,7 @@ fun addUnitToSquad(user: EntityID<Int>, unit: CharUnit) {
     }
 }
 
-fun ResultRow.toCharUnit(): CharUnit {
+fun ResultRow.toCharUnit(): MyUnit {
     val id = this[UnitTable.id].value
     val unitEnum = this[UnitTable.unit]
     val hp = this[UnitTable.hp]
@@ -92,14 +49,14 @@ fun ResultRow.toCharUnit(): CharUnit {
     }
 }
 
-fun SquadTable.getAllies(userId: Int): List<CharUnit> {
+fun SquadTable.getAllies(userId: Int): List<MyUnit> {
     return innerJoin(UnitTable)
         .slice(UnitTable.columns)
         .select { SquadTable.user.eq(userId) }
         .map { it.toCharUnit() }
 }
 
-fun SquadTable.getAlly(userId: Int, allyId: Long): CharUnit? {
+fun SquadTable.getAlly(userId: Int, allyId: Long): MyUnit? {
     return innerJoin(UnitTable)
         .slice(UnitTable.columns)
         .select { SquadTable.user.eq(userId) and UnitTable.id.eq(allyId) }
@@ -107,7 +64,7 @@ fun SquadTable.getAlly(userId: Int, allyId: Long): CharUnit? {
         ?.toCharUnit()
 }
 
-fun UnitTable.insertUnitAndGetId(unit: CharUnit): EntityID<Long> {
+fun UnitTable.insertUnitAndGetId(unit: MyUnit): EntityID<Long> {
     return insertAndGetId {
         it[UnitTable.unit] = unit.enum
         it[UnitTable.hp] = unit.hp
@@ -117,7 +74,7 @@ fun UnitTable.insertUnitAndGetId(unit: CharUnit): EntityID<Long> {
     }
 }
 
-fun UnitTable.updateUnit(unitId: Long, unit: CharUnit) {
+fun UnitTable.updateUnit(unitId: Long, unit: MyUnit) {
     update({ UnitTable.id.eq(unitId) }) {
         it[UnitTable.hp] = unit.hp
         it[UnitTable.maxHP] = unit.maxHP
@@ -126,23 +83,23 @@ fun UnitTable.updateUnit(unitId: Long, unit: CharUnit) {
     }
 }
 
-fun CharUnit.receiveDamage(damage: Int): CharUnit {
+fun MyUnit.receiveDamage(damage: Int): MyUnit {
     val newHp = max(hp - damage, 0)
 
     return when (this) {
-        is CharUnit.IceCreamWizard -> copy(hp = newHp)
-        is CharUnit.Twolip -> copy(hp = newHp)
-        is CharUnit.Carpshooter -> copy(hp = newHp)
+        is IceCreamWizard -> copy(hp = newHp)
+        is Twolip -> copy(hp = newHp)
+        is Carpshooter -> copy(hp = newHp)
     }
 }
 
-fun CharUnit.gainExperience(gainedExp: Long): CharUnit {
+fun MyUnit.gainExperience(gainedExp: Long): MyUnit {
     val newExp = exp + gainedExp
 
     return when (this) {
-        is CharUnit.IceCreamWizard -> copy(exp = newExp)
-        is CharUnit.Twolip -> copy(exp = newExp)
-        is CharUnit.Carpshooter -> copy(exp = newExp)
+        is IceCreamWizard -> copy(exp = newExp)
+        is Twolip -> copy(exp = newExp)
+        is Carpshooter -> copy(exp = newExp)
     }
 }
 

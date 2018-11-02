@@ -1,12 +1,13 @@
 package com.bitwiserain.pbbg
 
-import com.bitwiserain.pbbg.CharUnit.IceCreamWizard
-import com.bitwiserain.pbbg.CharUnit.Twolip
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
+import com.bitwiserain.pbbg.domain.model.MyUnit
+import com.bitwiserain.pbbg.domain.model.MyUnit.IceCreamWizard
+import com.bitwiserain.pbbg.domain.model.MyUnit.Twolip
 import com.bitwiserain.pbbg.route.api.CharUnitJSON
 import com.google.gson.annotations.SerializedName
 import org.jetbrains.exposed.dao.EntityID
@@ -93,8 +94,8 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 }
 
 data class Battle(
-    val allies: List<CharUnit>,
-    val enemies: List<CharUnit>
+    val allies: List<MyUnit>,
+    val enemies: List<MyUnit>
 )
 
 class BattleJSON(
@@ -102,7 +103,7 @@ class BattleJSON(
     @SerializedName("enemies") val enemies: List<CharUnitJSON>
 )
 
-fun BattleEnemyTable.insertEnemies(battleSession: EntityID<Long>, enemies: List<CharUnit>) {
+fun BattleEnemyTable.insertEnemies(battleSession: EntityID<Long>, enemies: List<MyUnit>) {
     // TODO: There's gotta be a way to do this in batch :/
     for (enemy in enemies) {
         // Create enemy unit in unit table
@@ -116,14 +117,14 @@ fun BattleEnemyTable.insertEnemies(battleSession: EntityID<Long>, enemies: List<
     }
 }
 
-fun BattleEnemyTable.getEnemies(battleSession: EntityID<Long>): List<CharUnit> {
+fun BattleEnemyTable.getEnemies(battleSession: EntityID<Long>): List<MyUnit> {
     return innerJoin(UnitTable)
         .slice(UnitTable.columns)
         .select { BattleEnemyTable.battle.eq(battleSession) }
         .map { it.toCharUnit() }
 }
 
-fun BattleEnemyTable.getEnemy(battleSession: EntityID<Long>, enemyId: Long): CharUnit? {
+fun BattleEnemyTable.getEnemy(battleSession: EntityID<Long>, enemyId: Long): MyUnit? {
     return innerJoin(UnitTable)
         .slice(UnitTable.columns)
         .select { BattleEnemyTable.battle.eq(battleSession) and UnitTable.id.eq(enemyId) }
