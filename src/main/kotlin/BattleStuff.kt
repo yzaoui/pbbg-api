@@ -1,13 +1,13 @@
 package com.bitwiserain.pbbg
 
+import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
 import com.bitwiserain.pbbg.domain.model.MyUnit
-import com.bitwiserain.pbbg.domain.model.MyUnit.IceCreamWizard
-import com.bitwiserain.pbbg.domain.model.MyUnit.Twolip
+import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.route.api.CharUnitJSON
 import com.google.gson.annotations.SerializedName
 import org.jetbrains.exposed.dao.EntityID
@@ -15,6 +15,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.sql.ResultSet
+import kotlin.random.Random
 
 interface BattleUC {
     fun getCurrentBattle(userId: Int): Battle?
@@ -38,10 +39,12 @@ class BattleUCImpl(private val db: Database) : BattleUC {
             it[BattleSessionTable.userId] = EntityID(userId, UserTable)
         }
 
-        BattleEnemyTable.insertEnemies(battleSession, listOf(
-            IceCreamWizard(0, 10, 10, 2, 0L),
-            Twolip(0, 16, 16, 3, 0L)
-        ))
+        val newEnemies = mutableListOf<MyUnitForm>()
+        // Add 1-3 new enemies
+        for (i in 0..Random.nextInt(1, 3)) {
+            newEnemies.add(MyUnitForm(MyUnitEnum.values().random(), Random.nextInt(7, 12), 0))
+        }
+        BattleEnemyTable.insertEnemies(battleSession, newEnemies)
 
         val allies = SquadTable.getAllies(userId)
         val enemies = BattleEnemyTable.getEnemies(battleSession)
@@ -103,7 +106,7 @@ class BattleJSON(
     @SerializedName("enemies") val enemies: List<CharUnitJSON>
 )
 
-fun BattleEnemyTable.insertEnemies(battleSession: EntityID<Long>, enemies: List<MyUnit>) {
+fun BattleEnemyTable.insertEnemies(battleSession: EntityID<Long>, enemies: List<MyUnitForm>) {
     // TODO: There's gotta be a way to do this in batch :/
     for (enemy in enemies) {
         // Create enemy unit in unit table

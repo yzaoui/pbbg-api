@@ -3,13 +3,14 @@ package com.bitwiserain.pbbg.db.usecase
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.bitwiserain.pbbg.PASSWORD_REGEX
 import com.bitwiserain.pbbg.addUnitToSquad
+import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.EquipmentTable
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.Item
-import com.bitwiserain.pbbg.domain.model.MyUnit
+import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.UserStats
 import com.bitwiserain.pbbg.domain.usecase.IllegalPasswordException
 import com.bitwiserain.pbbg.domain.usecase.UnconfirmedNewPasswordException
@@ -61,7 +62,9 @@ class UserUCImpl(private val db: Database) : UserUC {
         }
 
         // TODO: Temporarily give users a default unit
-        addUnitToSquad(userId, MyUnit.IceCreamWizard(0L, 8, 8, 1, 0L))
+        addUnitToSquad(userId, MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1))
+        addUnitToSquad(userId, MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1))
+        addUnitToSquad(userId, MyUnitForm(MyUnitEnum.TWOLIP, 11, 2))
 
         userId.value
     }

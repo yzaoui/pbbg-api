@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg
 
+import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.domain.model.MyUnit
@@ -9,7 +10,7 @@ import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import kotlin.math.max
 
-fun addUnitToSquad(user: EntityID<Int>, unit: MyUnit) {
+fun addUnitToSquad(user: EntityID<Int>, unit: MyUnitForm) {
     val unitId = UnitTable.insertUnitAndGetId(unit)
 
     SquadTable.insert {
@@ -48,13 +49,13 @@ fun SquadTable.getAlly(userId: Int, allyId: Long): MyUnit? {
         ?.toCharUnit()
 }
 
-fun UnitTable.insertUnitAndGetId(unit: MyUnit): EntityID<Long> {
+fun UnitTable.insertUnitAndGetId(unit: MyUnitForm): EntityID<Long> {
     return insertAndGetId {
         it[UnitTable.unit] = unit.enum
         it[UnitTable.hp] = unit.hp
-        it[UnitTable.maxHP] = unit.maxHP
+        it[UnitTable.maxHP] = unit.hp
         it[UnitTable.atk] = unit.atk
-        it[UnitTable.exp] = unit.exp
+        it[UnitTable.exp] = 0L
     }
 }
 
