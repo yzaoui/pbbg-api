@@ -3,7 +3,6 @@ package com.bitwiserain.pbbg.db.usecase
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.domain.model.Squad
 import com.bitwiserain.pbbg.domain.usecase.UnitUC
-import com.bitwiserain.pbbg.getAllies
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 

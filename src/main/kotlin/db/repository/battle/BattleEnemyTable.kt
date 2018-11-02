@@ -2,9 +2,8 @@ package com.bitwiserain.pbbg.db.repository.battle
 
 import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
+import com.bitwiserain.pbbg.db.repository.toMyUnit
 import com.bitwiserain.pbbg.domain.model.MyUnit
-import com.bitwiserain.pbbg.insertUnitAndGetId
-import com.bitwiserain.pbbg.toMyUnit
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 
@@ -13,7 +12,7 @@ object BattleEnemyTable : Table() {
     val unit = reference("unit_id", UnitTable, ReferenceOption.CASCADE)
 
     /**
-     * Get a single enemy belonging to a battle session, if any.
+     * Gets a single enemy belonging to a battle session, if any.
      */
     fun getEnemy(battleSession: EntityID<Long>, enemyId: Long): MyUnit? {
         return innerJoin(UnitTable)
@@ -24,7 +23,7 @@ object BattleEnemyTable : Table() {
     }
 
     /**
-     * Get a list of enemies belonging to a battle session, if any.
+     * Gets a list of enemies belonging to a battle session, if any.
      */
     fun getEnemies(battleSession: EntityID<Long>): List<MyUnit> {
         return innerJoin(UnitTable)
@@ -34,7 +33,7 @@ object BattleEnemyTable : Table() {
     }
 
     /**
-     * Insert new enemy units into a battle session.
+     * Inserts new enemy units into a battle session.
      */
     fun insertEnemies(battleSession: EntityID<Long>, enemies: List<MyUnitForm>) {
         // TODO: There's gotta be a way to do this in batch :/

@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.domain.model
 
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum.*
+import kotlin.math.max
 
 sealed class MyUnit {
     abstract val id: Long
@@ -35,6 +36,26 @@ sealed class MyUnit {
     ) : MyUnit() {
         override val name: String get() = "Carpshooter"
         override val enum get() = CARPSHOOTER
+    }
+
+    fun receiveDamage(damage: Int): MyUnit {
+        val newHp = max(hp - damage, 0)
+
+        return when (this) {
+            is IceCreamWizard -> copy(hp = newHp)
+            is Twolip -> copy(hp = newHp)
+            is Carpshooter -> copy(hp = newHp)
+        }
+    }
+
+    fun gainExperience(gainedExp: Long): MyUnit {
+        val newExp = exp + gainedExp
+
+        return when (this) {
+            is IceCreamWizard -> copy(exp = newExp)
+            is Twolip -> copy(exp = newExp)
+            is Carpshooter -> copy(exp = newExp)
+        }
     }
 }
 

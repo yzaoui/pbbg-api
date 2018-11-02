@@ -1,7 +1,10 @@
 package com.bitwiserain.pbbg.route.api
 
 import com.bitwiserain.pbbg.*
+import com.bitwiserain.pbbg.domain.model.Battle
+import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.view.model.BattleJSON
 import io.ktor.application.call
 import io.ktor.request.receive
 import io.ktor.routing.*
