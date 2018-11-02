@@ -1,11 +1,14 @@
 package com.bitwiserain.pbbg.route.api
 
-import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.UnitExperienceManager
 import com.bitwiserain.pbbg.domain.model.MyUnit
 import com.bitwiserain.pbbg.domain.model.Squad
 import com.bitwiserain.pbbg.domain.usecase.UnitUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.interceptSetUserOr401
+import com.bitwiserain.pbbg.loggedInUserKey
+import com.bitwiserain.pbbg.respondSuccess
+import com.bitwiserain.pbbg.view.model.MyUnitJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get
@@ -24,24 +27,14 @@ fun Route.squadAPI(userUC: UserUC, unitUC: UnitUC) = route("/squad") {
 }
 
 class SquadJSON(
-    val units: List<CharUnitJSON>
-)
-
-class CharUnitJSON(
-    val id: Long,
-    val name: String,
-    val baseUnitId: Int,
-    val hp: Int,
-    val maxHP: Int,
-    val atk: Int,
-    val levelProgress: LevelProgressJSON
+    val units: List<MyUnitJSON>
 )
 
 fun Squad.toJSON() = SquadJSON(
     units = units.map { it.toJSON() }
 )
 
-fun MyUnit.toJSON() = CharUnitJSON(
+fun MyUnit.toJSON() = MyUnitJSON(
     id = id,
     name = name,
     baseUnitId = enum.ordinal,

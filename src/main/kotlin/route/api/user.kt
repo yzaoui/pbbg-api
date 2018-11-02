@@ -6,6 +6,7 @@ import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondSuccess
+import com.bitwiserain.pbbg.view.model.LevelProgressJSON
 import com.google.gson.annotations.SerializedName
 import io.ktor.application.call
 import io.ktor.locations.Location
@@ -38,12 +39,6 @@ fun Route.user(userUC: UserUC) = route("/user") {
 
 data class UserDetailsJSON(
     @SerializedName("mining") val miningLvlProgress: LevelProgressJSON
-)
-
-data class LevelProgressJSON(
-    @SerializedName("level") val level: Int,
-    @SerializedName("relativeExp") val relativeExp: Long,
-    @SerializedName("relativeExpToNextLevel") val relativeExpToNextLevel: Long
 )
 
 fun LevelProgress.toJSON() = LevelProgressJSON(

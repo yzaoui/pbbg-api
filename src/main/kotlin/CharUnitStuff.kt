@@ -19,7 +19,7 @@ fun addUnitToSquad(user: EntityID<Int>, unit: MyUnitForm) {
     }
 }
 
-fun ResultRow.toCharUnit(): MyUnit {
+fun ResultRow.toMyUnit(): MyUnit {
     val id = this[UnitTable.id].value
     val unitEnum = this[UnitTable.unit]
     val hp = this[UnitTable.hp]
@@ -38,7 +38,7 @@ fun SquadTable.getAllies(userId: Int): List<MyUnit> {
     return innerJoin(UnitTable)
         .slice(UnitTable.columns)
         .select { SquadTable.user.eq(userId) }
-        .map { it.toCharUnit() }
+        .map { it.toMyUnit() }
 }
 
 fun SquadTable.getAlly(userId: Int, allyId: Long): MyUnit? {
@@ -46,7 +46,7 @@ fun SquadTable.getAlly(userId: Int, allyId: Long): MyUnit? {
         .slice(UnitTable.columns)
         .select { SquadTable.user.eq(userId) and UnitTable.id.eq(allyId) }
         .singleOrNull()
-        ?.toCharUnit()
+        ?.toMyUnit()
 }
 
 fun UnitTable.insertUnitAndGetId(unit: MyUnitForm): EntityID<Long> {
