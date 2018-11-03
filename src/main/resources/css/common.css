@@ -22,11 +22,14 @@ body > footer {
     text-align: center;
 }
 
-.content {
-    flex: 1;
+main {
     display: flex;
     flex-direction: column;
+    flex: 1;
     height: 100%;
+    border: 1px solid black;
+    padding: 6px;
+    box-sizing: border-box;
 }
 
 .sidebar {
@@ -49,14 +52,6 @@ body > footer {
     font-weight: bold;
     border-bottom: grey 1px solid;
     padding: 10px;
-}
-
-.content main {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    border: 1px solid black;
-    padding: 6px;
 }
 
 a.sidebar-item {
@@ -90,10 +85,6 @@ span.sidebar-item-icon {
 .sidebar-login-form > * {
     max-width: 100%;
     box-sizing: border-box;
-}
-
-.content main > input {
-    padding: 4px;
 }
 
 .form-errors > li {

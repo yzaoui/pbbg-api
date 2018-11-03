@@ -59,11 +59,9 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
                         }
                     }
                 }
-                div(classes = "content") {
-                    main {
-                        id = "main"
-                        insert(content)
-                    }
+                main {
+                    id = "main"
+                    insert(content)
                 }
             }
             footer {

@@ -39,11 +39,9 @@ class GuestTemplate(private val pageTitle: String, private val guestPageVM: Gues
                         button(type = ButtonType.submit) { +"Log in" }
                     }
                 }
-                div(classes = "content") {
-                    main {
-                        id = "main"
-                        insert(content)
-                    }
+                main {
+                    id = "main"
+                    insert(content)
                 }
             }
             footer {
