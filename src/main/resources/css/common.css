@@ -15,9 +15,8 @@ a {
     margin-right: auto;
 }
 
-.container > footer {
+body > footer {
     text-align: center;
-    font-size: 14px;
 }
 
 .content {

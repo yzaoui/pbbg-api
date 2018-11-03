@@ -65,9 +65,9 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
                         insert(content)
                     }
                 }
-                footer {
-                    +"BitwiseRain © 2018"
-                }
+            }
+            footer {
+                +"BitwiseRain © 2018"
             }
             insert(endOfBody)
         }

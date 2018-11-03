@@ -45,9 +45,9 @@ class GuestTemplate(private val pageTitle: String, private val guestPageVM: Gues
                         insert(content)
                     }
                 }
-                footer {
-                    +"BitwiseRain © 2018"
-                }
+            }
+            footer {
+                +"BitwiseRain © 2018"
             }
             insert(endOfBody)
         }
