@@ -23,23 +23,23 @@ class GuestTemplate(private val pageTitle: String, private val guestPageVM: Gues
         }
         body {
             div(classes = "container") {
-                div(classes = "content") {
-                    nav(classes = "sidebar sidebar-guest") {
-                        a(href = "/") {
-                            +"Index"
-                        }
-                        form(action = guestPageVM.loginURL, method = FormMethod.post, classes = "sidebar-login-form") {
-                            input(type = InputType.text, name = "username") {
-                                required = true
-                                placeholder = "Username"
-                            }
-                            input(type = InputType.password, name = "password") {
-                                required = true
-                                placeholder = "Password"
-                            }
-                            button(type = ButtonType.submit) { +"Log in" }
-                        }
+                nav(classes = "sidebar sidebar-guest") {
+                    a(href = "/") {
+                        +"Index"
                     }
+                    form(action = guestPageVM.loginURL, method = FormMethod.post, classes = "sidebar-login-form") {
+                        input(type = InputType.text, name = "username") {
+                            required = true
+                            placeholder = "Username"
+                        }
+                        input(type = InputType.password, name = "password") {
+                            required = true
+                            placeholder = "Password"
+                        }
+                        button(type = ButtonType.submit) { +"Log in" }
+                    }
+                }
+                div(classes = "content") {
                     main {
                         id = "main"
                         insert(content)

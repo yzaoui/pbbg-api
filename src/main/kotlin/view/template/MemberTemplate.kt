@@ -23,43 +23,43 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
         }
         body {
             div(classes = "container") {
-                div(classes = "content") {
-                    nav(classes = "sidebar") {
-                        div(classes = "username") {
-                            +memberPageVM.user.username
-                        }
-                        a(href = memberPageVM.homeUrl, classes = "sidebar-item") {
-                            span(classes = "sidebar-item-icon") { +"""🏠""" }
-                            span { +"Home" }
-                        }
-                        a(href = memberPageVM.squadUrl, classes = "sidebar-item") {
-                            span(classes = "sidebar-item-icon") { +"""👥""" }
-                            span { +"Squad" }
-                        }
-                        a(href = memberPageVM.inventoryUrl, classes = "sidebar-item") {
-                            span(classes = "sidebar-item-icon") { +"""🎒""" }
-                            span { +"Inventory" }
-                        }
-                        a(href = memberPageVM.battleUrl, classes = "sidebar-item") {
-                            span(classes = "sidebar-item-icon") { +"""⚔️""" } // Unicode variation selector 16
-                            span { +"Battle" }
-                        }
-                        a(href = memberPageVM.mineUrl, classes = "sidebar-item") {
-                            span(classes = "sidebar-item-icon") { +"""⛏️""" } // Unicode variation selector 16
-                            span { +"Mine" }
-                        }
-                        a(href = memberPageVM.settingsUrl, classes = "sidebar-item") {
-                            span(classes = "sidebar-item-icon") { +"""⚙️""" } // Unicode variation selector 16
-                            span { +"Settings" }
-                        }
-                        div(classes = "sidebar-logout") {
-                            form(action = memberPageVM.logoutUrl, method = FormMethod.post) {
-                                button(type = ButtonType.submit) {
-                                    +"Log out"
-                                }
+                nav(classes = "sidebar") {
+                    div(classes = "username") {
+                        +memberPageVM.user.username
+                    }
+                    a(href = memberPageVM.homeUrl, classes = "sidebar-item") {
+                        span(classes = "sidebar-item-icon") { +"""🏠""" }
+                        span { +"Home" }
+                    }
+                    a(href = memberPageVM.squadUrl, classes = "sidebar-item") {
+                        span(classes = "sidebar-item-icon") { +"""👥""" }
+                        span { +"Squad" }
+                    }
+                    a(href = memberPageVM.inventoryUrl, classes = "sidebar-item") {
+                        span(classes = "sidebar-item-icon") { +"""🎒""" }
+                        span { +"Inventory" }
+                    }
+                    a(href = memberPageVM.battleUrl, classes = "sidebar-item") {
+                        span(classes = "sidebar-item-icon") { +"""⚔️""" } // Unicode variation selector 16
+                        span { +"Battle" }
+                    }
+                    a(href = memberPageVM.mineUrl, classes = "sidebar-item") {
+                        span(classes = "sidebar-item-icon") { +"""⛏️""" } // Unicode variation selector 16
+                        span { +"Mine" }
+                    }
+                    a(href = memberPageVM.settingsUrl, classes = "sidebar-item") {
+                        span(classes = "sidebar-item-icon") { +"""⚙️""" } // Unicode variation selector 16
+                        span { +"Settings" }
+                    }
+                    div(classes = "sidebar-logout") {
+                        form(action = memberPageVM.logoutUrl, method = FormMethod.post) {
+                            button(type = ButtonType.submit) {
+                                +"Log out"
                             }
                         }
                     }
+                }
+                div(classes = "content") {
                     main {
                         id = "main"
                         insert(content)
