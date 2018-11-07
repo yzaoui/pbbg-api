@@ -12,7 +12,7 @@ buildscript {
     }
 }
 
-group = 'bitwiserain'
+group = 'com.bitwiserain'
 version = '0.0.1'
 
 apply plugin: 'kotlin'
