@@ -17,6 +17,10 @@ import io.ktor.routing.route
 fun Route.squadAPI(userUC: UserUC, unitUC: UnitUC) = route("/squad") {
     interceptSetUserOr401(userUC)
 
+    /**
+     * On success:
+     *   [SquadJSON]
+     */
     get {
         val loggedInUser = call.attributes[loggedInUserKey]
 
@@ -26,11 +30,11 @@ fun Route.squadAPI(userUC: UserUC, unitUC: UnitUC) = route("/squad") {
     }
 }
 
-class SquadJSON(
+private class SquadJSON(
     val units: List<MyUnitJSON>
 )
 
-fun Squad.toJSON() = SquadJSON(
+private fun Squad.toJSON() = SquadJSON(
     units = units.map { it.toJSON() }
 )
 

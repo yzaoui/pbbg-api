@@ -44,6 +44,13 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
     }
 
     route("/attack") {
+        /**
+         * Expects body:
+         *   [AttackParams]
+         *
+         * On success:
+         *   [BattleJSON]
+         */
         post {
             val loggedInUser = call.attributes[loggedInUserKey]
 
@@ -56,9 +63,9 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
     }
 }
 
-fun Battle.toJSON() = BattleJSON(
+private data class AttackParams(val allyId: Long, val enemyId: Long)
+
+private fun Battle.toJSON() = BattleJSON(
     allies = allies.map { it.toJSON() },
     enemies = enemies.map { it.toJSON() }
 )
-
-class AttackParams(val allyId: Long, val enemyId: Long)

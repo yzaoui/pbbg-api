@@ -91,7 +91,7 @@ fun Route.inventoryAPI(userUC: UserUC, inventoryUC: InventoryUC, equipmentUC: Eq
     }
 }
 
-data class EquipmentActionParams(
+private data class EquipmentActionParams(
     val inventoryItemId: Int
 )
 

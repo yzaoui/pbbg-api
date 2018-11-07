@@ -18,9 +18,6 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 
-@Location("/mine")
-class MineAPILocation
-
 data class MinePositionParams(val x: Int, val y: Int)
 
 data class MineGenerateParams(val mineTypeId: Int)
@@ -30,7 +27,8 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
     /**
      * On success:
-     *   [MineJSON]
+     *   [MineJSON] When user has a mine in session.
+     *   null When user does not have a mine in session.
      */
     get {
         val loggedInUser = call.attributes[loggedInUserKey]
@@ -42,7 +40,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
     route("/perform") {
         /**
-         * Expects:
+         * Expects body:
          *   [MinePositionParams]
          *
          * On success:
@@ -76,7 +74,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
 
     route("/generate") {
         /**
-         * Expects:
+         * Expects body:
          *   [MineGenerateParams]
          *
          * On success:
@@ -103,6 +101,10 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
     }
 
     route("/exit") {
+        /**
+         * On success:
+         *   null
+         */
         post {
             val loggedInUser = call.attributes[loggedInUserKey]
 

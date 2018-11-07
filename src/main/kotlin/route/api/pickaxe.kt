@@ -13,26 +13,25 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 
-const val PICKAXE_PATH = "/pickaxe"
-@Location(PICKAXE_PATH)
-class PickaxeLocation
-
-fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) {
+fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) = route("/pickaxe") {
     interceptSetUserOr401(userUC)
 
-    route(PICKAXE_PATH) {
-        get {
-            val loggedInUser = call.attributes[loggedInUserKey]
+    /**
+     * On success:
+     *   [PickaxeJSON] When user has a pickaxe equipped.
+     *   null When user does not have a pickaxe equipped.
+     */
+    get {
+        val loggedInUser = call.attributes[loggedInUserKey]
 
-            val pickaxe = equipmentUC.getEquippedPickaxe(loggedInUser.id)
+        val pickaxe = equipmentUC.getEquippedPickaxe(loggedInUser.id)
 
-            call.respondSuccess(pickaxe?.toJSON())
-        }
+        call.respondSuccess(pickaxe?.toJSON())
     }
 }
 
 // TODO: Find appropriate place for this adapter
-fun Pickaxe.toJSON() = PickaxeJSON(
+private fun Pickaxe.toJSON() = PickaxeJSON(
     pickaxeKind = type,
     cells = cells.map { intArrayOf(it.first, it.second) }
 )
