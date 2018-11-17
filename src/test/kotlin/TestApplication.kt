@@ -20,3 +20,10 @@ fun initDatabase(): Database {
 
     return db
 }
+
+fun dropDatabase(db: Database) = transaction(db) {
+    SchemaUtils.drop(
+        UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable,
+        UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable
+    )
+}
