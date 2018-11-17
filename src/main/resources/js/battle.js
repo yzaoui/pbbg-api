@@ -155,18 +155,8 @@ const attack = async () => {
 const selectAlly = (allyId) => {
     const allyUnitEls = document.getElementById("ally-list").querySelectorAll("pbbg-unit");
 
-    for (let i = 0; i < allyUnitEls.length; i++) {
-        const el = allyUnitEls[i];
-
-        if (!el.hasAttribute("dead") && allyId === Number(el.unitId)) {
-            el.setAttribute("selected", "");
-            selectedAllyId = allyId;
-            break;
-        } else {
-            el.removeAttribute("selected");
-            selectedAllyId = null;
-        }
-    }
+    selectUnit(allyUnitEls, allyId);
+    selectedAllyId = allyId;
 
     document.getElementById("attack-button").disabled = !(selectedAllyId && selectedEnemyId);
 };
@@ -174,18 +164,20 @@ const selectAlly = (allyId) => {
 const selectEnemy = (enemyId) => {
     const enemyUnitEls = document.getElementById("enemy-list").querySelectorAll("pbbg-unit");
 
-    for (let i = 0; i < enemyUnitEls.length; i++) {
-        const el = enemyUnitEls[i];
-
-        if (!el.hasAttribute("dead") && enemyId === Number(el.unitId)) {
-            el.setAttribute("selected", "");
-            selectedEnemyId = enemyId;
-            break;
-        } else {
-            el.removeAttribute("selected");
-            selectedEnemyId = null;
-        }
-    }
+    selectUnit(enemyUnitEls, enemyId);
+    selectedEnemyId = enemyId;
 
     document.getElementById("attack-button").disabled = !(selectedAllyId && selectedEnemyId);
+};
+
+const selectUnit = (unitEls, unitId) => {
+    for (let i = 0; i < unitEls.length; i++) {
+        const el = unitEls[i];
+
+        if (!el.hasAttribute("dead") && unitId === Number(el.unitId)) {
+            el.setAttribute("selected", "");
+        } else {
+            el.removeAttribute("selected");
+        }
+    }
 };
