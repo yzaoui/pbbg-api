@@ -15,7 +15,8 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
     route("/session") {
         /**
          * On success:
-         *   [BattleJSON]
+         *   [BattleJSON] when a battle is in session.
+         *   [null] when no battle is in session.
          */
         get {
             val loggedInUser = call.attributes[loggedInUserKey]

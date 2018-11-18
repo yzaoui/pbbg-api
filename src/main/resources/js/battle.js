@@ -63,6 +63,25 @@ const postGenerateBattleSession = async () => {
 };
 
 /**
+ * @param {number} allyId
+ * @param {number} enemyId
+ *
+ * On success, returns {@see BattleSession}
+ */
+const postBattleAttack = async (allyId, enemyId) => {
+    return (await fetch("/api/battle/attack", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify({
+            allyId: allyId,
+            enemyId: enemyId
+        })
+    })).json();
+};
+
+/**
  * @param {UnitResponse[]} allies
  * @param {UnitResponse[]} enemies
  */
@@ -119,6 +138,10 @@ const setupBattle = (allies, enemies) => {
     main.appendChild(attackButton);
 };
 
+/**
+ * @param {UnitResponse[]} allies
+ * @param {UnitResponse[]} enemies
+ */
 const updateBattle = (allies, enemies) => {
     const allyUnitEls = document.getElementById("ally-list").querySelectorAll("pbbg-unit");
     const enemyUnitEls = document.getElementById("enemy-list").querySelectorAll("pbbg-unit");
@@ -179,21 +202,17 @@ const attack = async () => {
     attackButton.classList.add("loading");
     attackButton.disabled = true;
 
-    const { status, data } = await (await fetch("/api/battle/attack", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        },
-        body: JSON.stringify({
-            allyId: selectedAllyId,
-            enemyId: selectedEnemyId
-        })
-    })).json();
+    const res = await postBattleAttack(selectedAllyId, selectedEnemyId);
 
     attackButton.classList.remove("loading");
     attackButton.disabled = false;
 
-    if (status === "success") {
+    if (res.status === "success") {
+        /**
+         * @type {BattleSession}
+         */
+        const data = res.data;
+
         updateBattle(data.allies, data.enemies);
     }
 };
