@@ -1,3 +1,20 @@
+/**
+ * @typedef {Object} BattleSession
+ * @property {UnitResponse[]} allies - The user's units.
+ * @property {UnitResponse[]} enemies - The enemy units.
+ */
+
+/**
+ * @typedef {Object} UnitResponse
+ * @property {number} id - The unit's ID.
+ * @property {string} name - The unit's name.
+ * @property {number} baseUnitId - The ID of the unit's base unit type.
+ * @property {number} hp - The unit's current HP.
+ * @property {number} maxHP - The unit's maximum HP.
+ * @property {number} atk - The unit's attack stat.
+ * @property {LevelProgress} levelProgress - The unit's level and experience information.
+ */
+
 const main = document.getElementById("main");
 const GENERATE_BATTLE_BUTTON_ID = "generate-battle";
 let selectedAllyId;
@@ -6,20 +23,37 @@ let selectedEnemyId;
 window.onload = async () => {
     main.innerText = "Loading battle session...";
 
-    const { status, data } = await (await fetch("/api/battle/session")).json();
+    const res = await getBattleSession();
 
-    if (status === "success") {
+    if (res.status === "success") {
+        /**
+         * @type {?BattleSession}
+         */
+        const data = res.data;
+
         main.innerText = "";
 
         if (data !== null) {
-            const { allies, enemies } = data;
-            setupBattle(allies, enemies);
+            setupBattle(data.allies, data.enemies);
         } else {
             setupGenerateBattle();
         }
     }
 };
 
+/**
+ * On success, returns {@see ?BattleSession}.
+ */
+const getBattleSession = async () => {
+    return (await fetch("/api/battle/session", {
+        method: "GET",
+    })).json();
+};
+
+/**
+ * @param {UnitResponse[]} allies
+ * @param {UnitResponse[]} enemies
+ */
 const setupBattle = (allies, enemies) => {
     const battleDiv = document.createElement("div");
     battleDiv.className = "battle-interface";
@@ -39,7 +73,7 @@ const setupBattle = (allies, enemies) => {
         allyList.appendChild(li);
 
         const unitEl = document.createElement("pbbg-unit");
-        unitEl.setAttribute("unit-id", ally.id);
+        unitEl.setAttribute("unit-id", String(ally.id));
         unitEl.unit = ally;
         unitEl.onclick = () => selectAlly(ally.id);
         li.appendChild(unitEl);
@@ -59,7 +93,7 @@ const setupBattle = (allies, enemies) => {
         enemyList.appendChild(li);
 
         const unitEl = document.createElement("pbbg-unit");
-        unitEl.setAttribute("unit-id", enemy.id);
+        unitEl.setAttribute("unit-id", String(enemy.id));
         unitEl.unit = enemy;
         unitEl.onclick = () => selectEnemy(enemy.id);
         li.appendChild(unitEl);
