@@ -16,7 +16,6 @@
  */
 
 const main = document.getElementById("main");
-const GENERATE_BATTLE_BUTTON_ID = "generate-battle";
 let selectedAllyId;
 let selectedEnemyId;
 
@@ -34,9 +33,15 @@ window.onload = async () => {
         main.innerText = "";
 
         if (data !== null) {
+            /* If there is a battle, set up battle interface*/
             setupBattle(data.allies, data.enemies);
         } else {
-            setupGenerateBattle();
+            /* If there is no battle, set up interface to generate battle*/
+            const button = document.createElement("button");
+            button.innerText = "Generate battle";
+            button.onclick = () => generateBattle();
+
+            main.appendChild(button);
         }
     }
 };
@@ -163,15 +168,6 @@ const updateBattle = (allies, enemies) => {
 
     update(allies, allyUnitEls);
     update(enemies, enemyUnitEls);
-};
-
-const setupGenerateBattle = () => {
-    const button = document.createElement("button");
-    button.id = GENERATE_BATTLE_BUTTON_ID;
-    button.innerText = "Generate battle";
-    button.onclick = () => generateBattle();
-
-    main.appendChild(button);
 };
 
 const generateBattle = async () => {
