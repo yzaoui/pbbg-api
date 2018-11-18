@@ -51,6 +51,18 @@ const getBattleSession = async () => {
 };
 
 /**
+ * On success, returns {@see BattleSession}.
+ */
+const postGenerateBattleSession = async () => {
+    return (await fetch("/api/battle/session?action=generate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        }
+    })).json();
+};
+
+/**
  * @param {UnitResponse[]} allies
  * @param {UnitResponse[]} enemies
  */
@@ -146,14 +158,14 @@ const generateBattle = async () => {
 
     main.innerText = "Generating battle...";
 
-    const { status, data } = await (await fetch("/api/battle/session?action=generate", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        }
-    })).json();
+    const res = await postGenerateBattleSession();
 
-    if (status === "success") {
+    if (res.status === "success") {
+        /**
+         * @type {BattleSession}
+         */
+        const data = res.data;
+
         main.innerText = "";
 
         setupBattle(data.allies, data.enemies);
