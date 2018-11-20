@@ -17,8 +17,10 @@
  */
 
 const main = document.getElementById("main");
-let selectedAllyId;
-let selectedEnemyId;
+const selectedUnits = {
+    allyId: null,
+    enemyId: null
+};
 
 window.onload = async () => {
     main.innerText = "Loading battle session...";
@@ -149,7 +151,7 @@ const setupBattle = (allies, enemies) => {
  * @param {UnitResponse[]} allies
  * @param {UnitResponse[]} enemies
  */
-const updateBattle = (allies, enemies) => {
+const updateUnits = (allies, enemies) => {
     const allyUnitEls = document.getElementById("ally-list").querySelectorAll("pbbg-unit");
     const enemyUnitEls = document.getElementById("enemy-list").querySelectorAll("pbbg-unit");
 
@@ -200,7 +202,7 @@ const attack = async () => {
     attackButton.classList.add("loading");
     attackButton.disabled = true;
 
-    const res = await postBattleAttack(selectedAllyId, selectedEnemyId);
+    const res = await postBattleAttack(selectedUnits.allyId, selectedUnits.enemyId);
 
     attackButton.classList.remove("loading");
     attackButton.disabled = false;
@@ -211,36 +213,84 @@ const attack = async () => {
          */
         const data = res.data;
 
-        updateBattle(data.allies, data.enemies);
+        updateUnits(data.allies, data.enemies);
+        checkForDeaths();
     }
 };
 
+/**
+ * Removes selected unit if now dead.
+ */
+const checkForDeaths = () => {
+    const checkUnitStillAlive = (unitEls, unitId) => {
+        for (let i = 0; i < unitEls.length; i++) {
+            const el = unitEls[i];
+
+            if (el.hasAttribute("dead") && unitId === Number(el.unitId)) {
+                return null
+            }
+        }
+
+        return unitId;
+    };
+
+    selectedUnits.allyId = checkUnitStillAlive(getAllyPBBGUnits(), selectedUnits.allyId);
+    selectedUnits.enemyId = checkUnitStillAlive(getEnemyPBBGUnits(), selectedUnits.enemyId);
+
+    updateUI();
+};
+
+const updateUI = () => {
+    const updateSelectedUnit = (unitEls, unitId) => {
+        for (let i = 0; i < unitEls.length; i++) {
+            const el = unitEls[i];
+
+            if (!el.hasAttribute("dead") && unitId === Number(el.unitId)) {
+                el.setAttribute("selected", "");
+            } else {
+                el.removeAttribute("selected");
+            }
+        }
+    };
+
+    updateSelectedUnit(getAllyPBBGUnits(), selectedUnits.allyId);
+    updateSelectedUnit(getEnemyPBBGUnits(), selectedUnits.enemyId);
+
+    document.getElementById("attack-button").disabled = !(selectedUnits.allyId && selectedUnits.enemyId);
+};
+
+const getAllyPBBGUnits = () => document.getElementById("ally-list").querySelectorAll("pbbg-unit");
+
+const getEnemyPBBGUnits = () => document.getElementById("enemy-list").querySelectorAll("pbbg-unit");
+
 const selectAlly = (allyId) => {
-    const allyUnitEls = document.getElementById("ally-list").querySelectorAll("pbbg-unit");
+    selectedUnits.allyId = selectUnit(getAllyPBBGUnits(), allyId);
 
-    selectUnit(allyUnitEls, allyId);
-    selectedAllyId = allyId;
-
-    document.getElementById("attack-button").disabled = !(selectedAllyId && selectedEnemyId);
+    updateUI();
 };
 
 const selectEnemy = (enemyId) => {
-    const enemyUnitEls = document.getElementById("enemy-list").querySelectorAll("pbbg-unit");
+    selectedUnits.enemyId = selectUnit(getEnemyPBBGUnits(), enemyId);
 
-    selectUnit(enemyUnitEls, enemyId);
-    selectedEnemyId = enemyId;
-
-    document.getElementById("attack-button").disabled = !(selectedAllyId && selectedEnemyId);
+    updateUI();
 };
 
+/**
+ * @returns {?number} Selected unit's ID, or null if invalid.
+ */
 const selectUnit = (unitEls, unitId) => {
+    let selectedUnitId = null;
+
     for (let i = 0; i < unitEls.length; i++) {
         const el = unitEls[i];
 
         if (!el.hasAttribute("dead") && unitId === Number(el.unitId)) {
             el.setAttribute("selected", "");
+            selectedUnitId = unitId;
         } else {
             el.removeAttribute("selected");
         }
     }
+
+    return selectedUnitId;
 };
