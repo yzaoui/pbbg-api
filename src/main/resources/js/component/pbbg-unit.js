@@ -46,6 +46,10 @@ class PBBGUnit extends HTMLElement {
     margin-right: 12px;
 }
 
+:host([facing="left"]) #sprite {
+    transform: scaleX(-1); 
+}
+
 #name {
     font-weight: bold;
 }
@@ -109,6 +113,19 @@ class PBBGUnit extends HTMLElement {
      */
     get unitId() {
         return Number(this.getAttribute("unit-id"));
+    }
+
+    /**
+     * Direction the sprite should be facing.
+     *
+     * @returns {("left"|"right")}
+     */
+    get facing() {
+        if (this.getAttribute("facing") === "left") {
+            return "left";
+        } else {
+            return "right";
+        }
     }
 
     updateDisplay() {
