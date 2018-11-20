@@ -7,5 +7,6 @@ data class MyUnitJSON(
     val hp: Int,
     val maxHP: Int,
     val atk: Int,
-    val levelProgress: LevelProgressJSON
+    val levelProgress: LevelProgressJSON,
+    val idleAnimationURL: String
 )

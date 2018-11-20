@@ -12,6 +12,7 @@
  * @property {number} maxHP - Maximum HP.
  * @property {number} atk - Current ATK.
  * @property {LevelProgress} levelProgress - Unit's level and experience information.
+ * @property {string} idleAnimationURL - Unit's idle animation path.
  */
 
 class PBBGUnit extends HTMLElement {
@@ -24,8 +25,9 @@ class PBBGUnit extends HTMLElement {
 `
 <style>
 :host {
-    display: inline-block;
-    width: 18em;
+    display: inline-flex;
+    flex-direction: row;
+    width: 22em;
     height: 5.3em;
     box-sizing: border-box;
     border: 1px solid #333333;
@@ -38,6 +40,14 @@ class PBBGUnit extends HTMLElement {
 
 :host([dead]) {
     background-color: #4e313114;
+}
+
+#sprite {
+    margin-right: 12px;
+}
+
+:host([facing="left"]) #sprite {
+    transform: scaleX(-1); 
 }
 
 #name {
@@ -55,21 +65,24 @@ class PBBGUnit extends HTMLElement {
     height: 8px;
 }
 </style>
+<img id="sprite" src="" alt="Idle unit animation" width="64" height="64">
 <div>
-    <span id="name"></span>
-</div>
-<div>
-    <span>HP: </span>
-    <pbbg-progress-bar id="hp-bar"></pbbg-progress-bar>
-    <span id="hp-value"></span>
-</div>
-<div>
-    <span>ATK: <span id="atk-value"></span></span>
-</div>
-<div>
-    <span>Level <span id="level-value"></span></span>
-    <pbbg-progress-bar id="exp-bar"></pbbg-progress-bar>
-    <span id="exp-value"></span>
+    <div>
+        <span id="name"></span>
+    </div>
+    <div>
+        <span>HP: </span>
+        <pbbg-progress-bar id="hp-bar"></pbbg-progress-bar>
+        <span id="hp-value"></span>
+    </div>
+    <div>
+        <span>ATK: <span id="atk-value"></span></span>
+    </div>
+    <div>
+        <span>Level <span id="level-value"></span></span>
+        <pbbg-progress-bar id="exp-bar"></pbbg-progress-bar>
+        <span id="exp-value"></span>
+    </div>
 </div>
 `;
 
@@ -102,7 +115,21 @@ class PBBGUnit extends HTMLElement {
         return Number(this.getAttribute("unit-id"));
     }
 
+    /**
+     * Direction the sprite should be facing.
+     *
+     * @returns {("left"|"right")}
+     */
+    get facing() {
+        if (this.getAttribute("facing") === "left") {
+            return "left";
+        } else {
+            return "right";
+        }
+    }
+
     updateDisplay() {
+        this._shadowRoot.getElementById("sprite").src = this._unit.idleAnimationURL;
         this._shadowRoot.getElementById("name").innerText = this._unit.name;
         this._shadowRoot.getElementById("hp-bar").value = this._unit.hp;
         this._shadowRoot.getElementById("hp-bar").max = this._unit.maxHP;

@@ -13,6 +13,7 @@
  * @property {number} maxHP - The unit's maximum HP.
  * @property {number} atk - The unit's attack stat.
  * @property {LevelProgress} levelProgress - The unit's level and experience information.
+ * @property {string} idleAnimationURL - The unit's idle animation URL.
  */
 
 const main = document.getElementById("main");
@@ -130,6 +131,7 @@ const setupBattle = (allies, enemies) => {
 
         const unitEl = document.createElement("pbbg-unit");
         unitEl.setAttribute("unit-id", String(enemy.id));
+        unitEl.setAttribute("facing", "left");
         unitEl.unit = enemy;
         unitEl.onclick = () => selectEnemy(enemy.id);
         li.appendChild(unitEl);
