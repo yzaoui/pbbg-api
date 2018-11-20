@@ -41,6 +41,8 @@ window.onload = async () => {
         } else {
             /* If there is no battle, set up interface to generate battle*/
             const button = document.createElement("button");
+            button.className = "fancy";
+            button.style.alignSelf = "center";
             button.innerText = "Generate battle";
             button.onclick = () => generateBattle();
 
@@ -141,7 +143,9 @@ const setupBattle = (allies, enemies) => {
 
     const attackButton = document.createElement("button");
     attackButton.id = "attack-button";
+    attackButton.className = "fancy";
     attackButton.innerText = "Attack";
+    attackButton.style.alignSelf = "center";
     attackButton.onclick = () => attack();
     attackButton.disabled = true;
     main.appendChild(attackButton);
@@ -199,11 +203,13 @@ const generateBattle = async () => {
 
 const attack = async () => {
     const attackButton = document.getElementById("attack-button");
+    attackButton.innerText = "Attack (Loading...)";
     attackButton.classList.add("loading");
     attackButton.disabled = true;
 
     const res = await postBattleAttack(selectedUnits.allyId, selectedUnits.enemyId);
 
+    attackButton.innerText = "Attack";
     attackButton.classList.remove("loading");
     attackButton.disabled = false;
 

@@ -100,6 +100,28 @@ span.sidebar-item-icon {
     border-radius: .25rem;
 }
 
-button.loading {
+button.fancy {
+    cursor: pointer;
+    text-transform: uppercase;
+    padding: 3px 15px;
+    color: white;
+    height: 32px;
+    background-color: #00bcd4;
+    border: none;
+    border-radius: 2px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0 1px 6px, rgba(0, 0, 0, 0.12) 0 1px 4px;
+    transition: all 150ms ease-in;
+}
+
+button.fancy:disabled {
+    cursor: not-allowed;
+    background-color: #cccccc;
+    color: #8a8a8a;
+    border: 1px solid #999999;
+    box-shadow: initial;
+}
+
+button.loading, button.loading.fancy, button.loading.fancy:disabled {
     cursor: wait;
 }
+

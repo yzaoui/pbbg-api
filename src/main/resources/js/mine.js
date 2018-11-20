@@ -251,8 +251,9 @@ const generateMine = async (mineTypeId) => {
 const createExitMineButton = () => {
     const button = document.createElement("button");
     button.id = EXIT_MINE_BUTTON_ID;
-    button.className = "mining-exit-mine";
+    button.className = "fancy";
     button.innerText = "Exit mine";
+    button.style.alignSelf = "center";
     button.onclick = () => exitMine();
 
     return button;
