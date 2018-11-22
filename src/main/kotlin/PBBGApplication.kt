@@ -39,10 +39,21 @@ import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 
 data class ApplicationSession(val userId: Int)
+enum class ApplicationEnvironment {
+    DEV,
+    PROD
+}
 val loggedInUserKey = AttributeKey<User>("loggedInUser")
 val memberPageVM = AttributeKey<MemberPageVM>("memberPageVM")
+lateinit var appEnvironment: ApplicationEnvironment
 
 fun Application.main() {
+    appEnvironment = when (val env = environment.config.property("ktor.environment").getString()) {
+        "dev" -> ApplicationEnvironment.DEV
+        "prod" -> ApplicationEnvironment.PROD
+        else -> throw RuntimeException("Environment (KTOR_ENV) must be either dev or prod.")
+    }
+
     val db = Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
     transaction {
         addLogger(Slf4jSqlDebugLogger)
