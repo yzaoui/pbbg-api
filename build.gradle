@@ -1,6 +1,6 @@
 buildscript {
-    ext.kotlin_version = '1.3.10'
-    ext.ktor_version = '1.0.0'
+    ext.kotlin_version = "1.3.10"
+    ext.ktor_version = "1.0.0"
 
     repositories {
         mavenCentral()
@@ -8,16 +8,16 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
     }
 }
 
-group = 'com.bitwiserain'
-version = '0.0.1'
+group = "com.bitwiserain"
+version = "0.0.1"
 
-apply plugin: 'kotlin'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'application'
+apply plugin: "kotlin"
+apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: "application"
 
 mainClassName = "io.ktor.server.netty.DevelopmentEngine"
 
@@ -58,7 +58,7 @@ compileTestKotlin {
 }
 
 shadowJar {
-    baseName = 'pbbg'
+    baseName = "pbbg"
     classifier = null
     version = null
 }
