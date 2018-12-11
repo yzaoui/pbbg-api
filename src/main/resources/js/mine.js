@@ -23,24 +23,32 @@ let equippedPickaxe;
 let mineActionSubmitting = false;
 
 window.onload = async () => {
-    const main = document.getElementById("main");
+    replaceInterfaceWithText("Loading…");
 
-    const statusMessage = document.createElement("div");
-    statusMessage.innerText = "Loading...";
-    main.appendChild(statusMessage);
+    const res = await getMine();
 
-    const { status, data } = await (await fetch("/api/mine")).json();
+    if (res.status === "success") {
+        /**
+         * @type {?Mine}
+         */
+        const data = res.data;
 
-    statusMessage.parentNode.removeChild(statusMessage);
-
-    if (data !== null) {
-        // Currently in mine session
-        setupMiningInterface(data);
+        if (data !== null) {
+            // Currently in mine session
+            setupMiningInterface(data);
+        } else {
+            // No mine session in progress
+            setupGenerateMineInterface();
+        }
     } else {
-        // No mine session in progress
-        setupGenerateMineInterface();
+        replaceInterfaceWithText("Error.");
     }
 };
+
+/**
+ * On success, returns {@see Mine} or null.
+ */
+const getMine = async () => (await fetch("/api/mine")).json();
 
 const setupMiningInterface = (miningData) => {
     const main = document.getElementById("main");
