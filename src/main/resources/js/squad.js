@@ -1,16 +1,12 @@
-const unitScript = document.createElement("script");
-unitScript.src = "/js/component/pbbg-unit.js";
-document.body.insertAdjacentElement("beforeend", unitScript);
-
 window.onload = async () => {
-    const main = document.getElementById("main");
+    insertScript("/js/component/pbbg-unit.js");
 
-    main.innerText = "Loading squad...";
+    replaceInterfaceWithText("Loading…");
 
     const { status, data } = await (await fetch("/api/squad")).json();
 
     if (status === "success") {
-        main.innerText = "";
+        replaceInterfaceWithText("");
 
         const { units } = data;
 
@@ -20,6 +16,28 @@ window.onload = async () => {
             main.appendChild(el);
         });
     } else {
-        main.innerText = "Error loading squad."
+        replaceInterfaceWithText("Error loading squad.");
     }
+};
+
+/**
+ * @param {string} text
+ */
+const replaceInterfaceWithText = (text) => {
+    const main = document.getElementById("main");
+
+    while (main.hasChildNodes()) {
+        main.removeChild(main.firstChild);
+    }
+
+    main.innerText = text;
+};
+
+/**
+ * @param {string} scriptSrc
+ */
+const insertScript = (scriptSrc) => {
+    const unitScript = document.createElement("script");
+    unitScript.src = scriptSrc;
+    document.body.insertAdjacentElement("beforeend", unitScript);
 };
