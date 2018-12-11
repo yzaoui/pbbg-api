@@ -67,6 +67,7 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
             footer {
                 +"BitwiseRain © 2018"
             }
+            script(src = "/js/helpers.js") {}
             insert(endOfBody)
         }
     }
