@@ -1,3 +1,17 @@
+/**
+ * @typedef {Object} Mine
+ *
+ * @property {number} width - The width of the mine in cells.
+ * @property {number} height - The height of the mine in cells.
+ * @property {MineEntity[][]} cells - 2D array of entities, with indices indicating coordinates.
+ */
+
+/**
+ * @typedef {Object} MineEntity
+ *
+ * @property {string} imageURL - Link to the image of this entity.
+ */
+
 let grid;
 const GRID_WIDTH = 30;
 const GRID_HEIGHT = 20;
