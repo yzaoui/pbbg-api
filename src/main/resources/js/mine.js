@@ -34,9 +34,13 @@
  * @property {number} minLevel - Minimum level requirement to generate this type of mine.
  */
 
-let grid;
-const GRID_WIDTH = 30;
-const GRID_HEIGHT = 20;
+/**
+ * @property {number} width
+ * @property {number} height
+ * @property {HTMLTableDataCellElement[][]} cells
+ */
+let mineInfo;
+
 const MINING_GRID_ID = "mining-grid";
 const GENERATE_MINE_INTERFACE_ID = "generate-mine-container";
 const EXIT_MINE_BUTTON_ID = "exit-mine";
@@ -45,6 +49,7 @@ const MINING_RESULTS_LIST_ID = "mining-results-list";
  * @type {Pickaxe}
  */
 let equippedPickaxe;
+
 /**
  * @type {boolean}
  */
@@ -87,7 +92,14 @@ const setupMiningInterface = (mine) => {
     const main = document.getElementById("main");
 
     main.appendChild(createExitMineButton());
-    main.appendChild(createMiningGrid(mine));
+    const miningGrid = createMiningGrid(mine);
+    main.appendChild(miningGrid);
+
+    mineInfo = {
+        width: mine.width,
+        height: mine.height,
+        cells: [...miningGrid.firstElementChild.children].map(row => [...row.children])
+    };
 
     setupPickaxeAndResultsList();
 };
@@ -208,20 +220,20 @@ const reachableCells = (x, y, gridWidth, gridHeight, targets) => {
 };
 
 const enteredCell = (x, y) => {
-    const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.cells);
+    const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
 
     affectedCells.forEach(cell => {
         const [x, y] = cell;
-        grid[y][x].classList.add("selected-item");
+        mineInfo.cells[y][x].classList.add("selected-item");
     })
 };
 
 const leftCell = (x, y) => {
-    const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.cells);
+    const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
 
     affectedCells.forEach(cell => {
         const [x, y] = cell;
-        grid[y][x].classList.remove("selected-item");
+        mineInfo.cells[y][x].classList.remove("selected-item");
     })
 };
 
@@ -267,11 +279,11 @@ const clickedCell = async (x, y) => {
             appendListItemToResultsList(li);
         });
 
-        const affectedCells = reachableCells(x, y, GRID_WIDTH, GRID_HEIGHT, equippedPickaxe.cells);
+        const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
 
         affectedCells.forEach(cell => {
             const [x, y] = cell;
-            grid[y][x].style = "";
+            mineInfo.cells[y][x].removeAttribute("style");
         });
 
         mineActionSubmitting = false;
@@ -354,7 +366,7 @@ const exitMine = async() => {
 const createMiningGrid = (mine) => {
     const table = document.createElement("table");
     table.id = MINING_GRID_ID;
-    table.classList.add("mining-grid");
+    table.classList.add(MINING_GRID_ID);
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
 
@@ -396,7 +408,6 @@ const setupPickaxeAndResultsList = async () => {
         const data = res.data;
 
         if (data !== null) {
-            const miningGrid = document.getElementById("mining-grid");
             equippedPickaxe = data;
 
             main.appendChild(createEquippedPickaxeDisplay(equippedPickaxe.pickaxeKind));
@@ -406,9 +417,7 @@ const setupPickaxeAndResultsList = async () => {
             resultsList.className = "mining-results-list";
             main.appendChild(resultsList);
 
-            grid = [...miningGrid.firstElementChild.children].map(row => [...row.children]);
-
-            grid.forEach((row, y) => {
+            mineInfo.cells.forEach((row, y) => {
                 row.forEach((cell, x) => {
                     cell.onmouseenter = () => { enteredCell(x, y) };
                     cell.onmouseleave = () => { leftCell(x, y) };
@@ -416,7 +425,8 @@ const setupPickaxeAndResultsList = async () => {
                 });
             });
 
-            miningGrid.classList.add("enabled");
+            // Display mine grid as enabled.
+            document.getElementById(MINING_GRID_ID).classList.add("enabled");
         } else {
             const noPickaxe = document.createElement("div");
             noPickaxe.innerText = "No pickaxe equipped. Go to your inventory and equip one.";
