@@ -414,7 +414,7 @@ const setupPickaxeAndResultsList = async () => {
 
             const resultsList = document.createElement("ul");
             resultsList.id = MINING_RESULTS_LIST_ID;
-            resultsList.className = "mining-results-list";
+            resultsList.className = MINING_RESULTS_LIST_ID;
             main.appendChild(resultsList);
 
             mineInfo.cells.forEach((row, y) => {

@@ -1,26 +1,57 @@
+/**
+ * @typedef {Object} Inventory
+ *
+ * @property {InventoryItem[]} items
+ * @property {Equipment} equipment
+ */
+
+/**
+ * @typedef {Object} InventoryItem
+ *
+ * @property {number} id
+ * @property {Item} item
+ */
+
+/**
+ * @typedef {Object} Equipment
+ *
+ * @property {?Item} pickaxe
+ */
+
+/**
+ * @typedef {Object} Item
+ *
+ * @property {number} baseId
+ * @property {string} friendlyName
+ * @property {string} imgURL
+ * @property {?number} quantity
+ * @property {string} description
+ * @property {?boolean} equipped
+ */
+
 window.onload = async () => {
     const main = document.getElementById("main");
 
-    const loadingMessage = document.createElement("div");
-    loadingMessage.innerText = "Loading...";
-    main.appendChild(loadingMessage);
+    replaceInterfaceWithText("Loading…");
 
-    const { status, data: { items, equipment } } = await (await fetch("/api/inventory")).json();
+    const res = await getInventory();
 
-    /* Show equipment */
-    const equipmentDisplay = createEquipmentDisplay(equipment);
-    main.appendChild(equipmentDisplay);
+    if (res.status === "success") {
+        replaceInterfaceWithText("");
 
-    if (items.length === 0) {
-        const noItems = document.createElement("div");
-        noItems.innerText = "You have no items. Try looking around for some!";
-        main.appendChild(noItems);
-    } else {
+        /**
+         * @type {Inventory}
+         */
+        const data = res.data;
+
+        /* Show equipment */
+        main.appendChild(createEquipmentDisplay(data.equipment));
+
         const itemList = document.createElement("ul");
         itemList.className = "inventory-list";
         main.appendChild(itemList);
 
-        items.forEach(({ id, item }) => {
+        for (const {id, item} of data.items) {
             const li = document.createElement("li");
             li.className = "inventory-list-item";
 
@@ -44,37 +75,48 @@ window.onload = async () => {
             li.appendChild(itemInfo);
 
             itemList.appendChild(li);
-        });
+        }
+    } else {
+        replaceInterfaceWithText("Error.");
     }
-
-    main.removeChild(loadingMessage);
 };
 
-const createItemTooltip = (itemId, { description, friendlyName, quantity, equipped }) => {
+/**
+ * On success, returns {@see Inventory}.
+ */
+const getInventory = async () => (await fetch("/api/inventory")).json();
+
+/**
+ * @param {number} itemId
+ * @param {Item} item
+ *
+ * @returns {HTMLDivElement}
+ */
+const createItemTooltip = (itemId, item) => {
     const container = document.createElement("div");
     container.className = "inventory-list-item-tooltip";
 
     const itemName = document.createElement("div");
-    itemName.innerText = friendlyName;
+    itemName.innerText = item.friendlyName;
     container.appendChild(itemName);
 
-    if (quantity !== null) {
+    if (item.quantity !== null) {
         container.appendChild(document.createElement("hr"));
 
         const quantityDiv = document.createElement("div");
-        quantityDiv.innerText = `Quantity: ${quantity}`;
+        quantityDiv.innerText = `Quantity: ${item.quantity}`;
         container.appendChild(quantityDiv);
     }
 
-    if (equipped !== null) {
+    if (item.equipped !== null) {
         container.appendChild(document.createElement("hr"));
 
         const equipActionButton = document.createElement("button");
 
-        if (equipped === true) {
+        if (item.equipped === true) {
             equipActionButton.innerText = "Unequip";
             equipActionButton.onclick = () => unequip(itemId);
-        } else if (equipped === false) {
+        } else if (item.equipped === false) {
             equipActionButton.innerText = "Equip";
             equipActionButton.onclick = () => equip(itemId);
         }
@@ -85,7 +127,7 @@ const createItemTooltip = (itemId, { description, friendlyName, quantity, equipp
     container.appendChild(document.createElement("hr"));
 
     const descriptionDiv = document.createElement("div");
-    descriptionDiv.innerText = description;
+    descriptionDiv.innerText = item.description;
     container.appendChild(descriptionDiv);
 
     return container;
