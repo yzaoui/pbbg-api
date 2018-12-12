@@ -12,6 +12,13 @@
  * @property {string} imageURL - Link to the image of this entity.
  */
 
+/**
+ * @typedef {Object} Pickaxe
+ *
+ * @property {string} pickaxeKind - Name of this pickaxe's kind.
+ * @property {number[][]} cells - Cells that this pickaxe can reach, in the form of [x, y] coordinates, relative to [0, 0].
+ */
+
 let grid;
 const GRID_WIDTH = 30;
 const GRID_HEIGHT = 20;
@@ -19,7 +26,13 @@ const MINING_GRID_ID = "mining-grid";
 const GENERATE_MINE_INTERFACE_ID = "generate-mine-container";
 const EXIT_MINE_BUTTON_ID = "exit-mine";
 const MINING_RESULTS_LIST_ID = "mining-results-list";
+/**
+ * @type {Pickaxe}
+ */
 let equippedPickaxe;
+/**
+ * @type {boolean}
+ */
 let mineActionSubmitting = false;
 
 window.onload = async () => {
@@ -28,6 +41,8 @@ window.onload = async () => {
     const res = await getMine();
 
     if (res.status === "success") {
+        replaceInterfaceWithText("");
+
         /**
          * @type {?Mine}
          */
@@ -325,45 +340,62 @@ const createMiningGrid = ({ width, height, cells }) => {
     return table;
 };
 
+/**
+ * @param {string} pickaxeName
+ * @returns {HTMLDivElement}
+ */
 const createEquippedPickaxeDisplay = (pickaxeName) => {
     const div = document.createElement("div");
-    div.innerText = "Equipped pickaxe: " + pickaxeName;
+    div.innerText = `Equipped pickaxe: ${pickaxeName}`;
 
     return div;
 };
 
 const setupPickaxeAndResultsList = async () => {
-    const { status, data } = await (await fetch("/api/pickaxe")).json();
+    const res = await getPickaxe();
+
     const main = document.getElementById("main");
 
-    if (data !== null) {
-        const miningGrid = document.getElementById("mining-grid");
-        equippedPickaxe = data;
+    if (res.status === "success") {
+        /**
+         * @type {?Pickaxe}
+         */
+        const data = res.data;
 
-        main.appendChild(createEquippedPickaxeDisplay(equippedPickaxe.pickaxeKind));
+        if (data !== null) {
+            const miningGrid = document.getElementById("mining-grid");
+            equippedPickaxe = data;
 
-        const resultsList = document.createElement("ul");
-        resultsList.id = MINING_RESULTS_LIST_ID;
-        resultsList.className = "mining-results-list";
-        main.appendChild(resultsList);
+            main.appendChild(createEquippedPickaxeDisplay(equippedPickaxe.pickaxeKind));
 
-        grid = [...miningGrid.firstElementChild.children].map(row => [...row.children]);
+            const resultsList = document.createElement("ul");
+            resultsList.id = MINING_RESULTS_LIST_ID;
+            resultsList.className = "mining-results-list";
+            main.appendChild(resultsList);
 
-        grid.forEach((row, y) => {
-            row.forEach((cell, x) => {
-                cell.onmouseenter = () => { enteredCell(x, y) };
-                cell.onmouseleave = () => { leftCell(x, y) };
-                cell.onclick = () => { clickedCell(x, y) };
+            grid = [...miningGrid.firstElementChild.children].map(row => [...row.children]);
+
+            grid.forEach((row, y) => {
+                row.forEach((cell, x) => {
+                    cell.onmouseenter = () => { enteredCell(x, y) };
+                    cell.onmouseleave = () => { leftCell(x, y) };
+                    cell.onclick = () => { clickedCell(x, y) };
+                });
             });
-        });
 
-        miningGrid.classList.add("enabled");
-    } else {
-        const noPickaxe = document.createElement("div");
-        noPickaxe.innerText = "No pickaxe equipped. Go to your inventory and equip one.";
-        main.appendChild(noPickaxe);
+            miningGrid.classList.add("enabled");
+        } else {
+            const noPickaxe = document.createElement("div");
+            noPickaxe.innerText = "No pickaxe equipped. Go to your inventory and equip one.";
+            main.appendChild(noPickaxe);
+        }
     }
 };
+
+/**
+ * On success, returns {@see ?Pickaxe}
+ */
+const getPickaxe = async () => (await fetch("/api/pickaxe")).json();
 
 const appendListItemToResultsList = (li) => {
     const list = document.getElementById(MINING_RESULTS_LIST_ID);

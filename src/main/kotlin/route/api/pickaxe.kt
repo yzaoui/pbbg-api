@@ -8,7 +8,6 @@ import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.view.model.mine.PickaxeJSON
 import io.ktor.application.call
-import io.ktor.locations.Location
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
