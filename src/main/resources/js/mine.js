@@ -19,6 +19,21 @@
  * @property {number[][]} cells - Cells that this pickaxe can reach, in the form of [x, y] coordinates, relative to [0, 0].
  */
 
+/**
+ * @typedef {Object} MineTypeList
+ *
+ * @property {MineType[]} types - Individual mine types.
+ * @property {?number} nextUnlockLevel - Next level to unlock a new mine, if any.
+ */
+
+/**
+ * @typedef {Object} MineType
+ *
+ * @property {number} id - Mine type's ID.
+ * @property {string} name - Mine type's name.
+ * @property {number} minLevel - Minimum level requirement to generate this type of mine.
+ */
+
 let grid;
 const GRID_WIDTH = 30;
 const GRID_HEIGHT = 20;
@@ -65,14 +80,14 @@ window.onload = async () => {
  */
 const getMine = async () => (await fetch("/api/mine")).json();
 
-const setupMiningInterface = (miningData) => {
+/**
+ * @param {Mine} mine
+ */
+const setupMiningInterface = (mine) => {
     const main = document.getElementById("main");
 
-    const exitMineButton = createExitMineButton();
-    main.appendChild(exitMineButton);
-
-    const mine = createMiningGrid(miningData);
-    main.appendChild(mine);
+    main.appendChild(createExitMineButton());
+    main.appendChild(createMiningGrid(mine));
 
     setupPickaxeAndResultsList();
 };
@@ -86,12 +101,13 @@ const setupGenerateMineInterface = async () => {
     table.innerText = "Loading list of mines...";
     main.appendChild(table);
 
-    const mineTypesRequest = fetch("/api/mine/types");
+    const res = await getMineTypes();
 
-    const mineTypesResponse = await (await mineTypesRequest).json();
-
-    if (mineTypesResponse.status === "success") {
-        const { types: mineTypes, nextUnlockLevel } = mineTypesResponse.data;
+    if (res.status === "success") {
+        /**
+         * @typedef {MineTypeList}
+         */
+        const data = res.data;
 
         table.innerText = "";
 
@@ -116,15 +132,20 @@ const setupGenerateMineInterface = async () => {
         const tbody = document.createElement("tbody");
         table.appendChild(tbody);
 
-        mineTypes.forEach(mine => {
+        data.types.forEach(mine => {
             tbody.appendChild(createAvailableMineRow(mine));
         });
 
-        if (nextUnlockLevel !== null) {
-            tbody.appendChild(createMineToUnlockRow(nextUnlockLevel))
+        if (data.nextUnlockLevel !== null) {
+            tbody.appendChild(createMineToUnlockRow(data.nextUnlockLevel))
         }
     }
 };
+
+/**
+ * On success, returns {@see MineTypeList}.
+ */
+const getMineTypes = async () => (await fetch("/api/mine/types")).json();
 
 const createAvailableMineRow = ({ id, name, minLevel }) => {
     const tr = document.createElement("tr");
@@ -266,15 +287,7 @@ const generateMine = async (mineTypeId) => {
 
     mineListContainer.innerText = "Loading mine...";
 
-    const { status, data } = await (await fetch("/api/mine/generate", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        },
-        body: JSON.stringify({
-            mineTypeId: mineTypeId
-        })
-    })).json();
+    const { status, data } = await postGenerateMine(mineTypeId);
 
     if (status === "success") {
         mineListContainer.parentNode.removeChild(mineListContainer);
@@ -284,6 +297,21 @@ const generateMine = async (mineTypeId) => {
         //TODO: Display error
     }
 };
+
+/**
+ * On success, returns {@see Mine}
+ *
+ * @param {number} mineTypeId
+ */
+const postGenerateMine = async (mineTypeId) => (await fetch("/api/mine/generate", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json; charset=utf-8"
+    },
+    body: JSON.stringify({
+        mineTypeId: mineTypeId
+    })
+})).json();
 
 const createExitMineButton = () => {
     const button = document.createElement("button");
@@ -319,23 +347,28 @@ const exitMine = async() => {
     }
 };
 
-const createMiningGrid = ({ width, height, cells }) => {
+/**
+ * @param {Mine} mine
+ * @returns {HTMLTableElement}
+ */
+const createMiningGrid = (mine) => {
     const table = document.createElement("table");
     table.id = MINING_GRID_ID;
     table.classList.add("mining-grid");
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
-    cells.forEach(row => {
+
+    for (const row of mine.cells) {
         const tr = document.createElement("tr");
-        row.forEach(cell => {
+        for (const cell of row) {
             const td = document.createElement("td");
             if (cell !== null) {
                 td.style.backgroundImage = `url("${cell.imageURL}")`
             }
             tr.appendChild(td);
-        });
+        }
         tbody.appendChild(tr);
-    });
+    }
 
     return table;
 };
