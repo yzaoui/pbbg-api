@@ -90,7 +90,7 @@ const getInventory = async () => (await fetch("/api/inventory")).json();
  * @param {number} itemId
  * @param {Item} item
  *
- * @returns {HTMLDivElement}
+ * @returns {HTMLElement}
  */
 const createItemTooltip = (itemId, item) => {
     const container = document.createElement("div");
@@ -133,34 +133,43 @@ const createItemTooltip = (itemId, item) => {
     return container;
 };
 
+/**
+ * @param {number} itemId
+ */
 const equip = async (itemId) => {
-    const {status, data} = await (await fetch("/api/inventory/equipment?action=equip", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        },
-        body: JSON.stringify({
-            inventoryItemId: itemId
-        })
-    })).json();
+    const res = await postEquipmentAction(itemId, "equip");
 
-    if (status === "success") location.reload();
+    if (res.status === "success") location.reload();
 };
 
+/**
+ * @param {number} itemId
+ */
 const unequip = async (itemId) => {
-    const {status, data} = await (await fetch("/api/inventory/equipment?action=unequip", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        },
-        body: JSON.stringify({
-            inventoryItemId: itemId
-        })
-    })).json();
+    const res = await postEquipmentAction(itemId, "unequip");
 
-    if (status === "success") location.reload();
+    if (res.status === "success") location.reload();
 };
 
+/**
+ * @param {number} inventoryItemId
+ * @param {("equip"|"unequip")} action
+ */
+const postEquipmentAction = async (inventoryItemId, action) => (await fetch(`/api/inventory/equipment?action=${action}`, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json; charset=utf-8"
+    },
+    body: JSON.stringify({
+        inventoryItemId: inventoryItemId
+    })
+})).json();
+
+/**
+ * @param {number} quantity
+ *
+ * @returns {HTMLElement}
+ */
 const createItemQuantityDisplay = (quantity) => {
     const span = document.createElement("span");
     span.className = "inventory-list-item-quantity";
@@ -169,6 +178,9 @@ const createItemQuantityDisplay = (quantity) => {
     return span
 };
 
+/**
+ * @returns {HTMLElement}
+ */
 const createItemEquippedDisplay = () => {
     const span = document.createElement("span");
     span.className = "inventory-list-item-equipped";
@@ -178,6 +190,11 @@ const createItemEquippedDisplay = () => {
     return span;
 };
 
+/**
+ * @param {Equipment} equipment
+ *
+ * @returns {HTMLElement}
+ */
 const createEquipmentDisplay = (equipment) => {
     const container = document.createElement("div");
     container.className = "equipment-display";
