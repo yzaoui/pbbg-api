@@ -194,14 +194,14 @@ const createMineToUnlockRow = (nextUnlockLevel) => {
 const reachableCells = (x, y, gridWidth, gridHeight, targets) => {
     let cells = [];
 
-    targets.forEach(target => {
+    for (const target of targets) {
         const newX = x + target[0];
         const newY = y + target[1];
 
         if (newX >= 0 && newX < gridWidth && newY >= 0 && newY < gridHeight) {
             cells.push([newX, newY]);
         }
-    });
+    }
 
     return cells;
 };
@@ -209,62 +209,67 @@ const reachableCells = (x, y, gridWidth, gridHeight, targets) => {
 const enteredCell = (x, y) => {
     const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
 
-    affectedCells.forEach(cell => {
+    for (const cell of affectedCells) {
         const [x, y] = cell;
         mineInfo.cells[y][x].classList.add("selected-item");
-    })
+    }
 };
 
 const leftCell = (x, y) => {
     const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
 
-    affectedCells.forEach(cell => {
+    for (const cell of affectedCells) {
         const [x, y] = cell;
         mineInfo.cells[y][x].classList.remove("selected-item");
-    })
+    }
 };
 
 const clickedCell = async (x, y) => {
     if (!mineActionSubmitting) {
         mineActionSubmitting = true;
 
-        const {status, data: results} = await postPerformMine(x, y);
+        const res = await postPerformMine(x, y);
 
-        const { minedItemResults, levelUps } = results;
+        if (res.status === "success") {
+            /**
+             * @type {MineActionResult}
+             */
+            const data = res.data;
 
-        minedItemResults.forEach(({ item: { friendlyName, imgURL, quantity }, expPerIndividualItem}) => {
-            const li = document.createElement("li");
-            if (quantity !== null) {
-                li.appendChild(document.createTextNode("Obtained "));
+            for (const { item: { friendlyName, imgURL, quantity }, expPerIndividualItem } of data.minedItemResults) {
+                const li = document.createElement("li");
+                if (quantity !== null) {
+                    li.appendChild(document.createTextNode("Obtained "));
 
-                const itemImg = document.createElement("img");
-                itemImg.src = imgURL;
-                li.appendChild(itemImg);
+                    const itemImg = document.createElement("img");
+                    itemImg.src = imgURL;
+                    li.appendChild(itemImg);
 
-                li.appendChild(document.createTextNode(` [${friendlyName}] ×${quantity} (+${expPerIndividualItem * quantity} exp)`));
-            } else {
-                li.textContent = `Obtained ${friendlyName} (+${expPerIndividualItem} exp)`;
+                    li.appendChild(document.createTextNode(` [${friendlyName}] ×${quantity} (+${expPerIndividualItem * quantity} exp)`));
+                } else {
+                    li.textContent = `Obtained ${friendlyName} (+${expPerIndividualItem} exp)`;
+                }
+
+                appendListItemToResultsList(li);
             }
 
-            appendListItemToResultsList(li);
-        });
+            for (const { newLevel, additionalMessage } of data.levelUps) {
+                const li = document.createElement("li");
+                li.className = "mining-results-level-up";
+                li.textContent = `Mining levelled up to level ${newLevel}!` + (additionalMessage !== null ? ` ${additionalMessage}` : "");
 
-        levelUps.forEach(({ newLevel, additionalMessage }) => {
-            const li = document.createElement("li");
-            li.className = "mining-results-level-up";
-            li.textContent = `Mining levelled up to level ${newLevel}!` + (additionalMessage !== null ? ` ${additionalMessage}` : "");
+                appendListItemToResultsList(li);
+            }
 
-            appendListItemToResultsList(li);
-        });
+            const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
 
-        const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
+            for (const cell of affectedCells) {
+                const [x, y] = cell;
+                mineInfo.cells[y][x].removeAttribute("style");
+            }
 
-        affectedCells.forEach(cell => {
-            const [x, y] = cell;
-            mineInfo.cells[y][x].removeAttribute("style");
-        });
-
-        mineActionSubmitting = false;
+            mineActionSubmitting = false;
+        }
     }
 };
 
@@ -304,9 +309,9 @@ const exitMine = async() => {
     exitMineButton.disabled = true;
     exitMineButton.classList.add("loading");
 
-    const { status, data } = await postMineExit();
+    const res = await postMineExit();
 
-    if (status === "success") {
+    if (res.status === "success") {
         // Remove mining grid
         const miningGrid = document.getElementById(MINING_GRID_ID);
         miningGrid.parentNode.removeChild(miningGrid);
@@ -360,9 +365,9 @@ const createEquippedPickaxeDisplay = (pickaxeName) => {
 };
 
 const setupPickaxeAndResultsList = async () => {
-    const res = await getPickaxe();
-
     const main = document.getElementById("main");
+
+    const res = await getPickaxe();
 
     if (res.status === "success") {
         /**
@@ -398,6 +403,9 @@ const setupPickaxeAndResultsList = async () => {
     }
 };
 
+/**
+ * @param {HTMLLIElement} li
+ */
 const appendListItemToResultsList = (li) => {
     const list = document.getElementById(MINING_RESULTS_LIST_ID);
 
