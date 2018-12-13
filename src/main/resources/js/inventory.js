@@ -55,24 +55,19 @@ window.onload = async () => {
             const li = document.createElement("li");
             li.className = "inventory-list-item";
 
-            const itemImg = document.createElement("img");
-            itemImg.src = item.imgURL;
-            li.appendChild(itemImg);
+            li.insertAdjacentHTML("beforeend", `<img src="${item.imgURL}">`);
 
             if (item.quantity !== null) {
-                const itemQuantity = createItemQuantityDisplay(item.quantity);
-                li.appendChild(itemQuantity);
+                li.appendChild(createItemQuantityDisplay(item.quantity));
             }
 
             if (item.equipped !== null) {
                 if (item.equipped === true) {
-                    const itemEquipped = createItemEquippedDisplay();
-                    li.appendChild(itemEquipped);
+                    li.appendChild(createItemEquippedDisplay());
                 }
             }
 
-            const itemInfo = createItemTooltip(id, item);
-            li.appendChild(itemInfo);
+            li.appendChild(createItemTooltip(id, item));
 
             itemList.appendChild(li);
         }
@@ -96,27 +91,21 @@ const createItemTooltip = (itemId, item) => {
     const container = document.createElement("div");
     container.className = "inventory-list-item-tooltip";
 
-    const itemName = document.createElement("div");
-    itemName.innerText = item.friendlyName;
-    container.appendChild(itemName);
+    container.insertAdjacentHTML("beforeend", `<div>${item.friendlyName}</div>`);
 
     if (item.quantity !== null) {
-        container.appendChild(document.createElement("hr"));
-
-        const quantityDiv = document.createElement("div");
-        quantityDiv.innerText = `Quantity: ${item.quantity}`;
-        container.appendChild(quantityDiv);
+        container.insertAdjacentHTML("beforeend", `<hr><div>Quantity: ${item.quantity}</div>`);
     }
 
     if (item.equipped !== null) {
-        container.appendChild(document.createElement("hr"));
+        container.insertAdjacentHTML("beforeend", `<hr>`);
 
         const equipActionButton = document.createElement("button");
 
-        if (item.equipped === true) {
+        if (item.equipped) {
             equipActionButton.innerText = "Unequip";
             equipActionButton.onclick = () => unequip(itemId);
-        } else if (item.equipped === false) {
+        } else {
             equipActionButton.innerText = "Equip";
             equipActionButton.onclick = () => equip(itemId);
         }
@@ -124,11 +113,7 @@ const createItemTooltip = (itemId, item) => {
         container.appendChild(equipActionButton);
     }
 
-    container.appendChild(document.createElement("hr"));
-
-    const descriptionDiv = document.createElement("div");
-    descriptionDiv.innerText = item.description;
-    container.appendChild(descriptionDiv);
+    container.insertAdjacentHTML("beforeend", `<hr><div>${item.description}</div>`);
 
     return container;
 };
@@ -199,9 +184,7 @@ const createEquipmentDisplay = (equipment) => {
     const container = document.createElement("div");
     container.className = "equipment-display";
 
-    const playerImg = document.createElement("img");
-    playerImg.src = "/img/inventory/player.png";
-    container.appendChild(playerImg);
+    container.insertAdjacentHTML("beforeend", `<img src="/img/inventory/player.png">`);
 
     const equippedPickaxeContainer = document.createElement("div");
     equippedPickaxeContainer.className = "equipment-pickaxe-slot";
