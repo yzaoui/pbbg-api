@@ -35,6 +35,27 @@
  */
 
 /**
+ * @typedef {Object} MineActionResult
+ *
+ * @property {MinedItemResult[]} minedItemResults
+ * @property {LevelUp[]} levelUps
+ */
+
+/**
+ * @typedef {Object} MinedItemResult
+ *
+ * @property {Item} item
+ * @property {number} expPerIndividualItem
+ */
+
+/**
+ * @typedef {Object} LevelUp
+ *
+ * @property {number} newLevel
+ * @property {?string} additionalMessage
+ */
+
+/**
  * @property {number} width
  * @property {number} height
  * @property {HTMLTableDataCellElement[][]} cells
@@ -79,11 +100,6 @@ window.onload = async () => {
         replaceInterfaceWithText("Error.");
     }
 };
-
-/**
- * On success, returns {@see Mine} or null.
- */
-const getMine = async () => (await fetch("/api/mine")).json();
 
 /**
  * @param {Mine} mine
@@ -137,11 +153,6 @@ const setupGenerateMineInterface = async () => {
         }
     }
 };
-
-/**
- * On success, returns {@see MineTypeList}.
- */
-const getMineTypes = async () => (await fetch("/api/mine/types")).json();
 
 /**
  * @param {MineType} mineType
@@ -217,16 +228,7 @@ const clickedCell = async (x, y) => {
     if (!mineActionSubmitting) {
         mineActionSubmitting = true;
 
-        const {status, data: results} = await (await fetch("/api/mine/perform", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json; charset=utf-8"
-            },
-            body: JSON.stringify({
-                x: x,
-                y: y
-            })
-        })).json();
+        const {status, data: results} = await postPerformMine(x, y);
 
         const { minedItemResults, levelUps } = results;
 
@@ -285,21 +287,6 @@ const generateMine = async (mineTypeId) => {
     }
 };
 
-/**
- * On success, returns {@see Mine}
- *
- * @param {number} mineTypeId
- */
-const postGenerateMine = async (mineTypeId) => (await fetch("/api/mine/generate", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json; charset=utf-8"
-    },
-    body: JSON.stringify({
-        mineTypeId: mineTypeId
-    })
-})).json();
-
 const createExitMineButton = () => {
     const button = document.createElement("button");
     button.id = EXIT_MINE_BUTTON_ID;
@@ -317,7 +304,8 @@ const exitMine = async() => {
     exitMineButton.disabled = true;
     exitMineButton.classList.add("loading");
 
-    const { status, data } = await (await fetch("/api/mine/exit", { method: "POST" })).json();
+    const { status, data } = await postMineExit();
+
     if (status === "success") {
         // Remove mining grid
         const miningGrid = document.getElementById(MINING_GRID_ID);
@@ -410,11 +398,6 @@ const setupPickaxeAndResultsList = async () => {
     }
 };
 
-/**
- * On success, returns {@see ?Pickaxe}
- */
-const getPickaxe = async () => (await fetch("/api/pickaxe")).json();
-
 const appendListItemToResultsList = (li) => {
     const list = document.getElementById(MINING_RESULTS_LIST_ID);
 
@@ -426,3 +409,59 @@ const appendListItemToResultsList = (li) => {
         list.scrollTop = list.scrollHeight;
     }
 };
+
+/**************************************************
+ *                  API REQUESTS                  *
+ **************************************************/
+
+/**
+ * On success, returns {@see Mine} or null.
+ */
+const getMine = async () => (await fetch("/api/mine")).json();
+
+/**
+ * On success, returns {@see MineTypeList}.
+ */
+const getMineTypes = async () => (await fetch("/api/mine/types")).json();
+
+/**
+ * On success, returns {@see Mine}
+ *
+ * @param {number} mineTypeId
+ */
+const postGenerateMine = async (mineTypeId) => (await fetch("/api/mine/generate", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json; charset=utf-8"
+    },
+    body: JSON.stringify({
+        mineTypeId: mineTypeId
+    })
+})).json();
+
+/**
+ * On success, returns {@see ?Pickaxe}
+ */
+const getPickaxe = async () => (await fetch("/api/pickaxe")).json();
+
+/**
+ * On success, returns {@see MineActionResult}
+ *
+ * @param {number} x
+ * @param {number} y
+ */
+const postPerformMine = async (x, y) => (await fetch("/api/mine/perform", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json; charset=utf-8"
+    },
+    body: JSON.stringify({
+        x: x,
+        y: y
+    })
+})).json();
+
+/**
+ * On success, returns null.
+ */
+const postMineExit = async () => (await fetch("/api/mine/exit", { method: "POST" })).json();
