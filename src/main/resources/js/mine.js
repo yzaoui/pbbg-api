@@ -123,30 +123,14 @@ const setupGenerateMineInterface = async () => {
 
         table.innerText = "";
 
-        const thead = document.createElement("thead");
-        table.appendChild(thead);
-
-        const headerRow = document.createElement("tr");
-        thead.appendChild(headerRow);
-
-        const nameHeader = document.createElement("th");
-        nameHeader.innerText = "Mine name";
-        headerRow.appendChild(nameHeader);
-
-        const minLevelHeader = document.createElement("th");
-        minLevelHeader.innerText = "Minimum lvl.";
-        headerRow.appendChild(minLevelHeader);
-
-        const generateHeader = document.createElement("th");
-        generateHeader.innerText = "Generate mine";
-        headerRow.appendChild(generateHeader);
+        table.insertAdjacentHTML("beforeend", `<thead><tr><th>Mine name</th><th>Minimum lvl.</th><th>Generate mine</th></tr></thead>`);
 
         const tbody = document.createElement("tbody");
         table.appendChild(tbody);
 
-        data.types.forEach(mine => {
-            tbody.appendChild(createAvailableMineRow(mine));
-        });
+        for (const mineType of data.types) {
+            tbody.appendChild(createAvailableMineRow(mineType));
+        }
 
         if (data.nextUnlockLevel !== null) {
             tbody.appendChild(createMineToUnlockRow(data.nextUnlockLevel))
@@ -159,21 +143,19 @@ const setupGenerateMineInterface = async () => {
  */
 const getMineTypes = async () => (await fetch("/api/mine/types")).json();
 
-const createAvailableMineRow = ({ id, name, minLevel }) => {
+/**
+ * @param {MineType} mineType
+ * @returns {HTMLElement}
+ */
+const createAvailableMineRow = (mineType) => {
     const tr = document.createElement("tr");
 
-    const nameTd = document.createElement("td");
-    nameTd.innerText = name;
-    tr.appendChild(nameTd);
-
-    const minimumLvlTd = document.createElement("td");
-    minimumLvlTd.innerText = minLevel;
-    tr.appendChild(minimumLvlTd);
+    tr.insertAdjacentHTML("beforeend", `<td>${mineType.name}</td><td>${mineType.minLevel}</td>`);
 
     const button = document.createElement("button");
     button.className = "mining-generate-mine";
     button.innerText = "Generate";
-    button.onclick = () => generateMine(id);
+    button.onclick = () => generateMine(mineType.id);
     const generateTd = document.createElement("td");
     generateTd.appendChild(button);
     tr.appendChild(generateTd);
@@ -185,13 +167,7 @@ const createMineToUnlockRow = (nextUnlockLevel) => {
     const tr = document.createElement("tr");
     tr.className = "unmet-minimum-level";
 
-    const nameTd = document.createElement("td");
-    nameTd.innerText = "???";
-    tr.appendChild(nameTd);
-
-    const minimumLvlTd = document.createElement("td");
-    minimumLvlTd.innerText = nextUnlockLevel;
-    tr.appendChild(minimumLvlTd);
+    tr.insertAdjacentHTML("beforeend", `<td>???</td><td>${nextUnlockLevel}</td>`);
 
     const button = document.createElement("button");
     button.className = "mining-generate-mine";
@@ -291,22 +267,21 @@ const clickedCell = async (x, y) => {
 };
 
 const generateMine = async (mineTypeId) => {
-    const mineListContainer = document.getElementById(GENERATE_MINE_INTERFACE_ID);
+    replaceInterfaceWithText("Generating mine…");
 
-    while (mineListContainer.hasChildNodes()) {
-        mineListContainer.removeChild(mineListContainer.firstChild);
-    }
+    const res = await postGenerateMine(mineTypeId);
 
-    mineListContainer.innerText = "Loading mine...";
+    if (res.status === "success") {
+        replaceInterfaceWithText("");
 
-    const { status, data } = await postGenerateMine(mineTypeId);
-
-    if (status === "success") {
-        mineListContainer.parentNode.removeChild(mineListContainer);
+        /**
+         * @type {Mine}
+         */
+        const data = res.data;
 
         setupMiningInterface(data);
     } else {
-        //TODO: Display error
+        replaceInterfaceWithText("Error generating mine.");
     }
 };
 
