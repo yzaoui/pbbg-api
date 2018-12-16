@@ -1,25 +1,52 @@
-const unitScript = document.createElement("script");
-unitScript.src = "/js/component/pbbg-unit.js";
-document.body.insertAdjacentElement("beforeend", unitScript);
+/**
+ * @typedef {Object} Squad
+ *
+ * @property {MyUnit[]} units
+ */
+
+/**
+ * @typedef {Object} MyUnit
+ *
+ * @property {number} id
+ * @property {string} name
+ * @property {number} baseUnitId
+ * @property {number} hp
+ * @property {number} maxHP
+ * @property {number} atk
+ * @property {LevelProgress} levelProgress
+ * @property {string} idleAnimationURL
+ */
 
 window.onload = async () => {
-    const main = document.getElementById("main");
+    insertScript("/js/webcomponents-bundle-2.0.0.js");
+    insertScript("/js/component/pbbg-progress-bar.js");
+    insertScript("/js/component/pbbg-unit.js");
 
-    main.innerText = "Loading squad...";
+    replaceInterfaceWithText("Loading…");
 
-    const { status, data } = await (await fetch("/api/squad")).json();
+    const res = await (await fetch("/api/squad")).json();
 
-    if (status === "success") {
-        main.innerText = "";
+    if (res.status === "success") {
+        replaceInterfaceWithText("");
 
-        const { units } = data;
+        /**
+         * @type {Squad}
+         */
+        const data = res.data;
 
-        units.forEach(unit => {
+        for (const unit of data.units) {
             const el = document.createElement("pbbg-unit");
-            el.unit = unit;
+            el.unit = {
+                name: unit.name,
+                hp: unit.hp,
+                maxHP: unit.maxHP,
+                atk: unit.atk,
+                levelProgress: unit.levelProgress,
+                idleAnimationURL: unit.idleAnimationURL
+            };
             main.appendChild(el);
-        });
+        }
     } else {
-        main.innerText = "Error loading squad."
+        replaceInterfaceWithText("Error loading squad.");
     }
 };

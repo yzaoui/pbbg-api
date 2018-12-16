@@ -1,31 +1,25 @@
 const setup = async () => {
-    const main = document.getElementById("main");
-    main.innerText = "Loading...";
+    insertScript("/js/webcomponents-bundle-2.0.0.js");
+    insertScript("/js/component/pbbg-progress-bar.js");
+
+    replaceInterfaceWithText("Loading…");
 
     const res = await (await fetch("/api/user")).json();
 
     if (res.status === "success") {
-        main.innerText = "";
+        replaceInterfaceWithText("");
 
         const { mining } = res.data;
 
-        const div = document.createElement("div");
-        main.appendChild(div);
-
-        const levelSpan = document.createElement("span");
-        levelSpan.innerText = `Mining Level ${mining.level}`;
-        div.appendChild(levelSpan);
-
-        const progressBar = document.createElement("pbbg-progress-bar");
-        progressBar.max = mining.relativeExpToNextLevel;
-        progressBar.value = mining.relativeExp;
-        div.appendChild(progressBar);
-
-        const expSpan = document.createElement("span");
-        expSpan.innerText = `${mining.relativeExp} / ${mining.relativeExpToNextLevel} Exp.`;
-        div.appendChild(expSpan);
+        main.innerHTML = `
+<div>
+    <span>Mining Level ${mining.level}</span>
+    <pbbg-progress-bar max="${mining.relativeExpToNextLevel}" value="${mining.relativeExp}"></pbbg-progress-bar>
+    <span>${mining.relativeExp} / ${mining.relativeExpToNextLevel} Exp.</span>
+</div>        
+`;
     } else {
-        main.innerText = "Error";
+        main.innerText = "Error.";
     }
 };
 

@@ -23,17 +23,21 @@ const selectedUnits = {
 };
 
 window.onload = async () => {
-    main.innerText = "Loading battle session...";
+    insertScript("/js/webcomponents-bundle-2.0.0.js");
+    insertScript("/js/component/pbbg-progress-bar.js");
+    insertScript("/js/component/pbbg-unit.js");
+
+    replaceInterfaceWithText("Loading…");
 
     const res = await getBattleSession();
 
     if (res.status === "success") {
+        replaceInterfaceWithText("");
+
         /**
          * @type {?BattleSession}
          */
         const data = res.data;
-
-        main.innerText = "";
 
         if (data !== null) {
             /* If there is a battle, set up battle interface*/
@@ -49,46 +53,6 @@ window.onload = async () => {
             main.appendChild(button);
         }
     }
-};
-
-/**
- * On success, returns {@see ?BattleSession}.
- */
-const getBattleSession = async () => {
-    return (await fetch("/api/battle/session", {
-        method: "GET",
-    })).json();
-};
-
-/**
- * On success, returns {@see BattleSession}.
- */
-const postGenerateBattleSession = async () => {
-    return (await fetch("/api/battle/session?action=generate", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        }
-    })).json();
-};
-
-/**
- * @param {number} allyId
- * @param {number} enemyId
- *
- * On success, returns {@see BattleSession}
- */
-const postBattleAttack = async (allyId, enemyId) => {
-    return (await fetch("/api/battle/attack", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        },
-        body: JSON.stringify({
-            allyId: allyId,
-            enemyId: enemyId
-        })
-    })).json();
 };
 
 /**
@@ -179,21 +143,17 @@ const updateUnits = (allies, enemies) => {
 };
 
 const generateBattle = async () => {
-    while (main.hasChildNodes()) {
-        main.removeChild(main.firstChild);
-    }
-
-    main.innerText = "Generating battle...";
+    replaceInterfaceWithText("Generating battle…");
 
     const res = await postGenerateBattleSession();
 
     if (res.status === "success") {
+        replaceInterfaceWithText("");
+
         /**
          * @type {BattleSession}
          */
         const data = res.data;
-
-        main.innerText = "";
 
         setupBattle(data.allies, data.enemies);
     } else {
@@ -203,7 +163,7 @@ const generateBattle = async () => {
 
 const attack = async () => {
     const attackButton = document.getElementById("attack-button");
-    attackButton.innerText = "Attack (Loading...)";
+    attackButton.innerText = "Attack (Loading…)";
     attackButton.classList.add("loading");
     attackButton.disabled = true;
 
@@ -300,3 +260,37 @@ const selectUnit = (unitEls, unitId) => {
 
     return selectedUnitId;
 };
+
+/**
+ * On success, returns {@see ?BattleSession}.
+ */
+const getBattleSession = async () => (await fetch("/api/battle/session", {
+    method: "GET",
+})).json();
+
+/**
+ * On success, returns {@see BattleSession}.
+ */
+const postGenerateBattleSession = async () => (await fetch("/api/battle/session?action=generate", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json; charset=utf-8"
+    }
+})).json();
+
+/**
+ * @param {number} allyId
+ * @param {number} enemyId
+ *
+ * On success, returns {@see BattleSession}
+ */
+const postBattleAttack = async (allyId, enemyId) => (await fetch("/api/battle/attack", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json; charset=utf-8"
+    },
+    body: JSON.stringify({
+        allyId: allyId,
+        enemyId: enemyId
+    })
+})).json();
