@@ -93,6 +93,17 @@ class PBBGUnit extends HTMLElement {
         this._unit = undefined;
     }
 
+    connectedCallback() {
+        // In case property was set before this element could be upgraded
+        if (this.hasOwnProperty("unit")) {
+            const value = this["unit"];
+            delete this["unit"];
+            this.unit = value;
+
+            this.updateDisplay();
+        }
+    }
+
     /**
      * @returns {Unit}
      */
