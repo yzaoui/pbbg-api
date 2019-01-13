@@ -1,3 +1,4 @@
+import "/js/component/pbbg-level-progress.js";
 import "/js/component/pbbg-progress-bar.js";
 
 /**
@@ -82,7 +83,7 @@ class PBBGUnit extends HTMLElement {
     </div>
     <div>
         <span>Level <span id="level-value"></span></span>
-        <pbbg-progress-bar id="exp-bar"></pbbg-progress-bar>
+        <pbbg-level-progress id="exp-bar"></pbbg-level-progress>
         <span id="exp-value"></span>
     </div>
 </div>
@@ -101,8 +102,6 @@ class PBBGUnit extends HTMLElement {
             const value = this["unit"];
             delete this["unit"];
             this.unit = value;
-
-            this.updateDisplay();
         }
     }
 
@@ -117,6 +116,14 @@ class PBBGUnit extends HTMLElement {
      * @param {Unit} value
      */
     set unit(value) {
+        if (!this._unit) {
+            const bar = document.createElement("pbbg-level-progress");
+            bar.setAttribute("id", "exp-bar");
+            bar.setAttribute("level", value.levelProgress.level.toString());
+            bar.setAttribute("max", value.levelProgress.relativeExpToNextLevel.toString());
+            bar.setAttribute("value", value.levelProgress.relativeExp.toString());
+            this._shadowRoot.getElementById("exp-bar").replaceWith(bar);
+        }
         this._unit = value;
         this.updateDisplay();
     }
@@ -149,8 +156,11 @@ class PBBGUnit extends HTMLElement {
         this._shadowRoot.getElementById("hp-value").innerText = `${this._unit.hp} / ${this._unit.maxHP}`;
         this._shadowRoot.getElementById("atk-value").innerText = this._unit.atk.toString();
         this._shadowRoot.getElementById("level-value").innerText = this._unit.levelProgress.level.toString();
-        this._shadowRoot.getElementById("exp-bar").value = this._unit.levelProgress.relativeExp;
-        this._shadowRoot.getElementById("exp-bar").max = this._unit.levelProgress.relativeExpToNextLevel;
+        this._shadowRoot.getElementById("exp-bar").updateProgress({
+            level: this._unit.levelProgress.level,
+            max: this._unit.levelProgress.relativeExpToNextLevel,
+            value: this._unit.levelProgress.relativeExp
+        });
         this._shadowRoot.getElementById("exp-value").innerText = `${this._unit.levelProgress.relativeExp} / ${this._unit.levelProgress.relativeExpToNextLevel}`;
 
         if (this._unit.hp === 0) {
