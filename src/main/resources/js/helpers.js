@@ -19,3 +19,13 @@ const insertScript = (scriptSrc) => {
     unitScript.src = scriptSrc;
     document.body.insertAdjacentElement("beforeend", unitScript);
 };
+
+/**
+ * @param {string} scriptSrc
+ */
+const insertModule = (scriptSrc) => {
+    const unitScript = document.createElement("script");
+    unitScript.src = scriptSrc;
+    unitScript.type = "module";
+    document.body.insertAdjacentElement("beforeend", unitScript);
+};

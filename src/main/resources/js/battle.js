@@ -24,8 +24,7 @@ const selectedUnits = {
 
 window.onload = async () => {
     insertScript("/js/webcomponents-bundle-2.0.0.js");
-    insertScript("/js/component/pbbg-progress-bar.js");
-    insertScript("/js/component/pbbg-unit.js");
+    insertModule("/js/component/pbbg-unit.js");
 
     replaceInterfaceWithText("Loading…");
 

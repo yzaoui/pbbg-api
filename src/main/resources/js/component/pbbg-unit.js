@@ -1,3 +1,5 @@
+import "/js/component/pbbg-progress-bar.js";
+
 /**
  * @typedef {Object} LevelProgress
  * @property {number} level - Current level.
