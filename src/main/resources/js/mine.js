@@ -63,7 +63,6 @@
 let mineInfo;
 
 const MINING_GRID_ID = "mining-grid";
-const GENERATE_MINE_INTERFACE_ID = "generate-mine-container";
 const EXIT_MINE_BUTTON_ID = "exit-mine";
 const MINING_RESULTS_LIST_ID = "mining-results-list";
 /**
@@ -124,9 +123,9 @@ const setupGenerateMineInterface = async () => {
     const main = document.getElementById("main");
 
     const table = document.createElement("table");
-    table.id = GENERATE_MINE_INTERFACE_ID;
+    table.id = "generate-mine-container";
     table.className = "mining-mine-info";
-    table.innerText = "Loading list of mines...";
+    table.innerText = "Loading list of mines…";
     main.appendChild(table);
 
     const res = await getMineTypes();
@@ -178,15 +177,11 @@ const createMineToUnlockRow = (nextUnlockLevel) => {
     const tr = document.createElement("tr");
     tr.className = "unmet-minimum-level";
 
-    tr.insertAdjacentHTML("beforeend", `<td>???</td><td>${nextUnlockLevel}</td>`);
-
-    const button = document.createElement("button");
-    button.className = "mining-generate-mine";
-    button.innerText = "Need to unlock";
-    button.disabled = true;
-    const generateTd = document.createElement("td");
-    generateTd.appendChild(button);
-    tr.appendChild(generateTd);
+    tr.insertAdjacentHTML("beforeend",
+        `<td>???</td>` +
+        `<td>${nextUnlockLevel}</td>` +
+        `<td><button class="mining-generate-mine" disabled>Need to unlock</button></td>`
+    );
 
     return tr;
 };
@@ -239,15 +234,9 @@ const clickedCell = async (x, y) => {
             for (const { item: { friendlyName, imgURL, quantity }, expPerIndividualItem } of data.minedItemResults) {
                 const li = document.createElement("li");
                 if (quantity !== null) {
-                    li.appendChild(document.createTextNode("Obtained "));
-
-                    const itemImg = document.createElement("img");
-                    itemImg.src = imgURL;
-                    li.appendChild(itemImg);
-
-                    li.appendChild(document.createTextNode(` [${friendlyName}] ×${quantity} (+${expPerIndividualItem * quantity} exp)`));
+                    li.insertAdjacentHTML("beforeend", `Obtained <img src="${imgURL}"> [${friendlyName}] ×${quantity} (+${expPerIndividualItem * quantity} exp)`);
                 } else {
-                    li.textContent = `Obtained ${friendlyName} (+${expPerIndividualItem} exp)`;
+                    li.insertAdjacentHTML("beforeend", `Obtained ${friendlyName} (+${expPerIndividualItem} exp)`);
                 }
 
                 appendListItemToResultsList(li);
@@ -305,7 +294,7 @@ const createExitMineButton = () => {
 
 const exitMine = async() => {
     const exitMineButton = document.getElementById(EXIT_MINE_BUTTON_ID);
-    exitMineButton.innerText += " (Loading...)";
+    exitMineButton.innerText += " (Loading…)";
     exitMineButton.disabled = true;
     exitMineButton.classList.add("loading");
 
@@ -353,17 +342,6 @@ const createMiningGrid = (mine) => {
     return table;
 };
 
-/**
- * @param {string} pickaxeName
- * @returns {HTMLDivElement}
- */
-const createEquippedPickaxeDisplay = (pickaxeName) => {
-    const div = document.createElement("div");
-    div.innerText = `Equipped pickaxe: ${pickaxeName}`;
-
-    return div;
-};
-
 const setupPickaxeAndResultsList = async () => {
     const main = document.getElementById("main");
 
@@ -378,12 +356,10 @@ const setupPickaxeAndResultsList = async () => {
         if (data !== null) {
             equippedPickaxe = data;
 
-            main.appendChild(createEquippedPickaxeDisplay(equippedPickaxe.pickaxeKind));
-
-            const resultsList = document.createElement("ul");
-            resultsList.id = MINING_RESULTS_LIST_ID;
-            resultsList.className = MINING_RESULTS_LIST_ID;
-            main.appendChild(resultsList);
+            main.insertAdjacentHTML("beforeend",
+                `<div>Equipped pickaxe: ${equippedPickaxe.pickaxeKind}</div>` +
+                `<ul id="${MINING_RESULTS_LIST_ID}" class="${MINING_RESULTS_LIST_ID}"></ul>`
+            );
 
             mineInfo.cells.forEach((row, y) => {
                 row.forEach((cell, x) => {
@@ -396,9 +372,7 @@ const setupPickaxeAndResultsList = async () => {
             // Display mine grid as enabled.
             document.getElementById(MINING_GRID_ID).classList.add("enabled");
         } else {
-            const noPickaxe = document.createElement("div");
-            noPickaxe.innerText = "No pickaxe equipped. Go to your inventory and equip one.";
-            main.appendChild(noPickaxe);
+            main.insertAdjacentHTML("beforeend", `<div>No pickaxe equipped. Go to your inventory and equip one.</div>`);
         }
     }
 };
