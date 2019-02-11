@@ -56,6 +56,12 @@
  */
 
 /**
+ * @typedef {Object} UserDetails
+ *
+ * @property {LevelProgress} mining
+ */
+
+/**
  * @property {number} width
  * @property {number} height
  * @property {HTMLTableDataCellElement[][]} cells
@@ -65,6 +71,7 @@ let mineInfo;
 const MINING_GRID_ID = "mining-grid";
 const EXIT_MINE_BUTTON_ID = "exit-mine";
 const MINING_RESULTS_LIST_ID = "mining-results-list";
+const MINING_LEVEL_PROGRESS_ID = "mining-level-progress";
 /**
  * @type {Pickaxe}
  */
@@ -76,6 +83,9 @@ let equippedPickaxe;
 let mineActionSubmitting = false;
 
 window.onload = async () => {
+    insertScript("/js/webcomponents-bundle-2.0.0.js");
+    insertModule("/js/component/pbbg-level-progress.js");
+
     replaceInterfaceWithText("Loading…");
 
     const res = await getMine();
@@ -356,7 +366,15 @@ const setupPickaxeAndResultsList = async () => {
         if (data !== null) {
             equippedPickaxe = data;
 
+            /**
+             * @type {UserDetails}
+             */
+            const userDetails = (await getUserDetails()).data;
+
+            const { level, relativeExp, relativeExpToNextLevel } = userDetails.mining;
+
             main.insertAdjacentHTML("beforeend",
+                `<pbbg-level-progress id="${MINING_LEVEL_PROGRESS_ID}" level="${level}" value="${relativeExp}" max="${relativeExpToNextLevel}"></pbbg-level-progress>` +
                 `<div>Equipped pickaxe: ${equippedPickaxe.pickaxeKind}</div>` +
                 `<ul id="${MINING_RESULTS_LIST_ID}" class="${MINING_RESULTS_LIST_ID}"></ul>`
             );
@@ -447,3 +465,8 @@ const postPerformMine = async (x, y) => (await fetch("/api/mine/perform", {
  * On success, returns null.
  */
 const postMineExit = async () => (await fetch("/api/mine/exit", { method: "POST" })).json();
+
+/**
+ * On success, returns {@see UserDetails}.
+ */
+const getUserDetails = async() => (await fetch("/api/user")).json();
