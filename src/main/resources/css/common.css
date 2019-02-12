@@ -125,3 +125,29 @@ button.loading, button.loading.fancy, button.loading.fancy:disabled {
     cursor: wait;
 }
 
+.level-info {
+    display: inline-block;
+    width: 200px;
+    height: 26px;
+    position: relative;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+.level-info > pbbg-level-progress {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    --fill-color: linear-gradient(#c4ffec, #60c7c3);
+}
+
+.level-info > span {
+    position: relative;
+    display: block;
+    text-align: center;
+    font-weight: bold;
+}
