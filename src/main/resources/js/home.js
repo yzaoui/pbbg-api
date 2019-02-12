@@ -1,6 +1,6 @@
 const setup = async () => {
     insertScript("/js/webcomponents-bundle-2.0.0.js");
-    insertScript("/js/component/pbbg-progress-bar.js");
+    insertModule("/js/component/pbbg-level-progress.js");
 
     replaceInterfaceWithText("Loading…");
 
@@ -9,13 +9,16 @@ const setup = async () => {
     if (res.status === "success") {
         replaceInterfaceWithText("");
 
-        const { mining } = res.data;
+        /**
+         * @type {LevelProgress}
+         */
+        const mining = res.data.mining;
 
         main.innerHTML = `
-<div>
-    <span>Mining Level ${mining.level}</span>
-    <pbbg-progress-bar max="${mining.relativeExpToNextLevel}" value="${mining.relativeExp}"></pbbg-progress-bar>
-    <span>${mining.relativeExp} / ${mining.relativeExpToNextLevel} Exp.</span>
+Mining:
+<div class="level-info">
+    <pbbg-level-progress level="${mining.level}" max="${mining.relativeExpToNextLevel}" value="${mining.relativeExp}"></pbbg-level-progress>
+    <span>Lv. ${mining.level} — ${mining.relativeExp} / ${mining.relativeExpToNextLevel}</span>
 </div>        
 `;
     } else {
