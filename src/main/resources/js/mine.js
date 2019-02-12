@@ -72,6 +72,7 @@ const MINING_GRID_ID = "mining-grid";
 const EXIT_MINE_BUTTON_ID = "exit-mine";
 const MINING_RESULTS_LIST_ID = "mining-results-list";
 const MINING_LEVEL_PROGRESS_ID = "mining-level-progress";
+const MINING_LEVEL_TEXT_ID = "mining-level-text";
 /**
  * @type {Pickaxe}
  */
@@ -142,7 +143,7 @@ const setupGenerateMineInterface = async () => {
 
     if (res.status === "success") {
         /**
-         * @typedef {MineTypeList}
+         * @type {MineTypeList}
          */
         const data = res.data;
 
@@ -229,6 +230,17 @@ const leftCell = (x, y) => {
     }
 };
 
+const updateMiningLevel = async () => {
+    /**
+     * @type {LevelProgress}
+     */
+    const { level, relativeExp, relativeExpToNextLevel } = (await getUserDetails()).data.mining;
+
+    document.getElementById(MINING_LEVEL_PROGRESS_ID).updateProgress({ level: level, max: relativeExpToNextLevel, value: relativeExp });
+
+    document.getElementById(MINING_LEVEL_TEXT_ID).innerText = `Lv. ${level} — ${relativeExp} / ${relativeExpToNextLevel}`
+};
+
 const clickedCell = async (x, y) => {
     if (!mineActionSubmitting) {
         mineActionSubmitting = true;
@@ -240,6 +252,8 @@ const clickedCell = async (x, y) => {
              * @type {MineActionResult}
              */
             const data = res.data;
+
+            await updateMiningLevel();
 
             for (const { item: { friendlyName, imgURL, quantity }, expPerIndividualItem } of data.minedItemResults) {
                 const li = document.createElement("li");
@@ -374,7 +388,10 @@ const setupPickaxeAndResultsList = async () => {
             const { level, relativeExp, relativeExpToNextLevel } = userDetails.mining;
 
             main.insertAdjacentHTML("beforeend",
-                `<pbbg-level-progress id="${MINING_LEVEL_PROGRESS_ID}" level="${level}" value="${relativeExp}" max="${relativeExpToNextLevel}"></pbbg-level-progress>` +
+                `<div class="level-info" style="margin-left: auto; margin-right: auto;">` +
+                    `<pbbg-level-progress id="${MINING_LEVEL_PROGRESS_ID}" level="${level}" value="${relativeExp}" max="${relativeExpToNextLevel}"></pbbg-level-progress>` +
+                    `<span id="${MINING_LEVEL_TEXT_ID}">Lv. ${level} — ${relativeExp} / ${relativeExpToNextLevel}</span>` +
+                `</div>` +
                 `<div>Equipped pickaxe: ${equippedPickaxe.pickaxeKind}</div>` +
                 `<ul id="${MINING_RESULTS_LIST_ID}" class="${MINING_RESULTS_LIST_ID}"></ul>`
             );
