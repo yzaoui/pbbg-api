@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URI
 
 object Versions {
-    const val KOTLIN = "1.3.11"
-    const val KTOR = "1.1.1"
+    const val KOTLIN = "1.3.21"
+    const val KTOR = "1.1.2"
 }
 
 group = "com.bitwiserain"
@@ -12,8 +12,8 @@ version = "0.0.1"
 
 plugins {
     application
-    kotlin("jvm").version(/*Versions.KOTLIN*/"1.3.11")
-    id("com.github.johnrengelman.shadow").version("4.0.3")
+    kotlin("jvm").version(/*Versions.KOTLIN*/"1.3.21")
+    id("com.github.johnrengelman.shadow").version("4.0.4")
 }
 
 application {
@@ -30,8 +30,8 @@ repositories {
 dependencies {
     compile("com.h2database:h2:1.4.197")
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.KOTLIN}")
-    compile("org.jetbrains.exposed:exposed:0.11.2")
-    compile("at.favre.lib:bcrypt:0.6.0")
+    compile("org.jetbrains.exposed:exposed:0.12.2")
+    compile("at.favre.lib:bcrypt:0.7.0")
     compile("io.ktor:ktor-locations:${Versions.KTOR}")
     compile("io.ktor:ktor-server-netty:${Versions.KTOR}")
     compile("io.ktor:ktor-html-builder:${Versions.KTOR}")
