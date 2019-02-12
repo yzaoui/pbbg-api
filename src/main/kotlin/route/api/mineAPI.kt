@@ -4,13 +4,11 @@ import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.model.mine.Mine
 import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
-import com.bitwiserain.pbbg.domain.model.mine.MineType
 import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.view.model.LevelUpJSON
 import com.bitwiserain.pbbg.view.model.mine.*
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
-import io.ktor.locations.Location
 import io.ktor.request.ContentTransformationException
 import io.ktor.request.receive
 import io.ktor.routing.Route
