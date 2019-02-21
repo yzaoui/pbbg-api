@@ -3,7 +3,7 @@
     border-spacing: 0;
     border: 1px solid black;
     background-image: url("/img/mine/ground.png");
-    margin: 4px auto;
+    margin: 4px auto 0;
 }
 
 .mining-grid tr {

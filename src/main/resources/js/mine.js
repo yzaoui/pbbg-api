@@ -329,15 +329,25 @@ const exitMine = async() => {
         const miningGrid = document.getElementById(MINING_GRID_ID);
         miningGrid.parentNode.removeChild(miningGrid);
 
-        // Replace button with success message
-        const message = document.createElement("div");
-        message.innerText = "Successfully exited mine";
-        message.style.display = "block";
+        const exitMessageLi = document.createElement("li");
+        exitMessageLi.innerText = "Successfully exited mine.";
 
-        exitMineButton.parentNode.replaceChild(message, exitMineButton);
+        appendListItemToResultsList(exitMessageLi);
+
+        const toMineListBtn = document.createElement("button");
+        toMineListBtn.innerText = "Return to mine list";
+        toMineListBtn.onclick = () => { returnToMineList() };
+        toMineListBtn.className = "fancy";
+        toMineListBtn.style.alignSelf = "center";
+
+        exitMineButton.parentNode.replaceChild(toMineListBtn, exitMineButton);
     } else {
         //TODO: Display error
     }
+};
+
+const returnToMineList = () => {
+    location.reload();
 };
 
 /**
@@ -388,7 +398,7 @@ const setupPickaxeAndResultsList = async () => {
             const { level, relativeExp, relativeExpToNextLevel } = userDetails.mining;
 
             main.insertAdjacentHTML("beforeend",
-                `<div class="level-info" style="margin-left: auto; margin-right: auto;">` +
+                `<div class="level-info" style="margin-left: auto; margin-right: auto; margin-top: 4px;">` +
                     `<pbbg-level-progress id="${MINING_LEVEL_PROGRESS_ID}" level="${level}" value="${relativeExp}" max="${relativeExpToNextLevel}"></pbbg-level-progress>` +
                     `<span id="${MINING_LEVEL_TEXT_ID}">Lv. ${level} — ${relativeExp} / ${relativeExpToNextLevel}</span>` +
                 `</div>` +
