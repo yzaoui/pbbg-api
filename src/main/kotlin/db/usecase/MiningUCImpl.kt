@@ -88,7 +88,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
             .singleOrNull() ?: throw NotInMineSessionException()
 
         // Cells that the currently equipped pickaxe at this location can reach
-        val reacheableCells = reachableCells(x, y, mineSession.width, mineSession.height, pickaxe.cells)
+        val reacheableCells = reachableCells(x, y, mineSession.width, mineSession.height, pickaxe.cells.map { it.x to it.y }.toSet())
 
         // The mine cells of this mine, filtered to only get those that are reachable with this pickaxe and location
         // TODO: Exposed isn't likely to support tuples in `WHERE IN` expressions, consider using raw SQL

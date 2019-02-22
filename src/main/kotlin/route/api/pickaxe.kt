@@ -32,5 +32,5 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) = route("/pickaxe") 
 // TODO: Find appropriate place for this adapter
 private fun Pickaxe.toJSON() = PickaxeJSON(
     pickaxeKind = type,
-    cells = cells.map { intArrayOf(it.first, it.second) }
+    cells = cells.map { intArrayOf(it.x, it.y) }
 )
