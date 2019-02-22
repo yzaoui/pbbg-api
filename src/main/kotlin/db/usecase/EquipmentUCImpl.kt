@@ -4,7 +4,7 @@ import com.bitwiserain.pbbg.db.repository.EquipmentTable
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.domain.model.Equippable
 import com.bitwiserain.pbbg.domain.model.Item
-import com.bitwiserain.pbbg.domain.model.Pickaxe
+import com.bitwiserain.pbbg.domain.model.mine.Pickaxe
 import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.and

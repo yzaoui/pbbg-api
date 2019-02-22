@@ -5,6 +5,7 @@ import com.bitwiserain.pbbg.db.model.MineSession
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.Item
+import com.bitwiserain.pbbg.domain.model.Point
 import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.model.mine.*
 import com.bitwiserain.pbbg.domain.usecase.*
@@ -77,7 +78,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
     }
 
     override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction(db) {
-        // Currently equipped picakxe
+        // Currently equipped pickaxe
         val pickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
             .map { it[EquipmentTable.pickaxe] }
             .singleOrNull() ?: throw NoEquippedPickaxeException()
@@ -94,7 +95,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         // TODO: Exposed isn't likely to support tuples in `WHERE IN` expressions, consider using raw SQL
         val reachableCellsWithContent = MineCellTable.select { MineCellTable.mineId.eq(mineSession.id) }
             .map { it.toMineCell() }
-            .filter { reacheableCells.contains(it.x to it.y) }
+            .filter { reacheableCells.contains(Point(it.x, it.y)) }
 
         // Mine entities with the quantity hit
         val mineEntitiesAndCount = reachableCellsWithContent.map { it.mineEntity }.groupingBy { it }.eachCount()
@@ -179,15 +180,15 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         mineEntity = this[MineCellTable.mineEntity]
     )
 
-    private fun reachableCells(x: Int, y: Int, width: Int, height: Int, tiles: Set<Pair<Int, Int>>): Set<Pair<Int, Int>> {
-        val cells = mutableSetOf<Pair<Int, Int>>()
+    private fun reachableCells(x: Int, y: Int, width: Int, height: Int, tiles: Set<Point>): Set<Point> {
+        val cells = mutableSetOf<Point>()
 
         tiles.forEach {
-            val newX = x + it.first
-            val newY = y + it.second
+            val newX = x + it.x
+            val newY = y + it.y
 
             if ((newX in 0 until width) && newY in 0 until height) {
-                cells.add(newX to newY)
+                cells.add(Point(newX, newY))
             }
         }
 

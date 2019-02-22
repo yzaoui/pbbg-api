@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.Pickaxe
+import com.bitwiserain.pbbg.domain.model.mine.Pickaxe
 
 interface EquipmentUC {
     /**

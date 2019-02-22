@@ -13,10 +13,17 @@
  */
 
 /**
+ * @typedef {Object} Point
+ *
+ * @property {number} x
+ * @property {number} y
+ */
+
+/**
  * @typedef {Object} Pickaxe
  *
  * @property {string} pickaxeKind - Name of this pickaxe's kind.
- * @property {number[][]} cells - Cells that this pickaxe can reach, in the form of [x, y] coordinates, relative to [0, 0].
+ * @property {Point[]} cells - Cells that this pickaxe can reach, relative to (0, 0).
  */
 
 /**
@@ -197,15 +204,23 @@ const createMineToUnlockRow = (nextUnlockLevel) => {
     return tr;
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} gridWidth
+ * @param {number} gridHeight
+ * @param {Point[]} targets
+ * @returns {Point[]}
+ */
 const reachableCells = (x, y, gridWidth, gridHeight, targets) => {
     let cells = [];
 
     for (const target of targets) {
-        const newX = x + target[0];
-        const newY = y + target[1];
+        const newX = x + target.x;
+        const newY = y + target.y;
 
         if (newX >= 0 && newX < gridWidth && newY >= 0 && newY < gridHeight) {
-            cells.push([newX, newY]);
+            cells.push({ x: newX, y: newY });
         }
     }
 
@@ -216,8 +231,7 @@ const enteredCell = (x, y) => {
     const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
 
     for (const cell of affectedCells) {
-        const [x, y] = cell;
-        mineInfo.cells[y][x].classList.add("selected-item");
+        mineInfo.cells[cell.y][cell.x].classList.add("selected-item");
     }
 };
 
@@ -225,8 +239,7 @@ const leftCell = (x, y) => {
     const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
 
     for (const cell of affectedCells) {
-        const [x, y] = cell;
-        mineInfo.cells[y][x].classList.remove("selected-item");
+        mineInfo.cells[cell.y][cell.x].classList.remove("selected-item");
     }
 };
 
@@ -277,8 +290,7 @@ const clickedCell = async (x, y) => {
             const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
 
             for (const cell of affectedCells) {
-                const [x, y] = cell;
-                mineInfo.cells[y][x].removeAttribute("style");
+                mineInfo.cells[cell.y][cell.x].removeAttribute("style");
             }
 
             mineActionSubmitting = false;
