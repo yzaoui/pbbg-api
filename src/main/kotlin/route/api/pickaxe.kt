@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.route.api
 
-import com.bitwiserain.pbbg.domain.model.Pickaxe
+import com.bitwiserain.pbbg.domain.model.mine.Pickaxe
 import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.interceptSetUserOr401

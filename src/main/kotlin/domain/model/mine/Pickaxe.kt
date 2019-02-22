@@ -1,4 +1,6 @@
-package com.bitwiserain.pbbg.domain.model
+package com.bitwiserain.pbbg.domain.model.mine
+
+import com.bitwiserain.pbbg.domain.model.Item
 
 /**
  * Entity that can be equipped in the pickaxe slot and used for mining.

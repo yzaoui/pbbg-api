@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.db.repository
 
-import com.bitwiserain.pbbg.domain.model.Pickaxe
+import com.bitwiserain.pbbg.domain.model.mine.Pickaxe
 import org.jetbrains.exposed.sql.Table
 
 object EquipmentTable : Table() {
