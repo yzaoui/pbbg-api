@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.view.model.mine
 
+import com.bitwiserain.pbbg.view.model.PointJSON
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -10,5 +11,5 @@ import com.google.gson.annotations.SerializedName
  */
 data class PickaxeJSON(
     @SerializedName("pickaxeKind") val pickaxeKind: String,
-    @SerializedName("cells") val cells: List<IntArray>
+    @SerializedName("cells") val cells: Set<PointJSON>
 )
