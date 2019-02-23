@@ -8,6 +8,10 @@ interface Equippable {
     val equipped: Boolean
 }
 
+interface GridPreviewable {
+    val grid: Set<Point>
+}
+
 /**
  * Item that can go in the inventory.
  *
@@ -43,24 +47,27 @@ sealed class Item {
         }
     }
 
-    sealed class Pickaxe : Item(), Equippable {
+    sealed class Pickaxe : Item(), Equippable, GridPreviewable {
         class PlusPickaxe(override val equipped: Boolean) : Pickaxe() {
             override val enum get() = ItemEnum.PLUS_PICKAXE
             override val friendlyName get() = "Plus-shaped Pickaxe"
             override val spriteName get() = "plus-pickaxe"
             override val description get() = "Plus I can't even think about a description for this."
+            override val grid get() = com.bitwiserain.pbbg.domain.model.mine.Pickaxe.PLUS.cells
         }
         class CrossPickaxe(override val equipped: Boolean) : Pickaxe() {
             override val enum get() = ItemEnum.CROSS_PICKAXE
             override val friendlyName get() = "Cross-shaped Pickaxe"
             override val spriteName get() = "cross-pickaxe"
             override val description get() = "\"You'd better not cross me when I'm holding this!\"."
+            override val grid get() = com.bitwiserain.pbbg.domain.model.mine.Pickaxe.CROSS.cells
         }
         class SquarePickaxe(override val equipped: Boolean) : Pickaxe() {
             override val enum get() = ItemEnum.SQUARE_PICKAXE
             override val friendlyName get() = "Square-shaped Pickaxe"
             override val spriteName get() = "square-pickaxe"
             override val description get() = "Don't be a square."
+            override val grid get() = com.bitwiserain.pbbg.domain.model.mine.Pickaxe.SQUARE.cells
         }
     }
 }

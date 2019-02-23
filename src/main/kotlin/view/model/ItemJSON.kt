@@ -8,5 +8,6 @@ data class ItemJSON(
     @SerializedName("imgURL") val imgURL: String,
     @SerializedName("quantity") val quantity: Int?,
     @SerializedName("description") val description: String,
-    @SerializedName("equipped") val equipped: Boolean?
+    @SerializedName("equipped") val equipped: Boolean?,
+    @SerializedName("grid") val grid: Set<PointJSON>?
 )

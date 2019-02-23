@@ -27,9 +27,12 @@
  * @property {?number} quantity
  * @property {string} description
  * @property {?boolean} equipped
+ * @property {?Point[]} grid
  */
 
 window.onload = async () => {
+    insertModule("/js/component/pbbg-grid-preview.js");
+
     const main = document.getElementById("main");
 
     replaceInterfaceWithText("Loading…");
@@ -111,6 +114,15 @@ const createItemTooltip = (itemId, item) => {
         }
 
         container.appendChild(equipActionButton);
+    }
+
+    if (item.grid !== null) {
+        container.insertAdjacentHTML("beforeend", `<hr>`);
+
+        const preview = document.createElement("pbbg-grid-preview");
+        preview.grid = item.grid;
+
+        container.insertAdjacentElement("beforeend", preview);
     }
 
     container.insertAdjacentHTML("beforeend", `<hr><div>${item.description}</div>`);

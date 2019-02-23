@@ -93,6 +93,7 @@ let mineActionSubmitting = false;
 window.onload = async () => {
     insertScript("/js/webcomponents-bundle-2.0.0.js");
     insertModule("/js/component/pbbg-level-progress.js");
+    insertModule("/js/component/pbbg-grid-preview.js");
 
     replaceInterfaceWithText("Loading…");
 
@@ -353,6 +354,8 @@ const exitMine = async() => {
         toMineListBtn.style.alignSelf = "center";
 
         exitMineButton.parentNode.replaceChild(toMineListBtn, exitMineButton);
+
+        document.getElementById(MINING_RESULTS_LIST_ID).classList.add("expanded");
     } else {
         //TODO: Display error
     }
@@ -414,9 +417,14 @@ const setupPickaxeAndResultsList = async () => {
                     `<pbbg-level-progress id="${MINING_LEVEL_PROGRESS_ID}" level="${level}" value="${relativeExp}" max="${relativeExpToNextLevel}"></pbbg-level-progress>` +
                     `<span id="${MINING_LEVEL_TEXT_ID}">Lv. ${level} — ${relativeExp} / ${relativeExpToNextLevel}</span>` +
                 `</div>` +
-                `<div>Equipped pickaxe: ${equippedPickaxe.pickaxeKind}</div>` +
-                `<ul id="${MINING_RESULTS_LIST_ID}" class="${MINING_RESULTS_LIST_ID}"></ul>`
+                `<div>Equipped pickaxe: ${equippedPickaxe.pickaxeKind}</div>`
             );
+
+            const pickaxeGrid = document.createElement("pbbg-grid-preview");
+            pickaxeGrid.grid = equippedPickaxe.cells;
+            main.insertAdjacentElement("beforeend", pickaxeGrid);
+
+            main.insertAdjacentHTML("beforeend", `<ul id="${MINING_RESULTS_LIST_ID}" class="${MINING_RESULTS_LIST_ID}"></ul>`);
 
             mineInfo.cells.forEach((row, y) => {
                 row.forEach((cell, x) => {

@@ -27,13 +27,17 @@
 
 .mining-results-list {
     font-size: 13px;
-    min-height: 140px;
+    height: 140px;
     overflow-y: scroll;
     flex: 1;
     list-style: none;
     margin: 0;
     padding: 0;
     background-color: #c8cadacf;
+}
+
+.mining-results-list.expanded {
+    min-height: 140px;
 }
 
 .mining-results-list > li {

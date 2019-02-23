@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.route.api
 
 import com.bitwiserain.pbbg.domain.model.Equippable
+import com.bitwiserain.pbbg.domain.model.GridPreviewable
 import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.usecase.*
@@ -10,6 +11,7 @@ import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.view.model.EquipmentJSON
 import com.bitwiserain.pbbg.view.model.ItemJSON
+import com.bitwiserain.pbbg.view.model.PointJSON
 import com.bitwiserain.pbbg.view.model.inventory.InventoryItemJSON
 import com.bitwiserain.pbbg.view.model.inventory.InventoryJSON
 import io.ktor.application.call
@@ -102,5 +104,6 @@ fun Item.toJSON() = ItemJSON(
     imgURL = "/img/item/$spriteName-64.png",
     quantity = if (this is Stackable) quantity else null,
     description = description,
-    equipped = if (this is Equippable) equipped else null
+    equipped = if (this is Equippable) equipped else null,
+    grid = if (this is GridPreviewable) grid.map { PointJSON(it.x, it.y) }.toSet() else null
 )
