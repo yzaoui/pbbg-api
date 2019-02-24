@@ -1,9 +1,9 @@
-pbbg-unit {
+pbbg-unit:not([dead]) {
     cursor: pointer;
 }
 
-pbbg-unit:hover {
-    border-color: #1E768B;
+pbbg-unit:not([dead]):hover {
+    border-color: #53b6ca;
 }
 
 pbbg-unit[selected] {
