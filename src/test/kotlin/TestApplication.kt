@@ -16,7 +16,7 @@ fun initDatabase(): Database {
     transaction(db) {
         SchemaUtils.create(
             UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable,
-            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable
+            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable
         )
     }
 
