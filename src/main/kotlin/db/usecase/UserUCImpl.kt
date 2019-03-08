@@ -53,8 +53,6 @@ class UserUCImpl(private val db: Database) : UserUC {
                 it[InventoryTable.item] = pickaxe.enum
                 it[InventoryTable.equipped] = false
             }
-
-            Unit
         }
 
         SquadTable.insertAllies(userId, listOf(
@@ -63,7 +61,7 @@ class UserUCImpl(private val db: Database) : UserUC {
             MyUnitForm(MyUnitEnum.TWOLIP, 11, 2)
         ))
 
-        userId.value
+        return@transaction userId.value
     }
 
     override fun getUserIdByCredentials(username: String, password: String): Int? {
