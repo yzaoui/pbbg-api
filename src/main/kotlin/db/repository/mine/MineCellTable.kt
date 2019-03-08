@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.db.repository
+package com.bitwiserain.pbbg.db.repository.mine
 
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
 import org.jetbrains.exposed.dao.IntIdTable

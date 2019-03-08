@@ -3,6 +3,8 @@ package com.bitwiserain.pbbg.db.usecase
 import com.bitwiserain.pbbg.db.model.MineCell
 import com.bitwiserain.pbbg.db.model.MineSession
 import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
+import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.Point

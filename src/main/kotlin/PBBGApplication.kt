@@ -4,6 +4,8 @@ import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
+import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
+import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.db.usecase.*
 import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.route.api.*

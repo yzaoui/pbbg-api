@@ -1,5 +1,6 @@
-package com.bitwiserain.pbbg.db.repository
+package com.bitwiserain.pbbg.db.repository.mine
 
+import com.bitwiserain.pbbg.db.repository.UserTable
 import org.jetbrains.exposed.dao.IntIdTable
 
 object MineSessionTable : IntIdTable() {
