@@ -1,7 +1,5 @@
 package com.bitwiserain.pbbg.domain.model
 
-import domain.model.Equipment
-
 /**
  * Representation of player's inventory.
  */

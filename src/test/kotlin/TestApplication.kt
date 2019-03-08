@@ -3,6 +3,8 @@ package com.bitwiserain.pbbg.test
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
+import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
+import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils

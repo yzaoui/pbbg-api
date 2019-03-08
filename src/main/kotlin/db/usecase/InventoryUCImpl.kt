@@ -3,13 +3,9 @@ package com.bitwiserain.pbbg.db.usecase
 import com.bitwiserain.pbbg.db.repository.EquipmentTable
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.UserTable
-import com.bitwiserain.pbbg.domain.model.Equippable
-import com.bitwiserain.pbbg.domain.model.Inventory
-import com.bitwiserain.pbbg.domain.model.Item
+import com.bitwiserain.pbbg.domain.model.*
 import com.bitwiserain.pbbg.domain.model.ItemEnum.*
-import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
-import domain.model.Equipment
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
