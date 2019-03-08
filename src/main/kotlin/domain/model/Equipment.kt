@@ -1,6 +1,4 @@
-package domain.model
-
-import com.bitwiserain.pbbg.domain.model.Item
+package com.bitwiserain.pbbg.domain.model
 
 data class Equipment(
     val pickaxe: Item.Pickaxe?
