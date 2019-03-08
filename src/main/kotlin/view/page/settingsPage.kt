@@ -7,9 +7,9 @@ import com.bitwiserain.pbbg.view.template.MemberTemplate
 import io.ktor.html.Template
 import kotlinx.html.*
 
-const val currentPasswordId = "current-password"
-const val newPasswordId = "new-password"
-const val confirmNewPasswordId = "confirm-new-password"
+private const val currentPasswordId = "current-password"
+private const val newPasswordId = "new-password"
+private const val confirmNewPasswordId = "confirm-new-password"
 
 fun settingsPage(memberPageVM: MemberPageVM, changePasswordUrl: String, error: String? = null): Template<HTML> = MemberTemplate("Settings", memberPageVM).apply {
     content {
