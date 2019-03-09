@@ -67,7 +67,7 @@ const createDiscoveredDexRow = (id, item) => {
 const createUnknownDexRow = () => {
     const tr = document.createElement("tr");
     tr.classList.add("dex-unknown");
-    tr.innerHTML = `<td colspan="4"></td>`
+    tr.innerHTML = `<td colspan="4"><img src="/img/three-dots.svg" alt="Three vertical circles indicating missing row(s)"></td>`;
 
     return tr;
 };
