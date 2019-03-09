@@ -73,11 +73,12 @@ fun Application.main() {
     val equipmentUC = EquipmentUCImpl(db)
     val unitUC = UnitUCImpl(db)
     val battleUC = BattleUCImpl(db)
+    val dexUC = DexUCImpl(db)
 
-    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC)
+    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC, dexUC)
 }
 
-fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC) {
+fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC, dexUC: DexUC) {
     install(Sessions) {
         cookie<ApplicationSession>("pbbg_session") {
             cookie.path = "/"
