@@ -269,12 +269,12 @@ const clickedCell = async (x, y) => {
 
             await updateMiningLevel();
 
-            for (const { item: { friendlyName, imgURL, quantity }, expPerIndividualItem } of data.minedItemResults) {
+            for (const { item, expPerIndividualItem } of data.minedItemResults) {
                 const li = document.createElement("li");
-                if (quantity !== null) {
-                    li.insertAdjacentHTML("beforeend", `Obtained <img src="${imgURL}"> [${friendlyName}] ×${quantity} (+${expPerIndividualItem * quantity} exp)`);
+                if (item.quantity !== null) {
+                    li.insertAdjacentHTML("beforeend", `Obtained <img src="${item.baseItem.imgURL}"> [${item.baseItem.friendlyName}] ×${item.quantity} (+${expPerIndividualItem * item.quantity} exp)`);
                 } else {
-                    li.insertAdjacentHTML("beforeend", `Obtained ${friendlyName} (+${expPerIndividualItem} exp)`);
+                    li.insertAdjacentHTML("beforeend", `Obtained ${item.baseItem.friendlyName} (+${expPerIndividualItem} exp)`);
                 }
 
                 appendListItemToResultsList(li);

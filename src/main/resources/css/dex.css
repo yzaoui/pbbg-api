@@ -1,0 +1,23 @@
+table.dex {
+    border-collapse: collapse;
+}
+
+table.dex > tbody > tr > td {
+    border: 1px solid #909090;
+    padding: 8px;
+}
+
+table.dex > tbody > tr.dex-unknown {
+    height: 32px;
+    background-color: #0000001a;
+}
+
+table.dex > tbody > tr.dex-unknown > td {
+    text-align: center;
+}
+
+table.dex > tbody > tr.dex-unknown > td > img {
+    width: 16px;
+    height: 16px;
+    opacity: 0.5;
+}

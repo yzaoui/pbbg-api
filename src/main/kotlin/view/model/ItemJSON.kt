@@ -3,11 +3,14 @@ package com.bitwiserain.pbbg.view.model
 import com.google.gson.annotations.SerializedName
 
 data class ItemJSON(
-    @SerializedName("baseId") val baseId: Int,
-    @SerializedName("friendlyName") val friendlyName: String,
-    @SerializedName("imgURL") val imgURL: String,
+    @SerializedName("baseItem") val baseItem: ItemEnumJSON,
     @SerializedName("quantity") val quantity: Int?,
-    @SerializedName("description") val description: String,
     @SerializedName("equipped") val equipped: Boolean?,
     @SerializedName("grid") val grid: Set<PointJSON>?
+)
+
+data class ItemEnumJSON(
+    val friendlyName: String,
+    val imgURL: String,
+    val description: String
 )

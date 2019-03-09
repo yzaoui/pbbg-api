@@ -21,13 +21,18 @@
 /**
  * @typedef {Object} Item
  *
- * @property {number} baseId
- * @property {string} friendlyName
- * @property {string} imgURL
+ * @property {ItemEnum} baseItem
  * @property {?number} quantity
- * @property {string} description
  * @property {?boolean} equipped
  * @property {?Point[]} grid
+ */
+
+/**
+ * @typedef {Object} ItemEnum
+ *
+ * @property {string} friendlyName
+ * @property {string} imgURL
+ * @property {string} description
  */
 
 window.onload = async () => {
@@ -58,7 +63,7 @@ window.onload = async () => {
             const li = document.createElement("li");
             li.className = "inventory-list-item";
 
-            li.insertAdjacentHTML("beforeend", `<img src="${item.imgURL}">`);
+            li.insertAdjacentHTML("beforeend", `<img src="${item.baseItem.imgURL}">`);
 
             if (item.quantity !== null) {
                 li.appendChild(createItemQuantityDisplay(item.quantity));
@@ -94,7 +99,7 @@ const createItemTooltip = (itemId, item) => {
     const container = document.createElement("div");
     container.className = "inventory-list-item-tooltip";
 
-    container.insertAdjacentHTML("beforeend", `<div>${item.friendlyName}</div>`);
+    container.insertAdjacentHTML("beforeend", `<div>${item.baseItem.friendlyName}</div>`);
 
     if (item.quantity !== null) {
         container.insertAdjacentHTML("beforeend", `<hr><div>Quantity: ${item.quantity}</div>`);
@@ -125,7 +130,7 @@ const createItemTooltip = (itemId, item) => {
         container.insertAdjacentElement("beforeend", preview);
     }
 
-    container.insertAdjacentHTML("beforeend", `<hr><div>${item.description}</div>`);
+    container.insertAdjacentHTML("beforeend", `<hr><div>${item.baseItem.description}</div>`);
 
     return container;
 };
@@ -205,7 +210,7 @@ const createEquipmentDisplay = (equipment) => {
     const equippedPickaxeImg = document.createElement("img");
     equippedPickaxeContainer.appendChild(equippedPickaxeImg);
     if (equipment.pickaxe !== null) {
-        equippedPickaxeImg.src = equipment.pickaxe.imgURL;
+        equippedPickaxeImg.src = equipment.pickaxe.baseItem.imgURL;
         equippedPickaxeContainer.classList.add("equipped");
     } else {
         equippedPickaxeImg.src = "/img/inventory/no-pickaxe.png";
