@@ -1,11 +1,13 @@
 package com.bitwiserain.pbbg.db.usecase
 
+import com.bitwiserain.pbbg.db.repository.DexTable
 import com.bitwiserain.pbbg.db.repository.EquipmentTable
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.*
 import com.bitwiserain.pbbg.domain.model.ItemEnum.*
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
+import io.ktor.html.insert
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -49,6 +51,16 @@ class InventoryUCImpl(private val db: Database) : InventoryUC {
                 if (itemToStore is Equippable) {
                     it[InventoryTable.equipped] = itemToStore.equipped
                 }
+            }
+        }
+
+        /*************************************************
+         * Update user's dex to check off this item type *
+         *************************************************/
+        if (!DexTable.hasEntry(userId, itemToStore.enum)) {
+            DexTable.insert {
+                it[DexTable.userId] = EntityID(userId, UserTable)
+                it[DexTable.item] = itemToStore.enum
             }
         }
     }

@@ -53,6 +53,11 @@ class UserUCImpl(private val db: Database) : UserUC {
                 it[InventoryTable.item] = pickaxe.enum
                 it[InventoryTable.equipped] = false
             }
+
+            DexTable.insert {
+                it[DexTable.userId] = userId
+                it[DexTable.item] = pickaxe.enum
+            }
         }
 
         SquadTable.insertAllies(userId, listOf(
