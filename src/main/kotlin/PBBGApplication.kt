@@ -33,7 +33,6 @@ import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
-import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Slf4jSqlDebugLogger
@@ -50,13 +49,23 @@ val memberPageVM = AttributeKey<MemberPageVM>("memberPageVM")
 lateinit var appEnvironment: ApplicationEnvironment
 
 fun Application.main() {
-    appEnvironment = when (val env = environment.config.property("ktor.environment").getString()) {
+    appEnvironment = when (environment.config.property("ktor.environment").getString()) {
         "dev" -> ApplicationEnvironment.DEV
         "prod" -> ApplicationEnvironment.PROD
         else -> throw RuntimeException("Environment (KTOR_ENV) must be either dev or prod.")
     }
 
-    val db = Database.connect("jdbc:h2:./testDB", Driver::class.qualifiedName!!)
+    /*************
+     * Set up db *
+     *************/
+    val jdbcAddress = environment.config.property("jdbc.address").getString()
+
+    val db = Database.connect("jdbc:$jdbcAddress", when {
+        jdbcAddress.startsWith("h2:") -> org.h2.Driver::class.qualifiedName!!
+        jdbcAddress.startsWith("postgresql:") -> org.h2.Driver::class.qualifiedName!!
+        else -> throw RuntimeException("Only H2 and PostgreSQL databases are currently supported.")
+    })
+
     transaction {
         addLogger(Slf4jSqlDebugLogger)
         SchemaUtils.create(
