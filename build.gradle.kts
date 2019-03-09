@@ -28,21 +28,21 @@ repositories {
 }
 
 dependencies {
-    compile("com.h2database:h2:1.4.197")
-    compile(group = "org.postgresql", name = "postgresql", version = "42.2.1")
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.KOTLIN}")
-    compile("org.jetbrains.exposed:exposed:0.12.2")
-    compile("at.favre.lib:bcrypt:0.7.0")
-    compile("io.ktor:ktor-locations:${Versions.KTOR}")
-    compile("io.ktor:ktor-server-netty:${Versions.KTOR}")
-    compile("io.ktor:ktor-html-builder:${Versions.KTOR}")
-    compile("io.ktor:ktor-gson:${Versions.KTOR}")
-    compile("org.jetbrains.kotlinx:kotlinx-html-jvm:0.6.10")
-    compile("ch.qos.logback:logback-classic:1.2.3")
+    implementation(group = "com.h2database", name = "h2", version = "1.4.197")
+    implementation(group = "org.postgresql", name = "postgresql", version = "42.2.1")
+    implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version = Versions.KOTLIN)
+    implementation(group = "org.jetbrains.exposed", name = "exposed", version = "0.12.2")
+    implementation(group = "at.favre.lib", name = "bcrypt", version = "0.7.0")
+    implementation(group = "io.ktor", name = "ktor-locations", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-server-netty", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-html-builder", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-gson", version = Versions.KTOR)
+    implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-html-jvm", version = "0.6.10")
+    implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
 
-    testCompile("io.ktor:ktor-server-test-host:${Versions.KTOR}")
-    testCompile("org.junit.jupiter:junit-jupiter-api:5.3.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.3.2")
+    testImplementation(group = "io.ktor", name = "ktor-server-test-host", version = Versions.KTOR)
+    testImplementation(group = "org.junit.jupiter", name = "junit-jupiter-api", version = "5.3.2")
+    testRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = "5.3.2")
 }
 
 tasks.withType<KotlinCompile>().all {
