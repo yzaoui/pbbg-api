@@ -104,7 +104,7 @@ fun Item.toJSON() = ItemJSON(
 )
 
 // TODO: Find appropriate place for this adapter
-private fun ItemEnum.toJSON() = ItemEnumJSON(
+fun ItemEnum.toJSON() = ItemEnumJSON(
     friendlyName = friendlyName,
     imgURL = "/img/item/$spriteName-64.png",
     description = description

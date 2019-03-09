@@ -21,7 +21,7 @@ fun Route.dexAPI(userUC: UserUC, dexUC: DexUC) = route("/dex") {
 
         call.respondSuccess(
             DexJSON(
-                discoveredItems = dex.discoveredItems.map { it.ordinal }.toSortedSet(),
+                discoveredItems = dex.discoveredItems.associate { it.ordinal to it.toJSON() }.toSortedMap(),
                 lastItemIsDiscovered = dex.lastItemIsDiscovered
             )
         )
