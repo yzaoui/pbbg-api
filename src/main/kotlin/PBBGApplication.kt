@@ -61,7 +61,7 @@ fun Application.main() {
         addLogger(Slf4jSqlDebugLogger)
         SchemaUtils.create(
             UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable,
-            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable
+            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable
         )
     }
 
@@ -73,11 +73,12 @@ fun Application.main() {
     val equipmentUC = EquipmentUCImpl(db)
     val unitUC = UnitUCImpl(db)
     val battleUC = BattleUCImpl(db)
+    val dexUC = DexUCImpl(db)
 
-    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC)
+    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC, dexUC)
 }
 
-fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC) {
+fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC, dexUC: DexUC) {
     install(Sessions) {
         cookie<ApplicationSession>("pbbg_session") {
             cookie.path = "/"
@@ -99,6 +100,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         mineWeb(userUC)
         battleWeb(userUC)
         inventoryWeb(userUC)
+        dexWeb(userUC)
         settings(userUC)
         route("/api") {
             user(userUC)
@@ -107,6 +109,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
             squadAPI(userUC, unitUC)
             inventoryAPI(userUC, inventoryUC, equipmentUC)
             battleAPI(userUC, battleUC)
+            dexAPI(userUC, dexUC)
         }
         static("css") {
             resources("css")
@@ -136,6 +139,7 @@ fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPa
         inventoryUrl = href(InventoryLocation()),
         battleUrl = href(BattleLocation()),
         mineUrl = href(MineWebLocation()),
+        dexUrl = href(DexWebLocation()),
         settingsUrl = href(SettingsLocation()),
         logoutUrl = href(LogoutLocation())
     )

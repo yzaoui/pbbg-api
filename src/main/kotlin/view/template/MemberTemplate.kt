@@ -47,6 +47,10 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
                         span(classes = "sidebar-item-icon") { +"""⛏️""" } // Unicode variation selector 16
                         span { +"Mine" }
                     }
+                    a(href = memberPageVM.dexUrl, classes = "sidebar-item") {
+                        span(classes = "sidebar-item-icon") { +"""📚""" }
+                        span { +"Dex" }
+                    }
                     a(href = memberPageVM.settingsUrl, classes = "sidebar-item") {
                         span(classes = "sidebar-item-icon") { +"""⚙️""" } // Unicode variation selector 16
                         span { +"Settings" }

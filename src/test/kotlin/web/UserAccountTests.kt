@@ -22,6 +22,7 @@ class UserAccountTests {
     private val equipmentUC = EquipmentUCImpl(db)
     private val unitUC = UnitUCImpl(db)
     private val battleUC = BattleUCImpl(db)
+    private val dexUC = DexUCImpl(db)
 
     @Test
     fun `Registering with legal credentials redirects to member index and sets session cookie`() = testApp {
@@ -68,7 +69,7 @@ class UserAccountTests {
 
     private fun testApp(block: TestApplicationEngine.() -> Unit) {
         withTestApplication({
-            mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC)
+            mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC, dexUC)
         }) { block() }
     }
 }
