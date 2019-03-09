@@ -1,15 +1,13 @@
 package com.bitwiserain.pbbg.route.api
 
-import com.bitwiserain.pbbg.domain.model.Equippable
-import com.bitwiserain.pbbg.domain.model.GridPreviewable
-import com.bitwiserain.pbbg.domain.model.Item
-import com.bitwiserain.pbbg.domain.model.Stackable
+import com.bitwiserain.pbbg.domain.model.*
 import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.view.model.EquipmentJSON
+import com.bitwiserain.pbbg.view.model.ItemEnumJSON
 import com.bitwiserain.pbbg.view.model.ItemJSON
 import com.bitwiserain.pbbg.view.model.PointJSON
 import com.bitwiserain.pbbg.view.model.inventory.InventoryItemJSON
@@ -99,11 +97,15 @@ private data class EquipmentActionParams(
 
 // TODO: Find appropriate place for this adapter
 fun Item.toJSON() = ItemJSON(
-    baseId = this.enum.ordinal,
-    friendlyName = friendlyName,
-    imgURL = "/img/item/$spriteName-64.png",
+    baseItem = this.enum.toJSON(),
     quantity = if (this is Stackable) quantity else null,
-    description = description,
     equipped = if (this is Equippable) equipped else null,
     grid = if (this is GridPreviewable) grid.map { PointJSON(it.x, it.y) }.toSet() else null
+)
+
+// TODO: Find appropriate place for this adapter
+private fun ItemEnum.toJSON() = ItemEnumJSON(
+    friendlyName = friendlyName,
+    imgURL = "/img/item/$spriteName-64.png",
+    description = description
 )
