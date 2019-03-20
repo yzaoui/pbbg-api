@@ -232,7 +232,7 @@ const enteredCell = (x, y) => {
     const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
 
     for (const cell of affectedCells) {
-        mineInfo.cells[cell.y][cell.x].classList.add("selected-item");
+        mineInfo.cells[cell.y][cell.x].classList.add("hovered-cell");
     }
 };
 
@@ -240,7 +240,7 @@ const leftCell = (x, y) => {
     const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
 
     for (const cell of affectedCells) {
-        mineInfo.cells[cell.y][cell.x].classList.remove("selected-item");
+        mineInfo.cells[cell.y][cell.x].classList.remove("hovered-cell");
     }
 };
 
@@ -258,6 +258,15 @@ const updateMiningLevel = async () => {
 const clickedCell = async (x, y) => {
     if (!mineActionSubmitting) {
         mineActionSubmitting = true;
+
+        document.getElementById(MINING_GRID_ID).classList.add("pending-mine-action");
+
+        const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
+
+        for (const cell of affectedCells) {
+            mineInfo.cells[cell.y][cell.x].classList.remove("hovered-cell");
+            mineInfo.cells[cell.y][cell.x].classList.add("pending-cell");
+        }
 
         const res = await postPerformMine(x, y);
 
@@ -288,11 +297,12 @@ const clickedCell = async (x, y) => {
                 appendListItemToResultsList(li);
             }
 
-            const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
-
             for (const cell of affectedCells) {
+                mineInfo.cells[cell.y][cell.x].classList.remove("pending-cell");
                 mineInfo.cells[cell.y][cell.x].removeAttribute("style");
             }
+
+            document.getElementById(MINING_GRID_ID).classList.remove("pending-mine-action");
 
             mineActionSubmitting = false;
         }
