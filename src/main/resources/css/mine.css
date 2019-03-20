@@ -21,8 +21,31 @@
     cursor: pointer;
 }
 
-.mining-grid.enabled .selected-item {
+.mining-grid.enabled.pending-mine-action td {
+    cursor: wait;
+}
+
+.mining-grid.enabled:not(.pending-mine-action) td.hovered-cell {
     background-color: limegreen;
+}
+
+.mining-grid.enabled td.pending-cell {
+    animation: pending-cell-anim 1.5s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes pending-cell-anim {
+    0% {
+        background-color: #258b25;
+    }
+
+    50% {
+        background-color: #9d9d9d;
+    }
+
+    100% {
+        background-color: #258b25;
+    }
 }
 
 .mining-results-list {

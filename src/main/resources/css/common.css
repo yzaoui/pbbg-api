@@ -15,7 +15,6 @@ a {
     margin-top: 100px;
     margin-left: auto;
     margin-right: auto;
-    background: #e1e4ffcf;
 }
 
 body > footer {
@@ -30,16 +29,18 @@ main {
     border: 1px solid black;
     padding: 6px;
     box-sizing: border-box;
+    background: #e1e4ffcf;
 }
 
 .sidebar {
     display: flex;
     flex-direction: column;
-    min-height: 500px;
+    height: 640px;
     width: 150px;
     border: 1px solid black;
     flex: 0 0 150px;
     order: -1;
+    background: #e1e4ffcf;
 }
 
 .sidebar-guest > * {
