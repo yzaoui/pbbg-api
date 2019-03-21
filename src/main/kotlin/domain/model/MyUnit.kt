@@ -62,9 +62,3 @@ sealed class MyUnit {
         }
     }
 }
-
-enum class MyUnitEnum {
-    ICE_CREAM_WIZARD,
-    TWOLIP,
-    CARPSHOOTER
-}
