@@ -6,6 +6,24 @@
  */
 
 window.onload = async () => {
+    const splitPath = window.location.pathname.match(/[^/?]*[^/?]/g);
+
+    if (splitPath.length === 1) {
+        setupRootPage();
+    } else if (splitPath.length === 2 && splitPath[1] === "items") {
+        setupItemsPage();
+    } else if (splitPath.length === 2 && splitPath[1] === "units") {
+        setupUnitsPage();
+    } else {
+        window.location.pathname = "/dex";
+    }
+};
+
+const setupRootPage = () => {
+    replaceInterfaceWithText("[root page in progress]");
+};
+
+const setupItemsPage = async () => {
     replaceInterfaceWithText("Loading…");
 
     const res = await getDex();
@@ -43,6 +61,10 @@ window.onload = async () => {
             tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
         }
     }
+};
+
+const setupUnitsPage = () => {
+    replaceInterfaceWithText("[units page in progress]");
 };
 
 /**
