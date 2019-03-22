@@ -70,6 +70,7 @@ table.dex > tbody > tr > td:nth-child(3) {
 table.dex > tbody > tr.dex-unknown {
     height: 32px;
     background-color: #0000001a;
+    background-image: url("/img/dex/unknown.png");
 }
 
 table.dex > tbody > tr.dex-unknown > td {
