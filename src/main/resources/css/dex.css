@@ -36,6 +36,22 @@ table.dex > tbody > tr > td {
     padding: 8px;
 }
 
+/* ID column */
+table.dex > tbody > tr > td:nth-child(1) {
+    width: 25px;
+    text-align: center;
+}
+
+/* Name column */
+table.dex > tbody > tr > td:nth-child(2) {
+    width: 150px;
+}
+
+/* Image column */
+table.dex > tbody > tr > td:nth-child(3) {
+    width: 64px;
+}
+
 table.dex > tbody > tr.dex-unknown {
     height: 32px;
     background-color: #0000001a;

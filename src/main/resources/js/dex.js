@@ -1,8 +1,23 @@
 /**
- * @typedef {Object} Dex
+ * @typedef {Object} DexItems
  *
  * @property {Object.<number, ItemEnum>[]} discoveredItems - Item indices the user has discovered.
  * @property {boolean} lastItemIsDiscovered - Whether the last possible item has been discovered, i.e. if the list's bottom is discovered.
+ */
+
+/**
+ * @typedef {Object} MyUnitEnum
+ *
+ * @property {string} friendlyName
+ * @property {string} imgURL
+ * @property {string} description
+ */
+
+/**
+ * @typedef {Object} DexUnits
+ *
+ * @property {Object.<number, MyUnitEnum>[]} discoveredUnits - Units the user has discovered, associated by unit index.
+ * @property {boolean} lastUnitIsDiscovered - Whether the last possible unit has been discovered, i.e. if the list's bottom is discovered.
  */
 
 window.onload = async () => {
@@ -58,7 +73,7 @@ const setupItemsPage = async () => {
         replaceInterfaceWithText("");
 
         /**
-         * @type {Dex}
+         * @type {DexItems}
          */
         const dex = res.data;
 
@@ -78,7 +93,7 @@ const setupItemsPage = async () => {
                 tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
             }
 
-            tbody.insertAdjacentElement("beforeend", createDiscoveredDexRow(idnum, item));
+            tbody.insertAdjacentElement("beforeend", createDiscoveredDexItemRow(idnum, item));
 
             lastDiscoveredId = idnum;
         }
@@ -89,17 +104,53 @@ const setupItemsPage = async () => {
     }
 };
 
-const setupUnitsPage = () => {
+const setupUnitsPage = async () => {
     document.title = "Units - Dex";
 
-    replaceInterfaceWithText("[units page in progress]");
+    replaceInterfaceWithText("Loading…");
+
+    const res = await getDexUnits();
+
+    if (res.status === "success") {
+        replaceInterfaceWithText("");
+
+        /**
+         * @type {DexUnits}
+         */
+        const dex = res.data;
+
+        const table = document.createElement("table");
+        table.classList.add("dex");
+        document.getElementById("main").insertAdjacentElement("beforeend", table);
+
+        const tbody = document.createElement("tbody");
+        table.insertAdjacentElement("beforeend", tbody);
+
+        let lastDiscoveredId = -1;
+
+        for (const [id, unit] of Object.entries(dex.discoveredUnits)) {
+            const idnum = parseInt(id);
+
+            if (idnum !== lastDiscoveredId + 1) {
+                tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
+            }
+
+            tbody.insertAdjacentElement("beforeend", createDiscoveredDexUnitRow(idnum, unit));
+
+            lastDiscoveredId = idnum;
+        }
+
+        if (!dex.lastUnitIsDiscovered) {
+            tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
+        }
+    }
 };
 
 /**
  * @param {number} id
  * @param {ItemEnum} item
  */
-const createDiscoveredDexRow = (id, item) => {
+const createDiscoveredDexItemRow = (id, item) => {
     const { friendlyName, imgURL, description } = item;
 
     const tr = document.createElement("tr");
@@ -108,6 +159,25 @@ const createDiscoveredDexRow = (id, item) => {
         `<td>${id}</td>` +
         `<td>${friendlyName}</td>` +
         `<td><img src="${imgURL}" alt="Item image"></td>` +
+        `<td>${description}</td>`
+    );
+
+    return tr;
+};
+
+/**
+ * @param {number} id
+ * @param {MyUnitEnum} unit
+ */
+const createDiscoveredDexUnitRow = (id, unit) => {
+    const { friendlyName, imgURL, description } = unit;
+
+    const tr = document.createElement("tr");
+
+    tr.insertAdjacentHTML("beforeend",
+        `<td>${id}</td>` +
+        `<td>${friendlyName}</td>` +
+        `<td><img src="${imgURL}" alt="Unit sprite"></td>` +
         `<td>${description}</td>`
     );
 
@@ -123,8 +193,15 @@ const createUnknownDexRow = () => {
 };
 
 /**
- * On success, returns {@see Dex}.
+ * On success, returns {@see DexItems}.
  */
 const getDexItems = async () => (await fetch("/api/dex/items", {
+    method: "GET",
+})).json();
+
+/**
+ * On success, returns {@see DexUnits}.
+ */
+const getDexUnits = async () => (await fetch("/api/dex/units", {
     method: "GET",
 })).json();
