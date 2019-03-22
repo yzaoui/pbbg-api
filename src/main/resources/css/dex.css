@@ -27,6 +27,21 @@ a.dex-category:last-child {
     border-radius: 0 0 10px 10px;
 }
 
+a.dex-return {
+    width: 120px;
+    padding: 8px;
+    border: 1px solid black;
+    border-radius: 10px;
+    text-decoration: none;
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+a.dex-return:hover {
+    color: white;
+    background-color: #0390f9;
+}
+
 table.dex {
     border-collapse: collapse;
 }

@@ -55,7 +55,7 @@ const setupRootPage = () => {
 
     for (const link of links) {
         link.addEventListener("click", (e) => {
-            window.history.pushState({}, "AAA", link.href);
+            window.history.pushState({}, "", link.href);
             route();
             e.preventDefault();
         });
@@ -76,6 +76,8 @@ const setupItemsPage = async () => {
          * @type {DexItems}
          */
         const dex = res.data;
+
+        document.getElementById("main").insertAdjacentElement("beforeend", createBackToDex());
 
         const table = document.createElement("table");
         table.classList.add("dex");
@@ -118,6 +120,8 @@ const setupUnitsPage = async () => {
          * @type {DexUnits}
          */
         const dex = res.data;
+
+        document.getElementById("main").insertAdjacentElement("beforeend", createBackToDex());
 
         const table = document.createElement("table");
         table.classList.add("dex");
@@ -190,6 +194,20 @@ const createUnknownDexRow = () => {
     tr.innerHTML = `<td colspan="4"><img src="/img/three-dots.svg" alt="Three vertical circles indicating missing row(s)"></td>`;
 
     return tr;
+};
+
+const createBackToDex = () => {
+    const a = document.createElement("a");
+    a.setAttribute("href", "/dex");
+    a.classList.add("dex-return");
+    a.innerText = "⬅️ Return to Dex";
+    a.addEventListener("click", (e) => {
+        window.history.pushState({}, "", a.href);
+        route();
+        e.preventDefault();
+    });
+
+    return a;
 };
 
 /**
