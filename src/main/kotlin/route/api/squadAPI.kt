@@ -40,11 +40,11 @@ private fun Squad.toJSON() = SquadJSON(
 
 fun MyUnit.toJSON() = MyUnitJSON(
     id = id,
-    name = name,
+    name = enum.friendlyName,
     baseUnitId = enum.ordinal,
     hp = hp,
     maxHP = maxHP,
     atk = atk,
     levelProgress = UnitExperienceManager.getLevelProgress(exp).toJSON(),
-    idleAnimationURL = "/img/unit/$spriteName.gif"
+    idleAnimationURL = "/img/unit/${enum.spriteName}.gif"
 )

@@ -2,21 +2,33 @@ package com.bitwiserain.pbbg.db.usecase
 
 import com.bitwiserain.pbbg.db.repository.DexTable
 import com.bitwiserain.pbbg.domain.model.ItemEnum
-import com.bitwiserain.pbbg.domain.model.dex.Dex
+import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.domain.model.dex.DexItems
+import com.bitwiserain.pbbg.domain.model.dex.DexUnits
 import com.bitwiserain.pbbg.domain.usecase.DexUC
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class DexUCImpl(private val db: Database) : DexUC {
-    override fun getDex(userId: Int): Dex = transaction(db) {
+    override fun getDexItems(userId: Int): DexItems = transaction(db) {
         val discoveredItems = DexTable.select { DexTable.userId.eq(userId) }
             .map { it[DexTable.item] }
             .toSet()
 
-        return@transaction Dex(
+        return@transaction DexItems(
             discoveredItems = discoveredItems,
             lastItemIsDiscovered = discoveredItems.contains(ItemEnum.values().last())
+        )
+    }
+
+    override fun getDexUnits(userId: Int): DexUnits = transaction(db ) {
+        // TODO: Implement this
+        val discoveredUnits = MyUnitEnum.values().toSet()
+
+        return@transaction DexUnits(
+            discoveredUnits = discoveredUnits,
+            lastUnitIsDiscovered = true
         )
     }
 }
