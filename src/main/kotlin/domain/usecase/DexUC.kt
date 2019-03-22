@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.dex.Dex
+import com.bitwiserain.pbbg.domain.model.dex.DexItems
 
 interface DexUC {
-    fun getDex(userId: Int): Dex
+    fun getDexItems(userId: Int): DexItems
 }

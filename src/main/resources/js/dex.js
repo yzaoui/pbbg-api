@@ -52,7 +52,7 @@ const setupItemsPage = async () => {
 
     replaceInterfaceWithText("Loading…");
 
-    const res = await getDex();
+    const res = await getDexItems();
 
     if (res.status === "success") {
         replaceInterfaceWithText("");
@@ -125,6 +125,6 @@ const createUnknownDexRow = () => {
 /**
  * On success, returns {@see Dex}.
  */
-const getDex = async () => (await fetch("/api/dex", {
+const getDexItems = async () => (await fetch("/api/dex/items", {
     method: "GET",
 })).json();

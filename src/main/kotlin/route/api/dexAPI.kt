@@ -5,7 +5,7 @@ import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondSuccess
-import com.bitwiserain.pbbg.view.model.DexJSON
+import com.bitwiserain.pbbg.view.model.dex.DexItemsJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get
@@ -14,16 +14,18 @@ import io.ktor.routing.route
 fun Route.dexAPI(userUC: UserUC, dexUC: DexUC) = route("/dex") {
     interceptSetUserOr401(userUC)
 
-    get {
-        val loggedInUser = call.attributes[loggedInUserKey]
+    route("/items") {
+        get {
+            val loggedInUser = call.attributes[loggedInUserKey]
 
-        val dex = dexUC.getDex(loggedInUser.id)
+            val dex = dexUC.getDexItems(loggedInUser.id)
 
-        call.respondSuccess(
-            DexJSON(
-                discoveredItems = dex.discoveredItems.associate { it.ordinal to it.toJSON() }.toSortedMap(),
-                lastItemIsDiscovered = dex.lastItemIsDiscovered
+            call.respondSuccess(
+                DexItemsJSON(
+                    discoveredItems = dex.discoveredItems.associate { it.ordinal to it.toJSON() }.toSortedMap(),
+                    lastItemIsDiscovered = dex.lastItemIsDiscovered
+                )
             )
-        )
+        }
     }
 }
