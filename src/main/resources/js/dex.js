@@ -6,6 +6,14 @@
  */
 
 window.onload = async () => {
+    route();
+};
+
+window.onpopstate = () => {
+    route();
+};
+
+const route = async () => {
     const splitPath = window.location.pathname.match(/[^/?]*[^/?]/g);
 
     if (splitPath.length === 1) {
@@ -20,10 +28,28 @@ window.onload = async () => {
 };
 
 const setupRootPage = () => {
-    replaceInterfaceWithText("[root page in progress]");
+    document.title = "Dex";
+
+    document.getElementById("main").innerHTML =
+        `<div class="dex-categories">` +
+            `<a href="/dex/items" class="dex-category">Items</a>` +
+            `<a href="/dex/units" class="dex-category">Units</a>` +
+        `</div>`;
+
+    const links = document.querySelectorAll("#main a");
+
+    for (const link of links) {
+        link.addEventListener("click", (e) => {
+            window.history.pushState({}, "AAA", link.href);
+            route();
+            e.preventDefault();
+        });
+    }
 };
 
 const setupItemsPage = async () => {
+    document.title = "Items - Dex";
+
     replaceInterfaceWithText("Loading…");
 
     const res = await getDex();
@@ -64,6 +90,8 @@ const setupItemsPage = async () => {
 };
 
 const setupUnitsPage = () => {
+    document.title = "Units - Dex";
+
     replaceInterfaceWithText("[units page in progress]");
 };
 
