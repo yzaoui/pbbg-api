@@ -8,9 +8,3 @@ data class ItemJSON(
     @SerializedName("equipped") val equipped: Boolean?,
     @SerializedName("grid") val grid: Set<PointJSON>?
 )
-
-data class ItemEnumJSON(
-    val friendlyName: String,
-    val imgURL: String,
-    val description: String
-)
