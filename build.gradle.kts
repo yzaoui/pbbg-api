@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URI
 
 object Versions {
-    const val KOTLIN = "1.3.21"
+    const val KOTLIN = "1.3.30"
     const val KTOR = "1.1.3"
 }
 
@@ -12,7 +12,7 @@ version = "0.0.1"
 
 plugins {
     application
-    kotlin("jvm").version(/*Versions.KOTLIN*/"1.3.21")
+    kotlin("jvm").version(/*Versions.KOTLIN*/"1.3.30")
     id("com.github.johnrengelman.shadow").version("4.0.4")
 }
 
