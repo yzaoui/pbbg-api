@@ -107,10 +107,9 @@ const setupBattle = (battle) => {
     attackButton.id = "attack-button";
     attackButton.className = "fancy";
     attackButton.innerText = "Attack";
-    attackButton.style.alignSelf = "center";
     attackButton.onclick = () => attack();
     attackButton.disabled = true;
-    main.appendChild(attackButton);
+    battleDiv.appendChild(attackButton);
 };
 
 /**
