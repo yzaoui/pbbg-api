@@ -4,7 +4,7 @@ import java.net.URI
 
 object Versions {
     const val KOTLIN = "1.3.30"
-    const val KTOR = "1.1.3"
+    const val KTOR = "1.1.4"
 }
 
 group = "com.bitwiserain"
