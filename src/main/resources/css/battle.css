@@ -16,8 +16,23 @@ pbbg-unit[selected]:hover {
 }
 
 .battle-interface {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-areas:
+        "allies enemies"
+        "attack attack";
+}
+
+.battle-interface > :nth-child(1) {
+    grid-area: allies;
+}
+
+.battle-interface > :nth-child(2) {
+    grid-area: enemies;
+}
+
+.battle-interface > :nth-child(3) {
+    grid-area: attack;
+    justify-self: center;
 }
 
 .battle-interface > div {

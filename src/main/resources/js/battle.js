@@ -40,7 +40,7 @@ window.onload = async () => {
 
         if (data !== null) {
             /* If there is a battle, set up battle interface*/
-            setupBattle(data.allies, data.enemies);
+            setupBattle(data);
         } else {
             /* If there is no battle, set up interface to generate battle*/
             const button = document.createElement("button");
@@ -55,10 +55,9 @@ window.onload = async () => {
 };
 
 /**
- * @param {UnitResponse[]} allies
- * @param {UnitResponse[]} enemies
+ * @param {BattleSession} battle
  */
-const setupBattle = (allies, enemies) => {
+const setupBattle = (battle) => {
     const battleDiv = document.createElement("div");
     battleDiv.className = "battle-interface";
     main.appendChild(battleDiv);
@@ -72,7 +71,7 @@ const setupBattle = (allies, enemies) => {
     allyList.id = "ally-list";
     allyDiv.appendChild(allyList);
 
-    allies.forEach(ally => {
+    battle.allies.forEach(ally => {
         const li = document.createElement("li");
         allyList.appendChild(li);
 
@@ -92,7 +91,7 @@ const setupBattle = (allies, enemies) => {
     enemyList.id = "enemy-list";
     enemyDiv.appendChild(enemyList);
 
-    enemies.forEach(enemy => {
+    battle.enemies.forEach(enemy => {
         const li = document.createElement("li");
         enemyList.appendChild(li);
 
@@ -108,10 +107,9 @@ const setupBattle = (allies, enemies) => {
     attackButton.id = "attack-button";
     attackButton.className = "fancy";
     attackButton.innerText = "Attack";
-    attackButton.style.alignSelf = "center";
     attackButton.onclick = () => attack();
     attackButton.disabled = true;
-    main.appendChild(attackButton);
+    battleDiv.appendChild(attackButton);
 };
 
 /**
@@ -154,7 +152,7 @@ const generateBattle = async () => {
          */
         const data = res.data;
 
-        setupBattle(data.allies, data.enemies);
+        setupBattle(data);
     } else {
         main.innerText = "Error";
     }
