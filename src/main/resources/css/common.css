@@ -126,6 +126,25 @@ button.loading, button.loading.fancy, button.loading.fancy:disabled {
     cursor: wait;
 }
 
+a.btn {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 3px;
+    padding: 7px;
+    text-decoration: none;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+a.btn:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+a.btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.5);
+}
+
 .level-info {
     display: inline-block;
     width: 200px;
