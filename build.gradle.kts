@@ -13,7 +13,7 @@ version = "0.0.1"
 plugins {
     application
     kotlin("jvm").version(/*Versions.KOTLIN*/"1.3.30")
-    id("com.github.johnrengelman.shadow").version("4.0.4")
+    id("com.github.johnrengelman.shadow").version("5.0.0")
 }
 
 application {
