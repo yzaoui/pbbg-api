@@ -43,13 +43,7 @@ window.onload = async () => {
             setupBattle(data);
         } else {
             /* If there is no battle, set up interface to generate battle*/
-            const button = document.createElement("button");
-            button.className = "fancy";
-            button.style.alignSelf = "center";
-            button.innerText = "Generate battle";
-            button.onclick = () => generateBattle();
-
-            main.appendChild(button);
+            setupGenerateBattle();
         }
     }
 };
@@ -62,46 +56,30 @@ const setupBattle = (battle) => {
     battleDiv.className = "battle-interface";
     main.appendChild(battleDiv);
 
-    const allyDiv = document.createElement("div");
-    battleDiv.appendChild(allyDiv);
+    const createUnitDiv = (title, listId, units, selectFn) => {
+        const div = document.createElement("div");
+        div.insertAdjacentHTML("beforeend", `<h1>${title}</h1>`);
 
-    allyDiv.insertAdjacentHTML("beforeend", `<h1>Allies</h1>`);
+        const list = document.createElement("ul");
+        list.id = listId;
+        div.appendChild(list);
 
-    const allyList = document.createElement("ul");
-    allyList.id = "ally-list";
-    allyDiv.appendChild(allyList);
+        for (const unit of units) {
+            const li = document.createElement("li");
+            list.appendChild(li);
 
-    battle.allies.forEach(ally => {
-        const li = document.createElement("li");
-        allyList.appendChild(li);
+            const unitEl = document.createElement("pbbg-unit");
+            unitEl.setAttribute("unit-id", String(unit.id));
+            unitEl.unit = unit;
+            unitEl.onclick = () => selectFn(unit.id);
+            li.appendChild(unitEl);
+        }
 
-        const unitEl = document.createElement("pbbg-unit");
-        unitEl.setAttribute("unit-id", String(ally.id));
-        unitEl.unit = ally;
-        unitEl.onclick = () => selectAlly(ally.id);
-        li.appendChild(unitEl);
-    });
+        return div;
+    };
 
-    const enemyDiv = document.createElement("div");
-    battleDiv.appendChild(enemyDiv);
-
-    enemyDiv.insertAdjacentHTML("beforeend", `<h1>Enemies</h1>`);
-
-    const enemyList = document.createElement("ul");
-    enemyList.id = "enemy-list";
-    enemyDiv.appendChild(enemyList);
-
-    battle.enemies.forEach(enemy => {
-        const li = document.createElement("li");
-        enemyList.appendChild(li);
-
-        const unitEl = document.createElement("pbbg-unit");
-        unitEl.setAttribute("unit-id", String(enemy.id));
-        unitEl.setAttribute("facing", "left");
-        unitEl.unit = enemy;
-        unitEl.onclick = () => selectEnemy(enemy.id);
-        li.appendChild(unitEl);
-    });
+    battleDiv.appendChild(createUnitDiv("Allies", "ally-list", battle.allies, selectAlly));
+    battleDiv.appendChild(createUnitDiv("Enemies", "enemy-list", battle.enemies, selectEnemy));
 
     const attackButton = document.createElement("button");
     attackButton.id = "attack-button";
@@ -112,31 +90,27 @@ const setupBattle = (battle) => {
     battleDiv.appendChild(attackButton);
 };
 
+const setupGenerateBattle = () => {
+    const button = document.createElement("button");
+    button.className = "fancy";
+    button.style.alignSelf = "center";
+    button.innerText = "Generate battle";
+    button.onclick = () => generateBattle();
+
+    main.appendChild(button);
+};
+
 /**
  * @param {UnitResponse[]} allies
  * @param {UnitResponse[]} enemies
  */
 const updateUnits = (allies, enemies) => {
-    const allyUnitEls = document.getElementById("ally-list").querySelectorAll("pbbg-unit");
-    const enemyUnitEls = document.getElementById("enemy-list").querySelectorAll("pbbg-unit");
+    const unitEls = getAllPBBGUnits();
+    const unitObjs = allies.concat(enemies);
 
-    const update = (unitObjs, unitEls) => {
-        for (let i = 0; i < unitEls.length; i++) {
-            const unitEl = unitEls[i];
-
-            for (let j = 0; j < unitObjs.length; j++) {
-                const unitElId = Number(unitEl.unitId);
-
-                if (unitElId === unitObjs[j].id) {
-                    unitEl.unit = unitObjs[j];
-                    break;
-                }
-            }
-        }
-    };
-
-    update(allies, allyUnitEls);
-    update(enemies, enemyUnitEls);
+    for (const unitEl of unitEls) {
+        unitEl.unit = unitObjs.find((obj) => unitEl.unitId === obj.id)
+    }
 };
 
 const generateBattle = async () => {
@@ -154,7 +128,7 @@ const generateBattle = async () => {
 
         setupBattle(data);
     } else {
-        main.innerText = "Error";
+        replaceInterfaceWithText("Error");
     }
 };
 
@@ -186,15 +160,13 @@ const attack = async () => {
  */
 const checkForDeaths = () => {
     const checkUnitStillAlive = (unitEls, unitId) => {
-        for (let i = 0; i < unitEls.length; i++) {
-            const el = unitEls[i];
+        const unitEl = unitEls.find((el) => el.unitId === unitId);
 
-            if (el.hasAttribute("dead") && unitId === Number(el.unitId)) {
-                return null
-            }
+        if (unitEl.hasAttribute("dead")) {
+            return null;
+        } else {
+            return unitId;
         }
-
-        return unitId;
     };
 
     selectedUnits.allyId = checkUnitStillAlive(getAllyPBBGUnits(), selectedUnits.allyId);
@@ -204,16 +176,12 @@ const checkForDeaths = () => {
 };
 
 const updateUI = () => {
-    const updateSelectedUnit = (unitEls, unitId) => {
-        for (let i = 0; i < unitEls.length; i++) {
-            const el = unitEls[i];
+    getAllPBBGUnits().forEach((el) => el.removeAttribute("selected"));
 
-            if (!el.hasAttribute("dead") && unitId === Number(el.unitId)) {
-                el.setAttribute("selected", "");
-            } else {
-                el.removeAttribute("selected");
-            }
-        }
+    const updateSelectedUnit = (unitEls, unitId) => {
+        if (unitId === null) return;
+
+        unitEls.find((el) => el.unitId === unitId).setAttribute("selected", "");
     };
 
     updateSelectedUnit(getAllyPBBGUnits(), selectedUnits.allyId);
@@ -222,18 +190,20 @@ const updateUI = () => {
     document.getElementById("attack-button").disabled = !(selectedUnits.allyId && selectedUnits.enemyId);
 };
 
-const getAllyPBBGUnits = () => document.getElementById("ally-list").querySelectorAll("pbbg-unit");
+const getAllyPBBGUnits = () => Array.from(document.querySelectorAll("#ally-list pbbg-unit"));
 
-const getEnemyPBBGUnits = () => document.getElementById("enemy-list").querySelectorAll("pbbg-unit");
+const getEnemyPBBGUnits = () => Array.from(document.querySelectorAll("#enemy-list pbbg-unit"));
+
+const getAllPBBGUnits = () => Array.from(document.querySelectorAll("pbbg-unit"));
 
 const selectAlly = (allyId) => {
-    selectedUnits.allyId = selectUnit(getAllyPBBGUnits(), allyId);
+    selectedUnits.allyId = selectUnit(getAllyPBBGUnits(), allyId, selectedUnits.allyId);
 
     updateUI();
 };
 
 const selectEnemy = (enemyId) => {
-    selectedUnits.enemyId = selectUnit(getEnemyPBBGUnits(), enemyId);
+    selectedUnits.enemyId = selectUnit(getEnemyPBBGUnits(), enemyId, selectedUnits.enemyId);
 
     updateUI();
 };
@@ -241,21 +211,15 @@ const selectEnemy = (enemyId) => {
 /**
  * @returns {?number} Selected unit's ID, or null if invalid.
  */
-const selectUnit = (unitEls, unitId) => {
-    let selectedUnitId = null;
+const selectUnit = (unitEls, unitId, currentlySelectedId) => {
+    const unitEl = unitEls.find((el) => el.unitId === unitId);
 
-    for (let i = 0; i < unitEls.length; i++) {
-        const el = unitEls[i];
-
-        if (!el.hasAttribute("dead") && unitId === Number(el.unitId)) {
-            el.setAttribute("selected", "");
-            selectedUnitId = unitId;
-        } else {
-            el.removeAttribute("selected");
-        }
+    if (!unitEl.hasAttribute("dead")) {
+        unitEl.setAttribute("selected", "");
+        return unitId;
+    } else {
+        return currentlySelectedId;
     }
-
-    return selectedUnitId;
 };
 
 /**
