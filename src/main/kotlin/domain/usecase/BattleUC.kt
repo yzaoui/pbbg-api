@@ -15,6 +15,8 @@ interface BattleUC {
      * Generates a battle and assigns it to a user.
      *
      * @return Newly created battle.
+     *
+     * @throws NoAlliesAliveException when no allies are alive to start this battle.
      */
     fun generateBattle(userId: Int): Battle
 
@@ -23,7 +25,7 @@ interface BattleUC {
      *
      * @return Updated battle.
      *
-     * @throws NoBattleInSessionException
+     * @throws NoBattleInSessionException when user has no battle in session.
      */
     fun allyTurn(userId: Int, action: BattleAction): Battle
 
@@ -32,9 +34,10 @@ interface BattleUC {
      *
      * @return Updated battle.
      *
-     * @throws NoBattleInSessionException
+     * @throws NoBattleInSessionException when user has no battle in session.
      */
     fun enemyTurn(userId: Int): Battle
 }
 
+class NoAlliesAliveException : Exception()
 class NoBattleInSessionException : Exception()

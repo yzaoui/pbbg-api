@@ -14,6 +14,7 @@ import com.bitwiserain.pbbg.domain.model.battle.BattleAction
 import com.bitwiserain.pbbg.domain.model.battle.BattleQueue
 import com.bitwiserain.pbbg.domain.model.battle.Turn
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
+import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.domain.usecase.NoBattleInSessionException
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
@@ -33,6 +34,11 @@ class BattleUCImpl(private val db: Database) : BattleUC {
     override fun generateBattle(userId: Int): Battle = transaction(db) {
         // TODO: Forbid action if a battle is already in progress
 
+        val allies = SquadTable.getAllies(userId)
+
+        // There must be allies alive to start a battle
+        if (allies.none { it.alive }) throw NoAlliesAliveException()
+
         val battleSession = BattleSessionTable.insertAndGetId {
             it[BattleSessionTable.userId] = EntityID(userId, UserTable)
             it[BattleSessionTable.battleQueue] = ""
@@ -45,7 +51,6 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         }
         BattleEnemyTable.insertEnemies(battleSession, newEnemies)
 
-        val allies = SquadTable.getAllies(userId)
         val enemies = BattleEnemyTable.getEnemies(battleSession)
 
         val battleQueue = BattleQueue(
