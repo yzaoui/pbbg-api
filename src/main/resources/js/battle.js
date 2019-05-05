@@ -14,6 +14,7 @@
  * @property {number} atk - The unit's attack stat.
  * @property {LevelProgress} levelProgress - The unit's level and experience information.
  * @property {string} idleAnimationURL - The unit's idle animation URL.
+ * @property {string} iconURL - The unit's icon URL.
  */
 
 const main = document.getElementById("main");

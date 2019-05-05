@@ -46,5 +46,6 @@ fun MyUnit.toJSON() = MyUnitJSON(
     maxHP = maxHP,
     atk = atk,
     levelProgress = UnitExperienceManager.getLevelProgress(exp).toJSON(),
-    idleAnimationURL = "/img/unit/${enum.spriteName}.gif"
+    idleAnimationURL = "/img/unit/${enum.spriteName}.gif",
+    iconURL = "/img/unit-icon/${enum.spriteName}.png"
 )
