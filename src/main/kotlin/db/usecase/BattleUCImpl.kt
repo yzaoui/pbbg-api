@@ -140,11 +140,8 @@ class BattleUCImpl(private val db: Database) : BattleUC {
     )
 
     private fun deleteBattleIfOver(battle: Battle, battleSession: EntityID<Long>) = transaction(db) {
-        val aliveEnemies = battle.enemies.filter { it.hp > 0 }
-
-        if (aliveEnemies.isEmpty()) {
-            // All enemies are defeated
-
+        if (battle.allies.none { it.alive } || battle.enemies.none { it.alive }) {
+            // Delete enemies, since they only exist within this battle
             val enemyIdCSV = battle.enemies.asSequence().map { it.id }.joinToString()
 
             BattleSessionTable.deleteBattle(battleSession)
