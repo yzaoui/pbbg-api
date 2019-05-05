@@ -81,7 +81,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         // Pick an action
         // TODO: Only current action is attack, so pick a random target
-        val action = BattleAction.Attack(SquadTable.getAllies(userId).random().id)
+        val action = BattleAction.Attack(SquadTable.getAllies(userId).filter { it.alive }.random().id)
 
         return@transaction act(userId, battleSession, enemy, action)
     }

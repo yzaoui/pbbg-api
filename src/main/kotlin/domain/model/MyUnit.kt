@@ -10,8 +10,10 @@ sealed class MyUnit {
     abstract val maxHP: Int
     abstract val atk: Int
     abstract val exp: Long
+    val alive: Boolean
+        get() = hp > 0
     val dead: Boolean
-        get() = hp == 0
+        get() = !alive
 
     data class IceCreamWizard(
         override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
