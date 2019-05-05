@@ -49,7 +49,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         val enemies = BattleEnemyTable.getEnemies(battleSession)
 
         val battleQueue = BattleQueue(
-            turns = (allies + enemies).map { Turn(it.id, Random.nextInt(100)) }.sortedByDescending { it.counter }
+            turns = (allies + enemies).filter { it.alive }.map { Turn(it.id, Random.nextInt(100)) }.sortedByDescending { it.counter }
         )
 
         BattleSessionTable.updateBattleQueue(battleSession, battleQueue)
