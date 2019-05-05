@@ -7,9 +7,14 @@ import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
 import com.bitwiserain.pbbg.db.repository.execAndMap
+import com.bitwiserain.pbbg.domain.model.MyUnit
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.battle.Battle
+import com.bitwiserain.pbbg.domain.model.battle.BattleAction
+import com.bitwiserain.pbbg.domain.model.battle.BattleQueue
+import com.bitwiserain.pbbg.domain.model.battle.Turn
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
+import com.bitwiserain.pbbg.domain.usecase.NoBattleInSessionException
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -22,7 +27,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         if (battleSession == null) return@transaction null
 
-        Battle(allies = SquadTable.getAllies(userId), enemies = BattleEnemyTable.getEnemies(battleSession), battleQueue = BattleSessionTable.getBattleQueue(battleSession))
+        return@transaction getBattle(userId, battleSession)
     }
 
     override fun generateBattle(userId: Int): Battle = transaction(db) {
@@ -30,49 +35,104 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         val battleSession = BattleSessionTable.insertAndGetId {
             it[BattleSessionTable.userId] = EntityID(userId, UserTable)
+            it[BattleSessionTable.battleQueue] = ""
         }
 
         val newEnemies = mutableListOf<MyUnitForm>()
         // Add 1-3 new enemies
         for (i in 0..Random.nextInt(1, 3)) {
-            newEnemies.add(MyUnitForm(MyUnitEnum.values().random(), Random.nextInt(7, 12), 0))
+            newEnemies.add(MyUnitForm(MyUnitEnum.values().random(), Random.nextInt(7, 12), Random.nextInt(1, 3)))
         }
         BattleEnemyTable.insertEnemies(battleSession, newEnemies)
 
         val allies = SquadTable.getAllies(userId)
         val enemies = BattleEnemyTable.getEnemies(battleSession)
 
-        Battle(allies = allies, enemies = enemies, battleQueue = BattleSessionTable.getBattleQueue(battleSession))
+        val battleQueue = BattleQueue(
+            turns = (allies + enemies).map { Turn(it.id, Random.nextInt(100)) }.sortedByDescending { it.counter }
+        )
+
+        BattleSessionTable.updateBattleQueue(battleSession, battleQueue)
+
+        Battle(allies = allies, enemies = enemies, battleQueue = battleQueue)
     }
 
-    override fun attack(userId: Int, allyId: Long, enemyId: Long): Battle = transaction(db) {
-        val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw Exception()
+    override fun allyTurn(userId: Int, action: BattleAction): Battle = transaction(db) {
+        val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw NoBattleInSessionException()
 
-        // Ally should exist
-        val ally = SquadTable.getAlly(userId, allyId) ?: throw Exception()
+        val queue = BattleSessionTable.getBattleQueue(battleSession)
 
-        // Enemy should exist
-        val enemy = BattleEnemyTable.getEnemy(battleSession, enemyId) ?: throw Exception()
+        // Ally should be next in queue
+        val ally = SquadTable.getAlly(userId, queue.peek()) ?: throw Exception()
 
-        // Enemy should not already be dead
-        if (enemy.dead) throw Exception()
+        // Make sure this ally can perform this action
+        // TODO: Only current action is attack, which is available to every unit
 
-        // Apply damage to attacked enemy and update unit
-        val updatedEnemy = enemy.receiveDamage(ally.atk)
-        UnitTable.updateUnit(enemyId, updatedEnemy)
+        return@transaction act(userId, battleSession, ally, action)
+    }
 
-        // Gain experience if ally killed enemy
-        if (updatedEnemy.dead) {
-            val updatedAlly = ally.gainExperience(2L)
-            UnitTable.updateUnit(allyId, updatedAlly)
+    override fun enemyTurn(userId: Int): Battle = transaction(db) {
+        val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw NoBattleInSessionException()
+
+        val queue = BattleSessionTable.getBattleQueue(battleSession)
+
+        // Enemy should be next in queue
+        val enemy = BattleEnemyTable.getEnemy(battleSession, queue.peek()) ?: throw Exception()
+
+        // Pick an action
+        // TODO: Only current action is attack, so pick a random target
+        val action = BattleAction.Attack(SquadTable.getAllies(userId).random().id)
+
+        return@transaction act(userId, battleSession, enemy, action)
+    }
+
+    private fun act(userId: Int, battleSession: EntityID<Long>, actingUnit: MyUnit, action: BattleAction): Battle {
+        val queue = BattleSessionTable.getBattleQueue(battleSession)
+        val unitsToRemove: MutableList<Long> = mutableListOf()
+
+        when (action) {
+            is BattleAction.Attack -> {
+                // Unit should exist
+                val target = UnitTable.getUnit(action.targetUnitId) ?: throw Exception()
+
+                // Can't attack self
+                if (target.id == actingUnit.id) throw Exception()
+
+                // Can't attack units not in this battle
+                if (!getBattle(userId, battleSession).contains(target.id)) throw Exception()
+
+                // Can't attack dead units
+                if (target.dead) throw Exception()
+
+                val updatedTarget = target.receiveDamage(actingUnit.atk)
+                UnitTable.updateUnit(target.id, updatedTarget)
+
+                // Gain experience if target is defeated
+                if (updatedTarget.dead) {
+                    val updatedActingUnit = actingUnit.gainExperience(2L)
+                    UnitTable.updateUnit(actingUnit.id, updatedActingUnit)
+
+                    unitsToRemove.add(target.id)
+                }
+            }
+            else -> throw RuntimeException() // All actions should be accounted for
         }
 
-        val updatedBattle = Battle(allies = SquadTable.getAllies(userId), enemies = BattleEnemyTable.getEnemies(battleSession), battleQueue = BattleSessionTable.getBattleQueue(battleSession))
+        val updatedQueue = queue.endTurn(unitsToRemove)
+        BattleSessionTable.updateBattleQueue(battleSession, updatedQueue)
+
+        val updatedBattle = getBattle(userId, battleSession)
 
         deleteBattleIfOver(updatedBattle, battleSession)
 
-        return@transaction updatedBattle
+        return updatedBattle
     }
+
+    private fun getBattle(userId: Int, battleSession: EntityID<Long>) = Battle(
+        allies = SquadTable.getAllies(userId),
+        enemies = BattleEnemyTable.getEnemies(battleSession),
+        battleQueue = BattleSessionTable.getBattleQueue(battleSession)
+    )
 
     private fun deleteBattleIfOver(battle: Battle, battleSession: EntityID<Long>) = transaction(db) {
         val aliveEnemies = battle.enemies.filter { it.hp > 0 }

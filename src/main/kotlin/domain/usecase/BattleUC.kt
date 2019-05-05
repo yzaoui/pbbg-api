@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.domain.usecase
 
 import com.bitwiserain.pbbg.domain.model.battle.Battle
+import com.bitwiserain.pbbg.domain.model.battle.BattleAction
 
 interface BattleUC {
     /**
@@ -16,5 +17,24 @@ interface BattleUC {
      * @return Newly created battle.
      */
     fun generateBattle(userId: Int): Battle
-    fun attack(userId: Int, allyId: Long, enemyId: Long): Battle
+
+    /**
+     * Plays an ally unit's turn.
+     *
+     * @return Updated battle.
+     *
+     * @throws NoBattleInSessionException
+     */
+    fun allyTurn(userId: Int, action: BattleAction): Battle
+
+    /**
+     * Plays an enemy (A.I.) unit's turn.
+     *
+     * @return Updated battle.
+     *
+     * @throws NoBattleInSessionException
+     */
+    fun enemyTurn(userId: Int): Battle
 }
+
+class NoBattleInSessionException : Exception()
