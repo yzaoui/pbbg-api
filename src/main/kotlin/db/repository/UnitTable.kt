@@ -6,6 +6,7 @@ import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.LongIdTable
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 
 object UnitTable : LongIdTable() {
@@ -38,5 +39,11 @@ object UnitTable : LongIdTable() {
             it[UnitTable.atk] = unit.atk
             it[UnitTable.exp] = unit.exp
         }
+    }
+
+    fun getUnit(unitId: Long): MyUnit? {
+        return select { id eq unitId }
+            .singleOrNull()
+            ?.toMyUnit()
     }
 }
