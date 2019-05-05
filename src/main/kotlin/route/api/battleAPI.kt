@@ -4,9 +4,11 @@ import com.bitwiserain.pbbg.domain.model.battle.Battle
 import com.bitwiserain.pbbg.domain.model.battle.BattleAction
 import com.bitwiserain.pbbg.domain.model.battle.Turn
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
+import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
+import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.view.model.BattleJSON
 import com.bitwiserain.pbbg.view.model.TurnJSON
@@ -31,20 +33,24 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
             call.respondSuccess(battle?.toJSON())
         }
 
-        param("action") {
+        param("action", "generate") {
             /**
-             * Expects query string:
-             *   action = generate
-             *
              * On success:
              *   [BattleJSON]
+             *
+             * Error situations:
+             *   [NoAlliesAliveException]
              */
             post {
-                val loggedInUser = call.attributes[loggedInUserKey]
+                try {
+                    val loggedInUser = call.attributes[loggedInUserKey]
 
-                val battle = battleUC.generateBattle(loggedInUser.id)
+                    val battle = battleUC.generateBattle(loggedInUser.id)
 
-                call.respondSuccess(battle.toJSON())
+                    call.respondSuccess(battle.toJSON())
+                } catch (e: NoAlliesAliveException) {
+                    call.respondFail("Must have at least one unite alive to initiate battle.")
+                }
             }
         }
     }
