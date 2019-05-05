@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.Battle
+import com.bitwiserain.pbbg.domain.model.battle.Battle
 
 interface BattleUC {
     /**

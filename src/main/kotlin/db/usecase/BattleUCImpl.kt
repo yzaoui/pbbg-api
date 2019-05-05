@@ -7,8 +7,8 @@ import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
 import com.bitwiserain.pbbg.db.repository.execAndMap
-import com.bitwiserain.pbbg.domain.model.Battle
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.domain.model.battle.Battle
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
@@ -22,7 +22,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         if (battleSession == null) return@transaction null
 
-        Battle(allies = SquadTable.getAllies(userId), enemies = BattleEnemyTable.getEnemies(battleSession))
+        Battle(allies = SquadTable.getAllies(userId), enemies = BattleEnemyTable.getEnemies(battleSession), battleQueue = BattleSessionTable.getBattleQueue(battleSession))
     }
 
     override fun generateBattle(userId: Int): Battle = transaction(db) {
@@ -42,7 +42,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         val allies = SquadTable.getAllies(userId)
         val enemies = BattleEnemyTable.getEnemies(battleSession)
 
-        Battle(allies = allies, enemies = enemies)
+        Battle(allies = allies, enemies = enemies, battleQueue = BattleSessionTable.getBattleQueue(battleSession))
     }
 
     override fun attack(userId: Int, allyId: Long, enemyId: Long): Battle = transaction(db) {
@@ -67,7 +67,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
             UnitTable.updateUnit(allyId, updatedAlly)
         }
 
-        val updatedBattle = Battle(allies = SquadTable.getAllies(userId), enemies = BattleEnemyTable.getEnemies(battleSession))
+        val updatedBattle = Battle(allies = SquadTable.getAllies(userId), enemies = BattleEnemyTable.getEnemies(battleSession), battleQueue = BattleSessionTable.getBattleQueue(battleSession))
 
         deleteBattleIfOver(updatedBattle, battleSession)
 
