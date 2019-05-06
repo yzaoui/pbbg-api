@@ -12,6 +12,7 @@ import com.bitwiserain.pbbg.view.model.MyUnitJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get
+import io.ktor.routing.post
 import io.ktor.routing.route
 
 fun Route.squadAPI(userUC: UserUC, unitUC: UnitUC) = route("/squad") {
@@ -27,6 +28,20 @@ fun Route.squadAPI(userUC: UserUC, unitUC: UnitUC) = route("/squad") {
         val squad = unitUC.getSquad(loggedInUser.id)
 
         call.respondSuccess(squad.toJSON())
+    }
+
+    route("/heal") {
+        /**
+         * On success:
+         *   [SquadJSON]
+         */
+        post {
+            val loggedInUser = call.attributes[loggedInUserKey]
+
+            val healedSquad = unitUC.healSquad(loggedInUser.id)
+
+            call.respondSuccess(healedSquad.toJSON())
+        }
     }
 }
 
