@@ -96,7 +96,7 @@ const healSquad = async () => {
             unitEl.unit = data.units.find(unit => unit.id === unitEl.unitId);
         }
     } else if (res.status === "fail") {
-        replaceInterfaceWithText("FAIL");
+        replaceInterfaceWithText(`FAIL: ${res.data}`);
     } else {
         replaceInterfaceWithText("ERROR");
     }
