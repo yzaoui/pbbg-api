@@ -55,4 +55,12 @@ sealed class MyUnit {
             is Carpshooter -> copy(exp = newExp)
         }
     }
+
+    fun maxHeal(): MyUnit {
+        return when (this) {
+            is IceCreamWizard -> copy(hp = maxHP)
+            is Twolip -> copy(hp = maxHP)
+            is Carpshooter -> copy(hp = maxHP)
+        }
+    }
 }
