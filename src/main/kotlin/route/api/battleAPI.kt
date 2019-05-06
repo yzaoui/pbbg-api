@@ -55,7 +55,7 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
         }
     }
 
-    route("/attack") {
+    route("/allyTurn") {
         /**
          * Expects body:
          *   [AttackParams]
@@ -74,7 +74,7 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
         }
     }
 
-    route("/processEnemyTurn") {
+    route("/enemyTurn") {
         post {
             val loggedInUser = call.attributes[loggedInUserKey]
 

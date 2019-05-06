@@ -2,6 +2,7 @@
  * @typedef {Object} BattleSession
  * @property {UnitResponse[]} allies - The user's units.
  * @property {UnitResponse[]} enemies - The enemy units.
+ * @property {Turn[]} turns - Turn order.
  */
 
 /**
@@ -17,10 +18,43 @@
  * @property {string} iconURL - The unit's icon URL.
  */
 
+/**
+ * @typedef {Object} Turn
+ * @property {number} unitId
+ */
+
 const main = document.getElementById("main");
-const selectedUnits = {
-    allyId: null,
-    enemyId: null
+
+const STATE = {
+    /**
+     * @type {?BattleSession}
+     */
+    battle: null,
+    /**
+     * @type {?number}
+     */
+    selectedEnemyId: null,
+    /**
+     * @param {number} unitId
+     * @returns {UnitResponse}
+     */
+    getUnitById(unitId) {
+        const { allies, enemies } = this.battle;
+        return allies.concat(enemies).find(unit => unit.id === unitId)
+    },
+    /**
+     * @param {number} unitId
+     * @returns {boolean}
+     */
+    unitIsAlly(unitId) {
+        return this.battle.allies.some(unit => unit.id === unitId)
+    },
+    /**
+     * @returns {boolean}
+     */
+    nextUnitIsAlly() {
+        return this.unitIsAlly(this.battle.turns[0].unitId)
+    }
 };
 
 window.onload = async () => {
@@ -28,6 +62,8 @@ window.onload = async () => {
     insertModule("/js/component/pbbg-unit.js");
 
     replaceInterfaceWithText("Loading…");
+
+    await window.customElements.whenDefined("pbbg-unit");
 
     const res = await getBattleSession();
 
@@ -41,7 +77,8 @@ window.onload = async () => {
 
         if (data !== null) {
             /* If there is a battle, set up battle interface*/
-            setupBattle(data);
+            STATE.battle = data;
+            setupBattle();
         } else {
             /* If there is no battle, set up interface to generate battle*/
             setupGenerateBattle();
@@ -49,13 +86,12 @@ window.onload = async () => {
     }
 };
 
-/**
- * @param {BattleSession} battle
- */
-const setupBattle = (battle) => {
+const setupBattle = () => {
     const battleDiv = document.createElement("div");
     battleDiv.className = "battle-interface";
     main.appendChild(battleDiv);
+
+    battleDiv.appendChild(createBattleQueue(STATE.battle.turns));
 
     const createUnitDiv = (title, listId, units, selectFn) => {
         const div = document.createElement("div");
@@ -71,24 +107,35 @@ const setupBattle = (battle) => {
 
             const unitEl = document.createElement("pbbg-unit");
             unitEl.setAttribute("unit-id", String(unit.id));
+            unitEl.setAttribute("facing", title === "Allies" ? "right" : "left");
             unitEl.unit = unit;
             unitEl.onclick = () => selectFn(unit.id);
+            unitEl.onmouseenter = () => hoverUnit(unit.id);
+            unitEl.onmouseleave = () => unhoverUnit(unit.id);
             li.appendChild(unitEl);
         }
 
         return div;
     };
 
-    battleDiv.appendChild(createUnitDiv("Allies", "ally-list", battle.allies, selectAlly));
-    battleDiv.appendChild(createUnitDiv("Enemies", "enemy-list", battle.enemies, selectEnemy));
+    battleDiv.appendChild(createUnitDiv("Allies", "ally-list", STATE.battle.allies, ()=>({})));
+    battleDiv.appendChild(createUnitDiv("Enemies", "enemy-list", STATE.battle.enemies, selectEnemy));
 
     const attackButton = document.createElement("button");
     attackButton.id = "attack-button";
     attackButton.className = "fancy";
     attackButton.innerText = "Attack";
     attackButton.onclick = () => attack();
-    attackButton.disabled = true;
     battleDiv.appendChild(attackButton);
+
+    const processEnemyTurnButton = document.createElement("button");
+    processEnemyTurnButton.id = "process-enemy-turn-button";
+    processEnemyTurnButton.className = "fancy";
+    processEnemyTurnButton.innerText = "Process Enemy Turn";
+    processEnemyTurnButton.onclick = () => processEnemyTurn();
+    battleDiv.appendChild(processEnemyTurnButton);
+
+    updateUnits();
 };
 
 const setupGenerateBattle = () => {
@@ -102,16 +149,56 @@ const setupGenerateBattle = () => {
 };
 
 /**
- * @param {UnitResponse[]} allies
- * @param {UnitResponse[]} enemies
+ * @param {Turn[]} turns
  */
-const updateUnits = (allies, enemies) => {
-    const unitEls = getAllPBBGUnits();
-    const unitObjs = allies.concat(enemies);
+const createBattleQueue = (turns) => {
+    const list = document.createElement("ol");
+    list.id = "battle-queue";
 
-    for (const unitEl of unitEls) {
-        unitEl.unit = unitObjs.find((obj) => unitEl.unitId === obj.id)
+    for (const turn of turns) {
+        const li = document.createElement("li");
+        list.appendChild(li);
+
+        li.setAttribute("unit-id", String(turn.unitId));
+        li.onmouseenter = () => hoverUnit(turn.unitId);
+        li.onmouseleave = () => unhoverUnit(turn.unitId);
+
+        li.insertAdjacentHTML("beforeend", `<img src="${STATE.getUnitById(turn.unitId).iconURL}">`);
     }
+
+    return list;
+};
+
+const hoverUnit = (unitId) => {
+    const queueEl = getBattleQueueChildren().find((el) => el.getAttribute("unit-id") === String(unitId));
+
+    const battleEl = getAllPBBGUnits().find((el) => el.getAttribute("unit-id") === String(unitId));
+
+    queueEl.classList.add("hovered");
+    battleEl.classList.add("hovered");
+};
+
+const unhoverUnit = (unitId) => {
+    const queueEl = getBattleQueueChildren().find((el) => el.getAttribute("unit-id") === String(unitId));
+
+    const battleEl = getAllPBBGUnits().find((el) => el.getAttribute("unit-id") === String(unitId));
+
+    queueEl.classList.remove("hovered");
+    battleEl.classList.remove("hovered");
+};
+
+const updateUnits = () => {
+    for (const unitEl of getAllPBBGUnits()) {
+        unitEl.unit = STATE.getUnitById(unitEl.unitId);
+
+        if (unitEl.hasAttribute("dead")) {
+            unitEl.onclick = null;
+            unitEl.onmouseenter = null;
+            unitEl.onmouseleave = null;
+        }
+    }
+
+    checkForDeaths();
 };
 
 const generateBattle = async () => {
@@ -127,9 +214,12 @@ const generateBattle = async () => {
          */
         const data = res.data;
 
-        setupBattle(data);
+        STATE.battle = data;
+        setupBattle();
+    } else if (res.status === "fail") {
+        replaceInterfaceWithText(`FAIL: ${res.data}`);
     } else {
-        replaceInterfaceWithText("Error");
+        replaceInterfaceWithText("ERROR");
     }
 };
 
@@ -139,7 +229,7 @@ const attack = async () => {
     attackButton.classList.add("loading");
     attackButton.disabled = true;
 
-    const res = await postBattleAttack(selectedUnits.allyId, selectedUnits.enemyId);
+    const res = await postAllyTurn(STATE.selectedEnemyId);
 
     attackButton.innerText = "Attack";
     attackButton.classList.remove("loading");
@@ -151,8 +241,31 @@ const attack = async () => {
          */
         const data = res.data;
 
-        updateUnits(data.allies, data.enemies);
-        checkForDeaths();
+        STATE.battle = data;
+        updateUnits();
+    }
+};
+
+const processEnemyTurn = async () => {
+    const btn = document.getElementById("process-enemy-turn-button");
+    btn.innerText = "Process Enemy Turn (Loading…)";
+    btn.classList.add("loading");
+    btn.disabled = true;
+
+    const res = await postEnemyTurn();
+
+    btn.innerText = "Process Enemy Turn";
+    btn.classList.remove("loading");
+    btn.disabled = false;
+
+    if (res.status === "success") {
+        /**
+         * @type {BattleSession}
+         */
+        const data = res.data;
+
+        STATE.battle = data;
+        updateUnits();
     }
 };
 
@@ -161,6 +274,8 @@ const attack = async () => {
  */
 const checkForDeaths = () => {
     const checkUnitStillAlive = (unitEls, unitId) => {
+        if (unitId === null) return null;
+
         const unitEl = unitEls.find((el) => el.unitId === unitId);
 
         if (unitEl.hasAttribute("dead")) {
@@ -170,41 +285,46 @@ const checkForDeaths = () => {
         }
     };
 
-    selectedUnits.allyId = checkUnitStillAlive(getAllyPBBGUnits(), selectedUnits.allyId);
-    selectedUnits.enemyId = checkUnitStillAlive(getEnemyPBBGUnits(), selectedUnits.enemyId);
+    STATE.selectedEnemyId = checkUnitStillAlive(getEnemyPBBGUnits(), STATE.selectedEnemyId);
 
     updateUI();
 };
 
 const updateUI = () => {
+    const turnsEl = document.getElementById("battle-queue");
+    turnsEl.parentNode.replaceChild(createBattleQueue(STATE.battle.turns), turnsEl);
+
     getAllPBBGUnits().forEach((el) => el.removeAttribute("selected"));
 
-    const updateSelectedUnit = (unitEls, unitId) => {
-        if (unitId === null) return;
+    if (STATE.selectedEnemyId !== null) {
+        getEnemyPBBGUnits().find(el => el.unitId === STATE.selectedEnemyId).setAttribute("selected", "");
+    }
 
-        unitEls.find((el) => el.unitId === unitId).setAttribute("selected", "");
-    };
+    const atkbtn = document.getElementById("attack-button");
+    const enemyTurnBtn = document.getElementById("process-enemy-turn-button");
 
-    updateSelectedUnit(getAllyPBBGUnits(), selectedUnits.allyId);
-    updateSelectedUnit(getEnemyPBBGUnits(), selectedUnits.enemyId);
+    if (STATE.nextUnitIsAlly()) {
+        atkbtn.classList.remove("hidden");
+        enemyTurnBtn.classList.add("hidden");
+    } else {
+        atkbtn.classList.add("hidden");
+        enemyTurnBtn.classList.remove("hidden");
+    }
 
-    document.getElementById("attack-button").disabled = !(selectedUnits.allyId && selectedUnits.enemyId);
+    document.getElementById("attack-button").disabled = STATE.selectedEnemyId === null;
 };
-
-const getAllyPBBGUnits = () => Array.from(document.querySelectorAll("#ally-list pbbg-unit"));
 
 const getEnemyPBBGUnits = () => Array.from(document.querySelectorAll("#enemy-list pbbg-unit"));
 
 const getAllPBBGUnits = () => Array.from(document.querySelectorAll("pbbg-unit"));
 
-const selectAlly = (allyId) => {
-    selectedUnits.allyId = selectUnit(getAllyPBBGUnits(), allyId, selectedUnits.allyId);
-
-    updateUI();
-};
+/**
+ * @returns {Element[]}
+ */
+const getBattleQueueChildren = () => Array.from(document.getElementById("battle-queue").children);
 
 const selectEnemy = (enemyId) => {
-    selectedUnits.enemyId = selectUnit(getEnemyPBBGUnits(), enemyId, selectedUnits.enemyId);
+    STATE.selectedEnemyId = selectUnit(getEnemyPBBGUnits(), enemyId, STATE.selectedEnemyId);
 
     updateUI();
 };
@@ -241,18 +361,23 @@ const postGenerateBattleSession = async () => (await fetch("/api/battle/session?
 })).json();
 
 /**
- * @param {number} allyId
  * @param {number} enemyId
  *
  * On success, returns {@see BattleSession}
  */
-const postBattleAttack = async (allyId, enemyId) => (await fetch("/api/battle/attack", {
+const postAllyTurn = async (enemyId) => (await fetch("/api/battle/allyTurn", {
     method: "POST",
     headers: {
         "Content-Type": "application/json; charset=utf-8"
     },
     body: JSON.stringify({
-        allyId: allyId,
         enemyId: enemyId
     })
+})).json();
+
+const postEnemyTurn = async () => (await fetch("/api/battle/enemyTurn", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json; charset=utf-8"
+    }
 })).json();

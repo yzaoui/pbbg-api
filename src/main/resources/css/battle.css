@@ -2,7 +2,7 @@ pbbg-unit:not([dead]) {
     cursor: pointer;
 }
 
-pbbg-unit:not([dead]):hover {
+pbbg-unit:not([dead]).hovered {
     border-color: #53b6ca;
 }
 
@@ -15,22 +15,55 @@ pbbg-unit[selected]:hover {
     border-color: black;
 }
 
+#battle-queue {
+    list-style: none;
+    padding: 0;
+}
+
+#battle-queue > li {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+    margin: 4px;
+    box-sizing: border-box;
+}
+
+#battle-queue > li.hovered {
+    border: 3px solid blue;
+}
+
+#battle-queue > li > img {
+    display: block;
+    margin: auto;
+}
+
 .battle-interface {
     display: grid;
     grid-template-areas:
+        "turns turns"
         "allies enemies"
         "attack attack";
 }
 
 .battle-interface > :nth-child(1) {
-    grid-area: allies;
+    grid-area: turns;
 }
 
 .battle-interface > :nth-child(2) {
-    grid-area: enemies;
+    grid-area: allies;
 }
 
 .battle-interface > :nth-child(3) {
+    grid-area: enemies;
+}
+
+.battle-interface > :nth-child(4) {
+    grid-area: attack;
+    justify-self: center;
+}
+
+.battle-interface > :nth-child(5) {
     grid-area: attack;
     justify-self: center;
 }
@@ -50,4 +83,8 @@ pbbg-unit[selected]:hover {
     display: inline-block;
     list-style: none;
     padding: 0;
+}
+
+button.hidden {
+    display: none;
 }
