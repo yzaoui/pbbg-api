@@ -15,6 +15,36 @@ pbbg-unit[selected]:hover {
     border-color: black;
 }
 
+pbbg-unit.current-turn {
+    border-width: 3px 3px 3px 8px;
+}
+
+.queue-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.queue-section > span {
+    margin-top: -5px;
+    font-weight: bold;
+}
+
+.unit-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#ally-list pbbg-unit.current-turn {
+    border-color: darkblue;
+}
+
+#enemy-list pbbg-unit.current-turn {
+    border-color: darkred;
+}
+
 #battle-queue {
     list-style: none;
     padding: 0;
@@ -24,13 +54,24 @@ pbbg-unit[selected]:hover {
     display: inline-block;
     width: 40px;
     height: 40px;
-    border: 1px solid black;
+    border: 2px solid black;
     margin: 4px;
     box-sizing: border-box;
+    transition: transform 100ms ease-in;
+}
+
+#battle-queue > li.ally {
+    border-color: darkblue;
+}
+
+#battle-queue > li.enemy {
+    border-color: darkred;
 }
 
 #battle-queue > li.hovered {
-    border: 3px solid blue;
+    border-width: 3px;
+    box-shadow: #0000001f 0 1px 6px, #0000001f 0 1px 4px;
+    transform: translateY(-6px);
 }
 
 #battle-queue > li > img {
@@ -69,10 +110,6 @@ pbbg-unit[selected]:hover {
 }
 
 .battle-interface > div {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 .battle-interface > div > h1 {
@@ -83,6 +120,10 @@ pbbg-unit[selected]:hover {
     display: inline-block;
     list-style: none;
     padding: 0;
+}
+
+.battle-interface > div > ul > li {
+    padding: 4px;
 }
 
 button.hidden {

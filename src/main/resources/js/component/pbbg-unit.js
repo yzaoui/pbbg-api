@@ -41,8 +41,14 @@ class PBBGUnit extends HTMLElement {
     display: none;
 }
 
+:host(:not([dead])) {
+    box-shadow: #0000001f 0 1px 6px, #0000001f 0 1px 4px;
+}
+
 :host([dead]) {
     background-color: #4e313114;
+    border-color: #80808080;
+    opacity: 0.6;
 }
 
 #sprite {

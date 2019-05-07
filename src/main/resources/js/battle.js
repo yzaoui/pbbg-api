@@ -40,20 +40,26 @@ const STATE = {
      */
     getUnitById(unitId) {
         const { allies, enemies } = this.battle;
-        return allies.concat(enemies).find(unit => unit.id === unitId)
+        return allies.concat(enemies).find(unit => unit.id === unitId);
     },
     /**
      * @param {number} unitId
      * @returns {boolean}
      */
     unitIsAlly(unitId) {
-        return this.battle.allies.some(unit => unit.id === unitId)
+        return this.battle.allies.some(unit => unit.id === unitId);
+    },
+    /**
+     * @returns {number}
+     */
+    nextUnitId() {
+        return this.battle.turns[0].unitId;
     },
     /**
      * @returns {boolean}
      */
     nextUnitIsAlly() {
-        return this.unitIsAlly(this.battle.turns[0].unitId)
+        return this.unitIsAlly(this.nextUnitId());
     }
 };
 
@@ -78,7 +84,7 @@ window.onload = async () => {
         if (data !== null) {
             /* If there is a battle, set up battle interface*/
             STATE.battle = data;
-            setupBattle();
+            setupBattle(STATE.battle);
         } else {
             /* If there is no battle, set up interface to generate battle*/
             setupGenerateBattle();
@@ -86,15 +92,24 @@ window.onload = async () => {
     }
 };
 
-const setupBattle = () => {
+/**
+ * @param {BattleSession} battle
+ */
+const setupBattle = (battle) => {
     const battleDiv = document.createElement("div");
     battleDiv.className = "battle-interface";
     main.appendChild(battleDiv);
 
-    battleDiv.appendChild(createBattleQueue(STATE.battle.turns));
+    const queueSection = document.createElement("div");
+    queueSection.classList.add("queue-section");
+    battleDiv.appendChild(queueSection);
+
+    queueSection.insertAdjacentHTML("beforeend", `<span>Turn Order ►</span>`);
+    queueSection.insertAdjacentElement("beforeend", createBattleQueue(battle.turns));
 
     const createUnitDiv = (title, listId, units, selectFn) => {
         const div = document.createElement("div");
+        div.classList.add("unit-list");
         div.insertAdjacentHTML("beforeend", `<h1>${title}</h1>`);
 
         const list = document.createElement("ul");
@@ -118,8 +133,8 @@ const setupBattle = () => {
         return div;
     };
 
-    battleDiv.appendChild(createUnitDiv("Allies", "ally-list", STATE.battle.allies, ()=>({})));
-    battleDiv.appendChild(createUnitDiv("Enemies", "enemy-list", STATE.battle.enemies, selectEnemy));
+    battleDiv.appendChild(createUnitDiv("Allies", "ally-list", battle.allies, ()=>({})));
+    battleDiv.appendChild(createUnitDiv("Enemies", "enemy-list", battle.enemies, selectEnemy));
 
     const attackButton = document.createElement("button");
     attackButton.id = "attack-button";
@@ -163,6 +178,8 @@ const createBattleQueue = (turns) => {
         li.onmouseenter = () => hoverUnit(turn.unitId);
         li.onmouseleave = () => unhoverUnit(turn.unitId);
 
+        li.classList.add(STATE.unitIsAlly(turn.unitId) ? "ally" : "enemy");
+
         li.insertAdjacentHTML("beforeend", `<img src="${STATE.getUnitById(turn.unitId).iconURL}">`);
     }
 
@@ -196,6 +213,9 @@ const updateUnits = () => {
             unitEl.onmouseenter = null;
             unitEl.onmouseleave = null;
         }
+
+        // Highlight next unit
+        (STATE.nextUnitId() === unitEl.unitId) ? unitEl.classList.add("current-turn") : unitEl.classList.remove("current-turn");
     }
 
     checkForDeaths();
@@ -215,7 +235,7 @@ const generateBattle = async () => {
         const data = res.data;
 
         STATE.battle = data;
-        setupBattle();
+        setupBattle(STATE.battle);
     } else if (res.status === "fail") {
         replaceInterfaceWithText(`FAIL: ${res.data}`);
     } else {
