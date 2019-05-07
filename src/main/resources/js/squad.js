@@ -23,14 +23,14 @@ const healButton = {
     /**
      * @type {?HTMLButtonElement}
      */
-    dom: null,
+    DOM: null,
     /**
      * @param {boolean} val
      */
     set loading(val) {
-        this.dom.innerText = `Heal Squad${val ? " (Loading…)" : ""}`;
-        this.dom.disabled = val;
-        val ? this.dom.classList.add("loading") : this.dom.classList.remove("loading");
+        this.DOM.innerText = `Heal Squad${val ? " (Loading…)" : ""}`;
+        this.DOM.disabled = val;
+        val ? this.DOM.classList.add("loading") : this.DOM.classList.remove("loading");
     }
 };
 
@@ -73,7 +73,7 @@ const setupHealSquad = () => {
     btn.style.alignSelf = "center";
     btn.onclick = () => healSquad();
 
-    healButton.dom = btn;
+    healButton.DOM = btn;
 
     main.appendChild(btn);
 };

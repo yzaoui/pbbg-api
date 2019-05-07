@@ -63,6 +63,19 @@ const STATE = {
     }
 };
 
+const VIEW = {
+    attackButton: {
+        DOM: null,
+        set loading(val) {
+            this.DOM.innerText = `Attack${val ? " (Loading…)" : ""}`;
+            this.DOM.disabled = val;
+            val ? this.DOM.classList.add("loading") : this.DOM.classList.remove("loading");
+        },
+        set hidden(val) { val ? this.DOM.classList.add("hidden") : this.DOM.classList.remove("hidden"); },
+        set disabled(val) { this.DOM.disabled = val; }
+    }
+};
+
 window.onload = async () => {
     insertScript("/js/webcomponents-bundle-2.0.0.js");
     insertModule("/js/component/pbbg-unit.js");
@@ -141,6 +154,7 @@ const setupBattle = (battle) => {
     attackButton.className = "fancy";
     attackButton.innerText = "Attack";
     attackButton.onclick = () => attack();
+    VIEW.attackButton = attackButton;
     battleDiv.appendChild(attackButton);
 
     const processEnemyTurnButton = document.createElement("button");
@@ -244,16 +258,11 @@ const generateBattle = async () => {
 };
 
 const attack = async () => {
-    const attackButton = document.getElementById("attack-button");
-    attackButton.innerText = "Attack (Loading…)";
-    attackButton.classList.add("loading");
-    attackButton.disabled = true;
+    VIEW.attackButton.loading = true;
 
     const res = await postAllyTurn(STATE.selectedEnemyId);
 
-    attackButton.innerText = "Attack";
-    attackButton.classList.remove("loading");
-    attackButton.disabled = false;
+    VIEW.attackButton.loading = false;
 
     if (res.status === "success") {
         /**
@@ -320,18 +329,17 @@ const updateUI = () => {
         getEnemyPBBGUnits().find(el => el.unitId === STATE.selectedEnemyId).setAttribute("selected", "");
     }
 
-    const atkbtn = document.getElementById("attack-button");
     const enemyTurnBtn = document.getElementById("process-enemy-turn-button");
 
     if (STATE.nextUnitIsAlly()) {
-        atkbtn.classList.remove("hidden");
+        VIEW.attackButton.hidden = false;
         enemyTurnBtn.classList.add("hidden");
     } else {
-        atkbtn.classList.add("hidden");
+        VIEW.attackButton.hidden = false;
         enemyTurnBtn.classList.remove("hidden");
     }
 
-    document.getElementById("attack-button").disabled = STATE.selectedEnemyId === null;
+    VIEW.attackButton.disabled = STATE.selectedEnemyId === null;
 };
 
 const getEnemyPBBGUnits = () => Array.from(document.querySelectorAll("#enemy-list pbbg-unit"));
