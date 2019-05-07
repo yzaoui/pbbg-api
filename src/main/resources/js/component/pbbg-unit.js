@@ -165,6 +165,8 @@ class PBBGUnit extends HTMLElement {
 
         if (this._unit.hp === 0) {
             this.setAttribute("dead", "");
+        } else {
+            this.removeAttribute("dead");
         }
     }
 }
