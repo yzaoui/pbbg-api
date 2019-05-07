@@ -270,6 +270,15 @@ const attack = async () => {
          */
         const data = res.data;
 
+        //TODO: Use response to determine which units were affected and should animate
+        //TODO: Temporarily only works with enemies due to lack of enemy attack target
+        const targetedEnemy = getEnemyPBBGUnits().find(el => el.unitId === STATE.selectedEnemyId);
+        targetedEnemy.onanimationend = () => targetedEnemy.classList.remove("animation-attack");
+        targetedEnemy.classList.remove("animation-attack");
+        window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+            targetedEnemy.classList.add("animation-attack");
+        }));
+
         STATE.battle = data;
         updateUnits();
     }
