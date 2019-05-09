@@ -1,8 +1,33 @@
 /**
- * @typedef {Object} BattleSession
+ * @typedef {Object} Battle
  * @property {UnitResponse[]} allies - The user's units.
  * @property {UnitResponse[]} enemies - The enemy units.
  * @property {Turn[]} turns - Turn order.
+ */
+
+/**
+ * @typedef {Object} UnitEffect
+ * @abstract
+ * @property {string} type
+ */
+
+/**
+ * @typedef {Object} UnitEffect.Health
+ * @extends {UnitEffect}
+ * @property {number} delta
+ */
+
+/**
+ * @typedef {Object} BattleReward
+ * @property {number} gold
+ * @property {Item[]} items
+ */
+
+/**
+ * @typedef {Object} BattleActionResult
+ * @property {Battle} battle
+ * @property {Object.<number, UnitEffect>} unitEffects
+ * @property {?BattleReward} reward
  */
 
 /**
@@ -27,7 +52,7 @@ const main = document.getElementById("main");
 
 const STATE = {
     /**
-     * @type {?BattleSession}
+     * @type {?Battle}
      */
     battle: null,
     /**
@@ -99,7 +124,7 @@ window.onload = async () => {
         replaceInterfaceWithText("");
 
         /**
-         * @type {?BattleSession}
+         * @type {?Battle}
          */
         const data = res.data;
 
@@ -115,7 +140,7 @@ window.onload = async () => {
 };
 
 /**
- * @param {BattleSession} battle
+ * @param {Battle} battle
  */
 const setupBattle = (battle) => {
     VIEW.attackAudio.DOMs = ["attack1", "attack2", "attack3"].map(name => createAudio(name));
@@ -266,7 +291,7 @@ const generateBattle = async () => {
         replaceInterfaceWithText("");
 
         /**
-         * @type {BattleSession}
+         * @type {Battle}
          */
         const data = res.data;
 
@@ -288,22 +313,13 @@ const attack = async () => {
 
     if (res.status === "success") {
         /**
-         * @type {BattleSession}
+         * @type {BattleActionResult}
          */
         const data = res.data;
 
-        //TODO: Use response to determine which units were affected and should animate
-        //TODO: Temporarily only works with enemies due to lack of enemy attack target
-        const targetedEnemy = getEnemyPBBGUnits().find(el => el.unitId === STATE.selectedEnemyId);
-        targetedEnemy.onanimationend = () => targetedEnemy.classList.remove("animation-attack");
-        targetedEnemy.classList.remove("animation-attack");
-        window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
-            targetedEnemy.classList.add("animation-attack");
-        }));
+        processHealthEffects(filterObject(data.unitEffects, effect => effect.type === "health"));
 
-        VIEW.attackAudio.play();
-
-        STATE.battle = data;
+        STATE.battle = data.battle;
         updateUnits();
     }
 };
@@ -322,13 +338,32 @@ const processEnemyTurn = async () => {
 
     if (res.status === "success") {
         /**
-         * @type {BattleSession}
+         * @type {BattleActionResult}
          */
         const data = res.data;
 
-        STATE.battle = data;
+        processHealthEffects(filterObject(data.unitEffects, effect => effect.type === "health"));
+
+        STATE.battle = data.battle;
         updateUnits();
     }
+};
+
+/**
+ * @param {Object.<number, UnitEffect.Health>} healthEffects
+ */
+const processHealthEffects = (healthEffects) => {
+    const targets = getAllPBBGUnits().filter(el => healthEffects.hasOwnProperty(String(el.unitId)));
+
+    for (const target of targets) {
+        target.onanimationend = () => target.classList.remove("animation-attack");
+        target.classList.remove("animation-attack");
+        window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+            target.classList.add("animation-attack");
+        }));
+    }
+
+    VIEW.attackAudio.play();
 };
 
 /**
@@ -405,14 +440,24 @@ const selectUnit = (unitEls, unitId, currentlySelectedId) => {
 };
 
 /**
- * On success, returns {@see ?BattleSession}.
+ * Filter an object's properties based on a predicate applied to their value.
+ */
+const filterObject = (obj, pred) => Object.keys(obj)
+    .filter(key => pred(obj[key]))
+    .reduce( (res, key) => {
+        res[key] = obj[key];
+        return res;
+    }, {} );
+
+/**
+ * On success, returns {@see ?Battle}.
  */
 const getBattleSession = async () => (await fetch("/api/battle/session", {
     method: "GET",
 })).json();
 
 /**
- * On success, returns {@see BattleSession}.
+ * On success, returns {@see Battle}.
  */
 const postGenerateBattleSession = async () => (await fetch("/api/battle/session?action=generate", {
     method: "POST",
@@ -424,7 +469,7 @@ const postGenerateBattleSession = async () => (await fetch("/api/battle/session?
 /**
  * @param {number} enemyId
  *
- * On success, returns {@see BattleSession}
+ * On success, returns {@see BattleActionResult}
  */
 const postAllyTurn = async (enemyId) => (await fetch("/api/battle/allyTurn", {
     method: "POST",
@@ -436,6 +481,9 @@ const postAllyTurn = async (enemyId) => (await fetch("/api/battle/allyTurn", {
     })
 })).json();
 
+/**
+ * On success, returns {@see BattleActionResult}
+ */
 const postEnemyTurn = async () => (await fetch("/api/battle/enemyTurn", {
     method: "POST",
     headers: {
