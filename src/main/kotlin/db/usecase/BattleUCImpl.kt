@@ -92,6 +92,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         val queue = BattleSessionTable.getBattleQueue(battleSession)
         val unitsToRemove: MutableList<Long> = mutableListOf()
         val effects: MutableMap<Long, UnitEffect> = mutableMapOf()
+        var reward: BattleReward? = null
 
         when (action) {
             is BattleAction.Attack -> {
@@ -128,9 +129,13 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         val updatedBattle = getBattle(userId, battleSession)
 
-        if (isBattleOver(updatedBattle)) deleteBattle(updatedBattle, battleSession)
+        if (isBattleOver(updatedBattle)) {
+            // TODO: reward should depend on win/loss
+            reward = BattleReward(0, emptyList())
+            deleteBattle(updatedBattle, battleSession)
+        }
 
-        return BattleActionResult(updatedBattle, effects)
+        return BattleActionResult(updatedBattle, effects, reward)
     }
 
     private fun getBattle(userId: Int, battleSession: EntityID<Long>) = Battle(
