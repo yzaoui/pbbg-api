@@ -73,6 +73,15 @@ const VIEW = {
         },
         set hidden(val) { val ? this.DOM.classList.add("hidden") : this.DOM.classList.remove("hidden"); },
         set disabled(val) { this.DOM.disabled = val; }
+    },
+    attackAudio: {
+        /**
+         * @type {HTMLAudioElement[]}
+         */
+        DOMs: [],
+        play() {
+            this.DOMs[Math.floor(Math.random() * this.DOMs.length)].play();
+        }
     }
 };
 
@@ -109,6 +118,8 @@ window.onload = async () => {
  * @param {BattleSession} battle
  */
 const setupBattle = (battle) => {
+    VIEW.attackAudio.DOMs = ["attack1", "attack2", "attack3"].map(name => createAudio(name));
+
     const battleDiv = document.createElement("div");
     battleDiv.className = "battle-interface";
     main.appendChild(battleDiv);
@@ -175,6 +186,17 @@ const setupGenerateBattle = () => {
     button.onclick = () => generateBattle();
 
     main.appendChild(button);
+};
+
+const createAudio = (name) => {
+    const audio = document.createElement("audio");
+    audio.insertAdjacentHTML("beforeend",
+        `<source src="/audio/${name}.mp3" type="audio/mpeg">` +
+        `<source src="/audio/${name}.ogg" type="audio/ogg">`
+    );
+    audio.preload = "auto";
+
+    return audio;
 };
 
 /**
@@ -278,6 +300,8 @@ const attack = async () => {
         window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
             targetedEnemy.classList.add("animation-attack");
         }));
+
+        VIEW.attackAudio.play();
 
         STATE.battle = data;
         updateUnits();
