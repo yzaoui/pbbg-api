@@ -107,6 +107,25 @@ const VIEW = {
         play() {
             this.DOMs[Math.floor(Math.random() * this.DOMs.length)].play();
         }
+    },
+    /**
+     * @returns {PBBGUnit[]}
+     */
+    get enemyPBBGUnits() {
+        return Array.from(document.querySelectorAll("#enemy-list pbbg-unit"));
+    },
+    /**
+     * @returns {PBBGUnit[]}
+     */
+    get allPBBGUnits() {
+        return Array.from(document.querySelectorAll("pbbg-unit"));
+    },
+    /**
+     * @param {number} unitId
+     * @returns {PBBGUnit}
+     */
+    getPBBGUnitById(unitId) {
+        return this.allPBBGUnits.find(el => el.getAttribute("unit-id") === String(unitId));
     }
 };
 
@@ -247,26 +266,28 @@ const createBattleQueue = (turns) => {
     return list;
 };
 
+/**
+ * @param {number} unitId
+ */
 const hoverUnit = (unitId) => {
     const queueEl = getBattleQueueChildren().find((el) => el.getAttribute("unit-id") === String(unitId));
 
-    const battleEl = getAllPBBGUnits().find((el) => el.getAttribute("unit-id") === String(unitId));
-
     queueEl.classList.add("hovered");
-    battleEl.classList.add("hovered");
+    VIEW.getPBBGUnitById(unitId).classList.add("hovered");
 };
 
+/**
+ * @param {number} unitId
+ */
 const unhoverUnit = (unitId) => {
     const queueEl = getBattleQueueChildren().find((el) => el.getAttribute("unit-id") === String(unitId));
 
-    const battleEl = getAllPBBGUnits().find((el) => el.getAttribute("unit-id") === String(unitId));
-
     queueEl.classList.remove("hovered");
-    battleEl.classList.remove("hovered");
+    VIEW.getPBBGUnitById(unitId).classList.remove("hovered");
 };
 
 const updateUnits = () => {
-    for (const unitEl of getAllPBBGUnits()) {
+    for (const unitEl of VIEW.allPBBGUnits) {
         unitEl.unit = STATE.getUnitById(unitEl.unitId);
 
         if (unitEl.hasAttribute("dead")) {
@@ -382,7 +403,7 @@ const checkForDeaths = () => {
         }
     };
 
-    STATE.selectedEnemyId = checkUnitStillAlive(getEnemyPBBGUnits(), STATE.selectedEnemyId);
+    STATE.selectedEnemyId = checkUnitStillAlive(VIEW.enemyPBBGUnits, STATE.selectedEnemyId);
 
     updateUI();
 };
@@ -391,10 +412,10 @@ const updateUI = () => {
     const turnsEl = document.getElementById("battle-queue");
     turnsEl.parentNode.replaceChild(createBattleQueue(STATE.battle.turns), turnsEl);
 
-    getAllPBBGUnits().forEach((el) => el.removeAttribute("selected"));
+    VIEW.allPBBGUnits.forEach((el) => el.removeAttribute("selected"));
 
     if (STATE.selectedEnemyId !== null) {
-        getEnemyPBBGUnits().find(el => el.unitId === STATE.selectedEnemyId).setAttribute("selected", "");
+        VIEW.enemyPBBGUnits.find(el => el.unitId === STATE.selectedEnemyId).setAttribute("selected", "");
     }
 
     const enemyTurnBtn = document.getElementById("process-enemy-turn-button");
@@ -410,17 +431,13 @@ const updateUI = () => {
     VIEW.attackButton.disabled = STATE.selectedEnemyId === null;
 };
 
-const getEnemyPBBGUnits = () => Array.from(document.querySelectorAll("#enemy-list pbbg-unit"));
-
-const getAllPBBGUnits = () => Array.from(document.querySelectorAll("pbbg-unit"));
-
 /**
  * @returns {Element[]}
  */
 const getBattleQueueChildren = () => Array.from(document.getElementById("battle-queue").children);
 
 const selectEnemy = (enemyId) => {
-    STATE.selectedEnemyId = selectUnit(getEnemyPBBGUnits(), enemyId, STATE.selectedEnemyId);
+    STATE.selectedEnemyId = selectUnit(VIEW.enemyPBBGUnits, enemyId, STATE.selectedEnemyId);
 
     updateUI();
 };
