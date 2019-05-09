@@ -9,10 +9,7 @@ import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
 import com.bitwiserain.pbbg.db.repository.execAndMap
 import com.bitwiserain.pbbg.domain.model.MyUnit
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
-import com.bitwiserain.pbbg.domain.model.battle.Battle
-import com.bitwiserain.pbbg.domain.model.battle.BattleAction
-import com.bitwiserain.pbbg.domain.model.battle.BattleQueue
-import com.bitwiserain.pbbg.domain.model.battle.Turn
+import com.bitwiserain.pbbg.domain.model.battle.*
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.domain.usecase.NoBattleInSessionException
@@ -62,7 +59,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         Battle(allies = allies, enemies = enemies, battleQueue = battleQueue)
     }
 
-    override fun allyTurn(userId: Int, action: BattleAction): Battle = transaction(db) {
+    override fun allyTurn(userId: Int, action: BattleAction): BattleActionResult = transaction(db) {
         val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw NoBattleInSessionException()
 
         val queue = BattleSessionTable.getBattleQueue(battleSession)
@@ -76,7 +73,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         return@transaction act(userId, battleSession, ally, action)
     }
 
-    override fun enemyTurn(userId: Int): Battle = transaction(db) {
+    override fun enemyTurn(userId: Int): BattleActionResult = transaction(db) {
         val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw NoBattleInSessionException()
 
         val queue = BattleSessionTable.getBattleQueue(battleSession)
@@ -91,9 +88,10 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         return@transaction act(userId, battleSession, enemy, action)
     }
 
-    private fun act(userId: Int, battleSession: EntityID<Long>, actingUnit: MyUnit, action: BattleAction): Battle {
+    private fun act(userId: Int, battleSession: EntityID<Long>, actingUnit: MyUnit, action: BattleAction): BattleActionResult {
         val queue = BattleSessionTable.getBattleQueue(battleSession)
         val unitsToRemove: MutableList<Long> = mutableListOf()
+        val effects: MutableMap<Long, UnitEffect> = mutableMapOf()
 
         when (action) {
             is BattleAction.Attack -> {
@@ -119,6 +117,8 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
                     unitsToRemove.add(target.id)
                 }
+
+                effects[target.id] = UnitEffect.Health(-actingUnit.atk)
             }
             else -> throw RuntimeException() // All actions should be accounted for
         }
@@ -128,9 +128,9 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         val updatedBattle = getBattle(userId, battleSession)
 
-        deleteBattleIfOver(updatedBattle, battleSession)
+        if (isBattleOver(updatedBattle)) deleteBattle(updatedBattle, battleSession)
 
-        return updatedBattle
+        return BattleActionResult(updatedBattle, effects)
     }
 
     private fun getBattle(userId: Int, battleSession: EntityID<Long>) = Battle(
@@ -139,14 +139,16 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         battleQueue = BattleSessionTable.getBattleQueue(battleSession)
     )
 
-    private fun deleteBattleIfOver(battle: Battle, battleSession: EntityID<Long>) = transaction(db) {
-        if (battle.allies.none { it.alive } || battle.enemies.none { it.alive }) {
-            // Delete enemies, since they only exist within this battle
-            val enemyIdCSV = battle.enemies.asSequence().map { it.id }.joinToString()
+    private fun isBattleOver(battle: Battle): Boolean {
+        return battle.allies.none { it.alive } || battle.enemies.none { it.alive }
+    }
 
-            BattleSessionTable.deleteBattle(battleSession)
+    private fun deleteBattle(battle: Battle, battleSession: EntityID<Long>) = transaction(db) {
+        // Delete enemies, since they only exist within this battle
+        val enemyIdCSV = battle.enemies.asSequence().map { it.id }.joinToString()
 
-            "DELETE FROM ${UnitTable.tableName} WHERE ${UnitTable.id.name} IN ($enemyIdCSV)".execAndMap {}
-        }
+        BattleSessionTable.deleteBattle(battleSession)
+
+        "DELETE FROM ${UnitTable.tableName} WHERE ${UnitTable.id.name} IN ($enemyIdCSV)".execAndMap {}
     }
 }
