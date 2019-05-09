@@ -1,8 +1,6 @@
 package com.bitwiserain.pbbg.route.api
 
-import com.bitwiserain.pbbg.domain.model.battle.Battle
-import com.bitwiserain.pbbg.domain.model.battle.BattleAction
-import com.bitwiserain.pbbg.domain.model.battle.Turn
+import com.bitwiserain.pbbg.domain.model.battle.*
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
@@ -10,8 +8,7 @@ import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
-import com.bitwiserain.pbbg.view.model.BattleJSON
-import com.bitwiserain.pbbg.view.model.TurnJSON
+import com.bitwiserain.pbbg.view.model.battle.*
 import io.ktor.application.call
 import io.ktor.request.receive
 import io.ktor.routing.*
@@ -61,31 +58,54 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
          *   [AttackParams]
          *
          * On success:
-         *   [BattleJSON]
+         *   [BattleActionResultJSON]
          */
         post {
             val loggedInUser = call.attributes[loggedInUserKey]
 
             val params = call.receive<AttackParams>()
 
-            val battle = battleUC.allyTurn(loggedInUser.id, BattleAction.Attack(params.enemyId))
+            val result = battleUC.allyTurn(loggedInUser.id, BattleAction.Attack(params.enemyId))
 
-            call.respondSuccess(battle.toJSON())
+            call.respondSuccess(result.toJSON())
         }
     }
 
     route("/enemyTurn") {
+        /**
+         * On success:
+         *   [BattleActionResultJSON]
+         */
         post {
             val loggedInUser = call.attributes[loggedInUserKey]
 
-            val battle = battleUC.enemyTurn(loggedInUser.id)
+            val result = battleUC.enemyTurn(loggedInUser.id)
 
-            call.respondSuccess(battle.toJSON())
+            call.respondSuccess(result.toJSON())
         }
     }
 }
 
 private data class AttackParams(val enemyId: Long)
+
+private fun BattleActionResult.toJSON() = BattleActionResultJSON(
+    battle = battle.toJSON(),
+    unitEffects = unitEffects.mapValues { it.value.toJSON() },
+    reward = reward?.toJSON()
+)
+
+private fun UnitEffect.toJSON() = when (this) {
+    is UnitEffect.Health -> toJSON()
+}
+
+private fun UnitEffect.Health.toJSON() = UnitEffectJSON.HealthJSON(
+    delta = delta
+)
+
+private fun BattleReward.toJSON() = BattleRewardJSON(
+    gold = gold,
+    items = items.map { it.toJSON() }
+)
 
 private fun Battle.toJSON() = BattleJSON(
     allies = allies.map { it.toJSON() },

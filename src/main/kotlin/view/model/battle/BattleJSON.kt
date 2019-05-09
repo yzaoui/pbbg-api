@@ -1,5 +1,6 @@
-package com.bitwiserain.pbbg.view.model
+package com.bitwiserain.pbbg.view.model.battle
 
+import com.bitwiserain.pbbg.view.model.MyUnitJSON
 import com.google.gson.annotations.SerializedName
 
 class BattleJSON(
@@ -8,6 +9,4 @@ class BattleJSON(
     @SerializedName("turns") val turns: List<TurnJSON>
 )
 
-class TurnJSON(
-    @SerializedName("unitId") val unitId: Long
-)
+
