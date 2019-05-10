@@ -10,8 +10,10 @@ sealed class MyUnit {
     abstract val maxHP: Int
     abstract val atk: Int
     abstract val exp: Long
+    val alive: Boolean
+        get() = hp > 0
     val dead: Boolean
-        get() = hp == 0
+        get() = !alive
 
     data class IceCreamWizard(
         override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
@@ -51,6 +53,14 @@ sealed class MyUnit {
             is IceCreamWizard -> copy(exp = newExp)
             is Twolip -> copy(exp = newExp)
             is Carpshooter -> copy(exp = newExp)
+        }
+    }
+
+    fun maxHeal(): MyUnit {
+        return when (this) {
+            is IceCreamWizard -> copy(hp = maxHP)
+            is Twolip -> copy(hp = maxHP)
+            is Carpshooter -> copy(hp = maxHP)
         }
     }
 }

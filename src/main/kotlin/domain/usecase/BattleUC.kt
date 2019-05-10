@@ -1,6 +1,8 @@
 package com.bitwiserain.pbbg.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.Battle
+import com.bitwiserain.pbbg.domain.model.battle.Battle
+import com.bitwiserain.pbbg.domain.model.battle.BattleAction
+import com.bitwiserain.pbbg.domain.model.battle.BattleActionResult
 
 interface BattleUC {
     /**
@@ -14,7 +16,29 @@ interface BattleUC {
      * Generates a battle and assigns it to a user.
      *
      * @return Newly created battle.
+     *
+     * @throws NoAlliesAliveException when no allies are alive to start this battle.
      */
     fun generateBattle(userId: Int): Battle
-    fun attack(userId: Int, allyId: Long, enemyId: Long): Battle
+
+    /**
+     * Plays an ally unit's turn.
+     *
+     * @return Updated battle.
+     *
+     * @throws NoBattleInSessionException when user has no battle in session.
+     */
+    fun allyTurn(userId: Int, action: BattleAction): BattleActionResult
+
+    /**
+     * Plays an enemy (A.I.) unit's turn.
+     *
+     * @return Updated battle.
+     *
+     * @throws NoBattleInSessionException when user has no battle in session.
+     */
+    fun enemyTurn(userId: Int): BattleActionResult
 }
+
+class NoAlliesAliveException : Exception()
+class NoBattleInSessionException : Exception()

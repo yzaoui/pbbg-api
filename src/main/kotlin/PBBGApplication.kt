@@ -129,6 +129,9 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         static("img") {
             resources("img")
         }
+        static("audio") {
+            resources("audio")
+        }
     }
 }
 
