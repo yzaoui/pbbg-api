@@ -61,3 +61,13 @@ tasks.withType<ShadowJar> {
     classifier = ""
     version = ""
 }
+
+/**
+ * Helper task to reload resources without restarting server
+ */
+tasks.register<Copy>("copyResourcesToOut") {
+    from("src/main/resources") {
+        include("**/*")
+        destinationDir = File("out/production/resources")
+    }
+}
