@@ -105,7 +105,7 @@ const VIEW = {
          */
         DOMs: [],
         play() {
-            this.DOMs[Math.floor(Math.random() * this.DOMs.length)].play();
+            setTimeout(() => this.DOMs[Math.floor(Math.random() * this.DOMs.length)].play(), 230);
         }
     },
     /**
@@ -195,6 +195,9 @@ const setupBattle = (battle) => {
             unitEl.onclick = () => selectFn(unit.id);
             unitEl.onmouseenter = () => hoverUnit(unit.id);
             unitEl.onmouseleave = () => unhoverUnit(unit.id);
+            unitEl.addEventListener("animationend" , (event) => {
+                unitEl.classList.remove(`animation-${event.animationName}`);
+            });
             li.appendChild(unitEl);
         }
 
@@ -374,17 +377,25 @@ const processEnemyTurn = async () => {
  * @param {Object.<number, UnitEffect.Health>} healthEffects
  */
 const processHealthEffects = (healthEffects) => {
-    const targets = getAllPBBGUnits().filter(el => healthEffects.hasOwnProperty(String(el.unitId)));
+    const sender = VIEW.getPBBGUnitById(STATE.nextUnitId());
+    const targets = VIEW.allPBBGUnits.filter(el => healthEffects.hasOwnProperty(String(el.unitId)));
+
+    animate(sender, STATE.nextUnitIsAlly() ? "attack-send-right" : "attack-send-left");
 
     for (const target of targets) {
-        target.onanimationend = () => target.classList.remove("animation-attack");
-        target.classList.remove("animation-attack");
-        window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
-            target.classList.add("animation-attack");
-        }));
+        animate(target, "attack-receive");
     }
 
     VIEW.attackAudio.play();
+};
+
+const animate = (el, animationName) => {
+    const animClass = `animation-${animationName}`;
+
+    el.classList.remove(animClass);
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+        el.classList.add(animClass);
+    }));
 };
 
 /**
@@ -424,7 +435,7 @@ const updateUI = () => {
         VIEW.attackButton.hidden = false;
         enemyTurnBtn.classList.add("hidden");
     } else {
-        VIEW.attackButton.hidden = false;
+        VIEW.attackButton.hidden = true;
         enemyTurnBtn.classList.remove("hidden");
     }
 
