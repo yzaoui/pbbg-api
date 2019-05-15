@@ -10,7 +10,8 @@ a {
 .container {
     display: flex;
     flex-direction: row;
-    width: 992px;
+    width: 100%;
+    max-width: 992px;
     min-height: 640px;
     margin-top: 100px;
     margin-left: auto;
@@ -35,10 +36,10 @@ main {
 .sidebar {
     display: flex;
     flex-direction: column;
-    height: 640px;
     width: 150px;
+    flex-shrink: 0;
+    flex-basis: 150px;
     border: 1px solid black;
-    flex: 0 0 150px;
     order: -1;
     background: #e1e4ffcf;
 }
@@ -53,6 +54,11 @@ main {
     font-weight: bold;
     border-bottom: grey 1px solid;
     padding: 10px;
+}
+
+.navigation {
+    display: flex;
+    flex-direction: column;
 }
 
 a.sidebar-item {
@@ -170,4 +176,21 @@ a.btn:focus {
     display: block;
     text-align: center;
     font-weight: bold;
+}
+
+@media screen and (max-width: 600px) {
+    .container {
+        flex-direction: column;
+        margin: 0;
+    }
+
+    .sidebar {
+        width: unset;
+        flex-basis: unset;
+    }
+
+    .navigation {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
 }

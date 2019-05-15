@@ -19,6 +19,7 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
             link(rel = "icon", href = "/img/favicon-32.png", type = "image/png") {
                 sizes = "32x32"
             }
+            meta(name = "viewport", content = "width=device-width")
             insert(headContent)
         }
         body {
@@ -27,33 +28,35 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
                     div(classes = "username") {
                         +memberPageVM.user.username
                     }
-                    a(href = memberPageVM.homeUrl, classes = "sidebar-item") {
-                        span(classes = "sidebar-item-icon") { +"""🏠""" }
-                        span { +"Home" }
-                    }
-                    a(href = memberPageVM.squadUrl, classes = "sidebar-item") {
-                        span(classes = "sidebar-item-icon") { +"""👥""" }
-                        span { +"Squad" }
-                    }
-                    a(href = memberPageVM.inventoryUrl, classes = "sidebar-item") {
-                        span(classes = "sidebar-item-icon") { +"""🎒""" }
-                        span { +"Inventory" }
-                    }
-                    a(href = memberPageVM.battleUrl, classes = "sidebar-item") {
-                        span(classes = "sidebar-item-icon") { +"""⚔️""" } // Unicode variation selector 16
-                        span { +"Battle" }
-                    }
-                    a(href = memberPageVM.mineUrl, classes = "sidebar-item") {
-                        span(classes = "sidebar-item-icon") { +"""⛏️""" } // Unicode variation selector 16
-                        span { +"Mine" }
-                    }
-                    a(href = memberPageVM.dexUrl, classes = "sidebar-item") {
-                        span(classes = "sidebar-item-icon") { +"""📚""" }
-                        span { +"Dex" }
-                    }
-                    a(href = memberPageVM.settingsUrl, classes = "sidebar-item") {
-                        span(classes = "sidebar-item-icon") { +"""⚙️""" } // Unicode variation selector 16
-                        span { +"Settings" }
+                    div(classes = "navigation") {
+                        a(href = memberPageVM.homeUrl, classes = "sidebar-item") {
+                            span(classes = "sidebar-item-icon") { +"""🏠""" }
+                            span { +"Home" }
+                        }
+                        a(href = memberPageVM.squadUrl, classes = "sidebar-item") {
+                            span(classes = "sidebar-item-icon") { +"""👥""" }
+                            span { +"Squad" }
+                        }
+                        a(href = memberPageVM.inventoryUrl, classes = "sidebar-item") {
+                            span(classes = "sidebar-item-icon") { +"""🎒""" }
+                            span { +"Inventory" }
+                        }
+                        a(href = memberPageVM.battleUrl, classes = "sidebar-item") {
+                            span(classes = "sidebar-item-icon") { +"""⚔️""" } // Unicode variation selector 16
+                            span { +"Battle" }
+                        }
+                        a(href = memberPageVM.mineUrl, classes = "sidebar-item") {
+                            span(classes = "sidebar-item-icon") { +"""⛏️""" } // Unicode variation selector 16
+                            span { +"Mine" }
+                        }
+                        a(href = memberPageVM.dexUrl, classes = "sidebar-item") {
+                            span(classes = "sidebar-item-icon") { +"""📚""" }
+                            span { +"Dex" }
+                        }
+                        a(href = memberPageVM.settingsUrl, classes = "sidebar-item") {
+                            span(classes = "sidebar-item-icon") { +"""⚙️""" } // Unicode variation selector 16
+                            span { +"Settings" }
+                        }
                     }
                     div(classes = "sidebar-logout") {
                         form(action = memberPageVM.logoutUrl, method = FormMethod.post) {

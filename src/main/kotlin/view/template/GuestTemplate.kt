@@ -19,6 +19,7 @@ class GuestTemplate(private val pageTitle: String, private val guestPageVM: Gues
             link(rel = "icon", href = "/img/favicon-32.png", type = "image/png") {
                 sizes = "32x32"
             }
+            meta(name = "viewport", content = "width=device-width")
             insert(headContent)
         }
         body {
