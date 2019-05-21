@@ -68,6 +68,8 @@
  * @property {LevelProgress} mining
  */
 
+const main = document.getElementById("main");
+
 /**
  * @property {number} width
  * @property {number} height
@@ -123,8 +125,6 @@ window.onload = async () => {
  * @param {Mine} mine
  */
 const setupMiningInterface = (mine) => {
-    const main = document.getElementById("main");
-
     main.appendChild(createExitMineButton());
     const miningGrid = createMiningGrid(mine);
     main.appendChild(miningGrid);
@@ -139,8 +139,6 @@ const setupMiningInterface = (mine) => {
 };
 
 const setupGenerateMineInterface = async () => {
-    const main = document.getElementById("main");
-
     const table = document.createElement("table");
     table.id = "generate-mine-container";
     table.className = "mining-mine-info";
@@ -402,8 +400,6 @@ const createMiningGrid = (mine) => {
 };
 
 const setupPickaxeAndResultsList = async () => {
-    const main = document.getElementById("main");
-
     const res = await getPickaxe();
 
     if (res.status === "success") {
