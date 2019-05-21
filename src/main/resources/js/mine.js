@@ -70,27 +70,41 @@
 
 const main = document.getElementById("main");
 
-/**
- * @property {number} width
- * @property {number} height
- * @property {HTMLTableDataCellElement[][]} cells
- */
-let mineInfo;
+const STATE = {
+    /**
+     * @type {boolean}
+     */
+    mineActionSubmitting: false,
+    /**
+     * @type {Pickaxe}
+     */
+    equippedPickaxe: undefined
+};
 
-const MINING_GRID_ID = "mining-grid";
-const EXIT_MINE_BUTTON_ID = "exit-mine";
-const MINING_RESULTS_LIST_ID = "mining-results-list";
-const MINING_LEVEL_PROGRESS_ID = "mining-level-progress";
-const MINING_LEVEL_TEXT_ID = "mining-level-text";
-/**
- * @type {Pickaxe}
- */
-let equippedPickaxe;
+const VIEW = {
+    /**
+     * @property {number} width
+     * @property {number} height
+     * @property {HTMLTableDataCellElement[][]} cells
+     */
+    mineInfo: undefined,
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {HTMLTableDataCellElement}
+     */
+    cellAt(x, y) {
+        return this.mineInfo.cells[y][x];
+    }
+};
 
-/**
- * @type {boolean}
- */
-let mineActionSubmitting = false;
+const IDs = {
+    MINING_GRID: "mining-grid",
+    EXIT_MINE_BUTTON: "exit-mine",
+    MINING_RESULTS_LIST: "mining-results-list",
+    MINING_LEVEL_PROGRESS: "mining-level-progress",
+    MINING_LEVEL_TEXT: "mining-level-text"
+};
 
 window.onload = async () => {
     insertScript("/js/webcomponents-bundle-2.0.0.js");
@@ -129,7 +143,7 @@ const setupMiningInterface = (mine) => {
     const miningGrid = createMiningGrid(mine);
     main.appendChild(miningGrid);
 
-    mineInfo = {
+    VIEW.mineInfo = {
         width: mine.width,
         height: mine.height,
         cells: [...miningGrid.firstElementChild.children].map(row => [...row.children])
@@ -140,7 +154,6 @@ const setupMiningInterface = (mine) => {
 
 const setupGenerateMineInterface = async () => {
     const table = document.createElement("table");
-    table.id = "generate-mine-container";
     table.className = "mining-mine-info";
     table.innerText = "Loading list of mines…";
     main.appendChild(table);
@@ -227,18 +240,18 @@ const reachableCells = (x, y, gridWidth, gridHeight, targets) => {
 };
 
 const enteredCell = (x, y) => {
-    const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
+    const affectedCells = reachableCells(x, y, VIEW.mineInfo.width, VIEW.mineInfo.height, STATE.equippedPickaxe.cells);
 
-    for (const cell of affectedCells) {
-        mineInfo.cells[cell.y][cell.x].classList.add("hovered-cell");
+    for (const {x, y} of affectedCells) {
+        VIEW.cellAt(x, y).classList.add("hovered-cell");
     }
 };
 
 const leftCell = (x, y) => {
-    const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
+    const affectedCells = reachableCells(x, y, VIEW.mineInfo.width, VIEW.mineInfo.height, STATE.equippedPickaxe.cells);
 
-    for (const cell of affectedCells) {
-        mineInfo.cells[cell.y][cell.x].classList.remove("hovered-cell");
+    for (const {x, y} of affectedCells) {
+        VIEW.cellAt(x, y).classList.remove("hovered-cell");
     }
 };
 
@@ -248,22 +261,23 @@ const updateMiningLevel = async () => {
      */
     const { level, relativeExp, relativeExpToNextLevel } = (await getUserDetails()).data.mining;
 
-    document.getElementById(MINING_LEVEL_PROGRESS_ID).updateProgress({ level: level, max: relativeExpToNextLevel, value: relativeExp });
+    document.getElementById(IDs.MINING_LEVEL_PROGRESS).updateProgress({ level: level, max: relativeExpToNextLevel, value: relativeExp });
 
-    document.getElementById(MINING_LEVEL_TEXT_ID).innerText = `Lv. ${level} — ${relativeExp} / ${relativeExpToNextLevel}`
+    document.getElementById(IDs.MINING_LEVEL_TEXT).innerText = `Lv. ${level} — ${relativeExp} / ${relativeExpToNextLevel}`
 };
 
 const clickedCell = async (x, y) => {
-    if (!mineActionSubmitting) {
-        mineActionSubmitting = true;
+    if (!STATE.mineActionSubmitting) {
+        STATE.mineActionSubmitting = true;
 
-        document.getElementById(MINING_GRID_ID).classList.add("pending-mine-action");
+        document.getElementById(IDs.MINING_GRID).classList.add("pending-mine-action");
 
-        const affectedCells = reachableCells(x, y, mineInfo.width, mineInfo.height, equippedPickaxe.cells);
+        const affectedCells = reachableCells(x, y, VIEW.mineInfo.width, VIEW.mineInfo.height, STATE.equippedPickaxe.cells);
 
         for (const cell of affectedCells) {
-            mineInfo.cells[cell.y][cell.x].classList.remove("hovered-cell");
-            mineInfo.cells[cell.y][cell.x].classList.add("pending-cell");
+            const cellEl = VIEW.mineInfo.cells[cell.y][cell.x];
+            cellEl.classList.remove("hovered-cell");
+            cellEl.classList.add("pending-cell");
         }
 
         const res = await postPerformMine(x, y);
@@ -296,13 +310,14 @@ const clickedCell = async (x, y) => {
             }
 
             for (const cell of affectedCells) {
-                mineInfo.cells[cell.y][cell.x].classList.remove("pending-cell");
-                mineInfo.cells[cell.y][cell.x].removeAttribute("style");
+                const cellEl = VIEW.mineInfo.cells[cell.y][cell.x];
+                cellEl.classList.remove("pending-cell");
+                cellEl.removeAttribute("style");
             }
 
-            document.getElementById(MINING_GRID_ID).classList.remove("pending-mine-action");
+            document.getElementById(IDs.MINING_GRID).classList.remove("pending-mine-action");
 
-            mineActionSubmitting = false;
+            STATE.mineActionSubmitting = false;
         }
     }
 };
@@ -328,7 +343,7 @@ const generateMine = async (mineTypeId) => {
 
 const createExitMineButton = () => {
     const button = document.createElement("button");
-    button.id = EXIT_MINE_BUTTON_ID;
+    button.id = IDs.EXIT_MINE_BUTTON;
     button.className = "fancy";
     button.innerText = "Exit mine";
     button.style.alignSelf = "center";
@@ -338,7 +353,7 @@ const createExitMineButton = () => {
 };
 
 const exitMine = async() => {
-    const exitMineButton = document.getElementById(EXIT_MINE_BUTTON_ID);
+    const exitMineButton = document.getElementById(IDs.EXIT_MINE_BUTTON);
     exitMineButton.innerText += " (Loading…)";
     exitMineButton.disabled = true;
     exitMineButton.classList.add("loading");
@@ -347,7 +362,7 @@ const exitMine = async() => {
 
     if (res.status === "success") {
         // Remove mining grid
-        const miningGrid = document.getElementById(MINING_GRID_ID);
+        const miningGrid = document.getElementById(IDs.MINING_GRID);
         miningGrid.parentNode.removeChild(miningGrid);
 
         const exitMessageLi = document.createElement("li");
@@ -363,7 +378,7 @@ const exitMine = async() => {
 
         exitMineButton.parentNode.replaceChild(toMineListBtn, exitMineButton);
 
-        document.getElementById(MINING_RESULTS_LIST_ID).classList.add("expanded");
+        document.getElementById(IDs.MINING_RESULTS_LIST).classList.add("expanded");
     } else {
         //TODO: Display error
     }
@@ -379,8 +394,8 @@ const returnToMineList = () => {
  */
 const createMiningGrid = (mine) => {
     const table = document.createElement("table");
-    table.id = MINING_GRID_ID;
-    table.classList.add(MINING_GRID_ID);
+    table.id = IDs.MINING_GRID;
+    table.classList.add("mining-grid");
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
 
@@ -409,7 +424,7 @@ const setupPickaxeAndResultsList = async () => {
         const data = res.data;
 
         if (data !== null) {
-            equippedPickaxe = data;
+            STATE.equippedPickaxe = data;
 
             /**
              * @type {UserDetails}
@@ -420,19 +435,19 @@ const setupPickaxeAndResultsList = async () => {
 
             main.insertAdjacentHTML("beforeend",
                 `<div class="level-info" style="margin-left: auto; margin-right: auto; margin-top: 4px;">` +
-                    `<pbbg-level-progress id="${MINING_LEVEL_PROGRESS_ID}" level="${level}" value="${relativeExp}" max="${relativeExpToNextLevel}"></pbbg-level-progress>` +
-                    `<span id="${MINING_LEVEL_TEXT_ID}">Lv. ${level} — ${relativeExp} / ${relativeExpToNextLevel}</span>` +
+                    `<pbbg-level-progress id="${IDs.MINING_LEVEL_PROGRESS}" level="${level}" value="${relativeExp}" max="${relativeExpToNextLevel}"></pbbg-level-progress>` +
+                    `<span id="${IDs.MINING_LEVEL_TEXT}">Lv. ${level} — ${relativeExp} / ${relativeExpToNextLevel}</span>` +
                 `</div>` +
-                `<div>Equipped pickaxe: ${equippedPickaxe.pickaxeKind}</div>`
+                `<div>Equipped pickaxe: ${STATE.equippedPickaxe.pickaxeKind}</div>`
             );
 
             const pickaxeGrid = document.createElement("pbbg-grid-preview");
-            pickaxeGrid.grid = equippedPickaxe.cells;
+            pickaxeGrid.grid = STATE.equippedPickaxe.cells;
             main.insertAdjacentElement("beforeend", pickaxeGrid);
 
-            main.insertAdjacentHTML("beforeend", `<ul id="${MINING_RESULTS_LIST_ID}" class="${MINING_RESULTS_LIST_ID}"></ul>`);
+            main.insertAdjacentHTML("beforeend", `<ul id="${IDs.MINING_RESULTS_LIST}" class="${IDs.MINING_RESULTS_LIST}"></ul>`);
 
-            mineInfo.cells.forEach((row, y) => {
+            VIEW.mineInfo.cells.forEach((row, y) => {
                 row.forEach((cell, x) => {
                     cell.onmouseenter = () => { enteredCell(x, y) };
                     cell.onmouseleave = () => { leftCell(x, y) };
@@ -441,7 +456,7 @@ const setupPickaxeAndResultsList = async () => {
             });
 
             // Display mine grid as enabled.
-            document.getElementById(MINING_GRID_ID).classList.add("enabled");
+            document.getElementById(IDs.MINING_GRID).classList.add("enabled");
         } else {
             main.insertAdjacentHTML("beforeend", `<div>No pickaxe equipped. Go to your inventory and equip one.</div>`);
         }
@@ -452,7 +467,7 @@ const setupPickaxeAndResultsList = async () => {
  * @param {HTMLLIElement} li
  */
 const appendListItemToResultsList = (li) => {
-    const list = document.getElementById(MINING_RESULTS_LIST_ID);
+    const list = document.getElementById(IDs.MINING_RESULTS_LIST);
 
     let needToScroll = (list.scrollTop + list.clientHeight) === list.scrollHeight;
 
