@@ -1,3 +1,7 @@
+.mining-grid-container {
+    overflow: auto;
+}
+
 .mining-grid {
     table-layout: fixed;
     border-spacing: 0;

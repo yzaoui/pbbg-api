@@ -155,7 +155,7 @@ const setupMiningInterface = (mine) => {
     VIEW.mineInfo = {
         width: mine.width,
         height: mine.height,
-        cells: [...miningGrid.firstElementChild.children].map(row => [...row.children])
+        cells: [...miningGrid.firstElementChild.firstElementChild.children].map(row => [...row.children])
     };
 
     setupPickaxeAndResultsList();
@@ -391,10 +391,14 @@ const returnToMineList = () => {
 
 /**
  * @param {Mine} mine
- * @returns {HTMLTableElement}
+ * @returns {HTMLDivElement}
  */
 const createMiningGrid = (mine) => {
+    const div = document.createElement("div");
+    div.classList.add("mining-grid-container");
+
     const table = document.createElement("table");
+    div.appendChild(table);
     table.id = IDs.MINING_GRID;
     table.classList.add("mining-grid");
     const tbody = document.createElement("tbody");
@@ -412,7 +416,7 @@ const createMiningGrid = (mine) => {
         tbody.appendChild(tr);
     }
 
-    return table;
+    return div;
 };
 
 const setupPickaxeAndResultsList = async () => {
