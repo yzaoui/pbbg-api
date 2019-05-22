@@ -90,6 +90,9 @@ const STATE = {
 
 const VIEW = {
     attackButton: {
+        /**
+         * @type {HTMLButtonElement}
+         */
         DOM: null,
         set loading(val) {
             this.DOM.innerText = `Attack${val ? " (Loading…)" : ""}`;

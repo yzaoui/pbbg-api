@@ -65,6 +65,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
             } catch (e: NotInMineSessionException) {
                 call.respondFail(HttpStatusCode.Forbidden, "A mine session must be in progress in order to perform a mining operation.")
             } catch (e: Exception) {
+                e.printStackTrace()
                 call.respondError(HttpStatusCode.InternalServerError, e.message.orEmpty())
             }
         }
