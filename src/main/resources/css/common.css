@@ -7,6 +7,12 @@ a {
     color: #0070ff;
 }
 
+img {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
 .container {
     display: flex;
     flex-direction: row;
