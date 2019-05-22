@@ -16,6 +16,12 @@ enum class MyUnitEnum(val friendlyName: String, val spriteName: String, val desc
         "Carpshooter",
         "carpshooter",
         "Carpshooter uses the skills it has honed through determination and its sense of duty. This allows it to " +
-                "overcome its clear lack of the sense of smell."
+                "overcome its clear lack of a sense of smell."
+    ),
+    FLAMANGO(
+        "Flamango",
+        "flamango",
+        "This tropical avian isn't shy to pecking away any unwanted attention its colorful exterior and wonderful " +
+                "scent attract. Give it a sniff at your own risk."
     )
 }

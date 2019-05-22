@@ -36,6 +36,13 @@ sealed class MyUnit {
         override val enum get() = CARPSHOOTER
     }
 
+    data class Flamango(
+        override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
+        override val exp: Long
+    ) : MyUnit() {
+        override val enum get() = FLAMANGO
+    }
+
     fun receiveDamage(damage: Int): MyUnit {
         val newHp = max(hp - damage, 0)
 
@@ -43,6 +50,7 @@ sealed class MyUnit {
             is IceCreamWizard -> copy(hp = newHp)
             is Twolip -> copy(hp = newHp)
             is Carpshooter -> copy(hp = newHp)
+            is Flamango -> copy(hp = newHp)
         }
     }
 
@@ -53,6 +61,7 @@ sealed class MyUnit {
             is IceCreamWizard -> copy(exp = newExp)
             is Twolip -> copy(exp = newExp)
             is Carpshooter -> copy(exp = newExp)
+            is Flamango -> copy(exp = newExp)
         }
     }
 
@@ -61,6 +70,7 @@ sealed class MyUnit {
             is IceCreamWizard -> copy(hp = maxHP)
             is Twolip -> copy(hp = maxHP)
             is Carpshooter -> copy(hp = maxHP)
+            is Flamango -> copy(hp = maxHP)
         }
     }
 }
