@@ -28,5 +28,6 @@ fun ResultRow.toMyUnit(): MyUnit {
         MyUnitEnum.ICE_CREAM_WIZARD -> MyUnit.IceCreamWizard(id, hp, maxHP, atk, exp)
         MyUnitEnum.TWOLIP -> MyUnit.Twolip(id, hp, maxHP, atk, exp)
         MyUnitEnum.CARPSHOOTER -> MyUnit.Carpshooter(id, hp, maxHP, atk, exp)
+        MyUnitEnum.FLAMANGO -> MyUnit.Flamango(id, hp, maxHP, atk, exp)
     }
 }
