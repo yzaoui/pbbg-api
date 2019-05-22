@@ -25,11 +25,11 @@
     cursor: wait;
 }
 
-.mining-grid.enabled:not(.pending-mine-action) td.hovered-cell {
+.mining-grid.enabled:not(.pending-mine-action) td[data-in-range] {
     background-color: limegreen;
 }
 
-.mining-grid.enabled td.pending-cell {
+.mining-grid.enabled td[data-pending] {
     animation: pending-cell-anim 1.5s;
     animation-iteration-count: infinite;
 }

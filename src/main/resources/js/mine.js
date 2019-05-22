@@ -95,7 +95,16 @@ const VIEW = {
      */
     cellAt(x, y) {
         return this.mineInfo.cells[y][x];
-    }
+    },
+    setInRangeCellAt(x, y, val) {
+        this.cellAt(x, y).toggleAttribute("data-in-range", val);
+    },
+    setPendingCellAt(x, y, val) {
+        this.cellAt(x, y).toggleAttribute("data-pending", val);
+    },
+    removeItemCell(x, y) {
+        this.cellAt(x, y).removeAttribute("style");
+    },
 };
 
 const IDs = {
@@ -217,43 +226,40 @@ const createMineToUnlockRow = (nextUnlockLevel) => {
 };
 
 /**
- * @param {number} x
- * @param {number} y
+ * @param {Point} center
  * @param {number} gridWidth
  * @param {number} gridHeight
  * @param {Point[]} targets
  * @returns {Point[]}
  */
-const reachableCells = (x, y, gridWidth, gridHeight, targets) => {
-    let cells = [];
+const reachableCells = (center, gridWidth, gridHeight, targets) => {
+    let reachableCells = [];
 
     for (const target of targets) {
-        const newX = x + target.x;
-        const newY = y + target.y;
+        const newX = center.x + target.x;
+        const newY = center.y + target.y;
 
         if (newX >= 0 && newX < gridWidth && newY >= 0 && newY < gridHeight) {
-            cells.push({ x: newX, y: newY });
+            reachableCells.push({ x: newX, y: newY });
         }
     }
 
-    return cells;
+    return reachableCells;
 };
 
-const enteredCell = (x, y) => {
-    const affectedCells = reachableCells(x, y, VIEW.mineInfo.width, VIEW.mineInfo.height, STATE.equippedPickaxe.cells);
+/**
+ * @param {Point} center
+ */
+const enteredCell = (center) =>
+    reachableCells(center, VIEW.mineInfo.width, VIEW.mineInfo.height, STATE.equippedPickaxe.cells)
+        .map(cell => VIEW.setInRangeCellAt(cell.x, cell.y, true));
 
-    for (const {x, y} of affectedCells) {
-        VIEW.cellAt(x, y).classList.add("hovered-cell");
-    }
-};
-
-const leftCell = (x, y) => {
-    const affectedCells = reachableCells(x, y, VIEW.mineInfo.width, VIEW.mineInfo.height, STATE.equippedPickaxe.cells);
-
-    for (const {x, y} of affectedCells) {
-        VIEW.cellAt(x, y).classList.remove("hovered-cell");
-    }
-};
+/**
+ * @param {Point} center
+ */
+const leftCell = (center) =>
+    reachableCells(center, VIEW.mineInfo.width, VIEW.mineInfo.height, STATE.equippedPickaxe.cells)
+        .map(cell => VIEW.setInRangeCellAt(cell.x, cell.y, false));
 
 const updateMiningLevel = async () => {
     /**
@@ -266,21 +272,17 @@ const updateMiningLevel = async () => {
     document.getElementById(IDs.MINING_LEVEL_TEXT).innerText = `Lv. ${level} — ${relativeExp} / ${relativeExpToNextLevel}`
 };
 
-const clickedCell = async (x, y) => {
+const clickedCell = async (center) => {
     if (!STATE.mineActionSubmitting) {
         STATE.mineActionSubmitting = true;
 
         document.getElementById(IDs.MINING_GRID).classList.add("pending-mine-action");
 
-        const affectedCells = reachableCells(x, y, VIEW.mineInfo.width, VIEW.mineInfo.height, STATE.equippedPickaxe.cells);
+        const affectedCells = reachableCells(center, VIEW.mineInfo.width, VIEW.mineInfo.height, STATE.equippedPickaxe.cells);
 
-        for (const cell of affectedCells) {
-            const cellEl = VIEW.mineInfo.cells[cell.y][cell.x];
-            cellEl.classList.remove("hovered-cell");
-            cellEl.classList.add("pending-cell");
-        }
+        affectedCells.forEach(cell => VIEW.setPendingCellAt(cell.x, cell.y, true));
 
-        const res = await postPerformMine(x, y);
+        const res = await postPerformMine(center.x, center.y);
 
         if (res.status === "success") {
             /**
@@ -309,11 +311,10 @@ const clickedCell = async (x, y) => {
                 appendListItemToResultsList(li);
             }
 
-            for (const cell of affectedCells) {
-                const cellEl = VIEW.mineInfo.cells[cell.y][cell.x];
-                cellEl.classList.remove("pending-cell");
-                cellEl.removeAttribute("style");
-            }
+            affectedCells.forEach(cell => {
+                VIEW.setPendingCellAt(cell.x, cell.y, false);
+                VIEW.removeItemCell(cell.x, cell.y);
+            });
 
             document.getElementById(IDs.MINING_GRID).classList.remove("pending-mine-action");
 
@@ -449,9 +450,10 @@ const setupPickaxeAndResultsList = async () => {
 
             VIEW.mineInfo.cells.forEach((row, y) => {
                 row.forEach((cell, x) => {
-                    cell.onmouseenter = () => { enteredCell(x, y) };
-                    cell.onmouseleave = () => { leftCell(x, y) };
-                    cell.onclick = () => { clickedCell(x, y) };
+                    const center = {x, y};
+                    cell.onmouseenter = () => { enteredCell(center) };
+                    cell.onmouseleave = () => { leftCell(center) };
+                    cell.onclick = () => { clickedCell(center) };
                 });
             });
 
