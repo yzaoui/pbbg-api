@@ -9,8 +9,9 @@
  * @typedef {Object} MyUnitEnum
  *
  * @property {string} friendlyName
- * @property {string} imgURL
  * @property {string} description
+ * @property {string} iconURL
+ * @property {string} fullURL
  */
 
 /**
@@ -19,6 +20,8 @@
  * @property {Object.<number, MyUnitEnum>[]} discoveredUnits - Units the user has discovered, associated by unit index.
  * @property {boolean} lastUnitIsDiscovered - Whether the last possible unit has been discovered, i.e. if the list's bottom is discovered.
  */
+
+const main = document.getElementById("main");
 
 window.onload = async () => {
     route();
@@ -45,7 +48,7 @@ const route = async () => {
 const setupRootPage = () => {
     document.title = "Dex";
 
-    document.getElementById("main").innerHTML =
+    main.innerHTML =
         `<div class="dex-categories">` +
             `<a href="/dex/items" class="dex-category">Items</a>` +
             `<a href="/dex/units" class="dex-category">Units</a>` +
@@ -77,11 +80,11 @@ const setupItemsPage = async () => {
          */
         const dex = res.data;
 
-        document.getElementById("main").insertAdjacentElement("beforeend", createBackToDex());
+        main.insertAdjacentElement("beforeend", createBackToDex());
 
         const table = document.createElement("table");
         table.classList.add("dex");
-        document.getElementById("main").insertAdjacentElement("beforeend", table);
+        main.insertAdjacentElement("beforeend", table);
 
         const tbody = document.createElement("tbody");
         table.insertAdjacentElement("beforeend", tbody);
@@ -92,7 +95,7 @@ const setupItemsPage = async () => {
             const idnum = parseInt(id);
 
             if (idnum !== lastDiscoveredId + 1) {
-                tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
+                tbody.insertAdjacentElement("beforeend", createUnknownDexItemRow());
             }
 
             tbody.insertAdjacentElement("beforeend", createDiscoveredDexItemRow(idnum, item));
@@ -101,7 +104,7 @@ const setupItemsPage = async () => {
         }
 
         if (!dex.lastItemIsDiscovered) {
-            tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
+            tbody.insertAdjacentElement("beforeend", createUnknownDexItemRow());
         }
     }
 };
@@ -121,14 +124,11 @@ const setupUnitsPage = async () => {
          */
         const dex = res.data;
 
-        document.getElementById("main").insertAdjacentElement("beforeend", createBackToDex());
+        main.insertAdjacentElement("beforeend", createBackToDex());
 
-        const table = document.createElement("table");
-        table.classList.add("dex");
-        document.getElementById("main").insertAdjacentElement("beforeend", table);
-
-        const tbody = document.createElement("tbody");
-        table.insertAdjacentElement("beforeend", tbody);
+        const ol = document.createElement("ol");
+        ol.classList.add("dex");
+        main.insertAdjacentElement("beforeend", ol);
 
         let lastDiscoveredId = -1;
 
@@ -136,16 +136,16 @@ const setupUnitsPage = async () => {
             const idnum = parseInt(id);
 
             if (idnum !== lastDiscoveredId + 1) {
-                tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
+                ol.insertAdjacentElement("beforeend", createUnknownDexUnitRow());
             }
 
-            tbody.insertAdjacentElement("beforeend", createDiscoveredDexUnitRow(idnum, unit));
+            ol.insertAdjacentElement("beforeend", createDiscoveredDexUnitRow(idnum, unit));
 
             lastDiscoveredId = idnum;
         }
 
         if (!dex.lastUnitIsDiscovered) {
-            tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
+            ol.insertAdjacentElement("beforeend", createUnknownDexUnitRow());
         }
     }
 };
@@ -169,31 +169,43 @@ const createDiscoveredDexItemRow = (id, item) => {
     return tr;
 };
 
-/**
- * @param {number} id
- * @param {MyUnitEnum} unit
- */
-const createDiscoveredDexUnitRow = (id, unit) => {
-    const { friendlyName, imgURL, description } = unit;
-
-    const tr = document.createElement("tr");
-
-    tr.insertAdjacentHTML("beforeend",
-        `<td>${id}</td>` +
-        `<td>${friendlyName}</td>` +
-        `<td><img src="${imgURL}" alt="Unit sprite"></td>` +
-        `<td>${description}</td>`
-    );
-
-    return tr;
-};
-
-const createUnknownDexRow = () => {
+const createUnknownDexItemRow = () => {
     const tr = document.createElement("tr");
     tr.classList.add("dex-unknown");
     tr.innerHTML = `<td colspan="4"><img src="/img/three-dots.svg" alt="Three vertical circles indicating missing row(s)"></td>`;
 
     return tr;
+};
+
+/**
+ * @param {number} id
+ * @param {MyUnitEnum} unit
+ */
+const createDiscoveredDexUnitRow = (id, unit) => {
+    const { friendlyName, iconURL } = unit;
+
+    const li = document.createElement("li");
+
+    li.insertAdjacentHTML("beforeend",
+        `<a href="#">` +
+            `<span>#${id}</span>` +
+            `<img src="${iconURL}" alt="Unit sprite">` +
+            `<span>${friendlyName}</span>` +
+        `</a>`
+    );
+
+    return li;
+};
+
+/**
+ * @returns {HTMLLIElement}
+ */
+const createUnknownDexUnitRow = () => {
+    const li = document.createElement("li");
+    li.classList.add("dex-unknown");
+    li.innerHTML = `<img src="/img/three-dots.svg" alt="Three vertical circles indicating missing row(s)">`;
+
+    return li;
 };
 
 const createBackToDex = () => {
