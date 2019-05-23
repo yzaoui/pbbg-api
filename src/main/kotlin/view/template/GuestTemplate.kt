@@ -12,6 +12,7 @@ class GuestTemplate(private val pageTitle: String, private val guestPageVM: Gues
     override fun HTML.apply() {
         head {
             title { +pageTitle }
+            link(href = "/css/normalize.css", rel = "stylesheet")
             link(href = "/css/common.css", rel = "stylesheet")
             link(rel = "icon", href = "/img/favicon-16.png", type = "image/png") {
                 sizes = "16x16"
