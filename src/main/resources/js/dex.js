@@ -159,7 +159,24 @@ const setupUnitPage = async (unitId) => {
     const res = await getDexUnit(unitId);
 
     if (res.status === "success") {
-        replaceInterfaceWithText(JSON.stringify(res.data));
+        replaceInterfaceWithText("");
+
+        /**
+         * @type {MyUnitEnum}
+         */
+        const unit = res.data;
+
+        main.insertAdjacentElement("beforeend", (() => {
+            const a = document.createElement("a");
+            a.setAttribute("href", "/dex/units");
+            a.classList.add("dex-return");
+            a.innerText = "⬅️ Return to Units";
+            a.addEventListener("click", e => clickRouteListener(e, a.href));
+
+            return a;
+        })());
+
+        main.insertAdjacentText("beforeend", JSON.stringify(res.data));
     }
 };
 
