@@ -176,7 +176,14 @@ const setupUnitPage = async (unitId) => {
             return a;
         })());
 
-        main.insertAdjacentText("beforeend", JSON.stringify(res.data));
+        main.insertAdjacentHTML("beforeend",
+            `<div>` +
+                `<h1>${unit.friendlyName}</h1>` +
+                `<i>${unit.description}</i>` +
+                `<img src="${unit.iconURL}" alt="Unit's icon">` +
+                `<img src="${unit.fullURL}" alt="Unit's full sprite">` +
+            `</div>`
+        );
     }
 };
 
