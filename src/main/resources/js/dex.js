@@ -34,12 +34,14 @@ window.onpopstate = () => {
 const route = async () => {
     const splitPath = window.location.pathname.match(/[^/?]*[^/?]/g);
 
-    if (splitPath.length === 1) {
+    if (splitPath.length === 1) { // /dex
         setupRootPage();
-    } else if (splitPath.length === 2 && splitPath[1] === "items") {
+    } else if (splitPath.length === 2 && splitPath[1] === "items") { // /dex/items
         setupItemsPage();
-    } else if (splitPath.length === 2 && splitPath[1] === "units") {
+    } else if (splitPath.length === 2 && splitPath[1] === "units") { // /dex/units
         setupUnitsPage();
+    } else if (splitPath.length === 3 && splitPath[1] === "units" && isFinite(splitPath[2])) { // /dex/units/{id}
+        setupUnitPage(parseInt(splitPath[2]));
     } else {
         window.location.pathname = "/dex";
     }
@@ -57,11 +59,7 @@ const setupRootPage = () => {
     const links = document.querySelectorAll("#main a");
 
     for (const link of links) {
-        link.addEventListener("click", (e) => {
-            window.history.pushState({}, "", link.href);
-            route();
-            e.preventDefault();
-        });
+        link.addEventListener("click", e => clickRouteListener(e, link.href));
     }
 };
 
@@ -151,6 +149,21 @@ const setupUnitsPage = async () => {
 };
 
 /**
+ * @param {number} unitId
+ */
+const setupUnitPage = async (unitId) => {
+    document.title = "Units - Dex";
+
+    replaceInterfaceWithText("Loading…");
+
+    const res = await getDexUnit(unitId);
+
+    if (res.status === "success") {
+        replaceInterfaceWithText(JSON.stringify(res.data));
+    }
+};
+
+/**
  * @param {number} id
  * @param {ItemEnum} item
  */
@@ -187,12 +200,16 @@ const createDiscoveredDexUnitRow = (id, unit) => {
     const li = document.createElement("li");
 
     li.insertAdjacentHTML("beforeend",
-        `<a href="#">` +
+        `<a href="/dex/units/${id}">` +
             `<span>#${id}</span>` +
             `<img src="${iconURL}" alt="Unit sprite">` +
             `<span>${friendlyName}</span>` +
         `</a>`
     );
+
+    const a = li.children[0];
+
+    a.addEventListener("click", e => clickRouteListener(e, a.href));
 
     return li;
 };
@@ -213,13 +230,15 @@ const createBackToDex = () => {
     a.setAttribute("href", "/dex");
     a.classList.add("dex-return");
     a.innerText = "⬅️ Return to Dex";
-    a.addEventListener("click", (e) => {
-        window.history.pushState({}, "", a.href);
-        route();
-        e.preventDefault();
-    });
+    a.addEventListener("click", e => clickRouteListener(e, a.href));
 
     return a;
+};
+
+const clickRouteListener = (event, href) => {
+    window.history.pushState({}, "", href);
+    route();
+    event.preventDefault();
 };
 
 /**
@@ -233,5 +252,14 @@ const getDexItems = async () => (await fetch("/api/dex/items", {
  * On success, returns {@see DexUnits}.
  */
 const getDexUnits = async () => (await fetch("/api/dex/units", {
+    method: "GET",
+})).json();
+
+/**
+ * @param {number} unitId
+ *
+ * On success, returns {@see MyUnitEnum}.
+ */
+const getDexUnit = async (unitId) => (await fetch(`/api/dex/units/${unitId}`, {
     method: "GET",
 })).json();
