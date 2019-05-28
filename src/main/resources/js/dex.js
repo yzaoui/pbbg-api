@@ -152,8 +152,6 @@ const setupUnitsPage = async () => {
  * @param {number} unitId
  */
 const setupUnitPage = async (unitId) => {
-    document.title = "Units - Dex";
-
     replaceInterfaceWithText("Loading…");
 
     const res = await getDexUnit(unitId);
@@ -165,6 +163,8 @@ const setupUnitPage = async (unitId) => {
          * @type {MyUnitEnum}
          */
         const unit = res.data;
+
+        document.title = `${unit.friendlyName} - Units - Dex`;
 
         main.insertAdjacentElement("beforeend", (() => {
             const a = document.createElement("a");
