@@ -123,28 +123,7 @@ const setupUnitsPage = async () => {
         const dex = res.data;
 
         main.insertAdjacentElement("beforeend", createBackToDex());
-
-        const ol = document.createElement("ol");
-        ol.classList.add("dex");
-        main.insertAdjacentElement("beforeend", ol);
-
-        let lastDiscoveredId = -1;
-
-        for (const [id, unit] of Object.entries(dex.discoveredUnits)) {
-            const idnum = parseInt(id);
-
-            if (idnum !== lastDiscoveredId + 1) {
-                ol.insertAdjacentElement("beforeend", createUnknownDexUnitRow());
-            }
-
-            ol.insertAdjacentElement("beforeend", createDiscoveredDexUnitRow(idnum, unit));
-
-            lastDiscoveredId = idnum;
-        }
-
-        if (!dex.lastUnitIsDiscovered) {
-            ol.insertAdjacentElement("beforeend", createUnknownDexUnitRow());
-        }
+        main.insertAdjacentElement("beforeend", createUnitsList(dex));
     }
 };
 
@@ -212,6 +191,35 @@ const createUnknownDexItemRow = () => {
     tr.innerHTML = `<td colspan="4"><img src="/img/three-dots.svg" alt="Three vertical circles indicating missing row(s)"></td>`;
 
     return tr;
+};
+
+/**
+ *
+ * @param {DexUnits} dex
+ */
+const createUnitsList = (dex) => {
+    const ol = document.createElement("ol");
+    ol.classList.add("dex");
+
+    let lastDiscoveredId = -1;
+
+    for (const [id, unit] of Object.entries(dex.discoveredUnits)) {
+        const idnum = parseInt(id);
+
+        if (idnum !== lastDiscoveredId + 1) {
+            ol.insertAdjacentElement("beforeend", createUnknownDexUnitRow());
+        }
+
+        ol.insertAdjacentElement("beforeend", createDiscoveredDexUnitRow(idnum, unit));
+
+        lastDiscoveredId = idnum;
+    }
+
+    if (!dex.lastUnitIsDiscovered) {
+        ol.insertAdjacentElement("beforeend", createUnknownDexUnitRow());
+    }
+
+    return ol;
 };
 
 /**
