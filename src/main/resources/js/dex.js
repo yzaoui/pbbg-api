@@ -64,8 +64,6 @@ const setupRootPage = () => {
 };
 
 const setupItemsPage = async () => {
-    document.title = "Items - Dex";
-
     replaceInterfaceWithText("Loading…");
 
     const res = await getDexItems();
@@ -77,6 +75,8 @@ const setupItemsPage = async () => {
          * @type {DexItems}
          */
         const dex = res.data;
+
+        document.title = "Items - Dex";
 
         main.insertAdjacentElement("beforeend", createBackToDex());
 
@@ -108,8 +108,6 @@ const setupItemsPage = async () => {
 };
 
 const setupUnitsPage = async () => {
-    document.title = "Units - Dex";
-
     replaceInterfaceWithText("Loading…");
 
     const res = await getDexUnits();
@@ -121,6 +119,8 @@ const setupUnitsPage = async () => {
          * @type {DexUnits}
          */
         const dex = res.data;
+
+        document.title = "Units - Dex";
 
         main.insertAdjacentElement("beforeend", createBackToDex());
         main.insertAdjacentElement("beforeend", createUnitsList(dex));
