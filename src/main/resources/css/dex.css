@@ -129,7 +129,23 @@ ol.dex > li > a > * {
     margin-left: 6px;
 }
 
+ol.dex > li > a > img {
+    position: relative;
+}
+
 ol.dex > li > a:hover {
     background-color: #dfe5fc;
     border-color: #2248d3;
+}
+
+ol.dex > li > a:hover > img {
+    animation-name: unit-icon-hover;
+    animation-duration: 350ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: steps(1, end);
+}
+
+@keyframes unit-icon-hover {
+    0% { bottom: 2px; }
+    50% { bottom: 0; }
 }
