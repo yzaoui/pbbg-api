@@ -8,9 +8,11 @@
 /**
  * @typedef {Object} MyUnitEnum
  *
+ * @property {number} id
  * @property {string} friendlyName
- * @property {string} imgURL
  * @property {string} description
+ * @property {string} iconURL
+ * @property {string} fullURL
  */
 
 /**
@@ -19,6 +21,8 @@
  * @property {Object.<number, MyUnitEnum>[]} discoveredUnits - Units the user has discovered, associated by unit index.
  * @property {boolean} lastUnitIsDiscovered - Whether the last possible unit has been discovered, i.e. if the list's bottom is discovered.
  */
+
+const main = document.getElementById("main");
 
 window.onload = async () => {
     route();
@@ -31,12 +35,14 @@ window.onpopstate = () => {
 const route = async () => {
     const splitPath = window.location.pathname.match(/[^/?]*[^/?]/g);
 
-    if (splitPath.length === 1) {
+    if (splitPath.length === 1) { // /dex
         setupRootPage();
-    } else if (splitPath.length === 2 && splitPath[1] === "items") {
+    } else if (splitPath.length === 2 && splitPath[1] === "items") { // /dex/items
         setupItemsPage();
-    } else if (splitPath.length === 2 && splitPath[1] === "units") {
+    } else if (splitPath.length === 2 && splitPath[1] === "units") { // /dex/units
         setupUnitsPage();
+    } else if (splitPath.length === 3 && splitPath[1] === "units" && isFinite(splitPath[2])) { // /dex/units/{id}
+        setupUnitPage(parseInt(splitPath[2]));
     } else {
         window.location.pathname = "/dex";
     }
@@ -45,7 +51,7 @@ const route = async () => {
 const setupRootPage = () => {
     document.title = "Dex";
 
-    document.getElementById("main").innerHTML =
+    main.innerHTML =
         `<div class="dex-categories">` +
             `<a href="/dex/items" class="dex-category">Items</a>` +
             `<a href="/dex/units" class="dex-category">Units</a>` +
@@ -54,17 +60,11 @@ const setupRootPage = () => {
     const links = document.querySelectorAll("#main a");
 
     for (const link of links) {
-        link.addEventListener("click", (e) => {
-            window.history.pushState({}, "", link.href);
-            route();
-            e.preventDefault();
-        });
+        link.addEventListener("click", e => clickRouteListener(e, link.href));
     }
 };
 
 const setupItemsPage = async () => {
-    document.title = "Items - Dex";
-
     replaceInterfaceWithText("Loading…");
 
     const res = await getDexItems();
@@ -77,11 +77,13 @@ const setupItemsPage = async () => {
          */
         const dex = res.data;
 
-        document.getElementById("main").insertAdjacentElement("beforeend", createBackToDex());
+        document.title = "Items - Dex";
+
+        main.insertAdjacentElement("beforeend", createBackToDex());
 
         const table = document.createElement("table");
         table.classList.add("dex");
-        document.getElementById("main").insertAdjacentElement("beforeend", table);
+        main.insertAdjacentElement("beforeend", table);
 
         const tbody = document.createElement("tbody");
         table.insertAdjacentElement("beforeend", tbody);
@@ -92,7 +94,7 @@ const setupItemsPage = async () => {
             const idnum = parseInt(id);
 
             if (idnum !== lastDiscoveredId + 1) {
-                tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
+                tbody.insertAdjacentElement("beforeend", createUnknownDexItemRow());
             }
 
             tbody.insertAdjacentElement("beforeend", createDiscoveredDexItemRow(idnum, item));
@@ -101,14 +103,12 @@ const setupItemsPage = async () => {
         }
 
         if (!dex.lastItemIsDiscovered) {
-            tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
+            tbody.insertAdjacentElement("beforeend", createUnknownDexItemRow());
         }
     }
 };
 
 const setupUnitsPage = async () => {
-    document.title = "Units - Dex";
-
     replaceInterfaceWithText("Loading…");
 
     const res = await getDexUnits();
@@ -121,32 +121,34 @@ const setupUnitsPage = async () => {
          */
         const dex = res.data;
 
-        document.getElementById("main").insertAdjacentElement("beforeend", createBackToDex());
+        document.title = "Units - Dex";
 
-        const table = document.createElement("table");
-        table.classList.add("dex");
-        document.getElementById("main").insertAdjacentElement("beforeend", table);
+        main.insertAdjacentElement("beforeend", createBackToDex());
+        main.insertAdjacentElement("beforeend", createUnitsList(dex));
+    }
+};
 
-        const tbody = document.createElement("tbody");
-        table.insertAdjacentElement("beforeend", tbody);
+/**
+ * @param {number} unitId
+ */
+const setupUnitPage = async (unitId) => {
+    replaceInterfaceWithText("Loading…");
 
-        let lastDiscoveredId = -1;
+    const res = await getDexUnit(unitId);
 
-        for (const [id, unit] of Object.entries(dex.discoveredUnits)) {
-            const idnum = parseInt(id);
+    if (res.status === "success") {
+        replaceInterfaceWithText("");
 
-            if (idnum !== lastDiscoveredId + 1) {
-                tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
-            }
+        /**
+         * @type {MyUnitEnum}
+         */
+        const unit = res.data;
 
-            tbody.insertAdjacentElement("beforeend", createDiscoveredDexUnitRow(idnum, unit));
+        document.title = `${unit.friendlyName} - Units - Dex`;
 
-            lastDiscoveredId = idnum;
-        }
+        main.insertAdjacentElement("beforeend", createBackToUnitDex());
 
-        if (!dex.lastUnitIsDiscovered) {
-            tbody.insertAdjacentElement("beforeend", createUnknownDexRow());
-        }
+        main.insertAdjacentElement("beforeend", createDetailedUnitDex(unit));
     }
 };
 
@@ -169,26 +171,7 @@ const createDiscoveredDexItemRow = (id, item) => {
     return tr;
 };
 
-/**
- * @param {number} id
- * @param {MyUnitEnum} unit
- */
-const createDiscoveredDexUnitRow = (id, unit) => {
-    const { friendlyName, imgURL, description } = unit;
-
-    const tr = document.createElement("tr");
-
-    tr.insertAdjacentHTML("beforeend",
-        `<td>${id}</td>` +
-        `<td>${friendlyName}</td>` +
-        `<td><img src="${imgURL}" alt="Unit sprite"></td>` +
-        `<td>${description}</td>`
-    );
-
-    return tr;
-};
-
-const createUnknownDexRow = () => {
+const createUnknownDexItemRow = () => {
     const tr = document.createElement("tr");
     tr.classList.add("dex-unknown");
     tr.innerHTML = `<td colspan="4"><img src="/img/three-dots.svg" alt="Three vertical circles indicating missing row(s)"></td>`;
@@ -196,18 +179,116 @@ const createUnknownDexRow = () => {
     return tr;
 };
 
+/**
+ *
+ * @param {DexUnits} dex
+ */
+const createUnitsList = (dex) => {
+    const ol = document.createElement("ol");
+    ol.classList.add("dex");
+
+    let lastDiscoveredId = -1;
+
+    for (const [id, unit] of Object.entries(dex.discoveredUnits)) {
+        const idnum = parseInt(id);
+
+        if (idnum !== lastDiscoveredId + 1) {
+            ol.insertAdjacentElement("beforeend", createUnknownDexUnitRow());
+        }
+
+        ol.insertAdjacentElement("beforeend", createDiscoveredDexUnitRow(idnum, unit));
+
+        lastDiscoveredId = idnum;
+    }
+
+    if (!dex.lastUnitIsDiscovered) {
+        ol.insertAdjacentElement("beforeend", createUnknownDexUnitRow());
+    }
+
+    return ol;
+};
+
+/**
+ * @param {number} id
+ * @param {MyUnitEnum} unit
+ */
+const createDiscoveredDexUnitRow = (id, unit) => {
+    const { friendlyName, iconURL } = unit;
+
+    const li = document.createElement("li");
+
+    li.insertAdjacentHTML("beforeend",
+        `<a href="/dex/units/${id}">` +
+            `<span>#${id}</span>` +
+            `<img src="${iconURL}" alt="Unit sprite">` +
+            `<span>${friendlyName}</span>` +
+        `</a>`
+    );
+
+    const a = li.children[0];
+
+    a.addEventListener("click", e => clickRouteListener(e, a.href));
+
+    return li;
+};
+
+/**
+ * @returns {HTMLLIElement}
+ */
+const createUnknownDexUnitRow = () => {
+    const li = document.createElement("li");
+    li.classList.add("dex-unknown");
+    li.innerHTML = `<img src="/img/three-dots.svg" alt="Three vertical circles indicating missing row(s)">`;
+
+    return li;
+};
+
+/**
+ * @param {MyUnitEnum} unit
+ */
+const createDetailedUnitDex = (unit) => {
+    const div = document.createElement("div");
+    div.classList.add("detailed-unit-dex");
+    div.insertAdjacentHTML("beforeend",
+        `<h1 class="detailed-unit-dex-header">#${unit.id}: ${unit.friendlyName}</h1>` +
+        `<h2 class="detailed-unit-dex-header">Sprites</h2>` +
+        `<div>` +
+            `<img src="${unit.iconURL}" alt="${unit.friendlyName}'s icon">` +
+            `<img src="${unit.fullURL}" alt="${unit.friendlyName}'s full sprite">` +
+        `</div>` +
+        `<h2 class="detailed-unit-dex-header">Description</h2>` +
+        `<div>` +
+            `<i>${unit.description}</i>` +
+        `</div>`
+    );
+
+    return div;
+};
+
 const createBackToDex = () => {
     const a = document.createElement("a");
     a.setAttribute("href", "/dex");
     a.classList.add("dex-return");
     a.innerText = "⬅️ Return to Dex";
-    a.addEventListener("click", (e) => {
-        window.history.pushState({}, "", a.href);
-        route();
-        e.preventDefault();
-    });
+    a.addEventListener("click", e => clickRouteListener(e, a.href));
 
     return a;
+};
+
+const createBackToUnitDex = () => {
+    const a = document.createElement("a");
+    a.setAttribute("href", "/dex/units");
+    a.classList.add("dex-return");
+    a.innerText = "⬅️ Return to Units";
+    a.addEventListener("click", e => clickRouteListener(e, a.href));
+
+    return a;
+};
+
+const clickRouteListener = (event, href) => {
+    window.history.pushState({}, "", href);
+    route();
+    event.preventDefault();
 };
 
 /**
@@ -221,5 +302,14 @@ const getDexItems = async () => (await fetch("/api/dex/items", {
  * On success, returns {@see DexUnits}.
  */
 const getDexUnits = async () => (await fetch("/api/dex/units", {
+    method: "GET",
+})).json();
+
+/**
+ * @param {number} unitId
+ *
+ * On success, returns {@see MyUnitEnum}.
+ */
+const getDexUnit = async (unitId) => (await fetch(`/api/dex/units/${unitId}`, {
     method: "GET",
 })).json();

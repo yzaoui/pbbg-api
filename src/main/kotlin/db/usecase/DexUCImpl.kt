@@ -6,6 +6,7 @@ import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.dex.DexItems
 import com.bitwiserain.pbbg.domain.model.dex.DexUnits
 import com.bitwiserain.pbbg.domain.usecase.DexUC
+import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -30,5 +31,14 @@ class DexUCImpl(private val db: Database) : DexUC {
             discoveredUnits = discoveredUnits,
             lastUnitIsDiscovered = true
         )
+    }
+
+    override fun getDexUnit(userId: Int, unitEnumId: Int): MyUnitEnum {
+        // TODO: Make sure user can see this unit
+        return try {
+            MyUnitEnum.values()[unitEnumId]
+        } catch (e: IndexOutOfBoundsException) {
+            throw InvalidUnitException()
+        }
     }
 }

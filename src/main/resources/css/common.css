@@ -7,6 +7,12 @@ a {
     color: #0070ff;
 }
 
+img {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
 .container {
     display: flex;
     flex-direction: row;
@@ -26,6 +32,7 @@ main {
     display: flex;
     flex-direction: column;
     flex: 1;
+    max-width: 840px;
     min-height: 100%;
     border: 1px solid black;
     padding: 6px;
@@ -75,7 +82,7 @@ a.sidebar-item:hover {
 span.sidebar-item-icon {
     position: absolute;
     font-size: 20px;
-    top: 4px;
+    top: 8px;
     left: 10px;
 }
 
