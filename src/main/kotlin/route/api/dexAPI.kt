@@ -63,6 +63,7 @@ fun Route.dexAPI(userUC: UserUC, dexUC: DexUC) = route("/dex") {
 
 // TODO: Find appropriate place for this adapter
 fun MyUnitEnum.toJSON() = MyUnitEnumJSON(
+    id = ordinal,
     friendlyName = friendlyName,
     description = description,
     fullURL = "/img/unit/$spriteName.gif",

@@ -8,6 +8,7 @@
 /**
  * @typedef {Object} MyUnitEnum
  *
+ * @property {number} id
  * @property {string} friendlyName
  * @property {string} description
  * @property {string} iconURL
