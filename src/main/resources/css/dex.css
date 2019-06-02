@@ -88,9 +88,9 @@ table.dex > tbody > tr.dex-unknown > td > img {
     opacity: 0.5;
 }
 
-/**********************
- *      UNIT DEX      *
- **********************/
+/***************************
+ *      UNIT DEX LIST      *
+ ***************************/
 
 ol.dex {
     display: grid;
@@ -102,6 +102,7 @@ ol.dex {
     background-color: #c4ceff;
     border: 1px solid #7aa2f9;
     text-align: center;
+    border-radius: 10px;
 }
 
 ol.dex > li {
@@ -148,4 +149,35 @@ ol.dex > li > a:hover > img {
 @keyframes unit-icon-hover {
     0% { bottom: 2px; }
     50% { bottom: 0; }
+}
+
+/****************************
+ *  DETAILED UNIT DEX LIST  *
+ ****************************/
+
+.detailed-unit-dex {
+    background-color: #e0e6ff;;
+    border: 1px solid #9ea5fd;
+    border-radius: 10px;
+}
+
+.detailed-unit-dex-header {
+    background-color: #c4ceff;
+}
+
+.detailed-unit-dex > * {
+    padding: 4px;
+    margin: 0;
+}
+
+.detailed-unit-dex > *:not(:last-child) {
+    border-bottom: 1px solid #9ea5fd;
+}
+
+.detailed-unit-dex > *:first-child {
+    border-radius: 10px 10px 0 0;
+}
+
+.detailed-unit-dex > *:last-child {
+    border-radius: 0 0 10px 10px;
 }

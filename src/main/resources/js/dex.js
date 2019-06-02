@@ -248,11 +248,18 @@ const createUnknownDexUnitRow = () => {
  */
 const createDetailedUnitDex = (unit) => {
     const div = document.createElement("div");
+    div.classList.add("detailed-unit-dex");
     div.insertAdjacentHTML("beforeend",
-        `<h1>${unit.friendlyName}</h1>` +
-        `<i>${unit.description}</i>` +
-        `<img src="${unit.iconURL}" alt="Unit's icon">` +
-        `<img src="${unit.fullURL}" alt="Unit's full sprite">`
+        `<h1 class="detailed-unit-dex-header">#${unit.id}: ${unit.friendlyName}</h1>` +
+        `<h2 class="detailed-unit-dex-header">Sprites</h2>` +
+        `<div>` +
+            `<img src="${unit.iconURL}" alt="${unit.friendlyName}'s icon">` +
+            `<img src="${unit.fullURL}" alt="${unit.friendlyName}'s full sprite">` +
+        `</div>` +
+        `<h2 class="detailed-unit-dex-header">Description</h2>` +
+        `<div>` +
+            `<i>${unit.description}</i>` +
+        `</div>`
     );
 
     return div;
