@@ -147,14 +147,7 @@ const setupUnitPage = async (unitId) => {
 
         main.insertAdjacentElement("beforeend", createBackToUnitDex());
 
-        main.insertAdjacentHTML("beforeend",
-            `<div>` +
-                `<h1>${unit.friendlyName}</h1>` +
-                `<i>${unit.description}</i>` +
-                `<img src="${unit.iconURL}" alt="Unit's icon">` +
-                `<img src="${unit.fullURL}" alt="Unit's full sprite">` +
-            `</div>`
-        );
+        main.insertAdjacentElement("beforeend", createDetailedUnitDex(unit));
     }
 };
 
@@ -247,6 +240,21 @@ const createUnknownDexUnitRow = () => {
     li.innerHTML = `<img src="/img/three-dots.svg" alt="Three vertical circles indicating missing row(s)">`;
 
     return li;
+};
+
+/**
+ * @param {MyUnitEnum} unit
+ */
+const createDetailedUnitDex = (unit) => {
+    const div = document.createElement("div");
+    div.insertAdjacentHTML("beforeend",
+        `<h1>${unit.friendlyName}</h1>` +
+        `<i>${unit.description}</i>` +
+        `<img src="${unit.iconURL}" alt="Unit's icon">` +
+        `<img src="${unit.fullURL}" alt="Unit's full sprite">`
+    );
+
+    return div;
 };
 
 const createBackToDex = () => {
