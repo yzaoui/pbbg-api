@@ -145,15 +145,7 @@ const setupUnitPage = async (unitId) => {
 
         document.title = `${unit.friendlyName} - Units - Dex`;
 
-        main.insertAdjacentElement("beforeend", (() => {
-            const a = document.createElement("a");
-            a.setAttribute("href", "/dex/units");
-            a.classList.add("dex-return");
-            a.innerText = "⬅️ Return to Units";
-            a.addEventListener("click", e => clickRouteListener(e, a.href));
-
-            return a;
-        })());
+        main.insertAdjacentElement("beforeend", createBackToUnitDex());
 
         main.insertAdjacentHTML("beforeend",
             `<div>` +
@@ -262,6 +254,16 @@ const createBackToDex = () => {
     a.setAttribute("href", "/dex");
     a.classList.add("dex-return");
     a.innerText = "⬅️ Return to Dex";
+    a.addEventListener("click", e => clickRouteListener(e, a.href));
+
+    return a;
+};
+
+const createBackToUnitDex = () => {
+    const a = document.createElement("a");
+    a.setAttribute("href", "/dex/units");
+    a.classList.add("dex-return");
+    a.innerText = "⬅️ Return to Units";
     a.addEventListener("click", e => clickRouteListener(e, a.href));
 
     return a;
