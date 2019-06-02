@@ -93,24 +93,43 @@ table.dex > tbody > tr.dex-unknown > td > img {
  **********************/
 
 ol.dex {
+    display: grid;
+    justify-content: center;
+    grid-template-columns: repeat(auto-fit, 270px);
     margin: 0;
     padding: 0;
     list-style-type: none;
+    background-color: #c4ceff;
+    border: 1px solid #7aa2f9;
+    text-align: center;
 }
 
 ol.dex > li {
+    display: inline-block;
     padding: 6px 4px;
+    text-align: left;
 }
 
 ol.dex > li > a {
     display: block;
-    width: 300px;
+    width: 245px;
     height: 32px;
     padding: 4px;
-    border: 1px solid black;
+    background-color: #f4f6ff;
     border-radius: 4px;
+    border-style: solid;
+    border-color: #4064e0;
+    border-width: 1px 1px 1px 6px;
+    text-decoration: none;
+    color: black;
 }
 
 ol.dex > li > a > * {
     vertical-align: middle;
+    margin-left: 6px;
+}
+
+ol.dex > li > a:hover {
+    background-color: #dfe5fc;
+    border-color: #2248d3;
 }
