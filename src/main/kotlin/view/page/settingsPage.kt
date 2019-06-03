@@ -2,6 +2,7 @@ package com.bitwiserain.pbbg.view.page
 
 import com.bitwiserain.pbbg.PASSWORD_REGEX
 import com.bitwiserain.pbbg.PASSWORD_REGEX_DESCRIPTION
+import com.bitwiserain.pbbg.view.SiteSection
 import com.bitwiserain.pbbg.view.template.MemberPageVM
 import com.bitwiserain.pbbg.view.template.MemberTemplate
 import io.ktor.html.Template
@@ -11,7 +12,7 @@ private const val currentPasswordId = "current-password"
 private const val newPasswordId = "new-password"
 private const val confirmNewPasswordId = "confirm-new-password"
 
-fun settingsPage(memberPageVM: MemberPageVM, changePasswordUrl: String, error: String? = null): Template<HTML> = MemberTemplate("Settings", memberPageVM).apply {
+fun settingsPage(memberPageVM: MemberPageVM, changePasswordUrl: String, error: String? = null): Template<HTML> = MemberTemplate("Settings", memberPageVM, SiteSection.SETTINGS).apply {
     content {
         if (error != null) {
             div(classes = "alert-error") {
