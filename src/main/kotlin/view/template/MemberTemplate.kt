@@ -1,11 +1,12 @@
 package com.bitwiserain.pbbg.view.template
 
+import com.bitwiserain.pbbg.view.SiteSection
 import io.ktor.html.Placeholder
 import io.ktor.html.Template
 import io.ktor.html.insert
 import kotlinx.html.*
 
-class MemberTemplate(private val pageTitle: String, private val memberPageVM: MemberPageVM) : Template<HTML> {
+class MemberTemplate(private val pageTitle: String, private val memberPageVM: MemberPageVM, private val currentSiteSection: SiteSection) : Template<HTML> {
     val headContent = Placeholder<HEAD>()
     val content = Placeholder<MAIN>()
     val endOfBody = Placeholder<BODY>()
@@ -31,30 +32,37 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
                     }
                     div(classes = "navigation") {
                         a(href = memberPageVM.homeUrl, classes = "sidebar-item") {
+                            highlightIfCurrentSiteSection(currentSiteSection, SiteSection.HOME)
                             span(classes = "sidebar-item-icon") { +"""🏠""" }
                             span { +"Home" }
                         }
                         a(href = memberPageVM.squadUrl, classes = "sidebar-item") {
+                            highlightIfCurrentSiteSection(currentSiteSection, SiteSection.SQUAD)
                             span(classes = "sidebar-item-icon") { +"""👥""" }
                             span { +"Squad" }
                         }
                         a(href = memberPageVM.inventoryUrl, classes = "sidebar-item") {
+                            highlightIfCurrentSiteSection(currentSiteSection, SiteSection.INVENTORY)
                             span(classes = "sidebar-item-icon") { +"""🎒""" }
                             span { +"Inventory" }
                         }
                         a(href = memberPageVM.battleUrl, classes = "sidebar-item") {
+                            highlightIfCurrentSiteSection(currentSiteSection, SiteSection.BATTLE)
                             span(classes = "sidebar-item-icon") { +"""⚔️""" } // Unicode variation selector 16
                             span { +"Battle" }
                         }
                         a(href = memberPageVM.mineUrl, classes = "sidebar-item") {
+                            highlightIfCurrentSiteSection(currentSiteSection, SiteSection.MINE)
                             span(classes = "sidebar-item-icon") { +"""⛏️""" } // Unicode variation selector 16
                             span { +"Mine" }
                         }
                         a(href = memberPageVM.dexUrl, classes = "sidebar-item") {
+                            highlightIfCurrentSiteSection(currentSiteSection, SiteSection.DEX)
                             span(classes = "sidebar-item-icon") { +"""📚""" }
                             span { +"Dex" }
                         }
                         a(href = memberPageVM.settingsUrl, classes = "sidebar-item") {
+                            highlightIfCurrentSiteSection(currentSiteSection, SiteSection.SETTINGS)
                             span(classes = "sidebar-item-icon") { +"""⚙️""" } // Unicode variation selector 16
                             span { +"Settings" }
                         }
@@ -79,4 +87,8 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
             insert(endOfBody)
         }
     }
+}
+
+private fun A.highlightIfCurrentSiteSection(currentSiteSection: SiteSection, thisSiteSection: SiteSection) {
+    if (currentSiteSection == thisSiteSection) classes += "current-site-section"
 }
