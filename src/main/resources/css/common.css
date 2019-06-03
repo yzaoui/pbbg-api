@@ -86,6 +86,15 @@ span.sidebar-item-icon {
     left: 10px;
 }
 
+a.current-site-section {
+    background-color: #0370c4;
+    color: white;
+}
+
+a.current-site-section.sidebar-item:hover {
+    background-color: #0487ec;
+}
+
 .sidebar-logout {
     margin-top: auto;
     margin-bottom: 0;
