@@ -33,10 +33,10 @@ class UserUCImpl(private val db: Database) : UserUC {
     }
 
     override fun registerUser(username: String, password: String): Int = transaction(db) {
-        val userId = UserTable.insertAndGetId {
-            it[UserTable.username] = username
-            it[UserTable.passwordHash] = BCrypt.withDefaults().hash(12, password.toByteArray())
-        }
+        val userId = UserTable.createUserAndGetId(
+            username = username,
+            passwordHash = BCrypt.withDefaults().hash(12, password.toByteArray())
+        )
 
         UserStatsTable.insert {
             it[UserStatsTable.userId] = userId
