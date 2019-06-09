@@ -96,24 +96,27 @@ class BattleUCImplTests {
         }
     }
 
-    @Test
-    fun `Given a user, when they generate a battle and request their current battle, it should be returned`() {
-        val userId = createTestUserAndGetId(db)
-        insertAndGetAllies(userId)
-        battleUC.generateBattle(userId.value)
+    @Nested
+    inner class BattleRetrieval {
+        @Test
+        fun `Given a user, when they generate a battle and request their current battle, it should be returned`() {
+            val userId = createTestUserAndGetId(db)
+            insertAndGetAllies(userId)
+            battleUC.generateBattle(userId.value)
 
-        val battle = battleUC.getCurrentBattle(userId.value)
+            val battle = battleUC.getCurrentBattle(userId.value)
 
-        assertNotNull(battle, "User should have a battle in session.")
-    }
+            assertNotNull(battle, "User should have a battle in session.")
+        }
 
-    @Test
-    fun `Given a user who hasn't started a battle, when their current battle is requested, null should be returned`() {
-        val userId = createTestUserAndGetId(db).value
+        @Test
+        fun `Given a user who hasn't started a battle, when their current battle is requested, null should be returned`() {
+            val userId = createTestUserAndGetId(db).value
 
-        val battle = battleUC.getCurrentBattle(userId)
+            val battle = battleUC.getCurrentBattle(userId)
 
-        assertNull(battle, "User should not have a battle in session without requesting one.")
+            assertNull(battle, "User should not have a battle in session without requesting one.")
+        }
     }
 
     private fun createTestUserAndGetId(db: Database): EntityID<Int> = transaction(db) {
