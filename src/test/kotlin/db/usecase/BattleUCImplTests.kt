@@ -58,7 +58,7 @@ class BattleUCImplTests {
             battleUC.generateBattle(userId.value)
 
             // Attempt to generate another battle while the first is in progress
-            assertFailsWith(BattleAlreadyInProgressException::class) {
+            assertFailsWith(BattleAlreadyInProgressException::class, "Generating a new battle should fail if one is currently in progress") {
                 battleUC.generateBattle(userId.value)
             }
         }
@@ -78,7 +78,7 @@ class BattleUCImplTests {
             }
 
             // Attempt to generate battle with a wiped out squad
-            assertFailsWith(NoAlliesAliveException::class) {
+            assertFailsWith(NoAlliesAliveException::class, "Generating a new battle should fail if user's squad is wiped out") {
                 battleUC.generateBattle(userId.value)
             }
         }
