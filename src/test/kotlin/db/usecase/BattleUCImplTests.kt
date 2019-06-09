@@ -13,6 +13,7 @@ import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
@@ -29,6 +30,38 @@ class BattleUCImplTests {
         dropDatabase(db)
     }
 
+    @Nested
+    inner class BattleGeneration {
+        @Test
+        fun `Given a user with a squad who hasn't started a battle, when they generate a new battle, a battle containing their squad and 1+ enemies should be returned`() {
+            val userId = createTestUserAndGetId(db)
+
+            val allies = insertAndGetAllies(userId)
+
+            val battle = battleUC.generateBattle(userId.value)
+
+            assertFalse(battle.allies.isEmpty(), "There should be allies in the battle.")
+            assertFalse(battle.enemies.isEmpty(), "There should be enemies in the battle.")
+            assertEquals(battle.allies, allies, "The allies in the battle should be the squad in place when the battle was generated.")
+        }
+
+        @Test
+        fun `Given a user who is already in a battle, when they generate a new battle, an exception should be thrown`() {
+            val userId = createTestUserAndGetId(db)
+
+            // Give user a squad
+            insertAndGetAllies(userId)
+
+            // Generate a battle
+            battleUC.generateBattle(userId.value)
+
+            // Attempt to generate another battle while the first is in progress
+            assertFailsWith(BattleAlreadyInProgressException::class) {
+                battleUC.generateBattle(userId.value)
+            }
+        }
+    }
+
     @Test
     fun `Given a user who hasn't started a battle, when their current battle is requested, null should be returned`() {
         val userId = createTestUserAndGetId(db).value
@@ -36,35 +69,6 @@ class BattleUCImplTests {
         val battle = battleUC.getCurrentBattle(userId)
 
         assertEquals(battle, null, "User should not have a battle in session without requesting one.")
-    }
-
-    @Test
-    fun `Given a user with a squad who hasn't started a battle, when they generate a new battle, a battle containing their squad and 1+ enemies should be returned`() {
-        val userId = createTestUserAndGetId(db)
-
-        val allies = insertAndGetAllies(userId)
-
-        val battle = battleUC.generateBattle(userId.value)
-
-        assertFalse(battle.allies.isEmpty(), "There should be allies in the battle.")
-        assertFalse(battle.enemies.isEmpty(), "There should be enemies in the battle.")
-        assertEquals(battle.allies, allies, "The allies in the battle should be the squad in place when the battle was generated.")
-    }
-
-    @Test
-    fun `Given a user who is already in a battle, when they generate a new battle, an exception should be thrown`() {
-        val userId = createTestUserAndGetId(db)
-
-        // Give user a squad
-        insertAndGetAllies(userId)
-
-        // Generate a battle
-        battleUC.generateBattle(userId.value)
-
-        // Attempt to generate another battle while the first is in progress
-        assertFailsWith(BattleAlreadyInProgressException::class) {
-            battleUC.generateBattle(userId.value)
-        }
     }
 
     private fun createTestUserAndGetId(db: Database): EntityID<Int> = transaction(db) {
