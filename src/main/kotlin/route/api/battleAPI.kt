@@ -47,6 +47,8 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
                     val battle = battleUC.generateBattle(loggedInUser.id)
 
                     call.respondSuccess(battle.toJSON())
+                } catch (e: BattleAlreadyInProgressException) {
+                    call.respondFail("There is already a battle in progress.")
                 } catch (e: NoAlliesAliveException) {
                     call.respondFail("Must have at least one unite alive to initiate battle.")
                 }

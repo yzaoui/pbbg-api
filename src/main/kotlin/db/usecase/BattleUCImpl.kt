@@ -10,6 +10,7 @@ import com.bitwiserain.pbbg.db.repository.execAndMap
 import com.bitwiserain.pbbg.domain.model.MyUnit
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.battle.*
+import com.bitwiserain.pbbg.domain.usecase.BattleAlreadyInProgressException
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.domain.usecase.NoBattleInSessionException
@@ -29,7 +30,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
     }
 
     override fun generateBattle(userId: Int): Battle = transaction(db) {
-        // TODO: Forbid action if a battle is already in progress
+        if (BattleSessionTable.isBattleInProgress(userId)) throw BattleAlreadyInProgressException()
 
         val allies = SquadTable.getAllies(userId)
 
