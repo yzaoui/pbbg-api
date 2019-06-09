@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.route.api
 
 import com.bitwiserain.pbbg.domain.model.battle.*
+import com.bitwiserain.pbbg.domain.usecase.BattleAlreadyInProgressException
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
@@ -36,6 +37,7 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
              *   [BattleJSON]
              *
              * Error situations:
+             *   [BattleAlreadyInProgressException]
              *   [NoAlliesAliveException]
              */
             post {

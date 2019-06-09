@@ -17,6 +17,7 @@ interface BattleUC {
      *
      * @return Newly created battle.
      *
+     * @throws BattleAlreadyInProgressException when a battle is already in progress.
      * @throws NoAlliesAliveException when no allies are alive to start this battle.
      */
     fun generateBattle(userId: Int): Battle
@@ -40,5 +41,6 @@ interface BattleUC {
     fun enemyTurn(userId: Int): BattleActionResult
 }
 
+class BattleAlreadyInProgressException : Exception()
 class NoAlliesAliveException : Exception()
 class NoBattleInSessionException : Exception()
