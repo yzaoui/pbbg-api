@@ -44,8 +44,8 @@ dependencies {
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
 
     testImplementation(group = "io.ktor", name = "ktor-server-test-host", version = Versions.KTOR)
-    testImplementation(group = "org.junit.jupiter", name = "junit-jupiter-api", version = "5.3.2")
-    testRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = "5.3.2")
+    testImplementation(group = "org.junit.jupiter", name = "junit-jupiter-api", version = "5.4.2")
+    testRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = "5.4.2")
 }
 
 tasks.withType<KotlinCompile>().all {
