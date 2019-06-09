@@ -5,6 +5,7 @@ import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.usecase.BattleUCImpl
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.domain.usecase.BattleAlreadyInProgressException
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -40,14 +42,7 @@ class BattleUCImplTests {
     fun `Given a user with a squad who hasn't started a battle, when they generate a new battle, a battle containing their squad and 1+ enemies should be returned`() {
         val userId = createTestUserAndGetId(db)
 
-        val allies = transaction(db) {
-            SquadTable.insertAllies(userId, listOf(
-                MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1),
-                MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1),
-                MyUnitForm(MyUnitEnum.TWOLIP, 11, 2)
-            ))
-            SquadTable.getAllies(userId.value)
-        }
+        val allies = insertAndGetAllies(userId)
 
         val battle = battleUC.generateBattle(userId.value)
 
@@ -56,7 +51,32 @@ class BattleUCImplTests {
         assertEquals(battle.allies, allies, "The allies in the battle should be the squad in place when the battle was generated.")
     }
 
+    @Test
+    fun `Given a user who is already in a battle, when they generate a new battle, an exception should be thrown`() {
+        val userId = createTestUserAndGetId(db)
+
+        // Give user a squad
+        insertAndGetAllies(userId)
+
+        // Generate a battle
+        battleUC.generateBattle(userId.value)
+
+        // Attempt to generate another battle while the first is in progress
+        assertFailsWith(BattleAlreadyInProgressException::class) {
+            battleUC.generateBattle(userId.value)
+        }
+    }
+
     private fun createTestUserAndGetId(db: Database): EntityID<Int> = transaction(db) {
         UserTable.createUserAndGetId("testuser", ByteArray(60))
+    }
+
+    private fun insertAndGetAllies(userId: EntityID<Int>) = transaction(db) {
+        SquadTable.insertAllies(userId, listOf(
+            MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1),
+            MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1),
+            MyUnitForm(MyUnitEnum.TWOLIP, 11, 2)
+        ))
+        SquadTable.getAllies(userId.value)
     }
 }
