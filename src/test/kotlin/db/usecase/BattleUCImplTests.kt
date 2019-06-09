@@ -48,6 +48,20 @@ class BattleUCImplTests {
         }
 
         @Test
+        fun `Given a newly generated battle, its battle queue should include every ally and enemy exactly once`() {
+            val userId = createTestUserAndGetId(db).also {
+                insertAndGetAllies(it)
+            }
+
+            val battle = battleUC.generateBattle(userId.value)
+
+            val queueIds = battle.battleQueue.turns.map { it.unitId }.sorted()
+            val unitIds = battle.run { allies + enemies }.map { it.id }.sorted()
+
+            assertEquals(queueIds, unitIds, "Every unit in the battle should be in the battle queue exactly once.")
+        }
+
+        @Test
         fun `Given a user who is already in a battle, when they generate a new battle, a BattleAlreadyInProgressException should be thrown`() {
             val userId = createTestUserAndGetId(db)
 
