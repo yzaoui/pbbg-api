@@ -2,11 +2,13 @@ package com.bitwiserain.pbbg.test.db.usecase
 
 import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.repository.SquadTable
+import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.usecase.BattleUCImpl
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.usecase.BattleAlreadyInProgressException
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
+import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.dao.EntityID
@@ -46,7 +48,7 @@ class BattleUCImplTests {
         }
 
         @Test
-        fun `Given a user who is already in a battle, when they generate a new battle, an exception should be thrown`() {
+        fun `Given a user who is already in a battle, when they generate a new battle, a BattleAlreadyInProgressException should be thrown`() {
             val userId = createTestUserAndGetId(db)
 
             // Give user a squad
@@ -57,6 +59,26 @@ class BattleUCImplTests {
 
             // Attempt to generate another battle while the first is in progress
             assertFailsWith(BattleAlreadyInProgressException::class) {
+                battleUC.generateBattle(userId.value)
+            }
+        }
+
+        @Test
+        fun `Given a user with no living units in squad, when they generate a new battle, a NoAlliesAliveException should be thrown`() {
+            val userId = createTestUserAndGetId(db)
+
+            transaction(db) {
+                SquadTable.insertAllies(userId, listOf(
+                    MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1)
+                ))
+                val allies = SquadTable.getAllies(userId.value)
+
+                // Kill the only unit in squad
+                UnitTable.updateUnit(allies[0].id, allies[0].receiveDamage(allies[0].hp))
+            }
+
+            // Attempt to generate battle with a wiped out squad
+            assertFailsWith(NoAlliesAliveException::class) {
                 battleUC.generateBattle(userId.value)
             }
         }
