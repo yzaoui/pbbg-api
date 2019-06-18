@@ -1,7 +1,9 @@
 language: java
 
+dist: xenial
+
 jdk:
-  - oraclejdk8
+  - openjdk11
 
 script:
   - ./gradlew test
