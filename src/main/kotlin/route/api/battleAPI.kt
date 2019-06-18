@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.route.api
 
 import com.bitwiserain.pbbg.domain.model.battle.*
+import com.bitwiserain.pbbg.domain.usecase.BattleAlreadyInProgressException
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
@@ -36,6 +37,7 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
              *   [BattleJSON]
              *
              * Error situations:
+             *   [BattleAlreadyInProgressException]
              *   [NoAlliesAliveException]
              */
             post {
@@ -45,6 +47,8 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
                     val battle = battleUC.generateBattle(loggedInUser.id)
 
                     call.respondSuccess(battle.toJSON())
+                } catch (e: BattleAlreadyInProgressException) {
+                    call.respondFail("There is already a battle in progress.")
                 } catch (e: NoAlliesAliveException) {
                     call.respondFail("Must have at least one unite alive to initiate battle.")
                 }

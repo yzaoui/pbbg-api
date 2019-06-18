@@ -21,6 +21,10 @@ object BattleSessionTable : LongIdTable() {
             ?.get(id)
     }
 
+    fun isBattleInProgress(userId: Int): Boolean {
+        return select { BattleSessionTable.userId eq userId }.count() > 0
+    }
+
     /**
      * Delete a battle session entry.
      */
