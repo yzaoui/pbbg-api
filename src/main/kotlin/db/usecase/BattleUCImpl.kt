@@ -45,7 +45,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         val newEnemies = mutableListOf<MyUnitForm>()
         // Add 1-3 new enemies
         for (i in 0..Random.nextInt(1, 3)) {
-            newEnemies.add(MyUnitForm(MyUnitEnum.values().random(), Random.nextInt(7, 12), Random.nextInt(1, 3)))
+            newEnemies.add(MyUnitForm(MyUnitEnum.values().random(), Random.nextInt(7, 12), Random.nextInt(1, 3), Random.nextInt(1, 3)))
         }
         BattleEnemyTable.insertEnemies(battleSession, newEnemies)
 

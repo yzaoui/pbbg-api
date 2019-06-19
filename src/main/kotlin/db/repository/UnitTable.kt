@@ -14,6 +14,7 @@ object UnitTable : LongIdTable() {
     val hp = integer("hp")
     val maxHP = integer("max_hp")
     val atk = integer("atk")
+    val def = integer("def")
     val exp = long("exp")
 
     /**
@@ -25,6 +26,7 @@ object UnitTable : LongIdTable() {
             it[UnitTable.hp] = unit.hp
             it[UnitTable.maxHP] = unit.hp
             it[UnitTable.atk] = unit.atk
+            it[UnitTable.def] = unit.def
             it[UnitTable.exp] = 0L
         }
     }
@@ -37,6 +39,7 @@ object UnitTable : LongIdTable() {
             it[UnitTable.hp] = unit.hp
             it[UnitTable.maxHP] = unit.maxHP
             it[UnitTable.atk] = unit.atk
+            it[UnitTable.def] = unit.def
             it[UnitTable.exp] = unit.exp
         }
     }

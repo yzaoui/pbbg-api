@@ -7,14 +7,16 @@
 /**
  * @typedef {Object} MyUnit
  *
- * @property {number} id
- * @property {string} name
- * @property {number} baseUnitId
- * @property {number} hp
- * @property {number} maxHP
- * @property {number} atk
- * @property {LevelProgress} levelProgress
- * @property {string} idleAnimationURL
+ * @property {number} id - The unit's ID.
+ * @property {string} name - The unit's name.
+ * @property {number} baseUnitId - The ID of the unit's base unit type.
+ * @property {number} hp - The unit's current HP.
+ * @property {number} maxHP - The unit's maximum HP.
+ * @property {number} atk - The unit's attack stat.
+ * @property {number} def - The unit's defence stat.
+ * @property {LevelProgress} levelProgress - The unit's level and experience information.
+ * @property {string} idleAnimationURL - The unit's idle animation URL.
+ * @property {string} iconURL - The unit's icon URL.
  */
 
 const main = document.getElementById("main");
