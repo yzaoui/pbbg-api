@@ -81,7 +81,7 @@ class BattleUCImplTests {
 
             transaction(db) {
                 SquadTable.insertAllies(userId, listOf(
-                    MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1)
+                    MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1)
                 ))
                 val allies = SquadTable.getAllies(userId.value)
 
@@ -125,9 +125,9 @@ class BattleUCImplTests {
 
     private fun insertAndGetAllies(userId: EntityID<Int>) = transaction(db) {
         SquadTable.insertAllies(userId, listOf(
-            MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1),
-            MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1),
-            MyUnitForm(MyUnitEnum.TWOLIP, 11, 2)
+            MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 2),
+            MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 1),
+            MyUnitForm(MyUnitEnum.TWOLIP, 11, 2, 1)
         ))
         SquadTable.getAllies(userId.value)
     }
