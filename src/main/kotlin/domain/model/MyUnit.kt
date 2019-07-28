@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.domain.model
 
+import com.bitwiserain.pbbg.domain.BattleManager
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum.*
 import kotlin.math.max
 
@@ -9,6 +10,7 @@ sealed class MyUnit {
     abstract val hp: Int
     abstract val maxHP: Int
     abstract val atk: Int
+    abstract val def: Int
     abstract val exp: Long
     val alive: Boolean
         get() = hp > 0
@@ -17,34 +19,35 @@ sealed class MyUnit {
 
     data class IceCreamWizard(
         override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
-        override val exp: Long
+        override val def: Int, override val exp: Long
     ) : MyUnit() {
         override val enum get() = ICE_CREAM_WIZARD
     }
 
     data class Twolip(
         override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
-        override val exp: Long
+        override val def: Int, override val exp: Long
     ) : MyUnit() {
         override val enum get() = TWOLIP
     }
 
     data class Carpshooter(
         override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
-        override val exp: Long
+        override val def: Int, override val exp: Long
     ) : MyUnit() {
         override val enum get() = CARPSHOOTER
     }
 
     data class Flamango(
         override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
-        override val exp: Long
+        override val def: Int, override val exp: Long
     ) : MyUnit() {
         override val enum get() = FLAMANGO
     }
 
-    fun receiveDamage(damage: Int): MyUnit {
-        val newHp = max(hp - damage, 0)
+    fun receiveDamage(attackerAtk: Int): MyUnit {
+        val damage = BattleManager.calculateDamage(attackerAtk, this.def)
+        val newHp = (hp - damage).coerceIn(0..this.maxHP)
 
         return when (this) {
             is IceCreamWizard -> copy(hp = newHp)

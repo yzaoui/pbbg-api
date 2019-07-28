@@ -9,5 +9,6 @@ import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 data class MyUnitForm(
     val enum: MyUnitEnum,
     val hp: Int,
-    val atk: Int
+    val atk: Int,
+    val def: Int
 )

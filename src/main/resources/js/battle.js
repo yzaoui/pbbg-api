@@ -1,7 +1,7 @@
 /**
  * @typedef {Object} Battle
- * @property {UnitResponse[]} allies - The user's units.
- * @property {UnitResponse[]} enemies - The enemy units.
+ * @property {MyUnit[]} allies - The user's units.
+ * @property {MyUnit[]} enemies - The enemy units.
  * @property {Turn[]} turns - Turn order.
  */
 
@@ -31,19 +31,6 @@
  */
 
 /**
- * @typedef {Object} UnitResponse
- * @property {number} id - The unit's ID.
- * @property {string} name - The unit's name.
- * @property {number} baseUnitId - The ID of the unit's base unit type.
- * @property {number} hp - The unit's current HP.
- * @property {number} maxHP - The unit's maximum HP.
- * @property {number} atk - The unit's attack stat.
- * @property {LevelProgress} levelProgress - The unit's level and experience information.
- * @property {string} idleAnimationURL - The unit's idle animation URL.
- * @property {string} iconURL - The unit's icon URL.
- */
-
-/**
  * @typedef {Object} Turn
  * @property {number} unitId
  */
@@ -61,7 +48,7 @@ const STATE = {
     selectedEnemyId: null,
     /**
      * @param {number} unitId
-     * @returns {UnitResponse}
+     * @returns {MyUnit}
      */
     getUnitById(unitId) {
         const { allies, enemies } = this.battle;

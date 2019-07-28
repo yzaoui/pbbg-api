@@ -22,11 +22,9 @@ import kotlin.random.Random
 
 class BattleUCImpl(private val db: Database) : BattleUC {
     override fun getCurrentBattle(userId: Int): Battle? = transaction(db) {
-        val battleSession = BattleSessionTable.getBattleSessionId(userId)
-
-        if (battleSession == null) return@transaction null
-
-        return@transaction getBattle(userId, battleSession)
+        return@transaction BattleSessionTable.getBattleSessionId(userId)?.let { battleSession ->
+            getBattle(userId, battleSession)
+        }
     }
 
     override fun generateBattle(userId: Int): Battle = transaction(db) {
@@ -45,7 +43,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         val newEnemies = mutableListOf<MyUnitForm>()
         // Add 1-3 new enemies
         for (i in 0..Random.nextInt(1, 3)) {
-            newEnemies.add(MyUnitForm(MyUnitEnum.values().random(), Random.nextInt(7, 12), Random.nextInt(1, 3)))
+            newEnemies.add(MyUnitForm(MyUnitEnum.values().random(), Random.nextInt(7, 12), Random.nextInt(1, 3), Random.nextInt(1, 3)))
         }
         BattleEnemyTable.insertEnemies(battleSession, newEnemies)
 
@@ -99,13 +97,10 @@ class BattleUCImpl(private val db: Database) : BattleUC {
             is BattleAction.Attack -> {
                 // Unit should exist
                 val target = UnitTable.getUnit(action.targetUnitId) ?: throw Exception()
-
                 // Can't attack self
                 if (target.id == actingUnit.id) throw Exception()
-
                 // Can't attack units not in this battle
                 if (!getBattle(userId, battleSession).contains(target.id)) throw Exception()
-
                 // Can't attack dead units
                 if (target.dead) throw Exception()
 
