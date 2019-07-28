@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.domain.model
 
+import com.bitwiserain.pbbg.domain.BattleManager
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum.*
 import kotlin.math.max
 
@@ -44,8 +45,9 @@ sealed class MyUnit {
         override val enum get() = FLAMANGO
     }
 
-    fun receiveDamage(damage: Int): MyUnit {
-        val newHp = max(hp - damage, 0)
+    fun receiveDamage(attackerAtk: Int): MyUnit {
+        val damage = BattleManager.calculateDamage(attackerAtk, this.def)
+        val newHp = (hp - damage).coerceIn(0..this.maxHP)
 
         return when (this) {
             is IceCreamWizard -> copy(hp = newHp)
