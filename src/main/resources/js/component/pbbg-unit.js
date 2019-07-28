@@ -14,6 +14,7 @@ import "/js/component/pbbg-progress-bar.js";
  * @property {number} hp - Current HP.
  * @property {number} maxHP - Maximum HP.
  * @property {number} atk - Current ATK.
+ * @property {number} def - Current DEF.
  * @property {LevelProgress} levelProgress - Unit's level and experience information.
  * @property {string} idleAnimationURL - Unit's idle animation path.
  */
@@ -31,7 +32,6 @@ class PBBGUnit extends HTMLElement {
     display: inline-flex;
     flex-direction: row;
     width: 22em;
-    height: 5.3em;
     box-sizing: border-box;
     border: 1px solid #333333;
     padding: 6px;
@@ -60,7 +60,13 @@ class PBBGUnit extends HTMLElement {
 }
 
 #name {
+    font-size: 1.1em;
     font-weight: bold;
+}
+
+.stat-container {
+    border: 1px solid #00000033;
+    border-radius: 8px;
 }
 
 #hp-bar {
@@ -85,7 +91,8 @@ class PBBGUnit extends HTMLElement {
         <span id="hp-value"></span>
     </div>
     <div>
-        <span>ATK: <span id="atk-value"></span></span>
+        <span class="stat-container">ATK: <span id="atk-value"></span></span>
+        <span class="stat-container">DEF: <span id="def-value"></span></span>
     </div>
     <div>
         <span>Level <span id="level-value"></span></span>
@@ -161,6 +168,7 @@ class PBBGUnit extends HTMLElement {
         this._shadowRoot.getElementById("hp-bar").max = this._unit.maxHP;
         this._shadowRoot.getElementById("hp-value").innerText = `${this._unit.hp} / ${this._unit.maxHP}`;
         this._shadowRoot.getElementById("atk-value").innerText = this._unit.atk.toString();
+        this._shadowRoot.getElementById("def-value").innerText = this._unit.def.toString();
         this._shadowRoot.getElementById("level-value").innerText = this._unit.levelProgress.level.toString();
         this._shadowRoot.getElementById("exp-bar").updateProgress({
             level: this._unit.levelProgress.level,
