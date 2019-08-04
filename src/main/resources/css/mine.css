@@ -65,7 +65,7 @@
 }
 
 .mining-results-list.expanded {
-    max-height: unset;
+    max-height: 510px;
 }
 
 .mining-results-list > li {
