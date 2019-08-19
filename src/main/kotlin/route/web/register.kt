@@ -5,6 +5,7 @@ import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.view.page.registerPage
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
+import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
 import io.ktor.request.receiveParameters
 import io.ktor.response.respondRedirect
@@ -60,12 +61,15 @@ fun Route.register(userUC: UserUC) = route("/register") {
             call.respondRedirect(href(IndexLocation()))
         } else {
             // TODO: Consider using PRG pattern to get rid of refresh-resubmitting-POST issue
-            call.respondHtmlTemplate(registerPage(
-                registerURL = href(RegisterLocation()),
-                loginURL = href(LoginLocation()),
-                guestPageVM = getGuestPageVM(),
-                errors = errors
-            )) {}
+            call.respondHtmlTemplate(
+                template = registerPage(
+                    registerURL = href(RegisterLocation()),
+                    loginURL = href(LoginLocation()),
+                    guestPageVM = getGuestPageVM(),
+                    errors = errors
+                ),
+                status = HttpStatusCode.BadRequest
+            ) {}
         }
     }
 }

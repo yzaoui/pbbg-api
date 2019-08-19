@@ -8,6 +8,7 @@ import com.bitwiserain.pbbg.interceptGuestOnly
 import com.bitwiserain.pbbg.view.page.loginPage
 import io.ktor.application.call
 import io.ktor.html.respondHtmlTemplate
+import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
 import io.ktor.request.receiveParameters
 import io.ktor.response.respondRedirect
@@ -57,12 +58,15 @@ fun Route.login(userUC: UserUC) = route("/login") {
             call.respondRedirect(href(IndexLocation()))
         } else {
             // TODO: Consider using PRG pattern to get rid of refresh-resubmitting-POST issue
-            call.respondHtmlTemplate(loginPage(
-                loginURL = href(LoginLocation()),
-                registerURL = href(RegisterLocation()),
-                guestPageVM = getGuestPageVM(),
-                error = "Credentials do not match an existing account."
-            )) {}
+            call.respondHtmlTemplate(
+                template = loginPage(
+                    loginURL = href(LoginLocation()),
+                    registerURL = href(RegisterLocation()),
+                    guestPageVM = getGuestPageVM(),
+                    error = "Credentials do not match an existing account."
+                ),
+                status = HttpStatusCode.BadRequest
+            ) {}
         }
     }
 }
