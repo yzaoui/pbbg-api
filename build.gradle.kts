@@ -40,6 +40,7 @@ dependencies {
     implementation(group = "io.ktor", name = "ktor-server-netty", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-html-builder", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-gson", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-auth-jwt", version = Versions.KTOR)
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-html-jvm", version = "0.6.10")
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
 
