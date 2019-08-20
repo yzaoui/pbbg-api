@@ -1,5 +1,7 @@
 package com.bitwiserain.pbbg
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
@@ -13,6 +15,9 @@ import com.bitwiserain.pbbg.route.web.*
 import com.bitwiserain.pbbg.view.template.GuestPageVM
 import com.bitwiserain.pbbg.view.template.MemberPageVM
 import io.ktor.application.*
+import io.ktor.auth.Authentication
+import io.ktor.auth.authenticate
+import io.ktor.auth.jwt.jwt
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.gson.gson
@@ -98,6 +103,19 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         // Handles "application/json" content type
         gson {
             serializeNulls()
+        }
+    }
+    install(Authentication) {
+        jwt {
+            realm = environment.config.property("jwt.realm").getString()
+            verifier(JWT
+                .require(Algorithm.HMAC256(environment.config.property("jwt.secret").getString()))
+                .withIssuer(environment.config.property("jwt.issuer").getString())
+                .build()
+            )
+            validate {
+                it.payload.getClaim("user.id").asInt()?.let(userUC::getUserById)
+            }
         }
     }
     routing {
@@ -224,3 +242,8 @@ suspend inline fun ApplicationCall.respondError(message: String = "") {
 suspend inline fun ApplicationCall.respondError(status: HttpStatusCode, message: String = "") {
     respond(status, mapOf("status" to "error", "message" to message))
 }
+
+fun Application.makeToken(userId: Int) = JWT.create()
+    .withIssuer(environment.config.property("jwt.issuer").getString())
+    .withClaim("user.id", userId)
+    .sign(Algorithm.HMAC256(environment.config.property("jwt.secret").getString()))

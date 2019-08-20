@@ -1,5 +1,7 @@
 package com.bitwiserain.pbbg.db.model
 
+import io.ktor.auth.Principal
+import io.ktor.auth.jwt.JWTPrincipal
 import java.util.*
 
 /**
@@ -13,7 +15,7 @@ data class User( // TODO: This class is being used across multiple layers
     val id: Int,
     val username: String,
     val passwordHash: ByteArray
-) {
+) : Principal {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
