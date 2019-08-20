@@ -130,6 +130,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         dexWeb(userUC)
         settings(userUC)
         route("/api") {
+            registerAPI(userUC)
             user(userUC)
             pickaxe(userUC, equipmentUC)
             mine(userUC, miningUC)
