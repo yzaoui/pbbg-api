@@ -131,6 +131,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         settings(userUC)
         route("/api") {
             registerAPI(userUC)
+            loginAPI(userUC)
             user(userUC)
             pickaxe(userUC, equipmentUC)
             mine(userUC, miningUC)
