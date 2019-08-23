@@ -17,6 +17,7 @@ import com.bitwiserain.pbbg.view.template.MemberPageVM
 import io.ktor.application.*
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
+import io.ktor.auth.authentication
 import io.ktor.auth.jwt.jwt
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
@@ -132,7 +133,9 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         route("/api") {
             registerAPI(userUC)
             loginAPI(userUC)
-            user(userUC)
+            authenticate {
+                user(userUC)
+            }
             pickaxe(userUC, equipmentUC)
             mine(userUC, miningUC)
             squadAPI(userUC, unitUC)
@@ -244,6 +247,9 @@ suspend inline fun ApplicationCall.respondError(message: String = "") {
 suspend inline fun ApplicationCall.respondError(status: HttpStatusCode, message: String = "") {
     respond(status, mapOf("status" to "error", "message" to message))
 }
+
+val ApplicationCall.user
+    get() = authentication.principal<User>()!!
 
 fun Application.makeToken(userId: Int) = JWT.create()
     .withIssuer(environment.config.property("jwt.issuer").getString())

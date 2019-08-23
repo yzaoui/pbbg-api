@@ -3,9 +3,8 @@ package com.bitwiserain.pbbg.route.api
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.LevelProgress
 import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.interceptSetUserOr401
-import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondSuccess
+import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.LevelProgressJSON
 import com.google.gson.annotations.SerializedName
 import io.ktor.application.call
@@ -18,14 +17,12 @@ import io.ktor.routing.route
 class UserAPILocation
 
 fun Route.user(userUC: UserUC) = route("/user") {
-    interceptSetUserOr401(userUC)
-
     /**
      * On success:
      *   [UserDetailsJSON]
      */
     get {
-        val loggedInUser = call.attributes[loggedInUserKey]
+        val loggedInUser = call.user
 
         val userStats = userUC.getUserStatsByUserId(loggedInUser.id)
 
