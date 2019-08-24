@@ -8,6 +8,7 @@ import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondSuccess
+import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.MyUnitEnumJSON
 import com.bitwiserain.pbbg.view.model.dex.DexItemsJSON
 import com.bitwiserain.pbbg.view.model.dex.DexUnitsJSON
@@ -19,11 +20,9 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 
 fun Route.dexAPI(userUC: UserUC, dexUC: DexUC) = route("/dex") {
-    interceptSetUserOr401(userUC)
-
     route("/items") {
         get {
-            val loggedInUser = call.attributes[loggedInUserKey]
+            val loggedInUser = call.user
 
             val dex = dexUC.getDexItems(loggedInUser.id)
 
@@ -38,7 +37,7 @@ fun Route.dexAPI(userUC: UserUC, dexUC: DexUC) = route("/dex") {
 
     route("/units/{id?}") {
         get {
-            val loggedInUser = call.attributes[loggedInUserKey]
+            val loggedInUser = call.user
 
             val unitEnumId = call.parameters["id"]?.toInt()
 

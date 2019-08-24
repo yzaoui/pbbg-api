@@ -128,20 +128,19 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         mineWeb(userUC)
         battleWeb(userUC)
         inventoryWeb(userUC)
-        dexWeb(userUC)
         settings(userUC)
         route("/api") {
             registerAPI(userUC)
             loginAPI(userUC)
             authenticate {
                 user(userUC)
+                dexAPI(userUC, dexUC)
             }
             pickaxe(userUC, equipmentUC)
             mine(userUC, miningUC)
             squadAPI(userUC, unitUC)
             inventoryAPI(userUC, inventoryUC, equipmentUC)
             battleAPI(userUC, battleUC)
-            dexAPI(userUC, dexUC)
         }
         static("css") {
             resources("css")
@@ -174,7 +173,6 @@ fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPa
         inventoryUrl = href(InventoryLocation()),
         battleUrl = href(BattleLocation()),
         mineUrl = href(MineWebLocation()),
-        dexUrl = href(DexWebLocation()),
         settingsUrl = href(SettingsLocation()),
         logoutUrl = href(LogoutLocation())
     )
