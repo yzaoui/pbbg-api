@@ -27,6 +27,7 @@ fun Route.user(userUC: UserUC) = route("/user") {
         val userStats = userUC.getUserStatsByUserId(loggedInUser.id)
 
         val response = UserDetailsJSON(
+            username = loggedInUser.username,
             miningLvlProgress = MiningExperienceManager.getLevelProgress(userStats.miningExp).toJSON()
         )
 
@@ -35,6 +36,7 @@ fun Route.user(userUC: UserUC) = route("/user") {
 }
 
 data class UserDetailsJSON(
+    @SerializedName("username") val username: String,
     @SerializedName("mining") val miningLvlProgress: LevelProgressJSON
 )
 
