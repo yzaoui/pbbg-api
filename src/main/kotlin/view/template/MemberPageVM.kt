@@ -5,7 +5,6 @@ import com.bitwiserain.pbbg.db.model.User
 data class MemberPageVM(
     val user: User,
     val homeUrl: String,
-    val squadUrl: String,
     val inventoryUrl: String,
     val battleUrl: String,
     val mineUrl: String,

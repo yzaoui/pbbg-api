@@ -124,7 +124,6 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         login(userUC)
         logout()
         register(userUC)
-        squadWeb(userUC)
         mineWeb(userUC)
         battleWeb(userUC)
         inventoryWeb(userUC)
@@ -135,10 +134,10 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
             authenticate {
                 user(userUC)
                 dexAPI(userUC, dexUC)
+                squadAPI(unitUC)
             }
             pickaxe(userUC, equipmentUC)
             mine(userUC, miningUC)
-            squadAPI(userUC, unitUC)
             inventoryAPI(userUC, inventoryUC, equipmentUC)
             battleAPI(userUC, battleUC)
         }
@@ -169,7 +168,6 @@ fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPa
     return MemberPageVM(
         user = user,
         homeUrl = href(IndexLocation()),
-        squadUrl = href(SquadLocation()),
         inventoryUrl = href(InventoryLocation()),
         battleUrl = href(BattleLocation()),
         mineUrl = href(MineWebLocation()),

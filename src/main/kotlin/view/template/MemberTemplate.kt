@@ -36,11 +36,6 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
                             span(classes = "sidebar-item-icon") { +"""🏠""" }
                             span { +"Home" }
                         }
-                        a(href = memberPageVM.squadUrl, classes = "sidebar-item") {
-                            highlightIfCurrentSiteSection(currentSiteSection, SiteSection.SQUAD)
-                            span(classes = "sidebar-item-icon") { +"""👥""" }
-                            span { +"Squad" }
-                        }
                         a(href = memberPageVM.inventoryUrl, classes = "sidebar-item") {
                             highlightIfCurrentSiteSection(currentSiteSection, SiteSection.INVENTORY)
                             span(classes = "sidebar-item-icon") { +"""🎒""" }

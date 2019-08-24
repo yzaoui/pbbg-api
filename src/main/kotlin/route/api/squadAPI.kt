@@ -5,11 +5,10 @@ import com.bitwiserain.pbbg.domain.model.MyUnit
 import com.bitwiserain.pbbg.domain.model.Squad
 import com.bitwiserain.pbbg.domain.usecase.SquadInBattleException
 import com.bitwiserain.pbbg.domain.usecase.UnitUC
-import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
+import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.MyUnitJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
@@ -17,15 +16,13 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 
-fun Route.squadAPI(userUC: UserUC, unitUC: UnitUC) = route("/squad") {
-    interceptSetUserOr401(userUC)
-
+fun Route.squadAPI(unitUC: UnitUC) = route("/squad") {
     /**
      * On success:
      *   [SquadJSON]
      */
     get {
-        val loggedInUser = call.attributes[loggedInUserKey]
+        val loggedInUser = call.user
 
         val squad = unitUC.getSquad(loggedInUser.id)
 
@@ -42,7 +39,7 @@ fun Route.squadAPI(userUC: UserUC, unitUC: UnitUC) = route("/squad") {
          */
         post {
             try {
-                val loggedInUser = call.attributes[loggedInUserKey]
+                val loggedInUser = call.user
 
                 val healedSquad = unitUC.healSquad(loggedInUser.id)
 
