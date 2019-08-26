@@ -20,16 +20,14 @@ data class MinePositionParams(val x: Int, val y: Int)
 
 data class MineGenerateParams(val mineTypeId: Int)
 
-fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
-    interceptSetUserOr401(userUC)
-
+fun Route.mine(miningUC: MiningUC) = route("/mine") {
     /**
      * On success:
      *   [MineJSON] When user has a mine in session.
      *   null When user does not have a mine in session.
      */
     get {
-        val loggedInUser = call.attributes[loggedInUserKey]
+        val loggedInUser = call.user
 
         val mine = miningUC.getMine(loggedInUser.id)
 
@@ -50,8 +48,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
          */
         post {
             try {
-                // TODO: Remove cookie dependency
-                val loggedInUser = call.attributes[loggedInUserKey]
+                val loggedInUser = call.user
 
                 val (x: Int, y: Int) = call.receive(MinePositionParams::class)
 
@@ -84,9 +81,9 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
          */
         post {
             try {
-                val loggedInUser = call.attributes[loggedInUserKey]
+                val loggedInUser = call.user
 
-                val (mineTypeId: Int) = call.receive<MineGenerateParams>() // TODO: Respond with error on illegal ID
+                val (mineTypeId: Int) = call.receive<MineGenerateParams>()
 
                 val mine = miningUC.generateMine(loggedInUser.id, mineTypeId, 30, 20)
 
@@ -105,7 +102,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
          *   null
          */
         post {
-            val loggedInUser = call.attributes[loggedInUserKey]
+            val loggedInUser = call.user
 
             miningUC.exitMine(loggedInUser.id)
 
@@ -119,7 +116,7 @@ fun Route.mine(userUC: UserUC, miningUC: MiningUC) = route("/mine") {
          *   [MineTypeListJSON]
          */
         get {
-            val loggedInUser = call.attributes[loggedInUserKey]
+            val loggedInUser = call.user
 
             val result = miningUC.getAvailableMines(loggedInUser.id).let {
                 MineTypeListJSON(
