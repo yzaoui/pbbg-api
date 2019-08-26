@@ -23,14 +23,7 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
 
         val inventory = inventoryUC.getInventory(loggedInUser.id)
 
-        call.respondSuccess(
-            InventoryJSON(
-                items = inventory.items.map { InventoryItemJSON(it.key, it.value.toJSON()) },
-                equipment = EquipmentJSON(
-                    pickaxe = inventory.equipment.pickaxe?.toJSON()
-                )
-            )
-        )
+        call.respondSuccess(inventory.toJSON())
     }
 
     route("/equipment") {
@@ -41,6 +34,9 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
              *
              * Expects body:
              *   [EquipmentActionParams]
+             *
+             * On success:
+             *   [InventoryJSON]
              *
              * Error situations:
              *   [InventoryItemNotFoundException] Must have a pickaxe equipped to mine.
@@ -64,12 +60,12 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
                         "equip" -> {
                             equipmentUC.equip(loggedInUser.id, body.inventoryItemId)
 
-                            call.respondSuccess("Item with ID ${body.inventoryItemId} successfully equipped.")
+                            call.respondSuccess(inventoryUC.getInventory(loggedInUser.id).toJSON())
                         }
                         "unequip" -> {
                             equipmentUC.unequip(loggedInUser.id, body.inventoryItemId)
 
-                            call.respondSuccess("Item with ID ${body.inventoryItemId} successfully unequipped.")
+                            call.respondSuccess(inventoryUC.getInventory(loggedInUser.id).toJSON())
                         }
                     }
                 } catch (e: InventoryItemNotFoundException) {
@@ -88,6 +84,13 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
 
 private data class EquipmentActionParams(
     val inventoryItemId: Int
+)
+
+private fun Inventory.toJSON() = InventoryJSON(
+    items = items.map { InventoryItemJSON(it.key, it.value.toJSON()) },
+    equipment = EquipmentJSON(
+        pickaxe = equipment.pickaxe?.toJSON()
+    )
 )
 
 // TODO: Find appropriate place for this adapter
