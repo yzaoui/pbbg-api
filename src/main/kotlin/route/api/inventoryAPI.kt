@@ -1,11 +1,8 @@
 package com.bitwiserain.pbbg.route.api
 
+import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.model.*
 import com.bitwiserain.pbbg.domain.usecase.*
-import com.bitwiserain.pbbg.interceptSetUserOr401
-import com.bitwiserain.pbbg.loggedInUserKey
-import com.bitwiserain.pbbg.respondFail
-import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.view.model.EquipmentJSON
 import com.bitwiserain.pbbg.view.model.ItemEnumJSON
 import com.bitwiserain.pbbg.view.model.ItemJSON
@@ -16,15 +13,13 @@ import io.ktor.application.call
 import io.ktor.request.receive
 import io.ktor.routing.*
 
-fun Route.inventoryAPI(userUC: UserUC, inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = route("/inventory") {
-    interceptSetUserOr401(userUC)
-
+fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = route("/inventory") {
     /**
      * On success:
      *   [InventoryJSON]
      */
     get {
-        val loggedInUser = call.attributes[loggedInUserKey]
+        val loggedInUser = call.user
 
         val inventory = inventoryUC.getInventory(loggedInUser.id)
 
@@ -61,7 +56,7 @@ fun Route.inventoryAPI(userUC: UserUC, inventoryUC: InventoryUC, equipmentUC: Eq
                         return@post call.respondFail("Missing equip query parameter")
                     }
 
-                    val loggedInUser = call.attributes[loggedInUserKey]
+                    val loggedInUser = call.user
 
                     val body = call.receive<EquipmentActionParams>()
 
