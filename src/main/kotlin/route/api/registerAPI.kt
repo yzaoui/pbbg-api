@@ -47,6 +47,6 @@ fun Route.registerAPI(userUC: UserUC) = post("/register") {
             "token" to application.makeToken(userId)
         ))
     } else {
-        call.respondFail(HttpStatusCode.BadRequest, errors)
+        call.respondFail(errors)
     }
 }

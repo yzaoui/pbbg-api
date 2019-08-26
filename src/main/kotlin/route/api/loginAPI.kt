@@ -33,7 +33,7 @@ fun Route.loginAPI(userUC: UserUC) = post("/login") {
     usernameError?.let { errors["username"] = it }
     passwordError?.let { errors["password"] = it }
 
-    if (errors.isNotEmpty()) return@post call.respondFail(HttpStatusCode.BadRequest, errors)
+    if (errors.isNotEmpty()) return@post call.respondFail(errors)
 
     val userId = userUC.getUserIdByCredentials(
         username = usernameParam as String,
@@ -41,7 +41,7 @@ fun Route.loginAPI(userUC: UserUC) = post("/login") {
     )
 
     if (userId == null) {
-        call.respondFail(HttpStatusCode.BadRequest, "Credentials do not match an existing account")
+        call.respondFail("Credentials do not match an existing account")
     } else {
         call.respondSuccess(mapOf("token" to application.makeToken(userId)))
     }

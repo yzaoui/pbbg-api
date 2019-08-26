@@ -216,27 +216,15 @@ fun Route.href(location: Any) = application.locations.href(location)
 
 fun PipelineContext<Unit, ApplicationCall>.href(location: Any) = application.locations.href(location)
 
-suspend inline fun ApplicationCall.respondSuccess(data: Any? = null) {
-    respond(mapOf("status" to "success", "data" to data))
-}
-
-suspend inline fun ApplicationCall.respondSuccess(status: HttpStatusCode, data: Any? = null) {
+suspend inline fun ApplicationCall.respondSuccess(data: Any? = null, status: HttpStatusCode = HttpStatusCode.OK) {
     respond(status, mapOf("status" to "success", "data" to data))
 }
 
-suspend inline fun ApplicationCall.respondFail(data: Any? = null) {
-    respond(mapOf("status" to "fail", "data" to data))
-}
-
-suspend inline fun ApplicationCall.respondFail(status: HttpStatusCode, data: Any? = null) {
+suspend inline fun ApplicationCall.respondFail(data: Any? = null, status: HttpStatusCode = HttpStatusCode.BadRequest) {
     respond(status, mapOf("status" to "fail", "data" to data))
 }
 
-suspend inline fun ApplicationCall.respondError(message: String = "") {
-    respond(mapOf("status" to "error", "message" to message))
-}
-
-suspend inline fun ApplicationCall.respondError(status: HttpStatusCode, message: String = "") {
+suspend inline fun ApplicationCall.respondError(message: String = "", status: HttpStatusCode = HttpStatusCode.InternalServerError) {
     respond(status, mapOf("status" to "error", "message" to message))
 }
 

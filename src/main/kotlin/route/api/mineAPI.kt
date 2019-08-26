@@ -56,14 +56,14 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
 
                 call.respondSuccess(mineActionResult)
             } catch (e: ContentTransformationException) {
-                call.respondFail(HttpStatusCode.BadRequest, "Missing or invalid parameters.")
+                call.respondFail("Missing or invalid parameters.")
             } catch (e: NoEquippedPickaxeException) {
-                call.respondFail(HttpStatusCode.Forbidden, "A pickaxe must be equipped in order to perform a mining operation.")
+                call.respondFail("A pickaxe must be equipped in order to perform a mining operation.")
             } catch (e: NotInMineSessionException) {
-                call.respondFail(HttpStatusCode.Forbidden, "A mine session must be in progress in order to perform a mining operation.")
+                call.respondFail("A mine session must be in progress in order to perform a mining operation.")
             } catch (e: Exception) {
                 e.printStackTrace()
-                call.respondError(HttpStatusCode.InternalServerError, e.message.orEmpty())
+                call.respondError(e.message.orEmpty())
             }
         }
     }
