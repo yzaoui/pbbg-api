@@ -77,6 +77,8 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
          *   [MineJSON]
          *
          * Error situations:
+         *   [AlreadyInMineException] Must not already be in a mine.
+         *   [InvalidMineTypeIdException] Mine type ID must be a valid type ID.
          *   [UnfulfilledLevelRequirementException] Must have minimum required level.
          */
         post {
@@ -88,6 +90,8 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
                 val mine = miningUC.generateMine(loggedInUser.id, mineTypeId, 30, 20)
 
                 call.respondSuccess(mine.toJSON())
+            } catch (e: AlreadyInMineException) {
+                call.respondFail("Already in a mine.")
             } catch (e: InvalidMineTypeIdException) {
                 call.respondFail("There is no mine with ID: ${e.id}.")
             } catch (e: UnfulfilledLevelRequirementException) {

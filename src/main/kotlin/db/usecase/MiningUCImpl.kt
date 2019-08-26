@@ -30,6 +30,9 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
     }
 
     override fun generateMine(userId: Int, mineTypeId: Int, width: Int, height: Int): Mine {
+        // Don't generate mine when already in one
+        if (getMine(userId) != null) throw AlreadyInMineException()
+
         val mineType: MineType
         try {
             mineType = MineType.values()[mineTypeId]

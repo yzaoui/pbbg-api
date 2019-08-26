@@ -19,6 +19,7 @@ interface MiningUC {
      * @param width The width in cells of the mine to generate.
      * @param height The height in cells of the mine to generate.
      *
+     * @throws AlreadyInMineException when already in a mine.
      * @throws InvalidMineTypeIdException when [mineTypeId] does not map to a valid [MineType].
      * @throws UnfulfilledLevelRequirementException when minimum mining level requirement is not met.
      */
@@ -38,6 +39,7 @@ interface MiningUC {
     fun getAvailableMines(userId: Int): AvailableMines
 }
 
+class AlreadyInMineException : Exception()
 class InvalidMineTypeIdException(val id: Int) : Exception()
 class UnfulfilledLevelRequirementException(val currentLevel: Int, val requiredMinimumLevel: Int) : Exception()
 
