@@ -22,11 +22,6 @@ td {
 td.active {
     background-color: green;
 }
-
-#inner {
-    height: 100%;
-    background: var(--fill-color, linear-gradient(#6de1ff, #00789c));
-}
 </style>
 <table>
     <tbody>
