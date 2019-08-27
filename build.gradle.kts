@@ -34,7 +34,7 @@ dependencies {
     implementation(group = "org.postgresql", name = "postgresql", version = "42.2.1")
     implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version = Versions.KOTLIN)
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-runtime", version = "0.11.0")
-    implementation(group = "org.jetbrains.exposed", name = "exposed", version = "0.12.2")
+    implementation(group = "org.jetbrains.exposed", name = "exposed", version = "0.17.2")
     implementation(group = "at.favre.lib", name = "bcrypt", version = "0.7.0")
     implementation(group = "io.ktor", name = "ktor-locations", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-server-netty", version = Versions.KTOR)
