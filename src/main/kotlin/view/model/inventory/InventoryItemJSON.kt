@@ -1,8 +1,9 @@
 package com.bitwiserain.pbbg.view.model.inventory
 
-import com.bitwiserain.pbbg.view.model.ItemJSON
+import com.bitwiserain.pbbg.view.model.MaterializedItemJSON
 
 data class InventoryItemJSON(
-    val id: Int,
-    val item: ItemJSON
+    val id: Long,
+    val item: MaterializedItemJSON,
+    val equipped: Boolean?
 )

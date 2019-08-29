@@ -5,8 +5,6 @@ import com.bitwiserain.pbbg.domain.model.dex.DexUnits
 import com.bitwiserain.pbbg.domain.usecase.DexUC
 import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.interceptSetUserOr401
-import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.MyUnitEnumJSON
@@ -28,7 +26,7 @@ fun Route.dexAPI(userUC: UserUC, dexUC: DexUC) = route("/dex") {
 
             call.respondSuccess(
                 DexItemsJSON(
-                    discoveredItems = dex.discoveredItems.associate { it.ordinal to it.toJSON() }.toSortedMap(),
+                    discoveredItems = dex.discoveredItems.associate { it.ordinal to it.baseItem.toJSON() }.toSortedMap(),
                     lastItemIsDiscovered = dex.lastItemIsDiscovered
                 )
             )

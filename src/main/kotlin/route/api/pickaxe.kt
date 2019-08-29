@@ -1,12 +1,10 @@
 package com.bitwiserain.pbbg.route.api
 
-import com.bitwiserain.pbbg.domain.model.mine.Pickaxe
 import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.interceptSetUserOr401
 import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondSuccess
-import com.bitwiserain.pbbg.view.model.PointJSON
 import com.bitwiserain.pbbg.view.model.mine.PickaxeJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
@@ -29,9 +27,3 @@ fun Route.pickaxe(userUC: UserUC, equipmentUC: EquipmentUC) = route("/pickaxe") 
         call.respondSuccess(pickaxe?.toJSON())
     }
 }
-
-// TODO: Find appropriate place for this adapter
-private fun Pickaxe.toJSON() = PickaxeJSON(
-    pickaxeKind = type,
-    cells = cells.map { PointJSON(it.x, it.y) }.toSet()
-)

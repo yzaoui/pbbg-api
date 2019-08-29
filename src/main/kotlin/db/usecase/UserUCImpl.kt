@@ -5,7 +5,7 @@ import com.bitwiserain.pbbg.PASSWORD_REGEX
 import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
-import com.bitwiserain.pbbg.domain.model.Item
+import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.UserStats
 import com.bitwiserain.pbbg.domain.usecase.IllegalPasswordException
@@ -42,22 +42,11 @@ class UserUCImpl(private val db: Database) : UserUC {
             it[UserStatsTable.userId] = userId
         }
 
-        EquipmentTable.insert {
-            it[EquipmentTable.userId] = userId
-        }
-
         // TODO: Temporarily giving user all three pickaxes on account creation
-        listOf(Item.Pickaxe.PlusPickaxe(equipped = false), Item.Pickaxe.CrossPickaxe(equipped = false), Item.Pickaxe.SquarePickaxe(equipped = false)).forEach { pickaxe ->
-            InventoryTable.insert {
-                it[InventoryTable.userId] = userId
-                it[InventoryTable.item] = pickaxe.enum
-                it[InventoryTable.equipped] = false
-            }
-
-            DexTable.insert {
-                it[DexTable.userId] = userId
-                it[DexTable.item] = pickaxe.enum
-            }
+        listOf(MaterializedItem.PlusPickaxe, MaterializedItem.CrossPickaxe, MaterializedItem.SquarePickaxe).forEach { pickaxe ->
+            val itemId = MaterializedItemTable.insertItemAndGetId(pickaxe)
+            InventoryTable.insertItem(userId, itemId, pickaxe.base)
+            DexTable.insertDiscovered(userId, pickaxe.enum)
         }
 
         SquadTable.insertAllies(userId, listOf(

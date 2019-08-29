@@ -1,8 +1,8 @@
 package com.bitwiserain.pbbg.view.model.battle
 
-import com.bitwiserain.pbbg.view.model.ItemJSON
+import com.bitwiserain.pbbg.view.model.MaterializedItemJSON
 
 data class BattleRewardJSON(
     val gold: Int,
-    val items: List<ItemJSON>
+    val items: List<MaterializedItemJSON>
 )

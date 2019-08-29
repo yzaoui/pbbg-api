@@ -1,7 +1,8 @@
 package com.bitwiserain.pbbg.view.model
 
-data class ItemEnumJSON(
+data class BaseItemJSON(
     val friendlyName: String,
     val imgURL: String,
-    val description: String
+    val description: String,
+    val grid: Set<PointJSON>?
 )

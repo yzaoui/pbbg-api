@@ -1,84 +1,69 @@
 package com.bitwiserain.pbbg.db.usecase
 
-import com.bitwiserain.pbbg.db.repository.EquipmentTable
-import com.bitwiserain.pbbg.db.repository.InventoryTable
-import com.bitwiserain.pbbg.domain.model.Equippable
-import com.bitwiserain.pbbg.domain.model.Item
-import com.bitwiserain.pbbg.domain.model.mine.Pickaxe
+import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.domain.model.BaseItem
+import com.bitwiserain.pbbg.domain.model.InventoryItem
+import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.usecase.*
+import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 
 class EquipmentUCImpl(private val db: Database) : EquipmentUC {
-    override fun equip(userId: Int, inventoryItemId: Int): Unit = transaction(db) {
-        /* Get item from inventory table */
-        val item = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.id.eq(inventoryItemId) }
-            .singleOrNull()
-            ?.toItem()
+    override fun equip(userId: Int, itemId: Long): Unit = transaction(db) {
+        val userId = EntityID(userId, UserTable)
 
-        /* Make sure item exists */
-        if (item == null) throw InventoryItemNotFoundException(inventoryItemId)
+        val inventoryItems = Joins.getInventoryItems(userId)
+
+        /* Get item from inventory table */
+        val item = inventoryItems[itemId] ?: throw InventoryItemNotFoundException(itemId)
+
         /* Make sure item is equippable */
-        if (item !is Equippable) throw InventoryItemNotEquippable(inventoryItemId)
+        if (item !is InventoryItem.Equippable) throw InventoryItemNotEquippable(itemId)
         /* Make sure item is not already equipped */
-        if (item.equipped) throw InventoryItemAlreadyEquipped(inventoryItemId)
+        if (item.equipped) throw InventoryItemAlreadyEquipped(itemId)
 
         /* Get all equipped items */
-        val equippedItems = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.equipped.eq(true) }
-            .associate { it[InventoryTable.id].value to it.toItem() as Equippable }
+        val equippedItems = inventoryItems.filter {
+            val i = it.value
+            i is InventoryItem.Equippable && i.equipped
+        }
+
+        /* Get category of equipment */
+        val isSameCategoryAsTargetItem = fun(entry: Map.Entry<Long, InventoryItem>) = when (item.base) {
+            is BaseItem.Pickaxe -> entry.value.base is BaseItem.Pickaxe
+            else -> throw Exception("Item is not equippable and somehow made it through the check")
+        }
 
         /* Unequip item currently in this equipment slot if any */
-        for (equippedItem in equippedItems) {
-            if (item is Item.Pickaxe && equippedItem.value is Item.Pickaxe) {
-                InventoryTable.update({ (InventoryTable.userId eq userId) and (InventoryTable.id eq equippedItem.key) }) {
-                    it[InventoryTable.equipped] = false
-                }
-
-                break
-            }
+        equippedItems.filter(isSameCategoryAsTargetItem).entries.singleOrNull()?.let {
+            Joins.setItemEquipped(userId, it.key, equipped = false)
         }
 
-        /* Add item to equipment table */
-        EquipmentTable.update({ EquipmentTable.userId.eq(userId) }) {
-            if (item is Item.Pickaxe) it[EquipmentTable.pickaxe] = Pickaxe.fromItem(item)
-        }
-
-        /* Mark item as equipped in inventory table */
-        InventoryTable.update({ (InventoryTable.userId eq userId) and (InventoryTable.id eq inventoryItemId) }) {
-            it[InventoryTable.equipped] = true
-        }
+        /* Equip item */
+        Joins.setItemEquipped(userId, itemId, equipped = true)
     }
 
-    override fun unequip(userId: Int, inventoryItemId: Int): Unit = transaction(db) {
+    override fun unequip(userId: Int, itemId: Long): Unit = transaction(db) {
+        val userId = EntityID(userId, UserTable)
+
         /* Get item from inventory table */
-        val item = InventoryTable.select { InventoryTable.userId.eq(userId) and InventoryTable.id.eq(inventoryItemId) }
-            .singleOrNull()
-            ?.toItem()
+        val item = Joins.getInventoryItem(userId, itemId) ?: throw InventoryItemNotFoundException(itemId)
 
-        /* Make sure item exists */
-        if (item == null) throw InventoryItemNotFoundException(inventoryItemId)
         /* Make sure item is equippable */
-        if (item !is Equippable) throw InventoryItemNotEquippable(inventoryItemId)
-        /* Make sure item is not already equipped */
-        if (!item.equipped) throw InventoryItemAlreadyUnequipped(inventoryItemId)
+        if (item !is InventoryItem.Equippable) throw InventoryItemNotEquippable(itemId)
+        /* Make sure item is already unequipped */
+        if (!item.equipped) throw InventoryItemNotEquipped(itemId)
 
-        /* Remove item from equipment table */
-        EquipmentTable.update({ EquipmentTable.userId.eq(userId) }) {
-            if (item is Item.Pickaxe) it[EquipmentTable.pickaxe] = null
-        }
-
-        /* Mark item as unequipped in inventory table */
-        InventoryTable.update({ (InventoryTable.userId eq userId) and (InventoryTable.id eq inventoryItemId) }) {
-            it[InventoryTable.equipped] = false
-        }
+        /* Unequip item */
+        Joins.setItemEquipped(userId, itemId, equipped = false)
     }
 
-    override fun getEquippedPickaxe(userId: Int): Pickaxe? = transaction(db) {
-        EquipmentTable.select { EquipmentTable.userId.eq(userId) }
-            .map { it[EquipmentTable.pickaxe] }
+    override fun getEquippedPickaxe(userId: Int): MaterializedItem? = transaction(db) {
+        return@transaction Joins.getEquippedItems(EntityID(userId, UserTable))
+            .filter { it.value.base is BaseItem.Pickaxe }
+            .entries
             .singleOrNull()
+            ?.let { it.value.item }
     }
 }

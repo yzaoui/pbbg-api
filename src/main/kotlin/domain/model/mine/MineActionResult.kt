@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.domain.model.mine
 
-import com.bitwiserain.pbbg.domain.model.Item
 import com.bitwiserain.pbbg.domain.model.LevelUp
+import com.bitwiserain.pbbg.domain.model.MaterializedItem
 
 class MineActionResult(
     val minedItemResults: List<MinedItemResult>,
@@ -9,6 +9,6 @@ class MineActionResult(
 )
 
 class MinedItemResult(
-    val item: Item,
+    val item: MaterializedItem,
     val expPerIndividualItem: Int
 )

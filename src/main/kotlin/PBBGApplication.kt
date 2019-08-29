@@ -75,7 +75,7 @@ fun Application.main() {
     transaction {
         addLogger(Slf4jSqlDebugLogger)
         SchemaUtils.create(
-            UserTable, MineSessionTable, MineCellTable, EquipmentTable, InventoryTable, UserStatsTable,
+            UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable,
             UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable
         )
     }

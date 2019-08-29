@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.view.model.dex
 
-import com.bitwiserain.pbbg.view.model.ItemEnumJSON
+import com.bitwiserain.pbbg.view.model.BaseItemJSON
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
@@ -11,6 +11,6 @@ import java.util.*
  * @property lastItemIsDiscovered See [com.bitwiserain.pbbg.domain.model.dex.DexItems.lastItemIsDiscovered]
  */
 data class DexItemsJSON(
-    @SerializedName("discoveredItems") val discoveredItems: SortedMap<Int, ItemEnumJSON>,
+    @SerializedName("discoveredItems") val discoveredItems: SortedMap<Int, BaseItemJSON>,
     @SerializedName("lastItemIsDiscovered") val lastItemIsDiscovered: Boolean
 )
