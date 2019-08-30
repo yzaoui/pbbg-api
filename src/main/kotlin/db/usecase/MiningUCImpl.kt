@@ -6,9 +6,10 @@ import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
-import com.bitwiserain.pbbg.domain.model.Item
+import com.bitwiserain.pbbg.domain.model.BaseItem
+import com.bitwiserain.pbbg.domain.model.MaterializedItem
+import com.bitwiserain.pbbg.domain.model.MaterializedItem.Stackable
 import com.bitwiserain.pbbg.domain.model.Point
-import com.bitwiserain.pbbg.domain.model.Stackable
 import com.bitwiserain.pbbg.domain.model.mine.*
 import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
@@ -83,18 +84,22 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
     }
 
     override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction(db) {
-        // Currently equipped pickaxe
-        val pickaxe = EquipmentTable.select { EquipmentTable.userId.eq(userId) }
-            .map { it[EquipmentTable.pickaxe] }
-            .singleOrNull() ?: throw NoEquippedPickaxeException()
-
-        // Currently running mine session
+        /* Get currently running mine session */
         val mineSession = MineSessionTable.select { MineSessionTable.userId.eq(userId) }
             .map { it.toMineSession() }
             .singleOrNull() ?: throw NotInMineSessionException()
 
+        /* Get currently equipped pickaxe */
+        val pickaxe = Joins.getEquippedItems(EntityID(userId, UserTable))
+            .filter { it.value.base is BaseItem.Pickaxe }
+            .entries.singleOrNull()
+            ?.let { it.value.item }
+            ?: throw NoEquippedPickaxeException()
+        val pickaxeBase = pickaxe.base as? BaseItem.Pickaxe
+        if (pickaxeBase !is BaseItem.Pickaxe) throw NoEquippedPickaxeException()
+
         // Cells that the currently equipped pickaxe at this location can reach
-        val reacheableCells = reachableCells(x, y, mineSession.width, mineSession.height, pickaxe.cells)
+        val reacheableCells = reachableCells(x, y, mineSession.width, mineSession.height, pickaxeBase.grid)
 
         // The mine cells of this mine, filtered to only get those that are reachable with this pickaxe and location
         // TODO: Exposed isn't likely to support tuples in `WHERE IN` expressions, consider using raw SQL
@@ -166,10 +171,10 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         return AvailableMines(mines, nextUnlockLevel)
     }
 
-    private fun mineEntityToItem(entity: MineEntity, quantity: Int): List<Item> = when (entity) {
-        MineEntity.ROCK -> listOf(Item.Material.Stone(quantity))
-        MineEntity.COAL -> listOf(Item.Material.Coal(quantity))
-        MineEntity.COPPER -> listOf(Item.Material.CopperOre(quantity))
+    private fun mineEntityToItem(entity: MineEntity, quantity: Int): List<MaterializedItem> = when (entity) {
+        MineEntity.ROCK -> listOf(MaterializedItem.Stone(quantity))
+        MineEntity.COAL -> listOf(MaterializedItem.Coal(quantity))
+        MineEntity.COPPER -> listOf(MaterializedItem.CopperOre(quantity))
     }
 
     private fun ResultRow.toMineSession() = MineSession(

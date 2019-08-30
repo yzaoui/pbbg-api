@@ -1,8 +1,8 @@
 package com.bitwiserain.pbbg.domain.model.battle
 
-import com.bitwiserain.pbbg.domain.model.Item
+import com.bitwiserain.pbbg.domain.model.MaterializedItem
 
 data class BattleReward(
     val gold: Int,
-    val items: List<Item>
+    val items: List<MaterializedItem>
 )

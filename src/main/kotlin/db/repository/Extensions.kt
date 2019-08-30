@@ -1,7 +1,6 @@
 package com.bitwiserain.pbbg.db.repository
 
-import com.bitwiserain.pbbg.domain.model.MyUnit
-import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.domain.model.*
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import java.sql.ResultSet
@@ -30,5 +29,32 @@ fun ResultRow.toMyUnit(): MyUnit {
         MyUnitEnum.TWOLIP -> MyUnit.Twolip(id, hp, maxHP, atk, def, exp)
         MyUnitEnum.CARPSHOOTER -> MyUnit.Carpshooter(id, hp, maxHP, atk, def, exp)
         MyUnitEnum.FLAMANGO -> MyUnit.Flamango(id, hp, maxHP, atk, def, exp)
+    }
+}
+
+fun ResultRow.toMaterializedItem(): MaterializedItem {
+    val itemEnum = this[MaterializedItemTable.itemEnum]
+    val quantity = this[MaterializedItemTable.quantity]
+
+    // TODO: Find a way to preserve a single source of truth, so that quantity isn't asserted separately here
+    return when (itemEnum) {
+        ItemEnum.STONE -> MaterializedItem.Stone(quantity!!)
+        ItemEnum.COAL -> MaterializedItem.Coal(quantity!!)
+        ItemEnum.COPPER_ORE -> MaterializedItem.CopperOre(quantity!!)
+        ItemEnum.PLUS_PICKAXE -> MaterializedItem.PlusPickaxe
+        ItemEnum.CROSS_PICKAXE -> MaterializedItem.CrossPickaxe
+        ItemEnum.SQUARE_PICKAXE -> MaterializedItem.SquarePickaxe
+    }
+}
+
+fun ResultRow.toInventoryItem(): InventoryItem {
+    val materializedItem = toMaterializedItem()
+
+    return if (materializedItem.base is BaseItem.Equippable) {
+        val equipped = this[InventoryTable.equipped]!!
+
+        InventoryItem.EquippableInventoryItem(materializedItem, equipped)
+    } else {
+        InventoryItem(materializedItem)
     }
 }

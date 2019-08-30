@@ -8,5 +8,6 @@ import com.google.gson.annotations.SerializedName
  * @property imageURL The URL to get this entity's image representation.
  */
 data class MineEntityJSON(
+    @SerializedName("name") val name: String,
     @SerializedName("imageURL") val imageURL: String
 )

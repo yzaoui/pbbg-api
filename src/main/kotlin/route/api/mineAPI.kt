@@ -108,6 +108,7 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
         post {
             val loggedInUser = call.user
 
+            // TODO: Maybe throw an exception if not currently in a mine
             miningUC.exitMine(loggedInUser.id)
 
             call.respondSuccess()
@@ -145,6 +146,7 @@ private fun Mine.toJSON() = MineJSON(
 
 // TODO: Find appropriate place for this adapter
 private fun MineEntity.toJSON() = MineEntityJSON(
+    name = friendlyName,
     imageURL = "/img/mine/$spriteName.png"
 )
 
