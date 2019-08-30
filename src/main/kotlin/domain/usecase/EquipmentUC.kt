@@ -1,7 +1,5 @@
 package com.bitwiserain.pbbg.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.MaterializedItem
-
 interface EquipmentUC {
     /**
      * @throws InventoryItemNotFoundException when this user-item combination is not found
@@ -16,8 +14,6 @@ interface EquipmentUC {
      * @throws InventoryItemNotEquipped when this item is already unequipped
      */
     fun unequip(userId: Int, itemId: Long)
-
-    fun getEquippedPickaxe(userId: Int): MaterializedItem?
 }
 
 class InventoryItemNotFoundException(val itemId: Long) : Exception()

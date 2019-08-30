@@ -136,7 +136,6 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
                 dexAPI(userUC, dexUC)
                 squadAPI(unitUC)
             }
-            pickaxe(userUC, equipmentUC)
             battleAPI(userUC, battleUC)
         }
         static("css") {

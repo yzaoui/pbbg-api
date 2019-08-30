@@ -1,9 +1,9 @@
 package com.bitwiserain.pbbg.db.usecase
 
-import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.db.repository.Joins
+import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.InventoryItem
-import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
@@ -57,13 +57,5 @@ class EquipmentUCImpl(private val db: Database) : EquipmentUC {
 
         /* Unequip item */
         Joins.setItemEquipped(userId, itemId, equipped = false)
-    }
-
-    override fun getEquippedPickaxe(userId: Int): MaterializedItem? = transaction(db) {
-        return@transaction Joins.getEquippedItems(EntityID(userId, UserTable))
-            .filter { it.value.base is BaseItem.Pickaxe }
-            .entries
-            .singleOrNull()
-            ?.let { it.value.item }
     }
 }
