@@ -23,9 +23,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
             .map { it.toMineSession() }
             .singleOrNull() ?: return@transaction null
 
-        val grid = mutableMapOf<Pair<Int, Int>, MineEntity> ()
-        MineCellTable.select { MineCellTable.mineId.eq(mineSession.id) }
-            .forEach { grid[it[MineCellTable.x] to it[MineCellTable.y]] = it[MineCellTable.mineEntity] }
+        val grid = MineCellTable.getGrid(mineSession.id)
 
         Mine(mineSession.width, mineSession.height, grid)
     }
