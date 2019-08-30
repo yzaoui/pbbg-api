@@ -158,5 +158,7 @@ private fun MineActionResult.toJSON() = MineActionResultJSON(
             expPerIndividualItem = it.expPerIndividualItem
         )
     },
-    levelUps = levelUps.map { LevelUpJSON(it.newLevel, it.additionalMessage) }
+    levelUps = levelUps.map { LevelUpJSON(it.newLevel, it.additionalMessage) },
+    mine = mine.toJSON(),
+    miningLvl = miningLvl.toJSON()
 )

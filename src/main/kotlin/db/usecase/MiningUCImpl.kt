@@ -139,7 +139,12 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
             }
         }
 
-        MineActionResult(minedItemResults, MiningExperienceManager.getLevelUpResults(currentLevelProgress.level, newLevelProgress.level))
+        MineActionResult(
+            minedItemResults = minedItemResults,
+            levelUps = MiningExperienceManager.getLevelUpResults(currentLevelProgress.level, newLevelProgress.level),
+            mine = Mine(mineSession.width, mineSession.height, MineCellTable.getGrid(mineSession.id)),
+            miningLvl = newLevelProgress
+        )
     }
 
     override fun getAvailableMines(userId: Int): AvailableMines {
