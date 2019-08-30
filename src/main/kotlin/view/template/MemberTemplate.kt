@@ -31,11 +31,6 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
                         +memberPageVM.user.username
                     }
                     div(classes = "navigation") {
-                        a(href = memberPageVM.homeUrl, classes = "sidebar-item") {
-                            highlightIfCurrentSiteSection(currentSiteSection, SiteSection.HOME)
-                            span(classes = "sidebar-item-icon") { +"""🏠""" }
-                            span { +"Home" }
-                        }
                         a(href = memberPageVM.battleUrl, classes = "sidebar-item") {
                             highlightIfCurrentSiteSection(currentSiteSection, SiteSection.BATTLE)
                             span(classes = "sidebar-item-icon") { +"""⚔️""" } // Unicode variation selector 16
@@ -45,13 +40,6 @@ class MemberTemplate(private val pageTitle: String, private val memberPageVM: Me
                             highlightIfCurrentSiteSection(currentSiteSection, SiteSection.SETTINGS)
                             span(classes = "sidebar-item-icon") { +"""⚙️""" } // Unicode variation selector 16
                             span { +"Settings" }
-                        }
-                    }
-                    div(classes = "sidebar-logout") {
-                        form(action = memberPageVM.logoutUrl, method = FormMethod.post) {
-                            button(type = ButtonType.submit) {
-                                +"Log out"
-                            }
                         }
                     }
                 }

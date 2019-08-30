@@ -11,8 +11,10 @@ import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.db.usecase.*
 import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.route.api.*
-import com.bitwiserain.pbbg.route.web.*
-import com.bitwiserain.pbbg.view.template.GuestPageVM
+import com.bitwiserain.pbbg.route.web.BattleLocation
+import com.bitwiserain.pbbg.route.web.SettingsLocation
+import com.bitwiserain.pbbg.route.web.battleWeb
+import com.bitwiserain.pbbg.route.web.settings
 import com.bitwiserain.pbbg.view.template.MemberPageVM
 import io.ktor.application.*
 import io.ktor.auth.Authentication
@@ -30,7 +32,6 @@ import io.ktor.locations.locations
 import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
-import io.ktor.routing.application
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.Sessions
@@ -120,10 +121,6 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         }
     }
     routing {
-        index(userUC)
-        login(userUC)
-        logout()
-        register(userUC)
         battleWeb(userUC)
         settings(userUC)
         route("/api") {
@@ -164,16 +161,8 @@ fun PipelineContext<Unit, ApplicationCall>.getUserUsingSession(userUC: UserUC): 
 fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPageVM {
     return MemberPageVM(
         user = user,
-        homeUrl = href(IndexLocation()),
         battleUrl = href(BattleLocation()),
-        settingsUrl = href(SettingsLocation()),
-        logoutUrl = href(LogoutLocation())
-    )
-}
-
-fun PipelineContext<Unit, ApplicationCall>.getGuestPageVM(): GuestPageVM {
-    return GuestPageVM(
-        loginURL = href(LoginLocation())
+        settingsUrl = href(SettingsLocation())
     )
 }
 
@@ -181,7 +170,7 @@ fun Route.interceptSetUserOrRedirect(userUC: UserUC) {
     intercept(ApplicationCallPipeline.Features) {
         val user = getUserUsingSession(userUC)
         if (user == null) {
-            call.respondRedirect(href(LoginLocation()))
+            call.respondRedirect(href("/login"))
             finish()
         } else {
             call.attributes.put(loggedInUserKey, user)
@@ -201,17 +190,6 @@ fun Route.interceptSetUserOr401(userUC: UserUC) {
         }
     }
 }
-
-fun Route.interceptGuestOnly(userUC: UserUC) {
-    intercept(ApplicationCallPipeline.Features) {
-        if (getUserUsingSession(userUC) != null) {
-            call.respondRedirect(href(IndexLocation()))
-            finish()
-        }
-    }
-}
-
-fun Route.href(location: Any) = application.locations.href(location)
 
 fun PipelineContext<Unit, ApplicationCall>.href(location: Any) = application.locations.href(location)
 
