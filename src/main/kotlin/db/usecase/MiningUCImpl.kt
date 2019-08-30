@@ -1,8 +1,9 @@
 package com.bitwiserain.pbbg.db.usecase
 
 import com.bitwiserain.pbbg.db.model.MineCell
-import com.bitwiserain.pbbg.db.model.MineSession
-import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.db.repository.Joins
+import com.bitwiserain.pbbg.db.repository.UserStatsTable
+import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
@@ -19,9 +20,10 @@ import kotlin.random.Random
 
 class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryUC) : MiningUC {
     override fun getMine(userId: Int): Mine? = transaction(db) {
-        val mineSession = MineSessionTable.select { MineSessionTable.userId.eq(userId) }
-            .map { it.toMineSession() }
-            .singleOrNull() ?: return@transaction null
+        val userId = EntityID(userId, UserTable)
+
+        /* Get currently running mine session */
+        val mineSession = MineSessionTable.getSession(userId) ?: return@transaction null
 
         val grid = MineCellTable.getGrid(mineSession.id)
 
@@ -32,9 +34,8 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         // Don't generate mine when already in one
         if (getMine(userId) != null) throw AlreadyInMineException()
 
-        val mineType: MineType
-        try {
-            mineType = MineType.values()[mineTypeId]
+        val mineType = try {
+            MineType.values()[mineTypeId]
         } catch (e: ArrayIndexOutOfBoundsException) {
             throw InvalidMineTypeIdException(id = mineTypeId)
         }
@@ -60,11 +61,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
                 requiredMinimumLevel = mineType.minLevel
             )
 
-            val mineSessionId = MineSessionTable.insertAndGetId {
-                it[MineSessionTable.userId] = EntityID(userId, UserTable)
-                it[MineSessionTable.width] = width
-                it[MineSessionTable.height] = height
-            }
+            val mineSessionId = MineSessionTable.insertSessionAndGetId(EntityID(userId, UserTable), width, height)
 
             MineCellTable.batchInsert(itemEntries.asIterable()) { (pos, entity) ->
                 this[MineCellTable.mineId] = mineSessionId
@@ -78,17 +75,17 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
     }
 
     override fun exitMine(userId: Int): Unit = transaction(db) {
-        MineSessionTable.deleteWhere { MineSessionTable.userId.eq(userId) }
+        MineSessionTable.deleteSession(EntityID(userId, UserTable))
     }
 
     override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction(db) {
+        val userId = EntityID(userId, UserTable)
+
         /* Get currently running mine session */
-        val mineSession = MineSessionTable.select { MineSessionTable.userId.eq(userId) }
-            .map { it.toMineSession() }
-            .singleOrNull() ?: throw NotInMineSessionException()
+        val mineSession = MineSessionTable.getSession(userId) ?: throw NotInMineSessionException()
 
         /* Get currently equipped pickaxe */
-        val pickaxe = Joins.getEquippedItems(EntityID(userId, UserTable))
+        val pickaxe = Joins.getEquippedItems(userId)
             .filter { it.value.base is BaseItem.Pickaxe }
             .entries.singleOrNull()
             ?.let { it.value.item }
@@ -125,7 +122,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
 
         // TODO: Store in batch
         for (result in minedItemResults) {
-            inventoryUC.storeInInventory(userId, result.item)
+            inventoryUC.storeInInventory(userId.value, result.item)
         }
 
         val userCurrentMiningExp = UserStatsTable.select { UserStatsTable.userId.eq(userId) }
@@ -174,12 +171,6 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         MineEntity.COAL -> listOf(MaterializedItem.Coal(quantity))
         MineEntity.COPPER -> listOf(MaterializedItem.CopperOre(quantity))
     }
-
-    private fun ResultRow.toMineSession() = MineSession(
-        id = this[MineSessionTable.id].value,
-        width = this[MineSessionTable.width],
-        height = this[MineSessionTable.height]
-    )
 
     private fun ResultRow.toMineCell() = MineCell(
         id = this[MineCellTable.id].value,
