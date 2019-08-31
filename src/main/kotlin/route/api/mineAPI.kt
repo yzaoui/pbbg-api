@@ -126,7 +126,12 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
             val result = miningUC.getAvailableMines(loggedInUser.id).let {
                 MineTypeListJSON(
                     types = it.mines.map {
-                        MineTypeListJSON.MineTypeJSON(id = it.ordinal, name = it.friendlyName, minLevel = it.minLevel)
+                        MineTypeListJSON.MineTypeJSON(
+                            id = it.ordinal,
+                            name = it.friendlyName,
+                            minLevel = it.minLevel,
+                            backgroundURL = "/img/mine/background/${it.spriteName}.png"
+                        )
                     },
                     nextUnlockLevel = it.nextUnlockLevel
                 )

@@ -9,6 +9,7 @@ data class MineTypeListJSON(
     data class MineTypeJSON(
         @SerializedName("id") val id: Int,
         @SerializedName("name") val name: String,
-        @SerializedName("minLevel") val minLevel: Int
+        @SerializedName("minLevel") val minLevel: Int,
+        @SerializedName("bgURL") val backgroundURL: String
     )
 }
