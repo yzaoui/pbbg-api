@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.db.usecase
 
 import com.bitwiserain.pbbg.db.repository.DexTable
+import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.dex.DexItems
@@ -21,6 +22,15 @@ class DexUCImpl(private val db: Database) : DexUC {
             discoveredItems = discoveredItems,
             lastItemIsDiscovered = discoveredItems.contains(ItemEnum.values().last())
         )
+    }
+
+    override fun getDexItem(userId: Int, itemEnumId: Int): BaseItem {
+        // TODO: Make sure user can see this item
+        return try {
+            ItemEnum.values()[itemEnumId].baseItem
+        } catch (e: IndexOutOfBoundsException) {
+            throw InvalidUnitException()
+        }
     }
 
     override fun getDexUnits(userId: Int): DexUnits = transaction(db ) {
