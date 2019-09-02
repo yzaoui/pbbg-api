@@ -13,7 +13,6 @@ import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.route.api.*
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
-import io.ktor.application.application
 import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
@@ -28,13 +27,11 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.locations.Locations
-import io.ktor.locations.locations
 import io.ktor.response.respond
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
-import io.ktor.util.pipeline.PipelineContext
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Slf4jSqlDebugLogger
@@ -133,7 +130,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
                 inventoryAPI(inventoryUC, equipmentUC)
                 battleAPI(battleUC)
                 mine(miningUC)
-                dexAPI(userUC, dexUC)
+                dexAPI(dexUC)
                 squadAPI(unitUC)
             }
         }

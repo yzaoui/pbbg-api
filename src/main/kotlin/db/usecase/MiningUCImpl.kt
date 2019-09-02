@@ -27,7 +27,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
 
         val grid = MineCellTable.getGrid(mineSession.id)
 
-        Mine(mineSession.width, mineSession.height, grid)
+        Mine(mineSession.width, mineSession.height, grid, mineSession.mineType)
     }
 
     override fun generateMine(userId: Int, mineTypeId: Int, width: Int, height: Int): Mine {
@@ -61,7 +61,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
                 requiredMinimumLevel = mineType.minLevel
             )
 
-            val mineSessionId = MineSessionTable.insertSessionAndGetId(EntityID(userId, UserTable), width, height)
+            val mineSessionId = MineSessionTable.insertSessionAndGetId(EntityID(userId, UserTable), width, height, mineType)
 
             MineCellTable.batchInsert(itemEntries.asIterable()) { (pos, entity) ->
                 this[MineCellTable.mineId] = mineSessionId
@@ -71,7 +71,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
             }
         }
 
-        return Mine(width, height, itemEntries)
+        return Mine(width, height, itemEntries, mineType)
     }
 
     override fun exitMine(userId: Int): Unit = transaction(db) {
@@ -142,7 +142,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         MineActionResult(
             minedItemResults = minedItemResults,
             levelUps = MiningExperienceManager.getLevelUpResults(currentLevelProgress.level, newLevelProgress.level),
-            mine = Mine(mineSession.width, mineSession.height, MineCellTable.getGrid(mineSession.id)),
+            mine = Mine(mineSession.width, mineSession.height, MineCellTable.getGrid(mineSession.id), mineSession.mineType),
             miningLvl = newLevelProgress
         )
     }

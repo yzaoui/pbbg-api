@@ -5,7 +5,6 @@ import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.dex.DexUnits
 import com.bitwiserain.pbbg.domain.usecase.DexUC
 import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
-import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.MyUnitEnumJSON
@@ -18,7 +17,7 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 
-fun Route.dexAPI(userUC: UserUC, dexUC: DexUC) = route("/dex") {
+fun Route.dexAPI(dexUC: DexUC) = route("/dex") {
     route("/items") {
         get {
             val loggedInUser = call.user

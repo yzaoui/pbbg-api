@@ -10,5 +10,6 @@ package com.bitwiserain.pbbg.domain.model.mine
 data class Mine(
     val width: Int,
     val height: Int,
-    val grid: Map<Pair<Int, Int>, MineEntity>
+    val grid: Map<Pair<Int, Int>, MineEntity>,
+    val mineType: MineType
 )

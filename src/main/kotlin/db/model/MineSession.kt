@@ -1,5 +1,7 @@
 package com.bitwiserain.pbbg.db.model
 
+import com.bitwiserain.pbbg.domain.model.mine.MineType
+
 /**
  * Holds the metadata of an open mine session.
  *
@@ -10,5 +12,6 @@ package com.bitwiserain.pbbg.db.model
 data class MineSession(
     val id: Int,
     val width: Int,
-    val height: Int
+    val height: Int,
+    val mineType: MineType
 )
