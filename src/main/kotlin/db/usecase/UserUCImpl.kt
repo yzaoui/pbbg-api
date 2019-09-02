@@ -12,6 +12,7 @@ import com.bitwiserain.pbbg.domain.usecase.IllegalPasswordException
 import com.bitwiserain.pbbg.domain.usecase.UnconfirmedNewPasswordException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.domain.usecase.WrongCurrentPasswordException
+import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -69,9 +70,7 @@ class UserUCImpl(private val db: Database) : UserUC {
 
     override fun getUserStatsByUserId(userId: Int): UserStats = transaction(db) {
         // TODO: Consider checking if user exists
-        UserStatsTable.select { UserStatsTable.userId.eq(userId) }
-            .single()
-            .toUserStats()
+        UserStatsTable.getUserStats(EntityID(userId, UserTable))
     }
 
     override fun changePassword(userId: Int, currentPassword: String, newPassword: String, confirmNewPassword: String): Unit = transaction(db) {
@@ -94,6 +93,4 @@ class UserUCImpl(private val db: Database) : UserUC {
             it[UserTable.passwordHash] = BCrypt.withDefaults().hash(12, newPassword.toByteArray())
         }
     }
-
-    private fun ResultRow.toUserStats(): UserStats = UserStats(this[UserStatsTable.miningExp])
 }
