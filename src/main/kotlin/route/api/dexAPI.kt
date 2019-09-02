@@ -2,9 +2,13 @@ package com.bitwiserain.pbbg.route.api
 
 import com.bitwiserain.pbbg.API_ROOT
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.domain.model.dex.DexItems
 import com.bitwiserain.pbbg.domain.model.dex.DexUnits
 import com.bitwiserain.pbbg.domain.usecase.DexUC
+import com.bitwiserain.pbbg.domain.usecase.InvalidItemException
 import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
+import com.bitwiserain.pbbg.domain.usecase.ItemUndiscoveredException
+import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.MyUnitEnumJSON
@@ -12,24 +16,35 @@ import com.bitwiserain.pbbg.view.model.dex.DexItemsJSON
 import com.bitwiserain.pbbg.view.model.dex.DexUnitsJSON
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 
 fun Route.dexAPI(dexUC: DexUC) = route("/dex") {
-    route("/items") {
+    route("/items/{id?}") {
         get {
             val loggedInUser = call.user
 
-            val dex = dexUC.getDexItems(loggedInUser.id)
+            val itemEnumId = call.parameters["id"]?.toInt()
 
-            call.respondSuccess(
-                DexItemsJSON(
-                    discoveredItems = dex.discoveredItems.associate { it.ordinal to it.baseItem.toJSON() }.toSortedMap(),
-                    lastItemIsDiscovered = dex.lastItemIsDiscovered
-                )
-            )
+            if (itemEnumId == null) {
+                // Calling for entire item dex
+                val dex = dexUC.getDexItems(loggedInUser.id)
+
+                call.respondSuccess(dex.toJSON())
+            } else {
+                // Calling for specific item
+                try {
+                    val item = dexUC.getDexItem(loggedInUser.id, itemEnumId)
+
+                    call.respondSuccess(item.toJSON())
+                } catch (e: InvalidItemException) {
+                    call.respondFail(HttpStatusCode.NotFound)
+                } catch (e: ItemUndiscoveredException) {
+                    // TODO: This is leaking information due to difference in response timing
+                    call.respondFail(HttpStatusCode.NotFound)
+                }
+            }
         }
     }
 
@@ -51,7 +66,7 @@ fun Route.dexAPI(dexUC: DexUC) = route("/dex") {
 
                     call.respondSuccess(unit.toJSON())
                 } catch (e: InvalidUnitException) {
-                    call.respond(HttpStatusCode.NotFound)
+                    call.respondFail(HttpStatusCode.NotFound)
                 }
             }
         }
@@ -70,4 +85,9 @@ fun MyUnitEnum.toJSON() = MyUnitEnumJSON(
 private fun DexUnits.toJSON() = DexUnitsJSON(
     discoveredUnits = discoveredUnits.associate { it.ordinal to it.toJSON() }.toSortedMap(),
     lastUnitIsDiscovered = lastUnitIsDiscovered
+)
+
+private fun DexItems.toJSON() = DexItemsJSON(
+    discoveredItems = discoveredItems.associate { it.ordinal to it.baseItem.toJSON() }.toSortedMap(),
+    lastItemIsDiscovered = lastItemIsDiscovered
 )
