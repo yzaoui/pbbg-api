@@ -11,12 +11,10 @@ import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.db.usecase.*
 import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.route.api.*
-import com.bitwiserain.pbbg.route.web.BattleLocation
-import com.bitwiserain.pbbg.route.web.SettingsLocation
-import com.bitwiserain.pbbg.route.web.battleWeb
-import com.bitwiserain.pbbg.route.web.settings
-import com.bitwiserain.pbbg.view.template.MemberPageVM
-import io.ktor.application.*
+import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
+import io.ktor.application.application
+import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
 import io.ktor.auth.authentication
@@ -32,15 +30,10 @@ import io.ktor.http.content.static
 import io.ktor.locations.Locations
 import io.ktor.locations.locations
 import io.ktor.response.respond
-import io.ktor.response.respondRedirect
-import io.ktor.routing.Route
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
-import io.ktor.sessions.get
-import io.ktor.sessions.sessions
-import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -53,8 +46,6 @@ enum class ApplicationEnvironment {
     DEV,
     PROD
 }
-val loggedInUserKey = AttributeKey<User>("loggedInUser")
-val memberPageVM = AttributeKey<MemberPageVM>("memberPageVM")
 lateinit var appEnvironment: ApplicationEnvironment
 lateinit var API_ROOT: String
 
@@ -134,25 +125,17 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
         allowNonSimpleContentTypes = true
     }
     routing {
-        battleWeb(userUC)
-        settings(userUC)
         route("/api") {
             registerAPI(userUC)
             loginAPI(userUC)
             authenticate {
                 user(userUC)
                 inventoryAPI(inventoryUC, equipmentUC)
+                battleAPI(battleUC)
                 mine(miningUC)
                 dexAPI(userUC, dexUC)
                 squadAPI(unitUC)
             }
-            battleAPI(userUC, battleUC)
-        }
-        static("css") {
-            resources("css")
-        }
-        static("js") {
-            resources("js")
         }
         static("img") {
             resources("img")
@@ -166,45 +149,6 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
 /**
  * Ktor-related extensions
  */
-
-fun PipelineContext<Unit, ApplicationCall>.getUserUsingSession(userUC: UserUC): User? {
-    return call.sessions.get<ApplicationSession>()?.let { userUC.getUserById(it.userId) }
-}
-
-fun PipelineContext<Unit, ApplicationCall>.getMemberPageVM(user: User): MemberPageVM {
-    return MemberPageVM(
-        user = user,
-        battleUrl = href(BattleLocation()),
-        settingsUrl = href(SettingsLocation())
-    )
-}
-
-fun Route.interceptSetUserOrRedirect(userUC: UserUC) {
-    intercept(ApplicationCallPipeline.Features) {
-        val user = getUserUsingSession(userUC)
-        if (user == null) {
-            call.respondRedirect(href("/login"))
-            finish()
-        } else {
-            call.attributes.put(loggedInUserKey, user)
-            call.attributes.put(memberPageVM, getMemberPageVM(user))
-        }
-    }
-}
-
-fun Route.interceptSetUserOr401(userUC: UserUC) {
-    intercept(ApplicationCallPipeline.Features) {
-        val user = getUserUsingSession(userUC)
-        if (user == null) {
-            call.respondFail(HttpStatusCode.Unauthorized)
-            finish()
-        } else {
-            call.attributes.put(loggedInUserKey, user)
-        }
-    }
-}
-
-fun PipelineContext<Unit, ApplicationCall>.href(location: Any) = application.locations.href(location)
 
 suspend inline fun ApplicationCall.respondSuccess(data: Any? = null, status: HttpStatusCode = HttpStatusCode.OK) {
     respond(status, mapOf("status" to "success", "data" to data))

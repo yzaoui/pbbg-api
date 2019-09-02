@@ -4,19 +4,15 @@ import com.bitwiserain.pbbg.domain.model.battle.*
 import com.bitwiserain.pbbg.domain.usecase.BattleAlreadyInProgressException
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
-import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.interceptSetUserOr401
-import com.bitwiserain.pbbg.loggedInUserKey
 import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
+import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.battle.*
 import io.ktor.application.call
 import io.ktor.request.receive
 import io.ktor.routing.*
 
-fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
-    interceptSetUserOr401(userUC)
-
+fun Route.battleAPI(battleUC: BattleUC) = route("/battle") {
     route("/session") {
         /**
          * On success:
@@ -24,7 +20,7 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
          *   [null] when no battle is in session.
          */
         get {
-            val loggedInUser = call.attributes[loggedInUserKey]
+            val loggedInUser = call.user
 
             val battle = battleUC.getCurrentBattle(loggedInUser.id)
 
@@ -42,7 +38,7 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
              */
             post {
                 try {
-                    val loggedInUser = call.attributes[loggedInUserKey]
+                    val loggedInUser = call.user
 
                     val battle = battleUC.generateBattle(loggedInUser.id)
 
@@ -65,7 +61,7 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
          *   [BattleActionResultJSON]
          */
         post {
-            val loggedInUser = call.attributes[loggedInUserKey]
+            val loggedInUser = call.user
 
             val params = call.receive<AttackParams>()
 
@@ -81,7 +77,7 @@ fun Route.battleAPI(userUC: UserUC, battleUC: BattleUC) = route("/battle") {
          *   [BattleActionResultJSON]
          */
         post {
-            val loggedInUser = call.attributes[loggedInUserKey]
+            val loggedInUser = call.user
 
             val result = battleUC.enemyTurn(loggedInUser.id)
 
