@@ -21,9 +21,11 @@ import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
 import io.ktor.auth.authentication
 import io.ktor.auth.jwt.jwt
+import io.ktor.features.CORS
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.gson.gson
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
@@ -119,6 +121,11 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
                 it.payload.getClaim("user.id").asInt()?.let(userUC::getUserById)
             }
         }
+    }
+    install(CORS) {
+        anyHost()
+        header(HttpHeaders.Authorization)
+        allowNonSimpleContentTypes = true
     }
     routing {
         battleWeb(userUC)
