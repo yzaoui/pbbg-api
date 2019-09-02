@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.model.mine.Mine
 import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
+import com.bitwiserain.pbbg.domain.model.mine.MineType
 import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.view.model.LevelUpJSON
 import com.bitwiserain.pbbg.view.model.mine.*
@@ -124,14 +125,7 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
 
             val result = miningUC.getAvailableMines(loggedInUser.id).let {
                 MineTypeListJSON(
-                    types = it.mines.map {
-                        MineTypeListJSON.MineTypeJSON(
-                            id = it.ordinal,
-                            name = it.friendlyName,
-                            minLevel = it.minLevel,
-                            backgroundURL = "$API_ROOT/img/mine/background/${it.spriteName}.png"
-                        )
-                    },
+                    types = it.mines.map { it.toJSON() },
                     nextUnlockLevel = it.nextUnlockLevel
                 )
             }
@@ -146,7 +140,7 @@ private fun Mine.toJSON() = MineJSON(
     width = width,
     height = height,
     cells = List(height) { y -> List(width) { x -> grid[x to y]?.toJSON() } },
-    mineBgURL = "$API_ROOT/img/mine/background/${mineType.spriteName}.png"
+    type = mineType.toJSON()
 )
 
 // TODO: Find appropriate place for this adapter
@@ -166,4 +160,11 @@ private fun MineActionResult.toJSON() = MineActionResultJSON(
     levelUps = levelUps.map { LevelUpJSON(it.newLevel, it.additionalMessage) },
     mine = mine.toJSON(),
     miningLvl = miningLvl.toJSON()
+)
+
+private fun MineType.toJSON() = MineTypeJSON(
+    id = ordinal,
+    name = friendlyName,
+    minLevel = minLevel,
+    backgroundURL = "$API_ROOT/img/mine/background/${spriteName}.png"
 )
