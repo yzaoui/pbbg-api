@@ -7,6 +7,7 @@ import com.bitwiserain.pbbg.domain.model.dex.DexUnits
 import com.bitwiserain.pbbg.domain.usecase.DexUC
 import com.bitwiserain.pbbg.domain.usecase.InvalidItemException
 import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
+import com.bitwiserain.pbbg.domain.usecase.ItemUndiscoveredException
 import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.user
@@ -38,6 +39,9 @@ fun Route.dexAPI(dexUC: DexUC) = route("/dex") {
 
                     call.respondSuccess(item.toJSON())
                 } catch (e: InvalidItemException) {
+                    call.respondFail(HttpStatusCode.NotFound)
+                } catch (e: ItemUndiscoveredException) {
+                    // TODO: This is leaking information due to difference in response timing
                     call.respondFail(HttpStatusCode.NotFound)
                 }
             }

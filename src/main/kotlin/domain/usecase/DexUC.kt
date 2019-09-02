@@ -9,6 +9,7 @@ interface DexUC {
     fun getDexItems(userId: Int): DexItems
     /**
      * @throws InvalidItemException when [itemEnumId] is invalid.
+     * @throws ItemUndiscoveredException when this item has not been discovered by this user.
      */
     fun getDexItem(userId: Int, itemEnumId: Int): BaseItem
     fun getDexUnits(userId: Int): DexUnits
@@ -19,4 +20,5 @@ interface DexUC {
 }
 
 class InvalidItemException : Exception()
+class ItemUndiscoveredException : Exception()
 class InvalidUnitException : Exception()
