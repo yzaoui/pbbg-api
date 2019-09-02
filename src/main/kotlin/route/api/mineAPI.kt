@@ -8,7 +8,6 @@ import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.view.model.LevelUpJSON
 import com.bitwiserain.pbbg.view.model.mine.*
 import io.ktor.application.call
-import io.ktor.http.HttpStatusCode
 import io.ktor.request.ContentTransformationException
 import io.ktor.request.receive
 import io.ktor.routing.Route
@@ -146,7 +145,8 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
 private fun Mine.toJSON() = MineJSON(
     width = width,
     height = height,
-    cells = List(height) { y -> List(width) { x -> grid[x to y]?.toJSON() } }
+    cells = List(height) { y -> List(width) { x -> grid[x to y]?.toJSON() } },
+    mineBgURL = "$API_ROOT/img/mine/background/${mineType.spriteName}.png"
 )
 
 // TODO: Find appropriate place for this adapter
