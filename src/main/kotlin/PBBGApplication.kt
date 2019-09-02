@@ -56,12 +56,18 @@ enum class ApplicationEnvironment {
 val loggedInUserKey = AttributeKey<User>("loggedInUser")
 val memberPageVM = AttributeKey<MemberPageVM>("memberPageVM")
 lateinit var appEnvironment: ApplicationEnvironment
+lateinit var API_ROOT: String
 
 fun Application.main() {
-    appEnvironment = when (environment.config.property("ktor.environment").getString()) {
+    appEnvironment = when (environment.config.propertyOrNull("ktor.environment")?.getString()) {
         "dev" -> ApplicationEnvironment.DEV
         "prod" -> ApplicationEnvironment.PROD
         else -> throw RuntimeException("Environment (KTOR_ENV) must be either dev or prod.")
+    }
+
+    API_ROOT = when(appEnvironment) {
+        ApplicationEnvironment.DEV -> "http://localhost:${environment.config.property("ktor.deployment.port").getString()}"
+        ApplicationEnvironment.PROD -> "https://pbbg-api.bitwiserain.com"
     }
 
     /*************

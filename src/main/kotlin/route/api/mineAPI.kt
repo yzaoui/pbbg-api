@@ -130,7 +130,7 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
                             id = it.ordinal,
                             name = it.friendlyName,
                             minLevel = it.minLevel,
-                            backgroundURL = "/img/mine/background/${it.spriteName}.png"
+                            backgroundURL = "$API_ROOT/img/mine/background/${it.spriteName}.png"
                         )
                     },
                     nextUnlockLevel = it.nextUnlockLevel
@@ -152,7 +152,7 @@ private fun Mine.toJSON() = MineJSON(
 // TODO: Find appropriate place for this adapter
 private fun MineEntity.toJSON() = MineEntityJSON(
     name = friendlyName,
-    imageURL = "/img/mine/$spriteName.png"
+    imageURL = "$API_ROOT/img/mine/$spriteName.png"
 )
 
 // TODO: Find appropriate place for this adapter

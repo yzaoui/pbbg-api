@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.route.api
 
+import com.bitwiserain.pbbg.API_ROOT
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.Inventory
 import com.bitwiserain.pbbg.domain.model.InventoryItem
@@ -114,7 +115,7 @@ fun MaterializedItem.toJSON() = MaterializedItemJSON(
 
 fun BaseItem.toJSON() = BaseItemJSON(
     friendlyName = friendlyName,
-    imgURL = "/img/item/$spriteName-64.png",
+    imgURL = "$API_ROOT/img/item/$spriteName-64.png",
     description = description,
     grid = if (this is BaseItem.GridPreviewable) grid.map { PointJSON(it.x, it.y) }.toSet() else null
 )

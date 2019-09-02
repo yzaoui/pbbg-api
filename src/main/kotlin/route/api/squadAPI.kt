@@ -1,14 +1,11 @@
 package com.bitwiserain.pbbg.route.api
 
+import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.UnitExperienceManager
 import com.bitwiserain.pbbg.domain.model.MyUnit
 import com.bitwiserain.pbbg.domain.model.Squad
 import com.bitwiserain.pbbg.domain.usecase.SquadInBattleException
 import com.bitwiserain.pbbg.domain.usecase.UnitUC
-import com.bitwiserain.pbbg.loggedInUserKey
-import com.bitwiserain.pbbg.respondFail
-import com.bitwiserain.pbbg.respondSuccess
-import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.MyUnitJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
@@ -68,6 +65,6 @@ fun MyUnit.toJSON() = MyUnitJSON(
     atk = atk,
     def = def,
     levelProgress = UnitExperienceManager.getLevelProgress(exp).toJSON(),
-    idleAnimationURL = "/img/unit/${enum.spriteName}.gif",
-    iconURL = "/img/unit-icon/${enum.spriteName}.png"
+    idleAnimationURL = "$API_ROOT/img/unit/${enum.spriteName}.gif",
+    iconURL = "$API_ROOT/img/unit-icon/${enum.spriteName}.png"
 )

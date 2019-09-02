@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.route.api
 
+import com.bitwiserain.pbbg.API_ROOT
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.dex.DexUnits
 import com.bitwiserain.pbbg.domain.usecase.DexUC
@@ -63,8 +64,8 @@ fun MyUnitEnum.toJSON() = MyUnitEnumJSON(
     id = ordinal,
     friendlyName = friendlyName,
     description = description,
-    fullURL = "/img/unit/$spriteName.gif",
-    iconURL = "/img/unit-icon/$spriteName.png"
+    fullURL = "$API_ROOT/img/unit/$spriteName.gif",
+    iconURL = "$API_ROOT/img/unit-icon/$spriteName.png"
 )
 
 private fun DexUnits.toJSON() = DexUnitsJSON(
