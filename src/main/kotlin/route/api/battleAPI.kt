@@ -65,7 +65,7 @@ fun Route.battleAPI(battleUC: BattleUC) = route("/battle") {
 
             val params = call.receive<AttackParams>()
 
-            val result = battleUC.allyTurn(loggedInUser.id, BattleAction.Attack(params.enemyId))
+            val result = battleUC.allyTurn(loggedInUser.id, BattleAction.Attack(params.targetUnitId))
 
             call.respondSuccess(result.toJSON())
         }
@@ -86,7 +86,7 @@ fun Route.battleAPI(battleUC: BattleUC) = route("/battle") {
     }
 }
 
-private data class AttackParams(val enemyId: Long)
+private data class AttackParams(val targetUnitId: Long)
 
 private fun BattleActionResult.toJSON() = BattleActionResultJSON(
     battle = battle.toJSON(),

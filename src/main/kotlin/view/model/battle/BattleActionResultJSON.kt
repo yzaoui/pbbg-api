@@ -2,8 +2,8 @@ package com.bitwiserain.pbbg.view.model.battle
 
 import com.google.gson.annotations.SerializedName
 
-class BattleActionResultJSON(
+data class BattleActionResultJSON(
     @SerializedName("battle") val battle: BattleJSON,
-    val unitEffects: Map<Long, UnitEffectJSON>,
-    val reward: BattleRewardJSON? = null
+    @SerializedName("unitEffects") val unitEffects: Map<Long, UnitEffectJSON>,
+    @SerializedName("reward") val reward: BattleRewardJSON? = null
 )
