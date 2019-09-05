@@ -115,7 +115,9 @@ fun MaterializedItem.toJSON() = MaterializedItemJSON(
 
 fun BaseItem.toJSON() = BaseItemJSON(
     friendlyName = friendlyName,
-    imgURL = "$API_ROOT/img/item/$spriteName-64.png",
+    img16 = "$API_ROOT/img/item/$spriteName-16.png",
+    img32 = "$API_ROOT/img/item/$spriteName-32.png",
+    img64 = "$API_ROOT/img/item/$spriteName-64.png",
     description = description,
     grid = if (this is BaseItem.GridPreviewable) grid.map { PointJSON(it.x, it.y) }.toSet() else null
 )
