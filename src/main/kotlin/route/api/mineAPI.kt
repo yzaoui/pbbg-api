@@ -146,7 +146,7 @@ private fun Mine.toJSON() = MineJSON(
 // TODO: Find appropriate place for this adapter
 private fun MineEntity.toJSON() = MineEntityJSON(
     name = friendlyName,
-    imageURL = "$API_ROOT/img/mine/$spriteName.png"
+    imageURL = "$API_ROOT/img/mine/entity/$spriteName.png"
 )
 
 // TODO: Find appropriate place for this adapter
