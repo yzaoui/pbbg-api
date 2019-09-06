@@ -128,6 +128,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
             authenticate {
                 user(userUC)
                 inventoryAPI(inventoryUC, equipmentUC)
+                market()
                 battleAPI(battleUC)
                 mine(miningUC)
                 dexAPI(dexUC)
