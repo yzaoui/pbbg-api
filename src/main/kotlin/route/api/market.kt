@@ -17,6 +17,7 @@ fun Route.market() = route("/market") {
     get {
         call.respondSuccess(MarketJSON(
             items = listOf(MarketItemJSON(
+                id = 1,
                 item = MaterializedItem.SquarePickaxe.toJSON(),
                 price = 5
             ))
