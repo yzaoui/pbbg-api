@@ -72,6 +72,7 @@ fun Market.toJSON() = MarketJSON(
 )
 
 fun UserAndGameMarkets.toJSON() = UserAndGameMarketsJSON(
+    gold = gold,
     userMarket = userMarket.toJSON(),
     gameMarket = gameMarket.toJSON()
 )

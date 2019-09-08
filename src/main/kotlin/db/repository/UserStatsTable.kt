@@ -5,6 +5,7 @@ import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.update
 
 object UserStatsTable : Table() {
     val userId = reference("user_id", UserTable)
@@ -14,6 +15,10 @@ object UserStatsTable : Table() {
     fun getUserStats(userId: EntityID<Int>) = select { UserStatsTable.userId.eq(userId) }
         .map { it.toUserStats() }
         .single()
+
+    fun updateGold(userId: EntityID<Int>, gold: Long) = update({ UserStatsTable.userId.eq(userId) }) {
+        it[UserStatsTable.gold] = gold
+    }
 
     private fun ResultRow.toUserStats(): UserStats = UserStats(
         gold = this[gold],
