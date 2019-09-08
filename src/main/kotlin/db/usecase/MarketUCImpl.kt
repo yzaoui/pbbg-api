@@ -16,22 +16,18 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class MarketUCImpl(private val db: Database) : MarketUC {
-    override fun getGameMarket(userId: Int): Market = transaction(db) {
+    override fun getMarkets(userId: Int): UserAndGameMarkets = transaction(db) {
         val userId = EntityID(userId, UserTable)
 
-        val marketItems = Joins.Market.getItems(userId)
-            .mapValues { MarketItem(it.value, PriceManager.getBuyPrice(it.value)) }
+        val userMarket = Market(
+            Joins.getInventoryItems(userId).mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }
+        )
 
-        return@transaction Market(marketItems)
-    }
+        val gameMarket = Market(
+            Joins.Market.getItems(userId).mapValues { MarketItem(it.value, PriceManager.getBuyPrice(it.value)) }
+        )
 
-    override fun getUserMarket(userId: Int): Market = transaction(db) {
-        val userId = EntityID(userId, UserTable)
-
-        val marketItems = Joins.getInventoryItems(userId)
-            .mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }
-
-        return@transaction Market(marketItems)
+        return@transaction UserAndGameMarkets(userMarket = userMarket, gameMarket = gameMarket)
     }
 
     override fun buy(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction(db) {

@@ -19,26 +19,14 @@ import io.ktor.routing.route
 fun Route.market(marketUC: MarketUC) = route("/market") {
     /**
      * On success:
-     *   [MarketJSON]
+     *   [UserAndGameMarketsJSON]
      */
     get {
         val loggedInUser = call.user
 
-        val market = marketUC.getGameMarket(loggedInUser.id)
+        val markets = marketUC.getMarkets(loggedInUser.id)
 
-        call.respondSuccess(market.toJSON())
-    }
-
-    /**
-     * On success:
-     *   [MarketJSON]
-     */
-    get("/inventory") {
-        val loggedInUser = call.user
-
-        val market = marketUC.getUserMarket(loggedInUser.id)
-
-        call.respondSuccess(market.toJSON())
+        call.respondSuccess(markets.toJSON())
     }
 
     /**
@@ -46,7 +34,7 @@ fun Route.market(marketUC: MarketUC) = route("/market") {
      *   [MarketOrderListParams]
      *
      * On success:
-     *   [MarketJSON]
+     *   [UserAndGameMarketsJSON]
      */
     post("/buy") {
         val loggedInUser = call.user
@@ -63,7 +51,7 @@ fun Route.market(marketUC: MarketUC) = route("/market") {
      *   [MarketOrderListParams]
      *
      * On success:
-     *   [MarketJSON]
+     *   [UserAndGameMarketsJSON]
      */
     post("/sell") {
         val loggedInUser = call.user

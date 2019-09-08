@@ -3,7 +3,6 @@ package com.bitwiserain.pbbg.db.repository.market
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 
