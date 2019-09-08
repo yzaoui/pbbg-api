@@ -1,5 +1,7 @@
 package com.bitwiserain.pbbg.db.repository
 
+import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
+import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.and
@@ -16,6 +18,11 @@ object Joins {
         (InventoryTable innerJoin MaterializedItemTable)
             .select { InventoryTable.userId.eq(userId) }
             .associate { it[MaterializedItemTable.id].value to it.toInventoryItem() }
+
+    fun getMarketItems(userId: EntityID<Int>) =
+        (MarketInventoryTable innerJoin MaterializedItemTable innerJoin MarketTable)
+            .select { MarketTable.userId.eq(userId) }
+            .associate { it[MaterializedItemTable.id].value to it.toMaterializedItem() }
 
     fun getEquippedItems(userId: EntityID<Int>) =
         (InventoryTable innerJoin MaterializedItemTable)

@@ -5,6 +5,8 @@ import com.bitwiserain.pbbg.PASSWORD_REGEX
 import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
+import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.UserStats
@@ -48,6 +50,15 @@ class UserUCImpl(private val db: Database) : UserUC {
             val itemId = MaterializedItemTable.insertItemAndGetId(pickaxe)
             InventoryTable.insertItem(userId, itemId, pickaxe.base)
             DexTable.insertDiscovered(userId, pickaxe.enum)
+        }
+
+        /* Market */
+        val marketId = MarketTable.insertAndGetId {
+            it[MarketTable.userId] = userId
+        }
+        listOf<MaterializedItem>(MaterializedItem.PlusPickaxe).forEach { item ->
+            val itemId = MaterializedItemTable.insertItemAndGetId(item)
+            MarketInventoryTable.insertItem(marketId, itemId)
         }
 
         SquadTable.insertAllies(userId, listOf(

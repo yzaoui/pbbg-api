@@ -6,6 +6,8 @@ import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
+import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
+import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.db.usecase.*
@@ -73,13 +75,14 @@ fun Application.main() {
         addLogger(Slf4jSqlDebugLogger)
         SchemaUtils.create(
             UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable,
-            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable
+            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable
         )
     }
 
     install(CallLogging)
 
     val userUC = UserUCImpl(db)
+    val marketUC = MarketUCImpl(db)
     val inventoryUC = InventoryUCImpl(db)
     val miningUC = MiningUCImpl(db, inventoryUC)
     val equipmentUC = EquipmentUCImpl(db)
@@ -87,10 +90,10 @@ fun Application.main() {
     val battleUC = BattleUCImpl(db)
     val dexUC = DexUCImpl(db)
 
-    mainWithDependencies(userUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC, dexUC)
+    mainWithDependencies(userUC, marketUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC, dexUC)
 }
 
-fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC, dexUC: DexUC) {
+fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC, dexUC: DexUC) {
     install(Sessions) {
         cookie<ApplicationSession>("pbbg_session") {
             cookie.path = "/"
@@ -128,7 +131,7 @@ fun Application.mainWithDependencies(userUC: UserUC, inventoryUC: InventoryUC, m
             authenticate {
                 user(userUC)
                 inventoryAPI(inventoryUC, equipmentUC)
-                market(inventoryUC)
+                market(marketUC)
                 battleAPI(battleUC)
                 mine(miningUC)
                 dexAPI(dexUC)
