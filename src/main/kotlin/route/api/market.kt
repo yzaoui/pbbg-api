@@ -4,6 +4,8 @@ import com.bitwiserain.pbbg.domain.model.market.Market
 import com.bitwiserain.pbbg.domain.model.market.MarketOrder
 import com.bitwiserain.pbbg.domain.model.market.UserAndGameMarkets
 import com.bitwiserain.pbbg.domain.usecase.MarketUC
+import com.bitwiserain.pbbg.domain.usecase.NotEnoughGoldException
+import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.market.MarketItemJSON
@@ -37,13 +39,17 @@ fun Route.market(marketUC: MarketUC) = route("/market") {
      *   [UserAndGameMarketsJSON]
      */
     post("/buy") {
-        val loggedInUser = call.user
+        try {
+            val loggedInUser = call.user
 
-        val params = call.receive<MarketOrderListParams>()
+            val params = call.receive<MarketOrderListParams>()
 
-        val markets = marketUC.buy(loggedInUser.id, params.orders.map { MarketOrder(it.id, it.quantity) })
+            val markets = marketUC.buy(loggedInUser.id, params.orders.map { MarketOrder(it.id, it.quantity) })
 
-        call.respondSuccess(markets.toJSON())
+            call.respondSuccess(markets.toJSON())
+        } catch (e: NotEnoughGoldException) {
+            call.respondFail(mapOf("message" to "Not enough gold to make this transaction."))
+        }
     }
 
     /**
