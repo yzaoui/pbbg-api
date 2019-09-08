@@ -3,28 +3,29 @@ package com.bitwiserain.pbbg.db.usecase
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.UserTable
+import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.domain.PriceManager
-import com.bitwiserain.pbbg.domain.model.InventoryItem
-import com.bitwiserain.pbbg.domain.model.MaterializedItem
+import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.market.Market
 import com.bitwiserain.pbbg.domain.model.market.MarketItem
 import com.bitwiserain.pbbg.domain.model.market.MarketOrder
+import com.bitwiserain.pbbg.domain.model.market.UserAndGameMarkets
 import com.bitwiserain.pbbg.domain.usecase.MarketUC
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class MarketUCImpl(private val db: Database) : MarketUC {
-    override fun getMarket(userId: Int): Market = transaction(db) {
+    override fun getGameMarket(userId: Int): Market = transaction(db) {
         val userId = EntityID(userId, UserTable)
 
-        val marketItems = Joins.getMarketItems(userId)
+        val marketItems = Joins.Market.getItems(userId)
             .mapValues { MarketItem(it.value, PriceManager.getBuyPrice(it.value)) }
 
         return@transaction Market(marketItems)
     }
 
-    override fun getUserInventory(userId: Int): Market = transaction(db) {
+    override fun getUserMarket(userId: Int): Market = transaction(db) {
         val userId = EntityID(userId, UserTable)
 
         val marketItems = Joins.getInventoryItems(userId)
@@ -33,7 +34,36 @@ class MarketUCImpl(private val db: Database) : MarketUC {
         return@transaction Market(marketItems)
     }
 
-    override fun sell(userId: Int, orders: List<MarketOrder>): Market = transaction(db) {
+    override fun buy(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction(db) {
+        val userId = EntityID(userId, UserTable)
+
+        val marketInventory = Joins.Market.getItems(userId).toMutableMap()
+
+        var totalPrice = 0
+        val itemIds = mutableMapOf<Long, BaseItem>()
+        for (order in orders) {
+            val item = marketInventory[order.id] ?: continue
+
+            totalPrice += PriceManager.getBuyPrice(item)
+            itemIds[order.id] = item.base
+            marketInventory.remove(order.id)
+        }
+
+        InventoryTable.insertItems(userId, itemIds)
+        MarketInventoryTable.removeItems(itemIds.keys)
+
+        val userInventory = Joins.getInventoryItems(userId)
+            .mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }
+
+        return@transaction UserAndGameMarkets(
+            userMarket = Market(userInventory),
+            gameMarket = Market(marketInventory
+                .mapValues { MarketItem(it.value, PriceManager.getBuyPrice(it.value)) }
+            )
+        )
+    }
+
+    override fun sell(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction(db) {
         val userId = EntityID(userId, UserTable)
 
         val heldItems = Joins.getInventoryItems(userId).toMutableMap()
@@ -49,7 +79,11 @@ class MarketUCImpl(private val db: Database) : MarketUC {
         }
 
         InventoryTable.removeItems(userId, itemIds)
+        Joins.Market.insertItems(userId, itemIds)
 
-        return@transaction Market(heldItems.mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) })
+        return@transaction UserAndGameMarkets(
+            userMarket = Market(heldItems.mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }),
+            gameMarket = Market(Joins.Market.getItems(userId).mapValues { MarketItem(it.value, PriceManager.getBuyPrice(it.value)) })
+        )
     }
 }
