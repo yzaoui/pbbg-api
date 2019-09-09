@@ -21,7 +21,7 @@ object InventoryTable : Table() {
         if (entry.value is BaseItem.Equippable) this[InventoryTable.equipped] = false
     }
 
-    fun removeItems(userId: EntityID<Int>, itemIds: List<Long>) = deleteWhere {
+    fun removeItems(userId: EntityID<Int>, itemIds: Iterable<Long>) = deleteWhere {
         InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.inList(itemIds)
     }
 }

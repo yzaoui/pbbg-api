@@ -127,25 +127,88 @@ class MarketUCImpl(private val db: Database) : MarketUC {
         val userId = EntityID(userId, UserTable)
 
         var gold = UserStatsTable.getUserStats(userId).gold
-        val heldItems = Joins.getInventoryItems(userId).toMutableMap()
+        val userMarket = Joins.getInventoryItems(userId).toMutableMap()
+        val gameMarket = Joins.Market.getItems(userId).toMutableMap()
 
-        val itemIds = mutableListOf<Long>()
+        val gameItemsToInsert = mutableSetOf<Long>()
+        val gameStackableItemsToCreate = mutableListOf<MaterializedItem.Stackable>()
+        val gameItemsToUpdateQuantity = mutableMapOf<Long, Int>()
+        val userItemsToRemove = mutableSetOf<Long>()
+        val userItemsToUpdateQuantity = mutableMapOf<Long, Int>()
+
         for (order in orders) {
-            val item = heldItems[order.id] ?: continue
+            /* Ordered item must exist in user inventory */
+            val userItem = userMarket[order.id]?.item ?: throw Exception()
 
-            gold += PriceManager.getSellPrice(item.item)
-            itemIds.add(order.id)
-            heldItems.remove(order.id)
+            /* Order quantity exists iff item is stackable */
+            if ((userItem is MaterializedItem.Stackable && order.quantity == null) || (userItem !is MaterializedItem.Stackable && order.quantity != null)) {
+                throw Exception()
+            }
+
+            if (order.quantity !== null) {
+                userItem as MaterializedItem.Stackable
+
+                /* Ordered item quantity must be non-negative */
+                if (order.quantity < 0) throw Exception()
+                /* Ordered item quantity must not exceed user item quantity */
+                if (order.quantity > userItem.quantity) throw Exception()
+                /* Skip transaction if quantity is 0 */
+                if (order.quantity == 0) continue
+
+                /** Handle game-side of item **/
+                /* Check if game has this type of stackable item already */
+                val gameItemOfThisKind = gameMarket.entries.find { it.value.base === userItem.base }
+                if (gameItemOfThisKind != null) {
+                    gameItemsToUpdateQuantity[gameItemOfThisKind.key] = +order.quantity
+                } else {
+                    gameStackableItemsToCreate.add((userItem as MaterializedItem.Stackable).copy(order.quantity))
+                }
+
+                /** Handle user-side of item **/
+                if (order.quantity == userItem.quantity) {
+                    userItemsToRemove.add(order.id)
+                } else {
+                    userItemsToUpdateQuantity[order.id] = -order.quantity
+                }
+
+                gold += PriceManager.getSellPrice(userItem) * order.quantity
+            } else {
+                /** For non-stackable items, just transfer **/
+                gameItemsToInsert.add(order.id)
+                userItemsToRemove.add(order.id)
+
+                gold += PriceManager.getSellPrice(userItem)
+            }
         }
 
+        /* Update user gold */
         UserStatsTable.updateGold(userId, gold)
-        InventoryTable.removeItems(userId, itemIds)
-        Joins.Market.insertItems(userId, itemIds)
+
+        /* Create new materialized items */
+        gameStackableItemsToCreate.forEach {
+            val item = it as MaterializedItem
+
+            gameItemsToInsert.add(MaterializedItemTable.insertItemAndGetId(item).value)
+        }
+        /* Insert items into game's market */
+        Joins.Market.insertItems(userId, gameItemsToInsert)
+        /* Update quantity of game's items */
+        gameItemsToUpdateQuantity.forEach { MaterializedItemTable.updateQuantity(it.key, it.value) }
+        /* Remove user's items */
+        InventoryTable.removeItems(userId, userItemsToRemove)
+        /* Update quantity of user's items */
+        userItemsToUpdateQuantity.forEach { MaterializedItemTable.updateQuantity(it.key, it.value) }
 
         return@transaction UserAndGameMarkets(
             gold = gold,
-            userMarket = Market(heldItems.mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }),
-            gameMarket = Market(Joins.Market.getItems(userId).mapValues { MarketItem(it.value, PriceManager.getBuyPrice(it.value)) })
+            userMarket = Market(
+                Joins.getInventoryItems(userId)
+                    .mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }
+            ),
+            gameMarket = Market(
+                Joins.Market.getItems(userId)
+                    .mapValues { MarketItem(it.value, PriceManager.getBuyPrice(it.value)) }
+            )
         )
     }
 }
