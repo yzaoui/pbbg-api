@@ -19,9 +19,10 @@ object MaterializedItemTable : LongIdTable() {
         }
     }
 
-    fun updateQuantity(itemId: EntityID<Long>, quantity: Int) = update({ MaterializedItemTable.id.eq(itemId) }) {
+    fun updateQuantity(itemId: EntityID<Long>, quantityDelta: Int) = update({ MaterializedItemTable.id.eq(itemId) }) {
         with (SqlExpressionBuilder) {
-            it.update(MaterializedItemTable.quantity, MaterializedItemTable.quantity + quantity)
+            it.update(MaterializedItemTable.quantity, MaterializedItemTable.quantity + quantityDelta)
         }
     }
+    fun updateQuantity(itemId: Long, quantityDelta: Int) = updateQuantity(EntityID(itemId, MaterializedItemTable), quantityDelta)
 }
