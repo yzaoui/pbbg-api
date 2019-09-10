@@ -16,11 +16,11 @@ sealed class MaterializedItem {
     }
     class Coal(override val quantity: Int) : MaterializedItem(), Stackable {
         override val base get() = BaseItem.Material.Coal
-        override fun copy(quantity: Int): Stackable = Stone(quantity)
+        override fun copy(quantity: Int): Stackable = Coal(quantity)
     }
     class CopperOre(override val quantity: Int) : MaterializedItem(), Stackable {
         override val base get() = BaseItem.Material.CopperOre
-        override fun copy(quantity: Int): Stackable = Stone(quantity)
+        override fun copy(quantity: Int): Stackable = CopperOre(quantity)
     }
 
     object IcePick : MaterializedItem() {
