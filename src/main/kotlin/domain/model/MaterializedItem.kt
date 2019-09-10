@@ -23,6 +23,9 @@ sealed class MaterializedItem {
         override fun copy(quantity: Int): Stackable = Stone(quantity)
     }
 
+    object IcePick : MaterializedItem() {
+        override val base get() = BaseItem.Pickaxe.IcePick
+    }
     object PlusPickaxe : MaterializedItem() {
         override val base get() = BaseItem.Pickaxe.PlusPickaxe
     }
