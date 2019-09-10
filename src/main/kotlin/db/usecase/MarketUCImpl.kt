@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.domain.PriceManager
 import com.bitwiserain.pbbg.domain.model.BaseItem
+import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.market.Market
 import com.bitwiserain.pbbg.domain.model.market.MarketItem
@@ -38,10 +39,12 @@ class MarketUCImpl(private val db: Database) : MarketUC {
         var gold = UserStatsTable.getUserStats(userId).gold
         val userMarket = Joins.getInventoryItems(userId).toMutableMap()
         val gameMarket = Joins.Market.getItems(userId).toMutableMap()
+        val dex = DexTable.getDiscovered(userId)
 
         val userItemsToInsert = mutableMapOf<Long, BaseItem>()
         val userStackableItemsToCreate = mutableListOf<MaterializedItem.Stackable>()
         val userItemsToUpdateQuantity = mutableMapOf<Long, Int>()
+        val dexItemsToInsert = mutableSetOf<ItemEnum>()
         val gameItemsToRemove = mutableSetOf<Long>()
         val gameItemsToUpdateQuantity = mutableMapOf<Long, Int>()
 
@@ -88,6 +91,9 @@ class MarketUCImpl(private val db: Database) : MarketUC {
 
                 gold -= PriceManager.getBuyPrice(gameItem)
             }
+
+            /* Insert into dex if not already there */
+            if (!dex.contains(gameItem.enum)) dexItemsToInsert.add(gameItem.enum)
         }
 
         if (gold < 0) throw NotEnoughGoldException()
@@ -103,6 +109,8 @@ class MarketUCImpl(private val db: Database) : MarketUC {
         }
         /* Insert items into user's inventory */
         InventoryTable.insertItems(userId, userItemsToInsert)
+        /* Insert items into user's dex */
+        DexTable.insertDiscovered(userId, dexItemsToInsert)
         /* Update quantity of user's items */
         userItemsToUpdateQuantity.forEach { MaterializedItemTable.updateQuantity(it.key, it.value) }
         /* Remove game's items */
