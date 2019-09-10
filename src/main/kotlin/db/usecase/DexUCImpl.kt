@@ -18,9 +18,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class DexUCImpl(private val db: Database) : DexUC {
     override fun getDexItems(userId: Int): DexItems = transaction(db) {
-        val discoveredItems = DexTable.select { DexTable.userId.eq(userId) }
-            .map { it[DexTable.item] }
-            .toSet()
+        val discoveredItems = DexTable.getDiscovered(EntityID(userId, UserTable))
 
         return@transaction DexItems(
             discoveredItems = discoveredItems,
