@@ -34,6 +34,17 @@ sealed class BaseItem {
     }
 
     sealed class Pickaxe : BaseItem(), Equippable, GridPreviewable {
+        object IcePick : Pickaxe() {
+            override val enum: ItemEnum get() = ItemEnum.ICE_PICK
+            override val friendlyName = "Ice Pick"
+            override val spriteName = "ice-pick"
+            override val description = "Not quite a pickaxe, but good enough."
+            override val grid get() = arrayOf(
+                arrayOf(0, 0, 0),
+                arrayOf(0, 1, 0),
+                arrayOf(0, 0, 0)
+            ).toPoints(3, 3, Point(1, 1))
+        }
         object PlusPickaxe : Pickaxe() {
             override val enum: ItemEnum get() = ItemEnum.PLUS_PICKAXE
             override val friendlyName = "Plus-shaped Pickaxe"

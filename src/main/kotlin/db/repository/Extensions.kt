@@ -41,6 +41,7 @@ fun ResultRow.toMaterializedItem(): MaterializedItem {
         ItemEnum.STONE -> MaterializedItem.Stone(quantity!!)
         ItemEnum.COAL -> MaterializedItem.Coal(quantity!!)
         ItemEnum.COPPER_ORE -> MaterializedItem.CopperOre(quantity!!)
+        ItemEnum.ICE_PICK -> MaterializedItem.IcePick
         ItemEnum.PLUS_PICKAXE -> MaterializedItem.PlusPickaxe
         ItemEnum.CROSS_PICKAXE -> MaterializedItem.CrossPickaxe
         ItemEnum.SQUARE_PICKAXE -> MaterializedItem.SquarePickaxe

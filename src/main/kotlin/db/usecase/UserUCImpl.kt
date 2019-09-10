@@ -45,8 +45,7 @@ class UserUCImpl(private val db: Database) : UserUC {
             it[UserStatsTable.userId] = userId
         }
 
-        // TODO: Temporarily giving user all three pickaxes on account creation
-        listOf(MaterializedItem.PlusPickaxe, MaterializedItem.CrossPickaxe, MaterializedItem.SquarePickaxe).forEach { pickaxe ->
+        listOf(MaterializedItem.IcePick).forEach { pickaxe ->
             val itemId = MaterializedItemTable.insertItemAndGetId(pickaxe)
             InventoryTable.insertItem(userId, itemId, pickaxe.base)
             DexTable.insertDiscovered(userId, pickaxe.enum)
@@ -56,7 +55,7 @@ class UserUCImpl(private val db: Database) : UserUC {
         val marketId = MarketTable.insertAndGetId {
             it[MarketTable.userId] = userId
         }
-        listOf<MaterializedItem>(MaterializedItem.PlusPickaxe).forEach { item ->
+        listOf(MaterializedItem.PlusPickaxe, MaterializedItem.CrossPickaxe, MaterializedItem.SquarePickaxe).forEach { item ->
             val itemId = MaterializedItemTable.insertItemAndGetId(item)
             MarketInventoryTable.insertItem(marketId, itemId)
         }
