@@ -4,7 +4,6 @@ import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import io.ktor.application.application
 import io.ktor.application.call
-import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.routing.Route
 import io.ktor.routing.post

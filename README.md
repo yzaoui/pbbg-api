@@ -1,6 +1,6 @@
 # PBBG
 
-[![Build Status](https://travis-ci.com/yzaoui/PBBG.svg?token=1yvK1SDS81zftyrRcxxU&branch=master)](https://travis-ci.com/yzaoui/PBBG)
+[![Build Status](https://travis-ci.com/yzaoui/pbbg-api.svg?branch=master)](https://travis-ci.com/yzaoui/pbbg-api)
 
 A persistent browser-based game built on Ktor.
 
