@@ -120,6 +120,7 @@ fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, invento
         route("/api") {
             registerAPI(userUC)
             loginAPI(userUC)
+            item()
             authenticate {
                 user(userUC)
                 inventoryAPI(inventoryUC, equipmentUC)
