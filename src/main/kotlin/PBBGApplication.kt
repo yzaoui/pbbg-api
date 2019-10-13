@@ -32,15 +32,12 @@ import io.ktor.locations.Locations
 import io.ktor.response.respond
 import io.ktor.routing.route
 import io.ktor.routing.routing
-import io.ktor.sessions.Sessions
-import io.ktor.sessions.cookie
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Slf4jSqlDebugLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 
-data class ApplicationSession(val userId: Int)
 enum class ApplicationEnvironment {
     DEV,
     PROD
@@ -94,11 +91,6 @@ fun Application.main() {
 }
 
 fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC, dexUC: DexUC) {
-    install(Sessions) {
-        cookie<ApplicationSession>("pbbg_session") {
-            cookie.path = "/"
-        }
-    }
     install(Locations)
     install(ContentNegotiation) {
         // Handles "application/json" content type
