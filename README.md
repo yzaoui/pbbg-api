@@ -12,7 +12,8 @@ A persistent browser-based game built on Ktor.
 |`KTOR_ENV`|Yes|Application environment|`dev`, `prod`|
 |`PORT`|Yes|The port on which to deploy the server|Valid port number|
 |`JDBC_ADDRESS`|No|Application database address|Valid JDBC address, appended to `jdbc`<br>H2 or PostgreSQL currently supported<br>Default: `h2:./default`|
+|`JWT_SECRET`|Yes|Secret used for JWT tokens|Any string|
 
 ### Example
 
-`java -DKTOR_ENV=prod -DPORT=8080 -jar pbbg-1.2.3.jar`
+`java -DKTOR_ENV=prod -DPORT=8080 -DJWT_SECRET=secret -jar pbbg-0.3.0.jar`
