@@ -153,7 +153,7 @@ private fun MineEntity.toJSON() = MineEntityJSON(
 private fun MineActionResult.toJSON() = MineActionResultJSON(
     minedItemResults = minedItemResults.map {
         MinedItemResultJSON(
-            item = it.item.toJSON(),
+            item = it.item.toJSON(it.id),
             expPerIndividualItem = it.expPerIndividualItem
         )
     },

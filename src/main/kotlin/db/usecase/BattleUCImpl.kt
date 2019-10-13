@@ -127,7 +127,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         if (isBattleOver(updatedBattle)) {
             // TODO: reward should depend on win/loss
-            reward = BattleReward(0, emptyList())
+            reward = BattleReward(0, emptyMap())
             deleteBattle(updatedBattle, battleSession)
         }
 
