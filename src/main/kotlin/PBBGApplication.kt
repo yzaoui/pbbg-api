@@ -84,7 +84,7 @@ fun Application.main() {
     val userUC = UserUCImpl(db)
     val marketUC = MarketUCImpl(db)
     val inventoryUC = InventoryUCImpl(db)
-    val miningUC = MiningUCImpl(db, inventoryUC)
+    val miningUC = MiningUCImpl(db)
     val equipmentUC = EquipmentUCImpl(db)
     val unitUC = UnitUCImpl(db)
     val battleUC = BattleUCImpl(db)

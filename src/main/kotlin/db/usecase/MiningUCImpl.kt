@@ -18,7 +18,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.random.Random
 
-class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryUC) : MiningUC {
+class MiningUCImpl(private val db: Database) : MiningUC {
     override fun getMine(userId: Int): Mine? = transaction(db) {
         val userId = EntityID(userId, UserTable)
 
@@ -122,7 +122,7 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
 
         // TODO: Store in batch
         for (result in minedItemResults) {
-            inventoryUC.storeInInventory(userId.value, result.item)
+            storeInInventoryReturnItemID(db, userId, result.item)
         }
 
         val userCurrentMiningExp = UserStatsTable.select { UserStatsTable.userId.eq(userId) }
