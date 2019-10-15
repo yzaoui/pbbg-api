@@ -25,14 +25,8 @@ class UserUCImpl(private val db: Database) : UserUC {
             .singleOrNull()
     }
 
-    override fun getUserByUsername(username: String): User? = transaction(db) {
-        UserTable.select { UserTable.username.eq(username) }
-            .map { User(it[UserTable.id].value, it[UserTable.username], it[UserTable.passwordHash]) }
-            .singleOrNull()
-    }
-
-    override fun usernameAvailable(username: String): Boolean {
-        return getUserByUsername(username) == null
+    override fun usernameAvailable(username: String): Boolean = transaction(db) {
+        return@transaction UserTable.getUserByUsername(username) == null
     }
 
     override fun registerUser(username: String, password: String): Int = transaction(db) {
@@ -70,7 +64,10 @@ class UserUCImpl(private val db: Database) : UserUC {
     }
 
     override fun getUserIdByCredentials(username: String, password: String): Int? {
-        val user = getUserByUsername(username)
+        val user = transaction(db) {
+            UserTable.getUserByUsername(username)
+        }
+
         return if (user != null && BCrypt.verifyer().verify(password.toByteArray(), user.passwordHash).verified) {
             user.id
         } else {
