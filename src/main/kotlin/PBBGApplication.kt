@@ -81,16 +81,17 @@ fun Application.main() {
     val userUC = UserUCImpl(db)
     val marketUC = MarketUCImpl(db)
     val inventoryUC = InventoryUCImpl(db)
+    val itemUC = ItemUCImpl(db)
     val miningUC = MiningUCImpl(db)
     val equipmentUC = EquipmentUCImpl(db)
     val unitUC = UnitUCImpl(db)
     val battleUC = BattleUCImpl(db)
     val dexUC = DexUCImpl(db)
 
-    mainWithDependencies(userUC, marketUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC, dexUC)
+    mainWithDependencies(userUC, marketUC, itemUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC, dexUC)
 }
 
-fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC, dexUC: DexUC) {
+fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC: ItemUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC, dexUC: DexUC) {
     install(Locations)
     install(ContentNegotiation) {
         // Handles "application/json" content type
@@ -120,7 +121,7 @@ fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, invento
         route("/api") {
             registerAPI(userUC)
             loginAPI(userUC)
-            item()
+            item(itemUC)
             authenticate {
                 user(userUC)
                 inventoryAPI(inventoryUC, equipmentUC)
