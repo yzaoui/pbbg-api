@@ -6,11 +6,16 @@ import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.LongIdTable
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 
 object MaterializedItemTable : LongIdTable() {
     val itemEnum = enumeration("item_enum_ordinal", ItemEnum::class)
     val quantity = integer("quantity").nullable()
+
+    fun getItem(itemId: Long) = select { MaterializedItemTable.id.eq(itemId) }
+        .singleOrNull()
+        ?.toMaterializedItem()
 
     fun insertItemAndGetId(itemToStore: MaterializedItem): EntityID<Long> = insertAndGetId {
         it[MaterializedItemTable.itemEnum] = itemToStore.enum

@@ -4,7 +4,7 @@ import com.bitwiserain.pbbg.USERNAME_MAX_LENGTH
 import com.bitwiserain.pbbg.db.model.User
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntIdTable
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 
@@ -21,5 +21,11 @@ object UserTable : IntIdTable() {
 
     fun getUserByUsername(username: String): User? = select { UserTable.username.eq(username) }
         .singleOrNull()
-        ?.let { User(it[UserTable.id].value, it[UserTable.username], it[UserTable.passwordHash]) }
+        ?.toUser()
+
+    fun getUserById(userId: Int): User? = select { UserTable.id.eq(userId) }
+        .singleOrNull()
+        ?.toUser()
+
+    private fun ResultRow.toUser() = User(this[id].value, this[username], this[passwordHash])
 }
