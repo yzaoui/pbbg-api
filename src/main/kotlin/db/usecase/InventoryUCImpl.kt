@@ -18,11 +18,4 @@ class InventoryUCImpl(private val db: Database) : InventoryUC {
 
         Inventory(items)
     }
-
-    override fun storeInInventory(userId: Int, itemToStore: MaterializedItem): Unit = transaction(db) {
-        // TODO: Consider checking if user exists
-        val userId = EntityID(userId, UserTable)
-
-        storeInInventoryReturnItemID(db, userId, itemToStore)
-    }
 }
