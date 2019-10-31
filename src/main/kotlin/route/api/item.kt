@@ -27,11 +27,12 @@ fun Route.item(itemUC: ItemUC) = route("/item/{$ITEM_ID_PARAM}") {
 
 fun ItemDetails.toJSON(itemId: Long) = ItemDetailsJSON(
     item = item.toJSON(itemId),
-    history = history.map { it.toJSON() }
+    history = history.map { it.toJSON() },
+    linkedUserInfo = linkedUserInfo
 )
 
 fun ItemHistory.toJSON() = ItemHistoryJSON(
-    date = date.toEpochMilli(),
+    date = date.epochSecond,
     info = info.toJSON()
 )
 
@@ -39,16 +40,11 @@ fun ItemHistoryInfo.toJSON() = ItemHistoryInfoJSON(
     type = when (this) {
         is ItemHistoryInfo.CreatedInMarket -> "created-market"
         is ItemHistoryInfo.CreatedWithUser -> "created-user"
-        is ItemHistoryInfo.Mined -> "mined"
+        is ItemHistoryInfo.FirstMined -> "first-mined"
     },
-    user = when (this) {
+    userId = when (this) {
         is ItemHistoryInfo.CreatedInMarket -> null
-        is ItemHistoryInfo.CreatedWithUser -> user.toJSON()
-        is ItemHistoryInfo.Mined -> user.toJSON()
+        is ItemHistoryInfo.CreatedWithUser -> userId
+        is ItemHistoryInfo.FirstMined -> userId
     }
-)
-
-fun ItemHistoryInfo.UserInfo.toJSON() = ItemHistoryInfoJSON.UserInfoJSON(
-    id = id,
-    name = name
 )

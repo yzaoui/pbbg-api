@@ -10,6 +10,8 @@ import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.UserStats
+import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
+import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.usecase.IllegalPasswordException
 import com.bitwiserain.pbbg.domain.usecase.UnconfirmedNewPasswordException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
@@ -17,6 +19,9 @@ import com.bitwiserain.pbbg.domain.usecase.WrongCurrentPasswordException
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalUnit
 
 class UserUCImpl(private val db: Database) : UserUC {
     override fun getUserById(userId: Int): User? = transaction(db) {
@@ -39,10 +44,17 @@ class UserUCImpl(private val db: Database) : UserUC {
             it[UserStatsTable.userId] = userId
         }
 
-        listOf(MaterializedItem.IcePick).forEach { pickaxe ->
-            val itemId = MaterializedItemTable.insertItemAndGetId(pickaxe)
-            InventoryTable.insertItem(userId, itemId, pickaxe.base)
-            DexTable.insertDiscovered(userId, pickaxe.enum)
+        listOf(MaterializedItem.IcePick).forEach { item ->
+            val itemId = MaterializedItemTable.insertItemAndGetId(item)
+            ItemHistoryTable.insertItemHistory(
+                itemId = itemId.value,
+                itemHistory = ItemHistory(
+                    date = Instant.now().truncatedTo(ChronoUnit.SECONDS),
+                    info = ItemHistoryInfo.CreatedWithUser(userId.value)
+                )
+            )
+            InventoryTable.insertItem(userId, itemId, item.base)
+            DexTable.insertDiscovered(userId, item.enum)
         }
 
         /* Market */

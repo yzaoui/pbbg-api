@@ -4,5 +4,6 @@ import com.bitwiserain.pbbg.view.model.MaterializedItemJSON
 
 class ItemDetailsJSON(
     val item: MaterializedItemJSON,
-    val history: List<ItemHistoryJSON>
+    val history: List<ItemHistoryJSON>,
+    val linkedUserInfo: Map<Int, String>
 )
