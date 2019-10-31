@@ -35,6 +35,8 @@ class UserUCImpl(private val db: Database) : UserUC {
     }
 
     override fun registerUser(username: String, password: String): Int = transaction(db) {
+        val now = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+
         val userId = UserTable.createUserAndGetId(
             username = username,
             passwordHash = BCrypt.withDefaults().hash(12, password.toByteArray())
@@ -49,7 +51,7 @@ class UserUCImpl(private val db: Database) : UserUC {
             ItemHistoryTable.insertItemHistory(
                 itemId = itemId.value,
                 itemHistory = ItemHistory(
-                    date = Instant.now().truncatedTo(ChronoUnit.SECONDS),
+                    date = now,
                     info = ItemHistoryInfo.CreatedWithUser(userId.value)
                 )
             )
@@ -61,9 +63,17 @@ class UserUCImpl(private val db: Database) : UserUC {
         val marketId = MarketTable.insertAndGetId {
             it[MarketTable.userId] = userId
         }
+        // Fill market with three pickaxe types
         listOf(MaterializedItem.PlusPickaxe, MaterializedItem.CrossPickaxe, MaterializedItem.SquarePickaxe).forEach { item ->
             val itemId = MaterializedItemTable.insertItemAndGetId(item)
             MarketInventoryTable.insertItem(marketId, itemId)
+            ItemHistoryTable.insertItemHistory(
+                itemId = itemId.value,
+                itemHistory = ItemHistory(
+                    date = now,
+                    info = ItemHistoryInfo.CreatedInMarket()
+                )
+            )
         }
 
         SquadTable.insertAllies(userId, listOf(
