@@ -131,6 +131,7 @@ fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC:
                 mine(miningUC)
                 dexAPI(dexUC)
                 squadAPI(unitUC)
+                settings(userUC)
             }
         }
         static("img") {
