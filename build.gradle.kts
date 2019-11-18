@@ -8,7 +8,7 @@ object Versions {
 }
 
 group = "com.bitwiserain"
-version = "0.3.0"
+version = "0.3.1"
 
 plugins {
     application

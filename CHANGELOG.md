@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.3.1
+
+### Changes
+
+#### NEW: Item pages
+
+- Individual items now have their own pages
+- These pages include the item's history
+
 ## 0.3.0
 
 ### Changes
