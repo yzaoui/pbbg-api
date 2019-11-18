@@ -1,9 +1,6 @@
 package com.bitwiserain.pbbg.route.api
 
-import com.bitwiserain.pbbg.domain.usecase.IllegalPasswordException
-import com.bitwiserain.pbbg.domain.usecase.UnconfirmedNewPasswordException
-import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.domain.usecase.WrongCurrentPasswordException
+import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.user
@@ -35,6 +32,8 @@ fun Route.settings(userUC: UserUC) = route("/settings") {
             call.respondFail("Wrong current password.")
         } catch (e: UnconfirmedNewPasswordException) {
             call.respondFail("New password and confirmation do not match.")
+        } catch (e: NewPasswordNotNewException) {
+            call.respondFail("New password is the same as current password.")
         } catch (e: IllegalPasswordException) {
             call.respondFail("New password does not fit requirements.")
         }
