@@ -27,5 +27,8 @@ object UserTable : IntIdTable() {
         .singleOrNull()
         ?.toUser()
 
+    fun getUsersById(userIds: Iterable<Int>): Map<Int, User> = select { UserTable.id.inList(userIds) }
+        .associate { it[UserTable.id].value to it.toUser() }
+
     private fun ResultRow.toUser() = User(this[id].value, this[username], this[passwordHash])
 }

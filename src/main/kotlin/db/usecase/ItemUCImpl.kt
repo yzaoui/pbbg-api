@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.db.repository.ItemHistoryTable
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemDetails
+import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.usecase.ItemNotFoundException
 import com.bitwiserain.pbbg.domain.usecase.ItemUC
 import org.jetbrains.exposed.sql.Database
@@ -15,8 +16,13 @@ class ItemUCImpl(private val db: Database) : ItemUC {
 
         val itemHistory = ItemHistoryTable.getItemHistoryList(itemId)
 
-        // TODO: Currently hardcoding user 1
-        val userInfo = UserTable.getUserById(1)!!.let { mapOf(it.id to it.username) }
+        val userSet = mutableSetOf<Int>()
+
+        for (info in itemHistory.map { it.info }) {
+            if (info is ItemHistoryInfo.HasUserId) userSet.add(info.userId)
+        }
+
+        val userInfo = UserTable.getUsersById(userSet).mapValues { it.value.username }
 
         return@transaction ItemDetails(
             item = item,
