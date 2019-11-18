@@ -16,4 +16,4 @@ A persistent browser-based game built on Ktor.
 
 ### Example
 
-`java -DKTOR_ENV=prod -DPORT=8080 -DJWT_SECRET=secret -jar pbbg-0.3.0.jar`
+`java -DKTOR_ENV=prod -DPORT=8080 -DJWT_SECRET=secret -jar pbbg-0.3.1.jar`
