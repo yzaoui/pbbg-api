@@ -15,6 +15,7 @@ import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.route.api.*
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
+import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
@@ -23,6 +24,7 @@ import io.ktor.auth.jwt.jwt
 import io.ktor.features.CORS
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
+import io.ktor.features.StatusPages
 import io.ktor.gson.gson
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -117,6 +119,11 @@ fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC:
         anyHost()
         header(HttpHeaders.Authorization)
         allowNonSimpleContentTypes = true
+    }
+    install(StatusPages) {
+        exception<Throwable> {
+            call.respondError()
+        }
     }
     routing {
         route("/api") {
