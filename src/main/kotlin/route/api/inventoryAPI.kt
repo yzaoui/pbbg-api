@@ -104,11 +104,12 @@ private fun Map.Entry<Long, InventoryItem>.toJSON(): InventoryItemJSON {
     val matItem = value.item
     val equipped = if (invItem is InventoryItem.Equippable) invItem.equipped else null
 
-    return InventoryItemJSON(key, matItem.toJSON(), equipped)
+    return InventoryItemJSON(matItem.toJSON(key), equipped)
 }
 
 // TODO: Find appropriate place for this adapter
-fun MaterializedItem.toJSON() = MaterializedItemJSON(
+fun MaterializedItem.toJSON(id: Long) = MaterializedItemJSON(
+    id = id,
     baseItem = this.base.toJSON(),
     quantity = if (this is MaterializedItem.Stackable) quantity else null
 )

@@ -20,11 +20,6 @@ object Joins {
             .select { InventoryTable.userId.eq(userId) }
             .associate { it[MaterializedItemTable.id].value to it.toInventoryItem() }
 
-    fun getEquippedItems(userId: EntityID<Int>) =
-        (InventoryTable innerJoin MaterializedItemTable)
-            .select { InventoryTable.userId.eq(userId) and InventoryTable.equipped.eq(true) }
-            .associate { it[MaterializedItemTable.id].value to it.toInventoryItem() }
-
     fun getInventoryItem(userId: EntityID<Int>, itemId: Long) =
         (InventoryTable innerJoin MaterializedItemTable)
             .select { InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.eq(itemId) }

@@ -74,7 +74,7 @@ private data class MarketOrderListParams(val orders: List<MarketOrderParams>)
 private data class MarketOrderParams(val id: Long, val quantity: Int?)
 
 fun Market.toJSON() = MarketJSON(
-    items = items.map { MarketItemJSON(it.key, it.value.item.toJSON(), it.value.price) }
+    items = items.map { MarketItemJSON(it.value.item.toJSON(it.key), it.value.price) }
 )
 
 fun UserAndGameMarkets.toJSON() = UserAndGameMarketsJSON(

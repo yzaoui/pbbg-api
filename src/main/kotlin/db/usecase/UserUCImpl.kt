@@ -10,6 +10,8 @@ import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.UserStats
+import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
+import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.usecase.IllegalPasswordException
 import com.bitwiserain.pbbg.domain.usecase.UnconfirmedNewPasswordException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
@@ -17,6 +19,8 @@ import com.bitwiserain.pbbg.domain.usecase.WrongCurrentPasswordException
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 class UserUCImpl(private val db: Database) : UserUC {
     override fun getUserById(userId: Int): User? = transaction(db) {
@@ -25,17 +29,13 @@ class UserUCImpl(private val db: Database) : UserUC {
             .singleOrNull()
     }
 
-    override fun getUserByUsername(username: String): User? = transaction(db) {
-        UserTable.select { UserTable.username.eq(username) }
-            .map { User(it[UserTable.id].value, it[UserTable.username], it[UserTable.passwordHash]) }
-            .singleOrNull()
-    }
-
-    override fun usernameAvailable(username: String): Boolean {
-        return getUserByUsername(username) == null
+    override fun usernameAvailable(username: String): Boolean = transaction(db) {
+        return@transaction UserTable.getUserByUsername(username) == null
     }
 
     override fun registerUser(username: String, password: String): Int = transaction(db) {
+        val now = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+
         val userId = UserTable.createUserAndGetId(
             username = username,
             passwordHash = BCrypt.withDefaults().hash(12, password.toByteArray())
@@ -45,19 +45,34 @@ class UserUCImpl(private val db: Database) : UserUC {
             it[UserStatsTable.userId] = userId
         }
 
-        listOf(MaterializedItem.IcePick).forEach { pickaxe ->
-            val itemId = MaterializedItemTable.insertItemAndGetId(pickaxe)
-            InventoryTable.insertItem(userId, itemId, pickaxe.base)
-            DexTable.insertDiscovered(userId, pickaxe.enum)
+        listOf(MaterializedItem.IcePick).forEach { item ->
+            val itemId = MaterializedItemTable.insertItemAndGetId(item)
+            ItemHistoryTable.insertItemHistory(
+                itemId = itemId.value,
+                itemHistory = ItemHistory(
+                    date = now,
+                    info = ItemHistoryInfo.CreatedWithUser(userId.value)
+                )
+            )
+            InventoryTable.insertItem(userId, itemId, item.base)
+            DexTable.insertDiscovered(userId, item.enum)
         }
 
         /* Market */
         val marketId = MarketTable.insertAndGetId {
             it[MarketTable.userId] = userId
         }
+        // Fill market with three pickaxe types
         listOf(MaterializedItem.PlusPickaxe, MaterializedItem.CrossPickaxe, MaterializedItem.SquarePickaxe).forEach { item ->
             val itemId = MaterializedItemTable.insertItemAndGetId(item)
             MarketInventoryTable.insertItem(marketId, itemId)
+            ItemHistoryTable.insertItemHistory(
+                itemId = itemId.value,
+                itemHistory = ItemHistory(
+                    date = now,
+                    info = ItemHistoryInfo.CreatedInMarket()
+                )
+            )
         }
 
         SquadTable.insertAllies(userId, listOf(
@@ -70,7 +85,10 @@ class UserUCImpl(private val db: Database) : UserUC {
     }
 
     override fun getUserIdByCredentials(username: String, password: String): Int? {
-        val user = getUserByUsername(username)
+        val user = transaction(db) {
+            UserTable.getUserByUsername(username)
+        }
+
         return if (user != null && BCrypt.verifyer().verify(password.toByteArray(), user.passwordHash).verified) {
             user.id
         } else {

@@ -8,6 +8,7 @@ import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.BaseItem
+import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem.Stackable
 import com.bitwiserain.pbbg.domain.model.Point
@@ -18,7 +19,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.random.Random
 
-class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryUC) : MiningUC {
+class MiningUCImpl(private val db: Database) : MiningUC {
     override fun getMine(userId: Int): Mine? = transaction(db) {
         val userId = EntityID(userId, UserTable)
 
@@ -84,9 +85,14 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         /* Get currently running mine session */
         val mineSession = MineSessionTable.getSession(userId) ?: throw NotInMineSessionException()
 
+        val inventoryItems = Joins.getInventoryItems(userId)
+
         /* Get currently equipped pickaxe */
-        val pickaxe = Joins.getEquippedItems(userId)
-            .filter { it.value.base is BaseItem.Pickaxe }
+        val pickaxe = inventoryItems
+            .filter {
+                val invItem = it.value
+                return@filter invItem is InventoryItem.Equippable && invItem.equipped && it.value.base is BaseItem.Pickaxe
+            }
             .entries.singleOrNull()
             ?.let { it.value.item }
             ?: throw NoEquippedPickaxeException()
@@ -108,22 +114,19 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         val minedItemResults = mutableListOf<MinedItemResult>()
         var totalExp = 0
         for ((mineEntity, count) in mineEntitiesAndCount) {
-            val items = mineEntityToItem(mineEntity, count)
-            for (item in items) {
-                val exp = mineEntity.exp * (if (item is Stackable) item.quantity else 1)
+            val item = mineEntityToItem(mineEntity, count)
 
-                minedItemResults.add(MinedItemResult(item, mineEntity.exp))
-                totalExp += exp
-            }
+            val exp = mineEntity.exp * (if (item is Stackable) item.quantity else 1)
+
+            // TODO: Store items in batch
+            val itemId = storeInInventoryReturnItemID(db, userId, item)
+
+            minedItemResults.add(MinedItemResult(itemId.value, item, mineEntity.exp))
+            totalExp += exp
         }
 
         // Remove mined cells from database
         MineCellTable.deleteWhere { MineCellTable.id.inList(reachableCellsWithContent.map { it.id }) }
-
-        // TODO: Store in batch
-        for (result in minedItemResults) {
-            inventoryUC.storeInInventory(userId.value, result.item)
-        }
 
         val userCurrentMiningExp = UserStatsTable.select { UserStatsTable.userId.eq(userId) }
             .single()
@@ -171,10 +174,10 @@ class MiningUCImpl(private val db: Database, private val inventoryUC: InventoryU
         return AvailableMines(mines, nextUnlockLevel)
     }
 
-    private fun mineEntityToItem(entity: MineEntity, quantity: Int): List<MaterializedItem> = when (entity) {
-        MineEntity.ROCK -> listOf(MaterializedItem.Stone(quantity))
-        MineEntity.COAL -> listOf(MaterializedItem.Coal(quantity))
-        MineEntity.COPPER -> listOf(MaterializedItem.CopperOre(quantity))
+    private fun mineEntityToItem(entity: MineEntity, quantity: Int): MaterializedItem = when (entity) {
+        MineEntity.ROCK -> MaterializedItem.Stone(quantity)
+        MineEntity.COAL -> MaterializedItem.Coal(quantity)
+        MineEntity.COPPER -> MaterializedItem.CopperOre(quantity)
     }
 
     private fun ResultRow.toMineCell() = MineCell(

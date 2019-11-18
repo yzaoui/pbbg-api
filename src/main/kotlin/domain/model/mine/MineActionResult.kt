@@ -12,6 +12,7 @@ class MineActionResult(
 )
 
 class MinedItemResult(
+    val id: Long,
     val item: MaterializedItem,
     val expPerIndividualItem: Int
 )

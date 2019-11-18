@@ -18,7 +18,8 @@ fun initDatabase(): Database {
     transaction(db) {
         SchemaUtils.create(
             UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable,
-            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable
+            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable,
+            ItemHistoryTable
         )
     }
 
@@ -28,6 +29,7 @@ fun initDatabase(): Database {
 fun dropDatabase(db: Database) = transaction(db) {
     SchemaUtils.drop(
         UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable,
-        UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable
+        UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable,
+        ItemHistoryTable
     )
 }

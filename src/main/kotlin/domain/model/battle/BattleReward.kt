@@ -4,5 +4,5 @@ import com.bitwiserain.pbbg.domain.model.MaterializedItem
 
 data class BattleReward(
     val gold: Int,
-    val items: List<MaterializedItem>
+    val items: Map<Long, MaterializedItem>
 )

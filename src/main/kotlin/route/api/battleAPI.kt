@@ -104,7 +104,7 @@ private fun UnitEffect.Health.toJSON() = UnitEffectJSON.HealthJSON(
 
 private fun BattleReward.toJSON() = BattleRewardJSON(
     gold = gold,
-    items = items.map { it.toJSON() }
+    items = items.map { it.value.toJSON(it.key) }
 )
 
 private fun Battle.toJSON() = BattleJSON(
