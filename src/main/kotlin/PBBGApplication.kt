@@ -15,6 +15,7 @@ import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.route.api.*
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
+import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
@@ -23,12 +24,12 @@ import io.ktor.auth.jwt.jwt
 import io.ktor.features.CORS
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
+import io.ktor.features.StatusPages
 import io.ktor.gson.gson
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
-import io.ktor.locations.Locations
 import io.ktor.response.respond
 import io.ktor.routing.route
 import io.ktor.routing.routing
@@ -93,7 +94,6 @@ fun Application.main() {
 }
 
 fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC: ItemUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC, dexUC: DexUC) {
-    install(Locations)
     install(ContentNegotiation) {
         // Handles "application/json" content type
         gson {
@@ -118,6 +118,11 @@ fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC:
         header(HttpHeaders.Authorization)
         allowNonSimpleContentTypes = true
     }
+    install(StatusPages) {
+        exception<Throwable> {
+            call.respondError()
+        }
+    }
     routing {
         route("/api") {
             registerAPI(userUC)
@@ -131,6 +136,7 @@ fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC:
                 mine(miningUC)
                 dexAPI(dexUC)
                 squadAPI(unitUC)
+                settings(userUC)
             }
         }
         static("img") {

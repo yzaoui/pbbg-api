@@ -37,7 +37,6 @@ dependencies {
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-html-jvm", version = "0.6.10")
     implementation(group = "org.jetbrains.exposed", name = "exposed", version = "0.17.7")
     implementation(group = "at.favre.lib", name = "bcrypt", version = "0.9.0")
-    implementation(group = "io.ktor", name = "ktor-locations", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-server-netty", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-html-builder", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-gson", version = Versions.KTOR)

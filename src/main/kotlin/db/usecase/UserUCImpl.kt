@@ -12,10 +12,7 @@ import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.UserStats
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
-import com.bitwiserain.pbbg.domain.usecase.IllegalPasswordException
-import com.bitwiserain.pbbg.domain.usecase.UnconfirmedNewPasswordException
-import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.domain.usecase.WrongCurrentPasswordException
+import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -109,6 +106,9 @@ class UserUCImpl(private val db: Database) : UserUC {
 
         // Make sure current password matches
         if (!BCrypt.verifyer().verify(currentPassword.toByteArray(), currentPasswordHash).verified) throw WrongCurrentPasswordException()
+
+        // Make sure new password is actually new
+        if (currentPassword == newPassword) throw NewPasswordNotNewException()
 
         // Make sure new password was typed twice correctly
         if (newPassword != confirmNewPassword) throw UnconfirmedNewPasswordException()

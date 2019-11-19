@@ -15,11 +15,11 @@ fun Route.registerAPI(userUC: UserUC) = post("/register") {
 
     val usernameParam = params["username"]
     val usernameError = if (usernameParam == null || usernameParam !is String) {
-        "A username is required"
+        "A username is required."
     } else if (!usernameParam.matches(USERNAME_REGEX.toRegex())) {
         USERNAME_REGEX_DESCRIPTION
     } else if (!userUC.usernameAvailable(usernameParam)) {
-        "This username is unavailable"
+        "This username is unavailable."
     } else {
         null
     }
