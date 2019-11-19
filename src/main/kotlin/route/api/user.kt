@@ -8,13 +8,9 @@ import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.LevelProgressJSON
 import com.bitwiserain.pbbg.view.model.UserStatsJSON
 import io.ktor.application.call
-import io.ktor.locations.Location
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
-
-@Location("/user")
-class UserAPILocation
 
 fun Route.user(userUC: UserUC) = route("/user") {
     /**
