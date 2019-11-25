@@ -3,8 +3,11 @@ package com.bitwiserain.pbbg.test.db.usecase
 import com.bitwiserain.pbbg.db.repository.DexTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.usecase.DexUCImpl
+import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.usecase.DexUC
+import com.bitwiserain.pbbg.domain.usecase.InvalidItemException
+import com.bitwiserain.pbbg.domain.usecase.ItemUndiscoveredException
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
@@ -15,6 +18,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -72,6 +76,42 @@ class DexUCImplTests {
             val dexItems = dexUC.getDexItems(userId.value)
 
             assertTrue(dexItems.lastItemIsDiscovered)
+        }
+    }
+
+    @Nested
+    inner class IndividualDexItem {
+        @Test
+        fun `Given a user who has discovered an item, when calling for said item by its ID, it should be returned in detail`() {
+            val userId = createTestUserAndGetId(db)
+
+            val discoveredItem = BaseItem.Material.Coal
+
+            transaction(db) {
+                DexTable.insertDiscovered(userId, discoveredItem.enum)
+            }
+
+            val dexItem = dexUC.getIndividualDexBaseItem(userId.value, discoveredItem.enum.ordinal)
+
+            assertEquals(dexItem, discoveredItem)
+        }
+
+        @Test
+        fun `Given a user, when calling for an invalid item by ID, an InvalidItemException should be thrown`() {
+            val userId = createTestUserAndGetId(db)
+
+            assertFailsWith<InvalidItemException> {
+                dexUC.getIndividualDexBaseItem(userId.value, ItemEnum.values().size + 7)
+            }
+        }
+
+        @Test
+        fun `Given a user who hasn't discovered an item, when calling for said item by its ID, an ItemUndiscoveredException should be thrown`() {
+            val userId = createTestUserAndGetId(db)
+
+            assertFailsWith<ItemUndiscoveredException> {
+                dexUC.getIndividualDexBaseItem(userId.value, ItemEnum.COPPER_ORE.ordinal)
+            }
         }
     }
 
