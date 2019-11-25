@@ -115,6 +115,16 @@ class DexUCImplTests {
         }
     }
 
+    @Nested
+    inner class DexUnits {
+        // TODO: Incomplete tests
+    }
+
+    @Nested
+    inner class IndividualDexUnit {
+        // TODO: Incomplete tests
+    }
+
     private fun createTestUserAndGetId(db: Database): EntityID<Int> = transaction(db) {
         UserTable.createUserAndGetId("testuser", ByteArray(60))
     }
