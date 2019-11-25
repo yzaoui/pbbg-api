@@ -6,6 +6,9 @@ import com.bitwiserain.pbbg.domain.model.dex.DexItems
 import com.bitwiserain.pbbg.domain.model.dex.DexUnits
 
 interface DexUC {
+    /**
+     * The dex entries of items that this user has seen.
+     */
     fun getDexItems(userId: Int): DexItems
     /**
      * @throws InvalidItemException when [itemEnumId] is invalid.
