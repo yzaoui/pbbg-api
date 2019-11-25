@@ -26,7 +26,7 @@ class DexUCImpl(private val db: Database) : DexUC {
         )
     }
 
-    override fun getDexItem(userId: Int, itemEnumId: Int): BaseItem = transaction(db) {
+    override fun getIndividualDexBaseItem(userId: Int, itemEnumId: Int): BaseItem = transaction(db) {
         if (itemEnumId !in ItemEnum.values().indices) throw InvalidItemException()
 
         val enum = ItemEnum.values()[itemEnumId]

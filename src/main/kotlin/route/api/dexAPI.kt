@@ -35,7 +35,7 @@ fun Route.dexAPI(dexUC: DexUC) = route("/dex") {
             } else {
                 // Calling for specific item
                 try {
-                    val item = dexUC.getDexItem(loggedInUser.id, itemEnumId)
+                    val item = dexUC.getIndividualDexBaseItem(loggedInUser.id, itemEnumId)
 
                     call.respondSuccess(item.toJSON())
                 } catch (e: InvalidItemException) {
