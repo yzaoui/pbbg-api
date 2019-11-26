@@ -11,6 +11,8 @@ interface EquipmentUC {
     fun equip(userId: Int, itemId: Long)
 
     /**
+     * Unequips a given item.
+     *
      * @throws InventoryItemNotFoundException when this user-item combination is not found
      * @throws InventoryItemNotEquippable when this item is not equippable
      * @throws InventoryItemNotEquipped when this item is already unequipped

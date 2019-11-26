@@ -145,7 +145,7 @@ class EquipmentUCImplTests {
         fun `Given a user, when equipping an already equipped item, should throw InventoryItemAlreadyEquippedException`() {
             val userId = createTestUserAndGetId(db)
 
-            /* Equip a pickaxe */
+            /* Equip item */
             val equippedItemId = transaction(db) {
                 val pickaxe = MaterializedItem.CrossPickaxe
                 val id = MaterializedItemTable.insertItemAndGetId(pickaxe)
@@ -162,6 +162,31 @@ class EquipmentUCImplTests {
 
     @Nested
     inner class Unequip {
+        @Test
+        fun `Given a user with an equipped item, when unequipping it, it should return unequipped`() {
+            val userId = createTestUserAndGetId(db)
 
+            /* Equip item */
+            val equippedItemId = transaction(db) {
+                val pickaxe = MaterializedItem.IcePick
+                val id = MaterializedItemTable.insertItemAndGetId(pickaxe)
+                InventoryTable.insertItem(userId, id, pickaxe.base)
+                Joins.setItemEquipped(userId, id.value, true)
+                return@transaction id.value
+            }
+            val equippedItem = transaction(db) { Joins.getInventoryItem(userId, equippedItemId) }
+
+            /* Item is initially equipped */
+            assertTrue((equippedItem as InventoryItem.EquippableInventoryItem).equipped)
+
+            /* Unequip item */
+            equipmentUC.unequip(userId.value, equippedItemId)
+
+            /* Item should now be unequipped */
+            val newlyUnequippedItem = transaction(db) { Joins.getInventoryItem(userId, equippedItemId) }
+
+            assertNotNull(newlyUnequippedItem, "Item should still exist in inventory after unequipping it.")
+            assertFalse((newlyUnequippedItem as InventoryItem.EquippableInventoryItem).equipped, "Item should be unequipped after unequip() call.")
+        }
     }
 }
