@@ -133,7 +133,7 @@ class EquipmentUCImplTests {
                 return@transaction id.value
             }
 
-            assertThrows<InventoryItemNotEquippable>("Equipping a non-equippable item should throw InventoryItemNotEquippableException") {
+            assertThrows<InventoryItemNotEquippableException>("Equipping a non-equippable item should throw InventoryItemNotEquippableException") {
                 equipmentUC.equip(userId.value, nonequippableItemId)
             }
         }
@@ -151,7 +151,7 @@ class EquipmentUCImplTests {
                 return@transaction id.value
             }
 
-            assertThrows<InventoryItemAlreadyEquipped>("Equipping an already-equipped item should throw InventoryItemAlreadyEquippedException") {
+            assertThrows<InventoryItemAlreadyEquippedException>("Equipping an already-equipped item should throw InventoryItemAlreadyEquippedException") {
                 equipmentUC.equip(userId.value, equippedItemId)
             }
         }
@@ -217,7 +217,7 @@ class EquipmentUCImplTests {
                 return@transaction id.value
             }
 
-            assertThrows<InventoryItemNotEquippable>("Unequipping a non-equippable item should throw InventoryItemNotEquippableException") {
+            assertThrows<InventoryItemNotEquippableException>("Unequipping a non-equippable item should throw InventoryItemNotEquippableException") {
                 equipmentUC.unequip(userId.value, nonequippableItemId)
             }
         }
@@ -234,7 +234,7 @@ class EquipmentUCImplTests {
                 return@transaction id.value
             }
 
-            assertThrows<InventoryItemNotEquipped>("Unequipping an already-unequipped item should throw InventoryItemNotEquippedException") {
+            assertThrows<InventoryItemNotEquippedException>("Unequipping an already-unequipped item should throw InventoryItemNotEquippedException") {
                 equipmentUC.unequip(userId.value, equippedItemId)
             }
         }

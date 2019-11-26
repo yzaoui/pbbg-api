@@ -3,7 +3,6 @@ package com.bitwiserain.pbbg.db.usecase
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.Inventory
-import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database

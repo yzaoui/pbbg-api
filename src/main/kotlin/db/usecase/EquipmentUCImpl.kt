@@ -19,9 +19,9 @@ class EquipmentUCImpl(private val db: Database) : EquipmentUC {
         val item = inventoryItems[itemId] ?: throw InventoryItemNotFoundException(itemId)
 
         /* Make sure item is equippable */
-        if (item !is InventoryItem.Equippable) throw InventoryItemNotEquippable(itemId)
+        if (item !is InventoryItem.Equippable) throw InventoryItemNotEquippableException(itemId)
         /* Make sure item is not already equipped */
-        if (item.equipped) throw InventoryItemAlreadyEquipped(itemId)
+        if (item.equipped) throw InventoryItemAlreadyEquippedException(itemId)
 
         /* Get all equipped items */
         val equippedItems = inventoryItems.filter {
@@ -51,9 +51,9 @@ class EquipmentUCImpl(private val db: Database) : EquipmentUC {
         val item = Joins.getInventoryItem(userId, itemId) ?: throw InventoryItemNotFoundException(itemId)
 
         /* Make sure item is equippable */
-        if (item !is InventoryItem.Equippable) throw InventoryItemNotEquippable(itemId)
+        if (item !is InventoryItem.Equippable) throw InventoryItemNotEquippableException(itemId)
         /* Make sure item is already unequipped */
-        if (!item.equipped) throw InventoryItemNotEquipped(itemId)
+        if (!item.equipped) throw InventoryItemNotEquippedException(itemId)
 
         /* Unequip item */
         Joins.setItemEquipped(userId, itemId, equipped = false)

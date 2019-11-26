@@ -8,6 +8,7 @@ import com.bitwiserain.pbbg.domain.usecase.DexUC
 import com.bitwiserain.pbbg.domain.usecase.InvalidItemException
 import com.bitwiserain.pbbg.domain.usecase.ItemUndiscoveredException
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
+import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
@@ -26,7 +27,7 @@ class DexUCImplTests {
 
     @AfterEach
     fun dropDatabase() {
-        com.bitwiserain.pbbg.test.dropDatabase(db)
+        dropDatabase(db)
     }
 
     @Nested
