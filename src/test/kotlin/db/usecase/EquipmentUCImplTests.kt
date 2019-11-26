@@ -207,5 +207,22 @@ class EquipmentUCImplTests {
                 equipmentUC.equip(userId.value, 10)
             }
         }
+
+        @Test
+        fun `Given a user, when unequipping a non-equippable held item, should throw InventoryItemNotEquippableException`() {
+            val userId = createTestUserAndGetId(db)
+
+            /* Insert equippable item into inventory */
+            val nonequippableItemId = transaction(db) {
+                val item = MaterializedItem.Stone(quantity = 1)
+                val id = MaterializedItemTable.insertItemAndGetId(item)
+                InventoryTable.insertItem(userId, id, item.base)
+                return@transaction id.value
+            }
+
+            assertThrows<InventoryItemNotEquippable>("Unequipping a non-equippable item should throw InventoryItemNotEquippableException") {
+                equipmentUC.unequip(userId.value, nonequippableItemId)
+            }
+        }
     }
 }
