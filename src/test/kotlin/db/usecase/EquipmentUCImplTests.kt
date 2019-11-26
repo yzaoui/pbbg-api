@@ -7,6 +7,7 @@ import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotEquippable
 import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotFoundException
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.dropDatabase
@@ -119,6 +120,23 @@ class EquipmentUCImplTests {
 
             assertThrows<InventoryItemNotFoundException>("Equipping an item that does not exist should throw an InventoryItemNotFoundException") {
                 equipmentUC.equip(userId.value, 10)
+            }
+        }
+
+        @Test
+        fun `Given a user, when equipping a non-equippable held item, should throw InventoryItemNotEquippableException`() {
+            val userId = createTestUserAndGetId(db)
+
+            /* Insert equippable item into inventory */
+            val nonequippableItemId = transaction(db) {
+                val item = MaterializedItem.CopperOre(quantity = 1)
+                val id = MaterializedItemTable.insertItemAndGetId(item)
+                InventoryTable.insertItem(userId, id, item.base)
+                return@transaction id.value
+            }
+
+            assertThrows<InventoryItemNotEquippable>("Equipping a non-equippable item should throw InventoryItemNotEquippableException") {
+                equipmentUC.equip(userId.value, nonequippableItemId)
             }
         }
     }
