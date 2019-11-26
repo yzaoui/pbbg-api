@@ -188,5 +188,24 @@ class EquipmentUCImplTests {
             assertNotNull(newlyUnequippedItem, "Item should still exist in inventory after unequipping it.")
             assertFalse((newlyUnequippedItem as InventoryItem.EquippableInventoryItem).equipped, "Item should be unequipped after unequip() call.")
         }
+
+        @Test
+        fun `Given a user, when unequipping an item not in inventory, or which doesn't exist, should throw InventoryItemNotFoundException`() {
+            val userId = createTestUserAndGetId(db)
+
+            /* Create item but not placed in inventory */
+            val itemId = transaction(db) {
+                val id = MaterializedItemTable.insertItemAndGetId(MaterializedItem.SquarePickaxe)
+                return@transaction id.value
+            }
+
+            assertThrows<InventoryItemNotFoundException>("Unequipping an item not in inventory should throw an InventoryItemNotFoundException") {
+                equipmentUC.unequip(userId.value, itemId)
+            }
+
+            assertThrows<InventoryItemNotFoundException>("Unequipping an item that does not exist should throw an InventoryItemNotFoundException") {
+                equipmentUC.equip(userId.value, 10)
+            }
+        }
     }
 }
