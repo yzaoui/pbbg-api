@@ -6,10 +6,7 @@ import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
-import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
-import com.bitwiserain.pbbg.domain.usecase.InventoryItemAlreadyEquipped
-import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotEquippable
-import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotFoundException
+import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
@@ -222,6 +219,23 @@ class EquipmentUCImplTests {
 
             assertThrows<InventoryItemNotEquippable>("Unequipping a non-equippable item should throw InventoryItemNotEquippableException") {
                 equipmentUC.unequip(userId.value, nonequippableItemId)
+            }
+        }
+
+        @Test
+        fun `Given a user, when unequipping an already unequipped item, should throw InventoryItemNotEquippedException`() {
+            val userId = createTestUserAndGetId(db)
+
+            /* Hold item unequipped */
+            val equippedItemId = transaction(db) {
+                val pickaxe = MaterializedItem.CrossPickaxe
+                val id = MaterializedItemTable.insertItemAndGetId(pickaxe)
+                InventoryTable.insertItem(userId, id, pickaxe.base)
+                return@transaction id.value
+            }
+
+            assertThrows<InventoryItemNotEquipped>("Unequipping an already-unequipped item should throw InventoryItemNotEquippedException") {
+                equipmentUC.unequip(userId.value, equippedItemId)
             }
         }
     }
