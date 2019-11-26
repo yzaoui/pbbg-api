@@ -7,6 +7,7 @@ import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemAlreadyEquipped
 import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotEquippable
 import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotFoundException
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
@@ -137,6 +138,24 @@ class EquipmentUCImplTests {
 
             assertThrows<InventoryItemNotEquippable>("Equipping a non-equippable item should throw InventoryItemNotEquippableException") {
                 equipmentUC.equip(userId.value, nonequippableItemId)
+            }
+        }
+
+        @Test
+        fun `Given a user, when equipping an already equipped item, should throw InventoryItemAlreadyEquippedException`() {
+            val userId = createTestUserAndGetId(db)
+
+            /* Equip a pickaxe */
+            val equippedItemId = transaction(db) {
+                val pickaxe = MaterializedItem.CrossPickaxe
+                val id = MaterializedItemTable.insertItemAndGetId(pickaxe)
+                InventoryTable.insertItem(userId, id, pickaxe.base)
+                Joins.setItemEquipped(userId, id.value, true)
+                return@transaction id.value
+            }
+
+            assertThrows<InventoryItemAlreadyEquipped>("Equipping an already-equipped item should throw InventoryItemAlreadyEquippedException") {
+                equipmentUC.equip(userId.value, equippedItemId)
             }
         }
     }
