@@ -3,16 +3,15 @@ package com.bitwiserain.pbbg.test.db.usecase
 import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UnitTable
-import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.usecase.BattleUCImpl
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.usecase.BattleAlreadyInProgressException
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
+import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
@@ -117,10 +116,6 @@ class BattleUCImplTests {
 
             assertNull(battle, "User should not have a battle in session without requesting one.")
         }
-    }
-
-    private fun createTestUserAndGetId(db: Database): EntityID<Int> = transaction(db) {
-        UserTable.createUserAndGetId("testuser", ByteArray(60))
     }
 
     private fun insertAndGetAllies(userId: EntityID<Int>) = transaction(db) {

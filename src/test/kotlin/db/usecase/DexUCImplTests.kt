@@ -1,16 +1,14 @@
 package com.bitwiserain.pbbg.test.db.usecase
 
 import com.bitwiserain.pbbg.db.repository.DexTable
-import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.usecase.DexUCImpl
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.usecase.DexUC
 import com.bitwiserain.pbbg.domain.usecase.InvalidItemException
 import com.bitwiserain.pbbg.domain.usecase.ItemUndiscoveredException
+import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -123,9 +121,5 @@ class DexUCImplTests {
     @Nested
     inner class IndividualDexUnit {
         // TODO: Incomplete tests
-    }
-
-    private fun createTestUserAndGetId(db: Database): EntityID<Int> = transaction(db) {
-        UserTable.createUserAndGetId("testuser", ByteArray(60))
     }
 }

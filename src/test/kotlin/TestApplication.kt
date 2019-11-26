@@ -8,6 +8,7 @@ import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import org.h2.Driver
+import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -32,4 +33,8 @@ fun dropDatabase(db: Database) = transaction(db) {
         UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable,
         ItemHistoryTable
     )
+}
+
+fun createTestUserAndGetId(db: Database): EntityID<Int> = transaction(db) {
+    UserTable.createUserAndGetId("testuser", ByteArray(60))
 }
