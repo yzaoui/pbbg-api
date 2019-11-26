@@ -7,14 +7,12 @@ import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotFoundException
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -37,9 +35,9 @@ class EquipmentUCImplTests {
 
             /* Insert equippable item into inventory */
             val itemId = transaction(db) {
-                val pickaxe = MaterializedItem.SquarePickaxe
-                val id = MaterializedItemTable.insertItemAndGetId(pickaxe)
-                InventoryTable.insertItem(userId, id, pickaxe.base)
+                val item = MaterializedItem.SquarePickaxe
+                val id = MaterializedItemTable.insertItemAndGetId(item)
+                InventoryTable.insertItem(userId, id, item.base)
                 return@transaction id.value
             }
 
@@ -103,6 +101,25 @@ class EquipmentUCImplTests {
                 (newPickaxeToEquip as InventoryItem.EquippableInventoryItem).equipped,
                 "Newly-equipped pickaxe should now be equipped after equipping it while already having another pickaxe equipped."
             )
+        }
+
+        @Test
+        fun `Given a user, when equipping an item not in inventory, or which doesn't exist, should throw InventoryItemNotFoundException`() {
+            val userId = createTestUserAndGetId(db)
+
+            /* Create item but not placed in inventory */
+            val itemId = transaction(db) {
+                val id = MaterializedItemTable.insertItemAndGetId(MaterializedItem.SquarePickaxe)
+                return@transaction id.value
+            }
+
+            assertThrows<InventoryItemNotFoundException>("Equipping an item not in inventory should throw an InventoryItemNotFoundException") {
+                equipmentUC.equip(userId.value, itemId)
+            }
+
+            assertThrows<InventoryItemNotFoundException>("Equipping an item that does not exist should throw an InventoryItemNotFoundException") {
+                equipmentUC.equip(userId.value, 10)
+            }
         }
     }
 
