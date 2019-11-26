@@ -4,12 +4,16 @@ import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
+import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.InventoryItem
+import com.bitwiserain.pbbg.domain.model.InventoryItem.EquippableInventoryItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
+import com.bitwiserain.pbbg.domain.model.MaterializedItem.*
 import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
+import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
 import kotlin.test.assertFalse
@@ -33,17 +37,10 @@ class EquipmentUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             /* Insert equippable item into inventory */
-            val itemId = transaction(db) {
-                val item = MaterializedItem.SquarePickaxe
-                val id = MaterializedItemTable.insertItemAndGetId(item)
-                InventoryTable.insertItem(userId, id, item.base)
-                return@transaction id.value
-            }
-
-            val oldItemInInventory = transaction(db) { Joins.getInventoryItem(userId, itemId) }
+            val (itemId, oldItemInInventory) = createItem(userId, item = SquarePickaxe, inInventory = true, equipped = false)
 
             /* Item is initially unequipped */
-            assertFalse((oldItemInInventory as InventoryItem.EquippableInventoryItem).equipped)
+            assertFalse((oldItemInInventory as EquippableInventoryItem).equipped)
 
             /* Equip item */
             equipmentUC.equip(userId.value, itemId)
@@ -52,7 +49,7 @@ class EquipmentUCImplTests {
             val newItemInInventory = transaction(db) { Joins.getInventoryItem(userId, itemId) }
 
             assertNotNull(newItemInInventory, "Item should still exist in inventory after equipping it.")
-            assertTrue((newItemInInventory as InventoryItem.EquippableInventoryItem).equipped, "Item should be equipped after equip() call.")
+            assertTrue((newItemInInventory as EquippableInventoryItem).equipped, "Item should be equipped after equip() call.")
         }
 
         @Test
@@ -60,27 +57,16 @@ class EquipmentUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             /* Equip a pickaxe */
-            val oldOriginallyEquippedPickaxeId = transaction(db) {
-                val pickaxe = MaterializedItem.SquarePickaxe
-                val id = MaterializedItemTable.insertItemAndGetId(pickaxe)
-                InventoryTable.insertItem(userId, id, pickaxe.base)
-                Joins.setItemEquipped(userId, id.value, true)
-                return@transaction id.value
-            }
-            val oldOriginallyEquippedPickaxe = transaction(db) { Joins.getInventoryItem(userId, oldOriginallyEquippedPickaxeId) }
+            val (oldOriginallyEquippedPickaxeId, oldOriginallyEquippedPickaxe) = createItem(userId, item = SquarePickaxe, inInventory = true, equipped = true)
+
             /* First pickaxe is initially equipped */
-            assertTrue((oldOriginallyEquippedPickaxe as InventoryItem.EquippableInventoryItem).equipped)
+            assertTrue((oldOriginallyEquippedPickaxe as EquippableInventoryItem).equipped)
 
             /* Store a second pickaxe in inventory */
-            val oldPickaxeToEquipId = transaction(db) {
-                val pickaxe = MaterializedItem.CrossPickaxe
-                val id = MaterializedItemTable.insertItemAndGetId(pickaxe)
-                InventoryTable.insertItem(userId, id, pickaxe.base)
-                return@transaction id.value
-            }
-            val oldPickaxeToEquip = transaction(db) { Joins.getInventoryItem(userId, oldPickaxeToEquipId) }
+            val (oldPickaxeToEquipId, oldPickaxeToEquip) = createItem(userId, item = CrossPickaxe, inInventory = true, equipped = false)
+
             /* Second pickaxe is initially unequipped */
-            assertFalse((oldPickaxeToEquip as InventoryItem.EquippableInventoryItem).equipped)
+            assertFalse((oldPickaxeToEquip as EquippableInventoryItem).equipped)
 
             /* Equip second pickaxe */
             equipmentUC.equip(userId.value, oldPickaxeToEquipId)
@@ -89,7 +75,7 @@ class EquipmentUCImplTests {
             val newOriginallyEquippedPickaxe = transaction(db) { Joins.getInventoryItem(userId, oldOriginallyEquippedPickaxeId) }
             assertNotNull(newOriginallyEquippedPickaxe, "Originally-equipped pickaxe should still be in inventory after equipping another pickaxe.")
             assertFalse(
-                (newOriginallyEquippedPickaxe as InventoryItem.EquippableInventoryItem).equipped,
+                (newOriginallyEquippedPickaxe as EquippableInventoryItem).equipped,
                 "Originally-equipped pickaxe should now be unequipped after equipping another pickaxe."
             )
 
@@ -97,7 +83,7 @@ class EquipmentUCImplTests {
             val newPickaxeToEquip = transaction(db) { Joins.getInventoryItem(userId, oldPickaxeToEquipId) }
             assertNotNull(newPickaxeToEquip, "Newly-equipped pickaxe should still be in inventory after equipping it while already having another pickaxe equipped.")
             assertTrue(
-                (newPickaxeToEquip as InventoryItem.EquippableInventoryItem).equipped,
+                (newPickaxeToEquip as EquippableInventoryItem).equipped,
                 "Newly-equipped pickaxe should now be equipped after equipping it while already having another pickaxe equipped."
             )
         }
@@ -107,10 +93,7 @@ class EquipmentUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             /* Create item but not placed in inventory */
-            val itemId = transaction(db) {
-                val id = MaterializedItemTable.insertItemAndGetId(MaterializedItem.SquarePickaxe)
-                return@transaction id.value
-            }
+            val (itemId) = createItem(userId, item = SquarePickaxe, inInventory = false, equipped = false)
 
             assertThrows<InventoryItemNotFoundException>("Equipping an item not in inventory should throw an InventoryItemNotFoundException") {
                 equipmentUC.equip(userId.value, itemId)
@@ -126,12 +109,7 @@ class EquipmentUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             /* Insert equippable item into inventory */
-            val nonequippableItemId = transaction(db) {
-                val item = MaterializedItem.CopperOre(quantity = 1)
-                val id = MaterializedItemTable.insertItemAndGetId(item)
-                InventoryTable.insertItem(userId, id, item.base)
-                return@transaction id.value
-            }
+            val (nonequippableItemId) = createItem(userId, item = CopperOre(quantity = 1), inInventory = true)
 
             assertThrows<InventoryItemNotEquippableException>("Equipping a non-equippable item should throw InventoryItemNotEquippableException") {
                 equipmentUC.equip(userId.value, nonequippableItemId)
@@ -143,13 +121,7 @@ class EquipmentUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             /* Equip item */
-            val equippedItemId = transaction(db) {
-                val pickaxe = MaterializedItem.CrossPickaxe
-                val id = MaterializedItemTable.insertItemAndGetId(pickaxe)
-                InventoryTable.insertItem(userId, id, pickaxe.base)
-                Joins.setItemEquipped(userId, id.value, true)
-                return@transaction id.value
-            }
+            val (equippedItemId) = createItem(userId, item = CrossPickaxe, inInventory = true, equipped = true)
 
             assertThrows<InventoryItemAlreadyEquippedException>("Equipping an already-equipped item should throw InventoryItemAlreadyEquippedException") {
                 equipmentUC.equip(userId.value, equippedItemId)
@@ -164,17 +136,10 @@ class EquipmentUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             /* Equip item */
-            val equippedItemId = transaction(db) {
-                val pickaxe = MaterializedItem.IcePick
-                val id = MaterializedItemTable.insertItemAndGetId(pickaxe)
-                InventoryTable.insertItem(userId, id, pickaxe.base)
-                Joins.setItemEquipped(userId, id.value, true)
-                return@transaction id.value
-            }
-            val equippedItem = transaction(db) { Joins.getInventoryItem(userId, equippedItemId) }
+            val (equippedItemId, equippedItem) = createItem(userId, item = IcePick, inInventory = true, equipped = true)
 
             /* Item is initially equipped */
-            assertTrue((equippedItem as InventoryItem.EquippableInventoryItem).equipped)
+            assertTrue((equippedItem as EquippableInventoryItem).equipped)
 
             /* Unequip item */
             equipmentUC.unequip(userId.value, equippedItemId)
@@ -183,7 +148,7 @@ class EquipmentUCImplTests {
             val newlyUnequippedItem = transaction(db) { Joins.getInventoryItem(userId, equippedItemId) }
 
             assertNotNull(newlyUnequippedItem, "Item should still exist in inventory after unequipping it.")
-            assertFalse((newlyUnequippedItem as InventoryItem.EquippableInventoryItem).equipped, "Item should be unequipped after unequip() call.")
+            assertFalse((newlyUnequippedItem as EquippableInventoryItem).equipped, "Item should be unequipped after unequip() call.")
         }
 
         @Test
@@ -191,10 +156,7 @@ class EquipmentUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             /* Create item but not placed in inventory */
-            val itemId = transaction(db) {
-                val id = MaterializedItemTable.insertItemAndGetId(MaterializedItem.SquarePickaxe)
-                return@transaction id.value
-            }
+            val (itemId) = createItem(userId, item = SquarePickaxe, inInventory = false)
 
             assertThrows<InventoryItemNotFoundException>("Unequipping an item not in inventory should throw an InventoryItemNotFoundException") {
                 equipmentUC.unequip(userId.value, itemId)
@@ -210,12 +172,7 @@ class EquipmentUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             /* Insert equippable item into inventory */
-            val nonequippableItemId = transaction(db) {
-                val item = MaterializedItem.Stone(quantity = 1)
-                val id = MaterializedItemTable.insertItemAndGetId(item)
-                InventoryTable.insertItem(userId, id, item.base)
-                return@transaction id.value
-            }
+            val (nonequippableItemId) = createItem(userId, item = Stone(quantity = 1), inInventory = true)
 
             assertThrows<InventoryItemNotEquippableException>("Unequipping a non-equippable item should throw InventoryItemNotEquippableException") {
                 equipmentUC.unequip(userId.value, nonequippableItemId)
@@ -227,16 +184,26 @@ class EquipmentUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             /* Hold item unequipped */
-            val equippedItemId = transaction(db) {
-                val pickaxe = MaterializedItem.CrossPickaxe
-                val id = MaterializedItemTable.insertItemAndGetId(pickaxe)
-                InventoryTable.insertItem(userId, id, pickaxe.base)
-                return@transaction id.value
-            }
+            val (equippedItemId) = createItem(userId, item = CrossPickaxe, inInventory = true, equipped = false)
 
             assertThrows<InventoryItemNotEquippedException>("Unequipping an already-unequipped item should throw InventoryItemNotEquippedException") {
                 equipmentUC.unequip(userId.value, equippedItemId)
             }
         }
+    }
+
+    fun createItem(userId: EntityID<Int>, item: MaterializedItem, inInventory: Boolean, equipped: Boolean? = null): Pair<Long, InventoryItem?> {
+        val itemId = transaction(db) {
+            val id = MaterializedItemTable.insertItemAndGetId(item)
+            if (inInventory) {
+                InventoryTable.insertItem(userId, id, item.base)
+                if (item.base is BaseItem.Equippable) Joins.setItemEquipped(userId, id.value, equipped!!)
+            }
+
+            return@transaction id.value
+        }
+        val invItem = transaction(db) { Joins.getInventoryItem(userId, itemId) }
+
+        return itemId to invItem
     }
 }
