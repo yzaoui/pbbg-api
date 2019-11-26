@@ -2,6 +2,8 @@ package com.bitwiserain.pbbg.domain.usecase
 
 interface EquipmentUC {
     /**
+     * Equips a given item. If an item is already equipped in the slot this item belongs to, unequips it.
+     *
      * @throws InventoryItemNotFoundException when this user-item combination is not found
      * @throws InventoryItemNotEquippable when this item is not equippable
      * @throws InventoryItemAlreadyEquipped when this item is already equipped
