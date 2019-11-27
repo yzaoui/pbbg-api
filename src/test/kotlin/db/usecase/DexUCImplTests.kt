@@ -4,18 +4,17 @@ import com.bitwiserain.pbbg.db.repository.DexTable
 import com.bitwiserain.pbbg.db.usecase.DexUCImpl
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
+import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.usecase.DexUC
 import com.bitwiserain.pbbg.domain.usecase.InvalidItemException
+import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
 import com.bitwiserain.pbbg.domain.usecase.ItemUndiscoveredException
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
@@ -116,11 +115,34 @@ class DexUCImplTests {
 
     @Nested
     inner class DexUnits {
-        // TODO: Incomplete tests
+        @Test
+        fun `When calling getDexUnits(), all dex units should be returned`() {
+            val userId = createTestUserAndGetId(db)
+
+            val dexUnits = dexUC.getDexUnits(userId.value)
+
+            assertEquals(MyUnitEnum.values().toSet(), dexUnits.discoveredUnits)
+        }
     }
 
     @Nested
     inner class IndividualDexUnit {
-        // TODO: Incomplete tests
+        @Test
+        fun `Given a dex unit ID, when calling getDexUnit(), that dex unit should be returned`() {
+            val userId = createTestUserAndGetId(db)
+
+            val dexUnit = dexUC.getDexUnit(userId.value, 2)
+
+            assertEquals(MyUnitEnum.values()[2], dexUnit)
+        }
+
+        @Test
+        fun `Given an invalid dex unit ID, when calling getDexUnit(), InvalidUnitException should be thrown`() {
+            val userId = createTestUserAndGetId(db)
+
+            assertThrows<InvalidUnitException> {
+                dexUC.getDexUnit(userId.value, 5000)
+            }
+        }
     }
 }

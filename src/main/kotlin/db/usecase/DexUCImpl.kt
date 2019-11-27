@@ -37,7 +37,6 @@ class DexUCImpl(private val db: Database) : DexUC {
     }
 
     override fun getDexUnits(userId: Int): DexUnits = transaction(db ) {
-        // TODO: Implement this
         val discoveredUnits = MyUnitEnum.values().toSet()
 
         return@transaction DexUnits(
@@ -47,11 +46,8 @@ class DexUCImpl(private val db: Database) : DexUC {
     }
 
     override fun getDexUnit(userId: Int, unitEnumId: Int): MyUnitEnum {
-        // TODO: Make sure user can see this unit
-        return try {
-            MyUnitEnum.values()[unitEnumId]
-        } catch (e: IndexOutOfBoundsException) {
-            throw InvalidUnitException()
-        }
+        if (unitEnumId !in MyUnitEnum.values().indices) throw InvalidUnitException()
+
+        return MyUnitEnum.values()[unitEnumId]
     }
 }
