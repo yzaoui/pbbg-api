@@ -35,6 +35,6 @@ fun dropDatabase(db: Database) = transaction(db) {
     )
 }
 
-fun createTestUserAndGetId(db: Database): EntityID<Int> = transaction(db) {
-    UserTable.createUserAndGetId("testuser", ByteArray(60))
+fun createTestUserAndGetId(db: Database, username: String = "testuser"): EntityID<Int> = transaction(db) {
+    UserTable.createUserAndGetId(username, ByteArray(60))
 }
