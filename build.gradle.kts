@@ -57,9 +57,7 @@ tasks.withType<Test> {
 }
 
 tasks.withType<ShadowJar> {
-    baseName = "pbbg"
-    classifier = ""
-    version = ""
+    archiveClassifier.set("")
 }
 
 /**
