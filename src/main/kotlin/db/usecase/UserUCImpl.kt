@@ -72,11 +72,17 @@ class UserUCImpl(private val db: Database) : UserUC {
             )
         }
 
-        SquadTable.insertAllies(userId, listOf(
+        listOf(
             MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1),
             MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2),
             MyUnitForm(MyUnitEnum.TWOLIP, 11, 2, 1)
-        ))
+        ).map {
+            // Create initial units
+            UnitTable.insertUnitAndGetId(it)
+        }.also {
+            // Add them to new user's squad
+            SquadTable.insertUnits(userId, it)
+        }
 
         return@transaction userId.value
     }

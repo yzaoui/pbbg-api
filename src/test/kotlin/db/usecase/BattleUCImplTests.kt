@@ -79,9 +79,9 @@ class BattleUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             transaction(db) {
-                SquadTable.insertAllies(userId, listOf(
-                    MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1)
-                ))
+                listOf(MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1))
+                    .map { UnitTable.insertUnitAndGetId(it) }
+                    .also { SquadTable.insertUnits(userId, it) }
                 val allies = SquadTable.getAllies(userId.value)
 
                 // Kill the only unit in squad
@@ -119,11 +119,16 @@ class BattleUCImplTests {
     }
 
     private fun insertAndGetAllies(userId: EntityID<Int>) = transaction(db) {
-        SquadTable.insertAllies(userId, listOf(
+        listOf(
             MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 2),
             MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 1),
             MyUnitForm(MyUnitEnum.TWOLIP, 11, 2, 1)
-        ))
-        SquadTable.getAllies(userId.value)
+        ).map {
+            UnitTable.insertUnitAndGetId(it)
+        }.also {
+            SquadTable.insertUnits(userId, it)
+        }
+
+        return@transaction SquadTable.getAllies(userId.value)
     }
 }

@@ -5,6 +5,7 @@ import com.bitwiserain.pbbg.domain.model.MyUnit
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.LongIdTable
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 
@@ -33,16 +34,10 @@ object SquadTable : LongIdTable() {
             .map { it.toMyUnit() }
     }
 
-    fun insertAllies(userId: EntityID<Int>, allies: List<MyUnitForm>) {
-        for (ally in allies) {
-            // Create enemy unit in unit table
-            val allyId = UnitTable.insertUnitAndGetId(ally)
-
-            // Connect newly created enemy to this battle session
-            insert {
-                it[SquadTable.user] = userId
-                it[SquadTable.unit] = allyId
-            }
+    fun insertUnits(userId: EntityID<Int>, unitIds: Iterable<EntityID<Long>>) {
+        batchInsert(unitIds) { unitId ->
+            this[SquadTable.user] = userId
+            this[SquadTable.unit] = unitId
         }
     }
 }
