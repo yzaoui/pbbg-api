@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.db.usecase
 
-import com.bitwiserain.pbbg.PASSWORD_REGEX
+import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
@@ -25,11 +25,21 @@ class UserUCImpl(private val db: Database) : UserUC {
             .singleOrNull()
     }
 
-    override fun usernameAvailable(username: String): Boolean = transaction(db) {
-        return@transaction UserTable.getUserByUsername(username) == null
-    }
-
     override fun registerUser(username: String, password: String): Int = transaction(db) {
+        /* Make sure username is available */
+        if (UserTable.getUserByUsername(username) != null) throw UsernameNotAvailableException(username)
+
+        /* Make sure username & password are valid */
+        run {
+            val usernameInvalid = !username.matches(USERNAME_REGEX.toRegex())
+            val passwordInvalid = !password.matches(PASSWORD_REGEX.toRegex())
+
+            if (usernameInvalid || passwordInvalid) throw CredentialsFormatException(
+                usernameError = if (usernameInvalid) USERNAME_REGEX_DESCRIPTION else null,
+                passwordError = if (passwordInvalid) PASSWORD_REGEX_DESCRIPTION else null
+            )
+        }
+
         val now = Instant.now().truncatedTo(ChronoUnit.SECONDS)
 
         val userId = UserTable.createUserAndGetId(
