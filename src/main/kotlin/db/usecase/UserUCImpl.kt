@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.db.usecase
 
-import at.favre.lib.crypto.bcrypt.BCrypt
 import com.bitwiserain.pbbg.PASSWORD_REGEX
 import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.model.User
@@ -35,7 +34,7 @@ class UserUCImpl(private val db: Database) : UserUC {
 
         val userId = UserTable.createUserAndGetId(
             username = username,
-            passwordHash = BCrypt.withDefaults().hash(12, password.toByteArray())
+            passwordHash = BCryptHelper.hashPassword(password)
         )
 
         UserStatsTable.insert {
@@ -92,7 +91,7 @@ class UserUCImpl(private val db: Database) : UserUC {
             UserTable.getUserByUsername(username)
         }
 
-        return if (user != null && BCrypt.verifyer().verify(password.toByteArray(), user.passwordHash).verified) {
+        return if (user != null && BCryptHelper.verifyPassword(password, user.passwordHash)) {
             user.id
         } else {
             null
@@ -106,12 +105,12 @@ class UserUCImpl(private val db: Database) : UserUC {
 
     override fun changePassword(userId: Int, currentPassword: String, newPassword: String, confirmNewPassword: String): Unit = transaction(db) {
         // TODO: Consider checking if user exists
-        val currentPasswordHash = UserTable.select { UserTable.id.eq(userId) }
+        val expectedPasswordHash = UserTable.select { UserTable.id.eq(userId) }
             .map { it[UserTable.passwordHash] }
             .single()
 
         // Make sure current password matches
-        if (!BCrypt.verifyer().verify(currentPassword.toByteArray(), currentPasswordHash).verified) throw WrongCurrentPasswordException()
+        if (!BCryptHelper.verifyPassword(currentPassword, expectedPasswordHash)) throw WrongCurrentPasswordException()
 
         // Make sure new password is actually new
         if (currentPassword == newPassword) throw NewPasswordNotNewException()
@@ -124,7 +123,7 @@ class UserUCImpl(private val db: Database) : UserUC {
 
         // At this point, new password is legal, so update
         UserTable.update({ UserTable.id.eq(userId) }) {
-            it[UserTable.passwordHash] = BCrypt.withDefaults().hash(12, newPassword.toByteArray())
+            it[UserTable.passwordHash] = BCryptHelper.hashPassword(newPassword)
         }
     }
 }

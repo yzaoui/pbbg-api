@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.test
 
+import com.bitwiserain.pbbg.BCryptHelper
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
@@ -35,6 +36,6 @@ fun dropDatabase(db: Database) = transaction(db) {
     )
 }
 
-fun createTestUserAndGetId(db: Database, username: String = "testuser"): EntityID<Int> = transaction(db) {
-    UserTable.createUserAndGetId(username, ByteArray(60))
+fun createTestUserAndGetId(db: Database, username: String = "username", password: String = "password"): EntityID<Int> = transaction(db) {
+    UserTable.createUserAndGetId(username, BCryptHelper.hashPassword(password))
 }

@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg
 
+import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.bitwiserain.pbbg.db.model.User
@@ -148,9 +149,9 @@ fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC:
     }
 }
 
-/**
- * Ktor-related extensions
- */
+/***************************
+ * Ktor-related extensions *
+ ***************************/
 
 suspend inline fun ApplicationCall.respondSuccess(data: Any? = null, status: HttpStatusCode = HttpStatusCode.OK) {
     respond(status, mapOf("status" to "success", "data" to data))
@@ -171,3 +172,11 @@ fun Application.makeToken(userId: Int) = JWT.create()
     .withIssuer(environment.config.property("jwt.issuer").getString())
     .withClaim("user.id", userId)
     .sign(Algorithm.HMAC256(environment.config.property("jwt.secret").getString()))
+
+/**********
+ * BCrypt *
+ **********/
+object BCryptHelper {
+    fun hashPassword(password: String): ByteArray = BCrypt.withDefaults().hash(12, password.toByteArray())
+    fun verifyPassword(attemptedPassword: String, expectedPasswordHash: ByteArray) = BCrypt.verifyer().verify(attemptedPassword.toByteArray(), expectedPasswordHash).verified
+}
