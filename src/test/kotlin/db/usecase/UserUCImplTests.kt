@@ -244,5 +244,23 @@ class UserUCImplTests {
             assertEquals("usr71", latestUser.username)
             assertTrue(BCryptHelper.verifyPassword(originalPassword, latestUser.passwordHash))
         }
+
+        @Test
+        fun `Given an existing user, when changing password using an invalid password, IllegalPasswordException should be thrown`() {
+            val originalPassword = "pass123".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
+            val userId = createTestUserAndGetId(db, "usr71", originalPassword).value
+
+            val newInvalidPassword = "a".also { assertFalse(it.matches(PASSWORD_REGEX.toRegex())) }
+
+            assertThrows<IllegalPasswordException>("New password being invalid should throw IllegalPasswordException.") {
+                userUC.changePassword(userId, originalPassword, newInvalidPassword, newInvalidPassword)
+            }
+
+            val latestUser = transaction(db) { UserTable.getUserById(userId) }
+
+            assertNotNull(latestUser)
+            assertEquals("usr71", latestUser.username)
+            assertTrue(BCryptHelper.verifyPassword(originalPassword, latestUser.passwordHash))
+        }
     }
 }
