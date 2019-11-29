@@ -228,5 +228,21 @@ class UserUCImplTests {
             assertEquals("usr71", latestUser.username)
             assertTrue(BCryptHelper.verifyPassword(originalPassword, latestUser.passwordHash))
         }
+
+        @Test
+        fun `Given an existing user, when changing password reusing the old password, NewPasswordNotNewException should be thrown`() {
+            val originalPassword = "pass123".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
+            val userId = createTestUserAndGetId(db, "usr71", originalPassword).value
+
+            assertThrows<NewPasswordNotNewException>("New password being the same as the old one should throw UnconfirmedNewPasswordException.") {
+                userUC.changePassword(userId, originalPassword, originalPassword, originalPassword)
+            }
+
+            val latestUser = transaction(db) { UserTable.getUserById(userId) }
+
+            assertNotNull(latestUser)
+            assertEquals("usr71", latestUser.username)
+            assertTrue(BCryptHelper.verifyPassword(originalPassword, latestUser.passwordHash))
+        }
     }
 }
