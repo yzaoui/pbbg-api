@@ -42,15 +42,18 @@ class UserUCImpl(private val db: Database) : UserUC {
 
         val now = Instant.now().truncatedTo(ChronoUnit.SECONDS)
 
+        /* Create user */
         val userId = UserTable.createUserAndGetId(
             username = username,
             passwordHash = BCryptHelper.hashPassword(password)
         )
 
+        /* Create user stats */
         UserStatsTable.insert {
             it[UserStatsTable.userId] = userId
         }
 
+        /* Add ice pick to inventory */
         listOf(MaterializedItem.IcePick).forEach { item ->
             val itemId = MaterializedItemTable.insertItemAndGetId(item)
             ItemHistoryTable.insertItemHistory(
@@ -64,7 +67,7 @@ class UserUCImpl(private val db: Database) : UserUC {
             DexTable.insertDiscovered(userId, item.enum)
         }
 
-        /* Market */
+        /* Create user's market */
         val marketId = MarketTable.insertAndGetId {
             it[MarketTable.userId] = userId
         }
@@ -81,6 +84,7 @@ class UserUCImpl(private val db: Database) : UserUC {
             )
         }
 
+        /* Create user squad */
         listOf(
             MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1),
             MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2),
