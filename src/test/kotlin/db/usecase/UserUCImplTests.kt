@@ -136,4 +136,30 @@ class UserUCImplTests {
             }
         }
     }
+
+    @Nested
+    inner class ByCredentials {
+        @Test
+        fun `Given an existing user, when getting the user's ID by correct credentials, the ID should return`() {
+            val expectedUserId = createTestUserAndGetId(db, username = "username24", password = "pass123").value
+
+            val actualUserId = userUC.getUserIdByCredentials("username24", "pass123")
+
+            assertEquals(expectedUserId, actualUserId)
+        }
+
+        @Test
+        fun `Given an existing user, when getting the user's ID by incorrect credentials, no ID should be returned`() {
+            val expectedUserId = createTestUserAndGetId(db, username = "username24", password = "pass123").value
+
+            /* Test incorrect username */
+            assertNull(userUC.getUserIdByCredentials("incorrecto17", "pass123"))
+
+            /* Test incorrect password */
+            assertNull(userUC.getUserIdByCredentials("username24", "pass12345"))
+
+            /* Test incorrect username & password */
+            assertNull(userUC.getUserIdByCredentials("incorrecto17", "pass12345"))
+        }
+    }
 }
