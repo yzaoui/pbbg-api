@@ -162,4 +162,23 @@ class UserUCImplTests {
             assertNull(userUC.getUserIdByCredentials("incorrecto17", "pass12345"))
         }
     }
+
+    @Nested
+    inner class UserStats {
+        @Test
+        fun `When getting user stats by ID, the user stats should return`() {
+            val userId = createTestUserAndGetId(db)
+
+            transaction(db) {
+                UserStatsTable.createUserStats(userId)
+                UserStatsTable.updateGold(userId, 20)
+                UserStatsTable.updateMiningExp(userId, 500)
+            }
+
+            val stats = userUC.getUserStatsByUserId(userId.value)
+
+            assertEquals(20, stats.gold)
+            assertEquals(500, stats.miningExp)
+        }
+    }
 }

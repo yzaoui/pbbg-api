@@ -49,9 +49,7 @@ class UserUCImpl(private val db: Database) : UserUC {
         )
 
         /* Create user stats */
-        UserStatsTable.insert {
-            it[UserStatsTable.userId] = userId
-        }
+        UserStatsTable.createUserStats(userId)
 
         /* Add ice pick to inventory */
         listOf(MaterializedItem.IcePick).forEach { item ->
