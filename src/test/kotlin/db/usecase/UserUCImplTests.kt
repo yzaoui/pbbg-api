@@ -9,10 +9,7 @@ import com.bitwiserain.pbbg.db.usecase.UserUCImpl
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
-import com.bitwiserain.pbbg.domain.usecase.CredentialsFormatException
-import com.bitwiserain.pbbg.domain.usecase.UserUC
-import com.bitwiserain.pbbg.domain.usecase.UsernameNotAvailableException
-import com.bitwiserain.pbbg.domain.usecase.WrongCurrentPasswordException
+import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
@@ -204,6 +201,25 @@ class UserUCImplTests {
 
             assertThrows<WrongCurrentPasswordException> {
                 userUC.changePassword(userId, "inc0rrect4", newPassword, newPassword)
+            }
+
+            val latestUser = transaction(db) { UserTable.getUserById(userId) }
+
+            assertNotNull(latestUser)
+            assertEquals("usr71", latestUser.username)
+            assertTrue(BCryptHelper.verifyPassword(originalPassword, latestUser.passwordHash))
+        }
+
+        @Test
+        fun `Given an existing user, when changing password with an incorrectly confirmed new password parameter, UnconfirmedNewPasswordException should be thrown`() {
+            val originalPassword = "pass123".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
+            val userId = createTestUserAndGetId(db, "usr71", originalPassword).value
+
+            val newPassword = "5fkd^s91$-".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
+            val confirmNewPassword = "differ3nt".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
+
+            assertThrows<UnconfirmedNewPasswordException>("New password not matching its confirmation should throw UnconfirmedNewPasswordException.") {
+                userUC.changePassword(userId, originalPassword, newPassword, confirmNewPassword)
             }
 
             val latestUser = transaction(db) { UserTable.getUserById(userId) }
