@@ -1,5 +1,9 @@
 package com.bitwiserain.pbbg.test.db.usecase
 
+import com.bitwiserain.pbbg.PASSWORD_REGEX
+import com.bitwiserain.pbbg.PASSWORD_REGEX_DESCRIPTION
+import com.bitwiserain.pbbg.USERNAME_REGEX
+import com.bitwiserain.pbbg.USERNAME_REGEX_DESCRIPTION
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
@@ -7,18 +11,19 @@ import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.usecase.UserUCImpl
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
-import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.domain.usecase.CredentialsFormatException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.domain.usecase.UsernameNotAvailableException
+import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -79,6 +84,56 @@ class UserUCImplTests {
                         units.any { it.enum == MyUnitEnum.TWOLIP } &&
                         units.any { it.enum == MyUnitEnum.CARPSHOOTER }
             )
+        }
+    }
+
+    @Nested
+    inner class FailedRegistration {
+        @Test
+        fun `Given an existing user, when registering a new user with the same username, UsernameNotAvailableException should be thrown`() {
+            createTestUserAndGetId(db, username = "username")
+
+            assertThrows<UsernameNotAvailableException> {
+                userUC.registerUser("username", "password")
+            }
+        }
+
+        @Test
+        fun `When registering a new user with invalid credentials, CredentialsFormatException should be thrown with appropriate members`() {
+            val invalidUsername = "usdlkfjsglksdjlkflksdjfmlkdsj"
+            val validUsername = "username"
+            val invalidPassword = "p"
+            val validPassword = "password"
+
+            /* Make sure test isn't wrong */
+            assertFalse(invalidUsername.matches(USERNAME_REGEX.toRegex()))
+            assertFalse(invalidPassword.matches(PASSWORD_REGEX.toRegex()))
+            assertTrue(validUsername.matches(USERNAME_REGEX.toRegex()))
+            assertTrue(validPassword.matches(USERNAME_REGEX.toRegex()))
+
+            /* Test invalid username, valid password */
+            assertThrows<CredentialsFormatException> {
+                userUC.registerUser(invalidUsername, validPassword)
+            }.also { e ->
+                assertEquals(USERNAME_REGEX_DESCRIPTION, e.usernameError)
+                assertNull(e.passwordError)
+            }
+
+            /* Test valid username, invalid password */
+            assertThrows<CredentialsFormatException> {
+                userUC.registerUser(validUsername, invalidPassword)
+            }.also { e ->
+                assertNull(e.usernameError)
+                assertEquals(PASSWORD_REGEX_DESCRIPTION, e.passwordError)
+            }
+
+            /* Test invalid username, invalid password */
+            assertThrows<CredentialsFormatException> {
+                userUC.registerUser(invalidUsername, invalidPassword)
+            }.also { e ->
+                assertEquals(USERNAME_REGEX_DESCRIPTION, e.usernameError)
+                assertEquals(PASSWORD_REGEX_DESCRIPTION, e.passwordError)
+            }
         }
     }
 }
