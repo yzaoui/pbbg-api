@@ -1,9 +1,6 @@
 package com.bitwiserain.pbbg.test.db.usecase
 
-import com.bitwiserain.pbbg.PASSWORD_REGEX
-import com.bitwiserain.pbbg.PASSWORD_REGEX_DESCRIPTION
-import com.bitwiserain.pbbg.USERNAME_REGEX
-import com.bitwiserain.pbbg.USERNAME_REGEX_DESCRIPTION
+import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
@@ -21,10 +18,8 @@ import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
+import kotlin.test.*
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class UserUCImplTests {
@@ -179,6 +174,24 @@ class UserUCImplTests {
 
             assertEquals(20, stats.gold)
             assertEquals(500, stats.miningExp)
+        }
+    }
+
+    @Nested
+    inner class ChangePassword {
+        @Test
+        fun `Given an existing user, when changing password with correct parameters, password should be changed`() {
+            val userId = createTestUserAndGetId(db, "user", "pass123").value
+
+            val newPassword = "new27pas".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
+
+            userUC.changePassword(userId, currentPassword = "pass123", newPassword = newPassword, confirmNewPassword = newPassword)
+
+            val changedUser = transaction(db) { UserTable.getUserById(userId) }
+
+            assertNotNull(changedUser)
+            assertEquals("user", changedUser.username)
+            assertTrue(BCryptHelper.verifyPassword(newPassword, changedUser.passwordHash))
         }
     }
 }
