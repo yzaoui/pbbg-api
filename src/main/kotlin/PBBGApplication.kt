@@ -12,7 +12,6 @@ import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.db.usecase.*
-import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.route.api.*
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
@@ -91,10 +90,6 @@ fun Application.main() {
     val battleUC = BattleUCImpl(db)
     val dexUC = DexUCImpl(db)
 
-    mainWithDependencies(userUC, marketUC, itemUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC, dexUC)
-}
-
-fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC: ItemUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC, dexUC: DexUC) {
     install(ContentNegotiation) {
         // Handles "application/json" content type
         gson {
