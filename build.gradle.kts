@@ -33,7 +33,7 @@ dependencies {
     implementation(group = "com.h2database", name = "h2", version = "1.4.200")
     implementation(group = "org.postgresql", name = "postgresql", version = "42.2.8")
     implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version = Versions.KOTLIN)
-    implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-runtime", version = "0.13.0")
+    implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-runtime", version = "0.14.0")
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-html-jvm", version = "0.6.10")
     implementation(group = "org.jetbrains.exposed", name = "exposed", version = "0.17.7")
     implementation(group = "at.favre.lib", name = "bcrypt", version = "0.9.0")
