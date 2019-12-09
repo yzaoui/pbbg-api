@@ -1,10 +1,12 @@
 package com.bitwiserain.pbbg.view.model
 
+import com.google.gson.annotations.SerializedName
+
 data class BaseItemJSON(
-    val friendlyName: String,
-    val img16: String,
-    val img32: String,
-    val img64: String,
-    val description: String,
-    val grid: Set<PointJSON>?
+    @SerializedName("friendlyName") val friendlyName: String,
+    @SerializedName("img16") val img16: String,
+    @SerializedName("img32") val img32: String,
+    @SerializedName("img64") val img64: String,
+    @SerializedName("description") val description: String,
+    @SerializedName("grid") val grid: Set<PointJSON>?
 )

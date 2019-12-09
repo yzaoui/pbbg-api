@@ -1,9 +1,11 @@
 package com.bitwiserain.pbbg.route.api
 
-import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.domain.usecase.CredentialsFormatException
 import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.domain.usecase.UsernameNotAvailableException
+import com.bitwiserain.pbbg.makeToken
+import com.bitwiserain.pbbg.respondFail
+import com.bitwiserain.pbbg.respondSuccess
 import io.ktor.application.application
 import io.ktor.application.call
 import io.ktor.request.receive
@@ -23,9 +25,10 @@ fun Route.registerAPI(userUC: UserUC) = post("/register") {
             ))
         }
 
-        val userId = userUC.registerUser(usernameParam, passwordParam)
+        val token = userUC.registerUser(usernameParam, passwordParam)
+            .let { application.makeToken(it) }
 
-        call.respondSuccess(mapOf("token" to application.makeToken(userId)))
+        call.respondSuccess(mapOf("token" to token))
     } catch (e: UsernameNotAvailableException) {
         call.respondFail(mapOf("username" to "The username \"${e.username}\" is unavailable."))
     } catch (e: CredentialsFormatException) {
