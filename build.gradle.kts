@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URI
 
 object Versions {
-    const val KOTLIN = "1.3.60"
+    const val KOTLIN = "1.3.61"
     const val KTOR = "1.2.5"
 }
 
@@ -12,9 +12,9 @@ version = "0.3.1"
 
 plugins {
     application
-    kotlin("jvm").version(/*Versions.KOTLIN*/"1.3.60")
+    kotlin("jvm").version(/*Versions.KOTLIN*/"1.3.61")
     id("com.github.johnrengelman.shadow").version("5.2.0")
-    id("kotlinx-serialization").version(/*Versions.KOTLIN*/"1.3.60")
+    id("kotlinx-serialization").version(/*Versions.KOTLIN*/"1.3.61")
 }
 
 application {
