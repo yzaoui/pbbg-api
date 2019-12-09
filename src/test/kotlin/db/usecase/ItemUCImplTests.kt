@@ -1,16 +1,15 @@
 package com.bitwiserain.pbbg.test.db.usecase
 
+import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.ItemHistoryTable
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.db.usecase.ItemUCImpl
-import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.usecase.ItemNotFoundException
 import com.bitwiserain.pbbg.domain.usecase.ItemUC
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
-import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
@@ -27,7 +26,7 @@ class ItemUCImplTests {
 
     @AfterEach
     fun dropDatabase() {
-        dropDatabase(db)
+        SchemaHelper.dropTables(db)
     }
 
     @Test

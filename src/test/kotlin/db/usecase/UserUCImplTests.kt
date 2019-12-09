@@ -11,7 +11,6 @@ import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
-import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -26,7 +25,7 @@ class UserUCImplTests {
 
     @AfterEach
     fun dropDatabase() {
-        dropDatabase(db)
+        SchemaHelper.dropTables(db)
     }
 
     @Nested

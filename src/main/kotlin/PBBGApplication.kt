@@ -35,8 +35,6 @@ import io.ktor.routing.route
 import io.ktor.routing.routing
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.Slf4jSqlDebugLogger
-import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 
 enum class ApplicationEnvironment {
@@ -69,14 +67,7 @@ fun Application.main() {
         else -> throw RuntimeException("Only H2 and PostgreSQL databases are currently supported.")
     })
 
-    transaction {
-        addLogger(Slf4jSqlDebugLogger)
-        SchemaUtils.create(
-            UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable,
-            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable,
-            ItemHistoryTable
-        )
-    }
+    SchemaHelper.createTables(db)
 
     install(CallLogging)
 
@@ -179,4 +170,23 @@ fun Application.makeToken(userId: Int): String = JWT.create()
 object BCryptHelper {
     fun hashPassword(password: String): ByteArray = BCrypt.withDefaults().hash(12, password.toByteArray())
     fun verifyPassword(attemptedPassword: String, expectedPasswordHash: ByteArray) = BCrypt.verifyer().verify(attemptedPassword.toByteArray(), expectedPasswordHash).verified
+}
+
+/**********
+ * Schema *
+ **********/
+object SchemaHelper {
+    fun createTables(db: Database) = transaction(db) {
+        SchemaUtils.create(
+            UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable,
+            SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable
+        )
+    }
+
+    fun dropTables(db: Database) = transaction(db) {
+        SchemaUtils.drop(
+            UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable,
+            SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable
+        )
+    }
 }

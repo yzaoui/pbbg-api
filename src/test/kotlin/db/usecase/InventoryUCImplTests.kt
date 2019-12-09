@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.test.db.usecase
 
+import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
@@ -9,7 +10,6 @@ import com.bitwiserain.pbbg.domain.model.Inventory
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.usecase.InventoryUC
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
-import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -26,7 +26,7 @@ class InventoryUCImplTests {
 
     @AfterEach
     fun dropDatabase() {
-        dropDatabase(db)
+        SchemaHelper.dropTables(db)
     }
 
     @Test

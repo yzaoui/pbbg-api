@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.test.db.usecase
 
+import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UnitTable
@@ -10,7 +11,6 @@ import com.bitwiserain.pbbg.domain.model.Squad
 import com.bitwiserain.pbbg.domain.usecase.SquadInBattleException
 import com.bitwiserain.pbbg.domain.usecase.UnitUC
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
-import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.insert
@@ -29,7 +29,7 @@ class UnitUCImplTests {
 
     @AfterEach
     fun dropDatabase() {
-        dropDatabase(db)
+        SchemaHelper.dropTables(db)
     }
 
     @Test

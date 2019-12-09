@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.test.db.usecase
 
+import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.DexTable
 import com.bitwiserain.pbbg.db.usecase.DexUCImpl
 import com.bitwiserain.pbbg.domain.model.BaseItem
@@ -10,7 +11,6 @@ import com.bitwiserain.pbbg.domain.usecase.InvalidItemException
 import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
 import com.bitwiserain.pbbg.domain.usecase.ItemUndiscoveredException
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
-import com.bitwiserain.pbbg.test.dropDatabase
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
@@ -26,7 +26,7 @@ class DexUCImplTests {
 
     @AfterEach
     fun dropDatabase() {
-        dropDatabase(db)
+        SchemaHelper.dropTables(db)
     }
 
     @Nested
