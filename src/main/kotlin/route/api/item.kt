@@ -6,8 +6,8 @@ import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.usecase.ItemUC
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.view.model.itemdetails.ItemDetailsJSON
-import com.bitwiserain.pbbg.view.model.itemdetails.ItemHistoryJSON
 import com.bitwiserain.pbbg.view.model.itemdetails.ItemHistoryInfoJSON
+import com.bitwiserain.pbbg.view.model.itemdetails.ItemHistoryJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get

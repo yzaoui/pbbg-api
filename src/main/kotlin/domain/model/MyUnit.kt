@@ -2,7 +2,6 @@ package com.bitwiserain.pbbg.domain.model
 
 import com.bitwiserain.pbbg.domain.BattleManager
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum.*
-import kotlin.math.max
 
 sealed class MyUnit {
     abstract val id: Long

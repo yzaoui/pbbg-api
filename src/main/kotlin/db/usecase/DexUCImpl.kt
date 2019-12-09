@@ -13,7 +13,6 @@ import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
 import com.bitwiserain.pbbg.domain.usecase.ItemUndiscoveredException
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class DexUCImpl(private val db: Database) : DexUC {
