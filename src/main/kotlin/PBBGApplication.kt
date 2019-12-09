@@ -121,6 +121,7 @@ fun Application.main() {
     install(StatusPages) {
         exception<Throwable> {
             call.respondError()
+            it.printStackTrace()
         }
     }
     routing {
@@ -167,7 +168,7 @@ suspend inline fun ApplicationCall.respondError(message: String = "", status: Ht
 val ApplicationCall.user
     get() = authentication.principal<User>()!!
 
-fun Application.makeToken(userId: Int) = JWT.create()
+fun Application.makeToken(userId: Int): String = JWT.create()
     .withIssuer(environment.config.property("jwt.issuer").getString())
     .withClaim("user.id", userId)
     .sign(Algorithm.HMAC256(environment.config.property("jwt.secret").getString()))
