@@ -32,7 +32,7 @@ class BattleUCImplTests {
     @Nested
     inner class BattleGeneration {
         @Test
-        fun `Given a user with a squad who hasn't started a battle, when they generate a new battle, a battle containing their squad and 1+ enemies should be returned`() {
+        fun `Given an out-of-battle user, when generating a new battle, a battle containing the squad and 1+ enemies should return`() {
             val userId = createTestUserAndGetId(db)
 
             val allies = insertAndGetAllies(userId)
@@ -45,7 +45,7 @@ class BattleUCImplTests {
         }
 
         @Test
-        fun `Given a newly generated battle, its battle queue should include every ally and enemy exactly once`() {
+        fun `Given an out-of-battle user, when generating a battle, its battle queue should include every ally and enemy exactly once`() {
             val userId = createTestUserAndGetId(db).also {
                 insertAndGetAllies(it)
             }
@@ -59,7 +59,7 @@ class BattleUCImplTests {
         }
 
         @Test
-        fun `Given a user who is already in a battle, when they generate a new battle, a BattleAlreadyInProgressException should be thrown`() {
+        fun `Given an in-battle user, when generating a new battle, BattleAlreadyInProgressException should be thrown`() {
             val userId = createTestUserAndGetId(db)
 
             // Give user a squad
@@ -69,13 +69,13 @@ class BattleUCImplTests {
             battleUC.generateBattle(userId.value)
 
             // Attempt to generate another battle while the first is in progress
-            assertFailsWith(BattleAlreadyInProgressException::class, "Generating a new battle should fail if one is currently in progress") {
+            assertFailsWith<BattleAlreadyInProgressException>("Generating a new battle should fail if one is currently in progress") {
                 battleUC.generateBattle(userId.value)
             }
         }
 
         @Test
-        fun `Given a user with no living units in squad, when they generate a new battle, a NoAlliesAliveException should be thrown`() {
+        fun `Given a user with only dead units, when generating a new battle, NoAlliesAliveException should be thrown`() {
             val userId = createTestUserAndGetId(db)
 
             transaction(db) {
@@ -89,7 +89,7 @@ class BattleUCImplTests {
             }
 
             // Attempt to generate battle with a wiped out squad
-            assertFailsWith(NoAlliesAliveException::class, "Generating a new battle should fail if user's squad is wiped out") {
+            assertFailsWith<NoAlliesAliveException> ("Generating a new battle should fail if user's squad is wiped out") {
                 battleUC.generateBattle(userId.value)
             }
         }
@@ -98,7 +98,7 @@ class BattleUCImplTests {
     @Nested
     inner class BattleRetrieval {
         @Test
-        fun `Given a user, when they generate a battle and request their current battle, it should be returned`() {
+        fun `When generating a battle and requesting the current battle, it should be returned`() {
             val userId = createTestUserAndGetId(db)
             insertAndGetAllies(userId)
             battleUC.generateBattle(userId.value)
@@ -109,7 +109,7 @@ class BattleUCImplTests {
         }
 
         @Test
-        fun `Given a user who hasn't started a battle, when their current battle is requested, null should be returned`() {
+        fun `Given an out-of-battle user, when their current battle is requested, null should be returned`() {
             val userId = createTestUserAndGetId(db).value
 
             val battle = battleUC.getCurrentBattle(userId)
