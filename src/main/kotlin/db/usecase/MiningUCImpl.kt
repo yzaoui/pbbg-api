@@ -137,9 +137,7 @@ class MiningUCImpl(private val db: Database) : MiningUC {
 
         // Increase user's mining experience from this mining operation if progress was made
         if (currentLevelProgress != newLevelProgress) {
-            UserStatsTable.update({ UserStatsTable.userId.eq(userId) }) {
-                it[UserStatsTable.miningExp] = newLevelProgress.absoluteExp
-            }
+            UserStatsTable.updateMiningExp(userId, newLevelProgress.absoluteExp)
         }
 
         MineActionResult(

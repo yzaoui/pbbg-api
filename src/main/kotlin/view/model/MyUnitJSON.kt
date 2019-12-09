@@ -1,14 +1,16 @@
 package com.bitwiserain.pbbg.view.model
 
+import com.google.gson.annotations.SerializedName
+
 data class MyUnitJSON(
-    val id: Long,
-    val name: String,
-    val baseUnitId: Int,
-    val hp: Int,
-    val maxHP: Int,
-    val atk: Int,
-    val def: Int,
-    val levelProgress: LevelProgressJSON,
-    val idleAnimationURL: String,
-    val iconURL: String
+    @SerializedName("id") val id: Long,
+    @SerializedName("name") val name: String,
+    @SerializedName("baseUnitId") val baseUnitId: Int,
+    @SerializedName("hp") val hp: Int,
+    @SerializedName("maxHP") val maxHP: Int,
+    @SerializedName("atk") val atk: Int,
+    @SerializedName("def") val def: Int,
+    @SerializedName("levelProgress") val levelProgress: LevelProgressJSON,
+    @SerializedName("idleAnimationURL") val idleAnimationURL: String,
+    @SerializedName("iconURL") val iconURL: String
 )

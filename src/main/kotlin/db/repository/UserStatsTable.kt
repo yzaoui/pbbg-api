@@ -2,15 +2,16 @@ package com.bitwiserain.pbbg.db.repository
 
 import com.bitwiserain.pbbg.domain.model.UserStats
 import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.update
+import org.jetbrains.exposed.sql.*
 
 object UserStatsTable : Table() {
     val userId = reference("user_id", UserTable)
     val gold = long("gold").default(0)
     val miningExp = long("mining_exp").default(0)
+
+    fun createUserStats(userId: EntityID<Int>) = insert {
+        it[UserStatsTable.userId] = userId
+    }
 
     fun getUserStats(userId: EntityID<Int>) = select { UserStatsTable.userId.eq(userId) }
         .map { it.toUserStats() }
@@ -18,6 +19,10 @@ object UserStatsTable : Table() {
 
     fun updateGold(userId: EntityID<Int>, gold: Long) = update({ UserStatsTable.userId.eq(userId) }) {
         it[UserStatsTable.gold] = gold
+    }
+
+    fun updateMiningExp(userId: EntityID<Int>, miningExp: Long) = update({ UserStatsTable.userId.eq(userId) }) {
+        it[UserStatsTable.miningExp] = miningExp
     }
 
     private fun ResultRow.toUserStats(): UserStats = UserStats(

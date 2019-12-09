@@ -46,9 +46,9 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
              *
              * Error situations:
              *   [InventoryItemNotFoundException] Must have a pickaxe equipped to mine.
-             *   [InventoryItemNotEquippable] Must be in a mine to mine.
-             *   [InventoryItemAlreadyEquipped] Redundant action if item is already equipped
-             *   [InventoryItemNotEquipped] Redundant action if item is already unequipped
+             *   [InventoryItemNotEquippableException] Must be in a mine to mine.
+             *   [InventoryItemAlreadyEquippedException] Redundant action if item is already equipped
+             *   [InventoryItemNotEquippedException] Redundant action if item is already unequipped
              */
             post {
                 try {
@@ -76,11 +76,11 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
                     }
                 } catch (e: InventoryItemNotFoundException) {
                     call.respondFail("Item(id=${e.itemId}) can't be found in your inventory.")
-                } catch (e: InventoryItemNotEquippable) {
+                } catch (e: InventoryItemNotEquippableException) {
                     call.respondFail("Item(id=${e.itemId}) is not equippable.")
-                } catch (e: InventoryItemAlreadyEquipped) {
+                } catch (e: InventoryItemAlreadyEquippedException) {
                     call.respondFail("Item(id=${e.itemId}) is already equipped.")
-                } catch (e: InventoryItemNotEquipped) {
+                } catch (e: InventoryItemNotEquippedException) {
                     call.respondFail("Item(id=${e.itemId}) is not equipped.")
                 }
             }

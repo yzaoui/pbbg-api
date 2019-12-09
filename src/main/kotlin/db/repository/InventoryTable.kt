@@ -15,7 +15,7 @@ object InventoryTable : Table() {
         if (baseItem is BaseItem.Equippable) it[InventoryTable.equipped] = false
     }
 
-    fun insertItems(userId: EntityID<Int>, itemIds: Map<Long, BaseItem>) = batchInsert(itemIds.asIterable()) { entry ->
+    fun insertItems(userId: EntityID<Int>, itemEntries: Map<Long, BaseItem>) = batchInsert(itemEntries.asIterable()) { entry ->
         this[InventoryTable.userId] = userId
         this[InventoryTable.materializedItem] = EntityID(entry.key, MaterializedItemTable)
         if (entry.value is BaseItem.Equippable) this[InventoryTable.equipped] = false

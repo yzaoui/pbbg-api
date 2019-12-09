@@ -1,9 +1,7 @@
 package com.bitwiserain.pbbg.db.usecase
 
-import at.favre.lib.crypto.bcrypt.BCrypt
-import com.bitwiserain.pbbg.PASSWORD_REGEX
+import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.db.form.MyUnitForm
-import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.db.repository.market.MarketTable
@@ -14,34 +12,42 @@ import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class UserUCImpl(private val db: Database) : UserUC {
-    override fun getUserById(userId: Int): User? = transaction(db) {
-        UserTable.select { UserTable.id.eq(userId) }
-            .map { User(it[UserTable.id].value, it[UserTable.username], it[UserTable.passwordHash]) }
-            .singleOrNull()
-    }
-
-    override fun usernameAvailable(username: String): Boolean = transaction(db) {
-        return@transaction UserTable.getUserByUsername(username) == null
-    }
-
     override fun registerUser(username: String, password: String): Int = transaction(db) {
-        val now = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+        /* Make sure username is available */
+        if (UserTable.getUserByUsername(username) != null) throw UsernameNotAvailableException(username)
 
-        val userId = UserTable.createUserAndGetId(
-            username = username,
-            passwordHash = BCrypt.withDefaults().hash(12, password.toByteArray())
-        )
+        /* Make sure username & password are valid */
+        run {
+            val usernameInvalid = !username.matches(USERNAME_REGEX.toRegex())
+            val passwordInvalid = !password.matches(PASSWORD_REGEX.toRegex())
 
-        UserStatsTable.insert {
-            it[UserStatsTable.userId] = userId
+            if (usernameInvalid || passwordInvalid) throw CredentialsFormatException(
+                usernameError = if (usernameInvalid) USERNAME_REGEX_DESCRIPTION else null,
+                passwordError = if (passwordInvalid) PASSWORD_REGEX_DESCRIPTION else null
+            )
         }
 
+        val now = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+
+        /* Create user */
+        val userId = UserTable.createUserAndGetId(
+            username = username,
+            passwordHash = BCryptHelper.hashPassword(password)
+        )
+
+        /* Create user stats */
+        UserStatsTable.createUserStats(userId)
+
+        /* Add ice pick to inventory */
         listOf(MaterializedItem.IcePick).forEach { item ->
             val itemId = MaterializedItemTable.insertItemAndGetId(item)
             ItemHistoryTable.insertItemHistory(
@@ -55,7 +61,7 @@ class UserUCImpl(private val db: Database) : UserUC {
             DexTable.insertDiscovered(userId, item.enum)
         }
 
-        /* Market */
+        /* Create user's market */
         val marketId = MarketTable.insertAndGetId {
             it[MarketTable.userId] = userId
         }
@@ -72,11 +78,18 @@ class UserUCImpl(private val db: Database) : UserUC {
             )
         }
 
-        SquadTable.insertAllies(userId, listOf(
+        /* Create user squad */
+        listOf(
             MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1),
             MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2),
             MyUnitForm(MyUnitEnum.TWOLIP, 11, 2, 1)
-        ))
+        ).map {
+            // Create initial units
+            UnitTable.insertUnitAndGetId(it)
+        }.also {
+            // Add them to new user's squad
+            SquadTable.insertUnits(userId, it)
+        }
 
         return@transaction userId.value
     }
@@ -86,7 +99,7 @@ class UserUCImpl(private val db: Database) : UserUC {
             UserTable.getUserByUsername(username)
         }
 
-        return if (user != null && BCrypt.verifyer().verify(password.toByteArray(), user.passwordHash).verified) {
+        return if (user != null && BCryptHelper.verifyPassword(password, user.passwordHash)) {
             user.id
         } else {
             null
@@ -100,12 +113,12 @@ class UserUCImpl(private val db: Database) : UserUC {
 
     override fun changePassword(userId: Int, currentPassword: String, newPassword: String, confirmNewPassword: String): Unit = transaction(db) {
         // TODO: Consider checking if user exists
-        val currentPasswordHash = UserTable.select { UserTable.id.eq(userId) }
+        val expectedPasswordHash = UserTable.select { UserTable.id.eq(userId) }
             .map { it[UserTable.passwordHash] }
             .single()
 
         // Make sure current password matches
-        if (!BCrypt.verifyer().verify(currentPassword.toByteArray(), currentPasswordHash).verified) throw WrongCurrentPasswordException()
+        if (!BCryptHelper.verifyPassword(currentPassword, expectedPasswordHash)) throw WrongCurrentPasswordException()
 
         // Make sure new password is actually new
         if (currentPassword == newPassword) throw NewPasswordNotNewException()
@@ -118,7 +131,7 @@ class UserUCImpl(private val db: Database) : UserUC {
 
         // At this point, new password is legal, so update
         UserTable.update({ UserTable.id.eq(userId) }) {
-            it[UserTable.passwordHash] = BCrypt.withDefaults().hash(12, newPassword.toByteArray())
+            it[UserTable.passwordHash] = BCryptHelper.hashPassword(newPassword)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg
 
+import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.bitwiserain.pbbg.db.model.User
@@ -11,7 +12,6 @@ import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.db.usecase.*
-import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.route.api.*
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
@@ -35,8 +35,6 @@ import io.ktor.routing.route
 import io.ktor.routing.routing
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.Slf4jSqlDebugLogger
-import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 
 enum class ApplicationEnvironment {
@@ -65,18 +63,11 @@ fun Application.main() {
 
     val db = Database.connect("jdbc:$jdbcAddress", when {
         jdbcAddress.startsWith("h2:") -> org.h2.Driver::class.qualifiedName!!
-        jdbcAddress.startsWith("postgresql:") -> org.h2.Driver::class.qualifiedName!!
+        jdbcAddress.startsWith("postgresql:") -> org.postgresql.Driver::class.qualifiedName!!
         else -> throw RuntimeException("Only H2 and PostgreSQL databases are currently supported.")
     })
 
-    transaction {
-        addLogger(Slf4jSqlDebugLogger)
-        SchemaUtils.create(
-            UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable,
-            UnitTable, SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable,
-            ItemHistoryTable
-        )
-    }
+    SchemaHelper.createTables(db)
 
     install(CallLogging)
 
@@ -90,10 +81,6 @@ fun Application.main() {
     val battleUC = BattleUCImpl(db)
     val dexUC = DexUCImpl(db)
 
-    mainWithDependencies(userUC, marketUC, itemUC, inventoryUC, miningUC, equipmentUC, unitUC, battleUC, dexUC)
-}
-
-fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC: ItemUC, inventoryUC: InventoryUC, miningUC: MiningUC, equipmentUC: EquipmentUC, unitUC: UnitUC, battleUC: BattleUC, dexUC: DexUC) {
     install(ContentNegotiation) {
         // Handles "application/json" content type
         gson {
@@ -109,7 +96,11 @@ fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC:
                 .build()
             )
             validate {
-                it.payload.getClaim("user.id").asInt()?.let(userUC::getUserById)
+                it.payload.getClaim("user.id").asInt()?.let {
+                    transaction(db) {
+                        UserTable.getUserById(it)
+                    }
+                }
             }
         }
     }
@@ -121,6 +112,7 @@ fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC:
     install(StatusPages) {
         exception<Throwable> {
             call.respondError()
+            it.printStackTrace()
         }
     }
     routing {
@@ -148,9 +140,9 @@ fun Application.mainWithDependencies(userUC: UserUC, marketUC: MarketUC, itemUC:
     }
 }
 
-/**
- * Ktor-related extensions
- */
+/***************************
+ * Ktor-related extensions *
+ ***************************/
 
 suspend inline fun ApplicationCall.respondSuccess(data: Any? = null, status: HttpStatusCode = HttpStatusCode.OK) {
     respond(status, mapOf("status" to "success", "data" to data))
@@ -167,7 +159,34 @@ suspend inline fun ApplicationCall.respondError(message: String = "", status: Ht
 val ApplicationCall.user
     get() = authentication.principal<User>()!!
 
-fun Application.makeToken(userId: Int) = JWT.create()
+fun Application.makeToken(userId: Int): String = JWT.create()
     .withIssuer(environment.config.property("jwt.issuer").getString())
     .withClaim("user.id", userId)
     .sign(Algorithm.HMAC256(environment.config.property("jwt.secret").getString()))
+
+/**********
+ * BCrypt *
+ **********/
+object BCryptHelper {
+    fun hashPassword(password: String): ByteArray = BCrypt.withDefaults().hash(12, password.toByteArray())
+    fun verifyPassword(attemptedPassword: String, expectedPasswordHash: ByteArray) = BCrypt.verifyer().verify(attemptedPassword.toByteArray(), expectedPasswordHash).verified
+}
+
+/**********
+ * Schema *
+ **********/
+object SchemaHelper {
+    fun createTables(db: Database) = transaction(db) {
+        SchemaUtils.create(
+            UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable,
+            SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable
+        )
+    }
+
+    fun dropTables(db: Database) = transaction(db) {
+        SchemaUtils.drop(
+            UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable,
+            SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable
+        )
+    }
+}

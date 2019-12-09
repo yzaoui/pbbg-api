@@ -18,7 +18,6 @@ import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.transaction
-import kotlin.random.Random
 
 class BattleUCImpl(private val db: Database) : BattleUC {
     override fun getCurrentBattle(userId: Int): Battle? = transaction(db) {
@@ -42,20 +41,26 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         val newEnemies = mutableListOf<MyUnitForm>()
         // Add 1-3 new enemies
-        for (i in 0..Random.nextInt(1, 3)) {
-            newEnemies.add(MyUnitForm(MyUnitEnum.values().random(), Random.nextInt(7, 12), Random.nextInt(1, 3), Random.nextInt(1, 3)))
+        for (i in 0 until (1..3).random()) {
+            newEnemies.add(MyUnitForm(MyUnitEnum.values().random(), (7..11).random(), (1..2).random(), (1..2).random()))
         }
         BattleEnemyTable.insertEnemies(battleSession, newEnemies)
 
         val enemies = BattleEnemyTable.getEnemies(battleSession)
 
+        // TODO: Temporary function to get around test coverage failing when sortedByDescending is involved directly
+        fun List<Turn>.sortedByDescendingCounter() = sortedByDescending { it.counter }
+
         val battleQueue = BattleQueue(
-            turns = (allies + enemies).filter { it.alive }.map { Turn(it.id, Random.nextInt(100)) }.sortedByDescending { it.counter }
+            turns = (allies + enemies)
+                .filter { it.alive }
+                .map { Turn(it.id, (0..99).random()) }
+                .sortedByDescendingCounter()
         )
 
         BattleSessionTable.updateBattleQueue(battleSession, battleQueue)
 
-        Battle(allies = allies, enemies = enemies, battleQueue = battleQueue)
+        return@transaction Battle(allies = allies, enemies = enemies, battleQueue = battleQueue)
     }
 
     override fun allyTurn(userId: Int, action: BattleAction): BattleActionResult = transaction(db) {

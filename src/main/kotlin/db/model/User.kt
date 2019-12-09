@@ -1,7 +1,6 @@
 package com.bitwiserain.pbbg.db.model
 
 import io.ktor.auth.Principal
-import io.ktor.auth.jwt.JWTPrincipal
 import java.util.*
 
 /**

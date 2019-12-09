@@ -1,9 +1,11 @@
 package com.bitwiserain.pbbg.view.model
 
+import com.google.gson.annotations.SerializedName
+
 data class MyUnitEnumJSON(
-    val id: Int,
-    val friendlyName: String,
-    val description: String,
-    val iconURL: String,
-    val fullURL: String
+    @SerializedName("id") val id: Int,
+    @SerializedName("friendlyName") val friendlyName: String,
+    @SerializedName("description") val description: String,
+    @SerializedName("iconURL") val iconURL: String,
+    @SerializedName("fullURL") val fullURL: String
 )

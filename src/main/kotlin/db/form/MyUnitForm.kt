@@ -4,7 +4,7 @@ import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 
 /**
  * The form of fields required to create a new unit.
- * The new unit will start 0 with exp, and be at full HP.
+ * The new unit will start with 0 exp, and be at full HP.
  */
 data class MyUnitForm(
     val enum: MyUnitEnum,
