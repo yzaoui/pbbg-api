@@ -66,7 +66,7 @@ fun Application.main() {
 
     val db = Database.connect("jdbc:$jdbcAddress", when {
         jdbcAddress.startsWith("h2:") -> org.h2.Driver::class.qualifiedName!!
-        jdbcAddress.startsWith("postgresql:") -> org.h2.Driver::class.qualifiedName!!
+        jdbcAddress.startsWith("postgresql:") -> org.postgresql.Driver::class.qualifiedName!!
         else -> throw RuntimeException("Only H2 and PostgreSQL databases are currently supported.")
     })
 
