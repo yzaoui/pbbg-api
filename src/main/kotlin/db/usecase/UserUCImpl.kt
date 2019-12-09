@@ -2,7 +2,6 @@ package com.bitwiserain.pbbg.db.usecase
 
 import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.db.form.MyUnitForm
-import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.db.repository.market.MarketTable
@@ -13,18 +12,15 @@ import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class UserUCImpl(private val db: Database) : UserUC {
-    override fun getUserById(userId: Int): User? = transaction(db) {
-        UserTable.select { UserTable.id.eq(userId) }
-            .map { User(it[UserTable.id].value, it[UserTable.username], it[UserTable.passwordHash]) }
-            .singleOrNull()
-    }
-
     override fun registerUser(username: String, password: String): Int = transaction(db) {
         /* Make sure username is available */
         if (UserTable.getUserByUsername(username) != null) throw UsernameNotAvailableException(username)

@@ -105,7 +105,11 @@ fun Application.main() {
                 .build()
             )
             validate {
-                it.payload.getClaim("user.id").asInt()?.let(userUC::getUserById)
+                it.payload.getClaim("user.id").asInt()?.let {
+                    transaction(db) {
+                        UserTable.getUserById(it)
+                    }
+                }
             }
         }
     }

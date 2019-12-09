@@ -1,14 +1,8 @@
 package com.bitwiserain.pbbg.domain.usecase
 
-import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.domain.model.UserStats
 
 interface UserUC {
-    /**
-     * Gets user by ID.
-     */
-    fun getUserById(userId: Int): User?
-
     /**
      * Registers a user.
      *
