@@ -79,6 +79,24 @@ sealed class BaseItem {
             ).toPoints(3, 3, Point(1, 1))
         }
     }
+
+    sealed class Sapling : BaseItem(), Stackable {
+        object AppleSapling : Sapling() {
+            override val enum: ItemEnum get() = ItemEnum.APPLE_SAPLING
+            override val friendlyName: String get() = "Apple Sapling"
+            override val spriteName: String get() = "apple-sapling"
+            override val description: String get() = "Apple sapling description here."
+        }
+    }
+
+    sealed class Seed : BaseItem(), Stackable {
+        object TomatoSeed: Seed() {
+            override val enum: ItemEnum get() = ItemEnum.TOMATO_SEED
+            override val friendlyName: String get() = "Tomato Seed"
+            override val spriteName: String get() = "tomato-seed"
+            override val description: String get() = "Tomato seed description here."
+        }
+    }
 }
 
 private fun Array<Array<Int>>.toPoints(width: Int, height: Int, center: Point): Set<Point> {

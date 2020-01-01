@@ -8,11 +8,13 @@ object PriceManager {
         is Stone, is Coal, is CopperOre -> 3
         is IcePick -> 5
         is PlusPickaxe, is CrossPickaxe, is SquarePickaxe -> 7
+        is AppleSapling, is TomatoSeed -> 8
     }
 
     fun getBuyPrice(item: MaterializedItem): Int = when (item) {
         is Stone, is Coal, is CopperOre -> 10
         is IcePick -> 15
         is PlusPickaxe, is CrossPickaxe, is SquarePickaxe -> 20
+        is AppleSapling, is TomatoSeed -> 15
     }
 }
