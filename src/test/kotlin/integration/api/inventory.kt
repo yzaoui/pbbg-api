@@ -6,7 +6,7 @@ import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.TestApplicationResponse
 import io.ktor.server.testing.handleRequest
 
-fun TestApplicationEngine.GETInventory(token: String): TestApplicationResponse =
-    handleRequest(HttpMethod.Get, "/api/inventory") {
+fun TestApplicationEngine.GETInventory(token: String, filter: String? = null): TestApplicationResponse =
+    handleRequest(HttpMethod.Get, "/api/inventory" + if (filter != null) "?filter=$filter" else "") {
         addHeader(HttpHeaders.Authorization, "Bearer $token")
     }.response
