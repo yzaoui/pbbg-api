@@ -1,10 +1,15 @@
 package com.bitwiserain.pbbg.domain.model
 
+import com.bitwiserain.pbbg.domain.model.farm.BasePlant
+
 sealed class BaseItem {
     interface Stackable
     interface Equippable
     interface GridPreviewable {
         val grid: Set<Point>
+    }
+    interface Plantable {
+        val basePlant: BasePlant
     }
 
     abstract val enum: ItemEnum
@@ -80,21 +85,23 @@ sealed class BaseItem {
         }
     }
 
-    sealed class Sapling : BaseItem(), Stackable {
+    sealed class Sapling : BaseItem(), Stackable, Plantable {
         object AppleSapling : Sapling() {
             override val enum: ItemEnum get() = ItemEnum.APPLE_SAPLING
             override val friendlyName: String get() = "Apple Sapling"
             override val spriteName: String get() = "apple-sapling"
             override val description: String get() = "Apple sapling description here."
+            override val basePlant: BasePlant get() = BasePlant.AppleTree
         }
     }
 
-    sealed class Seed : BaseItem(), Stackable {
+    sealed class Seed : BaseItem(), Stackable, Plantable {
         object TomatoSeed: Seed() {
             override val enum: ItemEnum get() = ItemEnum.TOMATO_SEED
             override val friendlyName: String get() = "Tomato Seed"
             override val spriteName: String get() = "tomato-seed"
             override val description: String get() = "Tomato seed description here."
+            override val basePlant: BasePlant get() = BasePlant.TomatoPlant
         }
     }
 }

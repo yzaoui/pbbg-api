@@ -15,16 +15,16 @@ object Joins {
             .select { InventoryTable.userId.eq(userId) and MaterializedItemTable.itemEnum.eq(itemEnum) }
             .associate { it[MaterializedItemTable.id] to it.toMaterializedItem() }
 
-    fun getInventoryItems(userId: EntityID<Int>) =
+    fun getInventoryItems(userId: EntityID<Int>): Map<Long, InventoryItem> =
         (InventoryTable innerJoin MaterializedItemTable)
             .select { InventoryTable.userId.eq(userId) }
             .associate { it[MaterializedItemTable.id].value to it.toInventoryItem() }
 
-    fun getInventoryItem(userId: EntityID<Int>, itemId: Long) =
+    fun getInventoryItem(userId: EntityID<Int>, itemId: Long): InventoryItem? =
         (InventoryTable innerJoin MaterializedItemTable)
             .select { InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.eq(itemId) }
-            .map { it.toInventoryItem() }
             .singleOrNull()
+            ?.toInventoryItem()
 
     fun setItemEquipped(userId: EntityID<Int>, itemId: Long, equipped: Boolean) =
         InventoryTable.update({ InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.eq(itemId) }) {
