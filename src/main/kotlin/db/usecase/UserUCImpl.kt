@@ -3,6 +3,7 @@ package com.bitwiserain.pbbg.db.usecase
 import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.db.repository.farm.PlotTable
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
@@ -90,6 +91,9 @@ class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
             // Add them to new user's squad
             SquadTable.insertUnits(userId, it)
         }
+
+        /* Create user farm */
+        PlotTable.createAndGetEmptyPlot(userId.value)
 
         return@transaction userId.value
     }
