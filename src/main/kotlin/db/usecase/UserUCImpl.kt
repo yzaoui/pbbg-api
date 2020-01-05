@@ -17,10 +17,10 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
-import java.time.Instant
+import java.time.Clock
 import java.time.temporal.ChronoUnit
 
-class UserUCImpl(private val db: Database) : UserUC {
+class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
     override fun registerUser(username: String, password: String): Int = transaction(db) {
         /* Make sure username is available */
         if (UserTable.getUserByUsername(username) != null) throw UsernameNotAvailableException(username)
@@ -36,7 +36,7 @@ class UserUCImpl(private val db: Database) : UserUC {
             )
         }
 
-        val now = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+        val now = clock.instant().truncatedTo(ChronoUnit.SECONDS)
 
         /* Create user */
         val userId = UserTable.createUserAndGetId(

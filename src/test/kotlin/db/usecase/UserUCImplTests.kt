@@ -10,6 +10,7 @@ import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.usecase.*
+import com.bitwiserain.pbbg.test.MutableClock
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.dao.EntityID
@@ -21,7 +22,8 @@ import kotlin.test.*
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class UserUCImplTests {
     private val db = initDatabase()
-    private val userUC: UserUC = UserUCImpl(db)
+    private val clock = MutableClock()
+    private val userUC: UserUC = UserUCImpl(db, clock)
 
     @AfterEach
     fun dropDatabase() {

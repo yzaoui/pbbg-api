@@ -17,9 +17,10 @@ import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.Clock
 import kotlin.random.Random
 
-class MiningUCImpl(private val db: Database) : MiningUC {
+class MiningUCImpl(private val db: Database, private val clock: Clock) : MiningUC {
     override fun getMine(userId: Int): Mine? = transaction(db) {
         val userId = EntityID(userId, UserTable)
 
@@ -80,6 +81,7 @@ class MiningUCImpl(private val db: Database) : MiningUC {
     }
 
     override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction(db) {
+        val now = clock.instant()
         val userId = EntityID(userId, UserTable)
 
         /* Get currently running mine session */
@@ -119,7 +121,7 @@ class MiningUCImpl(private val db: Database) : MiningUC {
             val exp = mineEntity.exp * (if (item is Stackable) item.quantity else 1)
 
             // TODO: Store items in batch
-            val itemId = storeInInventoryReturnItemID(db, userId, item)
+            val itemId = storeInInventoryReturnItemID(db, now, userId, item)
 
             minedItemResults.add(MinedItemResult(itemId.value, item, mineEntity.exp))
             totalExp += exp

@@ -36,6 +36,7 @@ import io.ktor.routing.routing
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.Clock
 
 enum class ApplicationEnvironment {
     DEV,
@@ -45,6 +46,10 @@ lateinit var appEnvironment: ApplicationEnvironment
 lateinit var API_ROOT: String
 
 fun Application.main() {
+    mainWithDependencies(Clock.systemUTC())
+}
+
+fun Application.mainWithDependencies(clock: Clock) {
     appEnvironment = when (environment.config.propertyOrNull("ktor.environment")?.getString()) {
         "dev" -> ApplicationEnvironment.DEV
         "prod" -> ApplicationEnvironment.PROD
@@ -71,11 +76,11 @@ fun Application.main() {
 
     install(CallLogging)
 
-    val userUC = UserUCImpl(db)
+    val userUC = UserUCImpl(db, clock)
     val marketUC = MarketUCImpl(db)
     val inventoryUC = InventoryUCImpl(db)
     val itemUC = ItemUCImpl(db)
-    val miningUC = MiningUCImpl(db)
+    val miningUC = MiningUCImpl(db, clock)
     val equipmentUC = EquipmentUCImpl(db)
     val unitUC = UnitUCImpl(db)
     val battleUC = BattleUCImpl(db)
