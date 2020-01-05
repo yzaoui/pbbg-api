@@ -43,13 +43,13 @@ class UserUCImplTests {
         }
 
         @Test
-        fun `When registering a new user, the user's inventory should only contain 1 ice pick`() {
+        fun `When registering a new user, the user's inventory should contain 1 ice pick, 2 apple saplings, 5 tomato seeds`() {
             val userId = userUC.registerUser("username", "password")
 
             val inventoryItems = transaction(db) { Joins.getInventoryItems(EntityID(userId, UserTable)) }
 
-            assertEquals(1, inventoryItems.count())
-            assertTrue(inventoryItems.values.single().base is BaseItem.Pickaxe.IcePick)
+            assertEquals(3, inventoryItems.count())
+            // TODO: Finish this test
         }
 
         @Test

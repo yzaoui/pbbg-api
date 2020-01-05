@@ -27,8 +27,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 @ImplicitReflectionSerializer
 @KtorExperimentalAPI
@@ -83,7 +84,7 @@ class NewUserTests {
     }
 
     @Test
-    fun `When registering successfully, user should only have an ice pick in inventory`() = testApp(clock) {
+    fun `When registering successfully, user should have 1 ice pick, 2 apple saplings, 5 tomato seeds, and nothing equipped`() = testApp(clock) {
         val inventoryResponse = GETInventory(registerUserAndGetToken())
 
         val body = Json.parse<JsonObject>(inventoryResponse.content.orEmpty())
@@ -92,11 +93,18 @@ class NewUserTests {
             Json.parse<Inventory>(Json.stringify(body["data"]!!))
         }
 
-        assertEquals(1, inventory.items.size, "Should only have 1 item in inventory.")
+        assertEquals(3, inventory.items.size, "Should have 3 items in inventory.")
 
-        val pick = inventory.items.single()
-        assertEquals("Ice Pick", pick.item.baseItem.friendlyName, "The held item is an Ice Pick.")
-        assertTrue(pick.equipped == false, "Ice Pick is initially unequipped.")
+        listOf("Apple Sapling" to 2, "Tomato Seed" to 5).forEach { (expectedItemName, expectedItemQuantity) ->
+            inventory.items.map { it.item }.find { it.baseItem.friendlyName == expectedItemName }.let {
+                assertNotNull(it, "$expectedItemName should be in inventory.")
+                assertEquals(expectedItemQuantity, it.quantity, "There should be $expectedItemQuantity $expectedItemName in inventory.")
+            }
+        }
+
+        val icePick = inventory.items.find { it.item.baseItem.friendlyName == "Ice Pick" }
+        assertNotNull(icePick, "Ice Pick should be in inventory")
+        assertFalse(icePick.equipped!!, "Ice Pick is initially unequipped.")
 
         assertNull(inventory.equipment.pickaxe, "No pickaxe should initially be equipped.")
     }
