@@ -3,7 +3,8 @@ package com.bitwiserain.pbbg.test.integration
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.test.MutableClock
 import com.bitwiserain.pbbg.test.initDatabase
-import com.bitwiserain.pbbg.test.integration.response.InventoryResponse
+import com.bitwiserain.pbbg.test.integration.api.GETInventory
+import com.bitwiserain.pbbg.test.integration.model.Inventory
 import com.bitwiserain.pbbg.test.integration.response.RegisterResponse
 import com.bitwiserain.pbbg.test.integration.response.UserResponse
 import com.bitwiserain.pbbg.test.registerUserAndGetToken
@@ -83,23 +84,20 @@ class NewUserTests {
 
     @Test
     fun `When registering successfully, user should only have an ice pick in inventory`() = testApp(clock) {
-        handleRequest(HttpMethod.Get, "/api/inventory") {
-            addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-            addHeader(HttpHeaders.Authorization, "Bearer ${registerUserAndGetToken()}")
-        }.apply {
-            val body = Json.parse<JsonObject>(response.content.orEmpty())
+        val inventoryResponse = GETInventory(registerUserAndGetToken())
 
-            val inventory = assertDoesNotThrow {
-                Json.parse<InventoryResponse>(Json.stringify(body["data"]!!))
-            }
+        val body = Json.parse<JsonObject>(inventoryResponse.content.orEmpty())
 
-            assertEquals(1, inventory.items.size, "Should only have 1 item in inventory.")
-
-            val pick = inventory.items.single()
-            assertEquals("Ice Pick", pick.item.baseItem.friendlyName, "The held item is an Ice Pick.")
-            assertTrue(pick.equipped == false, "Ice Pick is initially unequipped.")
-
-            assertNull(inventory.equipment.pickaxe, "No pickaxe should initially be equipped.")
+        val inventory = assertDoesNotThrow {
+            Json.parse<Inventory>(Json.stringify(body["data"]!!))
         }
+
+        assertEquals(1, inventory.items.size, "Should only have 1 item in inventory.")
+
+        val pick = inventory.items.single()
+        assertEquals("Ice Pick", pick.item.baseItem.friendlyName, "The held item is an Ice Pick.")
+        assertTrue(pick.equipped == false, "Ice Pick is initially unequipped.")
+
+        assertNull(inventory.equipment.pickaxe, "No pickaxe should initially be equipped.")
     }
 }
