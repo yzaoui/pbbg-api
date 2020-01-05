@@ -47,8 +47,8 @@ class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
         /* Create user stats */
         UserStatsTable.createUserStats(userId)
 
-        /* Add ice pick to inventory */
-        listOf(MaterializedItem.IcePick).forEach { item ->
+        /* Add ice pick, apple saplings, tomato seeds to inventory */
+        listOf(MaterializedItem.IcePick, MaterializedItem.AppleSapling(2), MaterializedItem.TomatoSeed(5)).forEach { item ->
             val itemId = MaterializedItemTable.insertItemAndGetId(item)
             ItemHistoryTable.insertItemHistory(
                 itemId = itemId.value,
