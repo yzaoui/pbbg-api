@@ -16,6 +16,7 @@ interface FarmUC {
      * @throws UserPlotNotFoundException when this user-plot combination is not found.
      * @throws OccupiedPlotException when this plot is already occupied.
      * @throws InventoryItemNotFoundException when this user-item combination is not found.
+     * @throws InsufficientItemQuantity when there aren't enough of this item to plant.
      * @throws ItemNotPlantableException when this item is not plantable.
      */
     fun plant(userId: Int, plotId: Long, itemId: Long): Plot
@@ -42,5 +43,6 @@ interface FarmUC {
 class UserPlotNotFoundException : Exception()
 class OccupiedPlotException : Exception()
 class EmptyPlotException : Exception()
+class InsufficientItemQuantity : Exception()
 class ItemNotPlantableException : Exception()
 class PlantNotHarvestableException : Exception()

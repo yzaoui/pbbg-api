@@ -1,11 +1,14 @@
 package com.bitwiserain.pbbg.db.usecase
 
+import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.Joins
+import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable
 import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable.PlantForm
 import com.bitwiserain.pbbg.db.repository.farm.PlotTable
 import com.bitwiserain.pbbg.domain.model.BaseItem
+import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.farm.IBasePlant
 import com.bitwiserain.pbbg.domain.model.farm.IMaterializedPlant
 import com.bitwiserain.pbbg.domain.model.farm.MaterializedPlant
@@ -31,7 +34,11 @@ class FarmUCImpl(private val db: Database, private val clock: Clock) : FarmUC {
         if (plot.plant != null) throw OccupiedPlotException()
 
         /* Make sure user owns this item */
-        val baseItem = (Joins.getInventoryItem(EntityID(userId, UserTable), itemId) ?: throw InventoryItemNotFoundException(itemId)).base
+        val item = (Joins.getInventoryItem(EntityID(userId, UserTable), itemId) ?: throw InventoryItemNotFoundException(itemId)).item
+        /* and that there is at least 1 item */
+        if (item is MaterializedItem.Stackable && item.quantity < 1) throw InsufficientItemQuantity()
+
+        val baseItem = item.base
 
         /* Make sure item can be planted */
         if (baseItem !is BaseItem.Plantable) throw ItemNotPlantableException()
@@ -43,7 +50,15 @@ class FarmUCImpl(private val db: Database, private val clock: Clock) : FarmUC {
             isMaturable = baseItem.basePlant is IBasePlant.Maturable
         )).value
 
+        /* Update plot that was planted into */
         PlotTable.updatePlot(userId, plot.id, plantId)
+
+        /* Remove plantable item that was used */
+        if (item is MaterializedItem.Stackable) {
+            MaterializedItemTable.updateQuantity(itemId, -1)
+        } else {
+            InventoryTable.removeItem(userId, itemId)
+        }
 
         return@transaction PlotTable.getPlot(userId, plot.id)!!
     }
