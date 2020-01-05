@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.domain.PriceManager
 import com.bitwiserain.pbbg.domain.model.BaseItem
+import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.market.Market
@@ -23,11 +24,15 @@ class MarketUCImpl(private val db: Database) : MarketUC {
         val gold = UserStatsTable.getUserStats(userId).gold
 
         val userMarket = Market(
-            Joins.getInventoryItems(userId).mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }
+            Joins.getInventoryItems(userId)
+                .filterOutZeroQuantityItems()
+                .mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }
         )
 
         val gameMarket = Market(
-            Joins.Market.getItems(userId).mapValues { MarketItem(it.value, PriceManager.getBuyPrice(it.value)) }
+            Joins.Market.getItems(userId)
+                .filterOutZeroQuantityItems()
+                .mapValues { MarketItem(it.value, PriceManager.getBuyPrice(it.value)) }
         )
 
         return@transaction UserAndGameMarkets(gold = gold, userMarket = userMarket, gameMarket = gameMarket)
@@ -173,11 +178,7 @@ class MarketUCImpl(private val db: Database) : MarketUC {
                 }
 
                 /** Handle user-side of item **/
-                if (order.quantity == userItem.quantity) {
-                    userItemsToRemove.add(order.id)
-                } else {
-                    userItemsToUpdateQuantity[order.id] = -order.quantity
-                }
+                userItemsToUpdateQuantity[order.id] = -order.quantity
 
                 gold += PriceManager.getSellPrice(userItem) * order.quantity
             } else {
@@ -219,4 +220,8 @@ class MarketUCImpl(private val db: Database) : MarketUC {
             )
         )
     }
+}
+
+private fun Map<Long, MaterializedItem>.filterOutZeroQuantityItems() = filter {
+    it.value.let { it !is MaterializedItem.Stackable || it.quantity > 0 }
 }
