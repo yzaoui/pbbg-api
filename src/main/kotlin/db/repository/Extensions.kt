@@ -48,6 +48,7 @@ fun ResultRow.toMaterializedItem(): MaterializedItem {
         ItemEnum.APPLE_SAPLING -> MaterializedItem.AppleSapling(quantity!!)
         ItemEnum.TOMATO_SEED -> MaterializedItem.TomatoSeed(quantity!!)
         ItemEnum.APPLE -> MaterializedItem.Apple(quantity!!)
+        ItemEnum.TOMATO -> MaterializedItem.Tomato(quantity!!)
     }
 }
 

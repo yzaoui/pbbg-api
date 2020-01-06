@@ -10,5 +10,6 @@ enum class ItemEnum(val baseItem: BaseItem) {
     SQUARE_PICKAXE(BaseItem.Pickaxe.SquarePickaxe),
     APPLE_SAPLING(BaseItem.Sapling.AppleSapling),
     TOMATO_SEED(BaseItem.Seed.TomatoSeed),
-    APPLE(BaseItem.Apple)
+    APPLE(BaseItem.Apple),
+    TOMATO(BaseItem.Tomato)
 }

@@ -111,6 +111,13 @@ sealed class BaseItem {
         override val spriteName: String get() = "apple"
         override val description: String get() = "Apple description here."
     }
+
+    object Tomato : BaseItem(), Stackable {
+        override val enum: ItemEnum get() = ItemEnum.TOMATO
+        override val friendlyName: String get() = "Tomato"
+        override val spriteName: String get() = "tomato"
+        override val description: String get() = "Tomato description here."
+    }
 }
 
 private fun Array<Array<Int>>.toPoints(width: Int, height: Int, center: Point): Set<Point> {
