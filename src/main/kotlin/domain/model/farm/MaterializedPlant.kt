@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.domain.model.farm
 
-import java.time.Clock
 import java.time.Instant
 
 interface IMaterializedPlant {

@@ -74,7 +74,7 @@ class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
                 itemId = itemId.value,
                 itemHistory = ItemHistory(
                     date = now,
-                    info = ItemHistoryInfo.CreatedInMarket()
+                    info = ItemHistoryInfo.CreatedInMarket
                 )
             )
         }

@@ -10,15 +10,22 @@ sealed class ItemHistoryInfo {
     }
 
     @Serializable
-    class CreatedInMarket : ItemHistoryInfo() {
-        override val enum: ItemHistoryInfoEnum get() = ItemHistoryInfoEnum.CREATED_IN_MARKET
+    object CreatedInMarket : ItemHistoryInfo() {
+        override val enum = ItemHistoryInfoEnum.CREATED_IN_MARKET
     }
+
     @Serializable
     class CreatedWithUser(override val userId: Int) : ItemHistoryInfo(), HasUserId {
-        override val enum: ItemHistoryInfoEnum get() = ItemHistoryInfoEnum.CREATED_WITH_USER
+        override val enum = ItemHistoryInfoEnum.CREATED_WITH_USER
     }
+
     @Serializable
     class FirstMined(override val userId: Int) : ItemHistoryInfo(), HasUserId {
-        override val enum: ItemHistoryInfoEnum get() = ItemHistoryInfoEnum.FIRST_MINED
+        override val enum = ItemHistoryInfoEnum.FIRST_MINED
+    }
+
+    @Serializable
+    class FirstHarvested(override val userId: Int) : ItemHistoryInfo(), HasUserId {
+        override val enum = ItemHistoryInfoEnum.FIRST_HARVESTED
     }
 }

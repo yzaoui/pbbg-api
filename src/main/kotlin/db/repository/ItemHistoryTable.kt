@@ -40,6 +40,7 @@ object ItemHistoryTable : Table() {
         is CreatedInMarket -> Json.stringify(CreatedInMarket.serializer(), this)
         is CreatedWithUser -> Json.stringify(CreatedWithUser.serializer(), this)
         is FirstMined -> Json.stringify(FirstMined.serializer(), this)
+        is FirstHarvested -> Json.stringify(FirstHarvested.serializer(), this)
     }
 
     @UnstableDefault
@@ -47,5 +48,6 @@ object ItemHistoryTable : Table() {
         CREATED_IN_MARKET -> Json.parse(CreatedInMarket.serializer(), infoJSON)
         CREATED_WITH_USER -> Json.parse(CreatedWithUser.serializer(), infoJSON)
         FIRST_MINED -> Json.parse(FirstMined.serializer(), infoJSON)
+        FIRST_HARVESTED -> Json.parse(FirstHarvested.serializer(), infoJSON)
     }
 }

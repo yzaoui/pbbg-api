@@ -41,10 +41,12 @@ fun ItemHistoryInfo.toJSON() = ItemHistoryInfoJSON(
         is ItemHistoryInfo.CreatedInMarket -> "created-market"
         is ItemHistoryInfo.CreatedWithUser -> "created-user"
         is ItemHistoryInfo.FirstMined -> "first-mined"
+        is ItemHistoryInfo.FirstHarvested -> "first-harvested"
     },
     userId = when (this) {
         is ItemHistoryInfo.CreatedInMarket -> null
         is ItemHistoryInfo.CreatedWithUser -> userId
         is ItemHistoryInfo.FirstMined -> userId
+        is ItemHistoryInfo.FirstHarvested -> userId
     }
 )
