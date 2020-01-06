@@ -3,6 +3,7 @@ package com.bitwiserain.pbbg.db.usecase
 import com.bitwiserain.pbbg.*
 import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.db.repository.farm.PlotTable
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
@@ -17,10 +18,10 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
-import java.time.Instant
+import java.time.Clock
 import java.time.temporal.ChronoUnit
 
-class UserUCImpl(private val db: Database) : UserUC {
+class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
     override fun registerUser(username: String, password: String): Int = transaction(db) {
         /* Make sure username is available */
         if (UserTable.getUserByUsername(username) != null) throw UsernameNotAvailableException(username)
@@ -36,7 +37,7 @@ class UserUCImpl(private val db: Database) : UserUC {
             )
         }
 
-        val now = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+        val now = clock.instant().truncatedTo(ChronoUnit.SECONDS)
 
         /* Create user */
         val userId = UserTable.createUserAndGetId(
@@ -47,8 +48,8 @@ class UserUCImpl(private val db: Database) : UserUC {
         /* Create user stats */
         UserStatsTable.createUserStats(userId)
 
-        /* Add ice pick to inventory */
-        listOf(MaterializedItem.IcePick).forEach { item ->
+        /* Add ice pick, apple saplings, tomato seeds to inventory */
+        listOf(MaterializedItem.IcePick, MaterializedItem.AppleSapling(2), MaterializedItem.TomatoSeed(5)).forEach { item ->
             val itemId = MaterializedItemTable.insertItemAndGetId(item)
             ItemHistoryTable.insertItemHistory(
                 itemId = itemId.value,
@@ -73,7 +74,7 @@ class UserUCImpl(private val db: Database) : UserUC {
                 itemId = itemId.value,
                 itemHistory = ItemHistory(
                     date = now,
-                    info = ItemHistoryInfo.CreatedInMarket()
+                    info = ItemHistoryInfo.CreatedInMarket
                 )
             )
         }
@@ -90,6 +91,9 @@ class UserUCImpl(private val db: Database) : UserUC {
             // Add them to new user's squad
             SquadTable.insertUnits(userId, it)
         }
+
+        /* Create user farm */
+        PlotTable.createAndGetEmptyPlot(userId.value)
 
         return@transaction userId.value
     }

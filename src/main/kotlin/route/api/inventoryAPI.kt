@@ -6,6 +6,7 @@ import com.bitwiserain.pbbg.domain.model.Inventory
 import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.usecase.*
+import com.bitwiserain.pbbg.domain.usecase.InventoryFilter.PLANTABLE
 import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.user
@@ -24,12 +25,20 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
      * On success:
      *   [InventoryJSON]
      */
-    get {
-        val loggedInUser = call.user
+    optionalParam("filter") {
+        get {
+            val loggedInUser = call.user
 
-        val inventory = inventoryUC.getInventory(loggedInUser.id)
+            val filter = when (call.request.queryParameters["filter"]) {
+                "plantable" -> PLANTABLE
+                null -> null
+                else -> throw Exception()
+            }
 
-        call.respondSuccess(inventory.toJSON())
+            val inventory = inventoryUC.getInventory(loggedInUser.id, filter)
+
+            call.respondSuccess(inventory.toJSON())
+        }
     }
 
     route("/equipment") {
@@ -52,7 +61,7 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
              */
             post {
                 try {
-                    val equipAction = call.parameters["action"]
+                    val equipAction = call.request.queryParameters["action"]
 
                     if (!(equipAction == "equip" || equipAction == "unequip")) {
                         return@post call.respondFail("Missing equip query parameter")

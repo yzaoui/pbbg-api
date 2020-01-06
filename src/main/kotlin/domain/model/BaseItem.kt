@@ -1,10 +1,15 @@
 package com.bitwiserain.pbbg.domain.model
 
+import com.bitwiserain.pbbg.domain.model.farm.BasePlant
+
 sealed class BaseItem {
     interface Stackable
     interface Equippable
     interface GridPreviewable {
         val grid: Set<Point>
+    }
+    interface Plantable {
+        val basePlant: BasePlant
     }
 
     abstract val enum: ItemEnum
@@ -78,6 +83,40 @@ sealed class BaseItem {
                 arrayOf(1, 1, 1)
             ).toPoints(3, 3, Point(1, 1))
         }
+    }
+
+    sealed class Sapling : BaseItem(), Stackable, Plantable {
+        object AppleSapling : Sapling() {
+            override val enum: ItemEnum get() = ItemEnum.APPLE_SAPLING
+            override val friendlyName: String get() = "Apple Sapling"
+            override val spriteName: String get() = "apple-sapling"
+            override val description: String get() = "Apple sapling description here."
+            override val basePlant: BasePlant get() = BasePlant.AppleTree
+        }
+    }
+
+    sealed class Seed : BaseItem(), Stackable, Plantable {
+        object TomatoSeed : Seed() {
+            override val enum: ItemEnum get() = ItemEnum.TOMATO_SEED
+            override val friendlyName: String get() = "Tomato Seed"
+            override val spriteName: String get() = "tomato-seed"
+            override val description: String get() = "Tomato seed description here."
+            override val basePlant: BasePlant get() = BasePlant.TomatoPlant
+        }
+    }
+
+    object Apple : BaseItem(), Stackable {
+        override val enum: ItemEnum get() = ItemEnum.APPLE
+        override val friendlyName: String get() = "Apple"
+        override val spriteName: String get() = "apple"
+        override val description: String get() = "Apple description here."
+    }
+
+    object Tomato : BaseItem(), Stackable {
+        override val enum: ItemEnum get() = ItemEnum.TOMATO
+        override val friendlyName: String get() = "Tomato"
+        override val spriteName: String get() = "tomato"
+        override val description: String get() = "Tomato description here."
     }
 }
 

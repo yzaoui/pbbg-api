@@ -40,7 +40,7 @@ class ItemUCImplTests {
 
             listOf(ItemHistory(
                 date = creationDate,
-                info = ItemHistoryInfo.CreatedInMarket()
+                info = ItemHistoryInfo.CreatedInMarket
             ), ItemHistory(
                 date = creationDate.plusSeconds(60),
                 info = ItemHistoryInfo.FirstMined(2)

@@ -45,6 +45,10 @@ fun ResultRow.toMaterializedItem(): MaterializedItem {
         ItemEnum.PLUS_PICKAXE -> MaterializedItem.PlusPickaxe
         ItemEnum.CROSS_PICKAXE -> MaterializedItem.CrossPickaxe
         ItemEnum.SQUARE_PICKAXE -> MaterializedItem.SquarePickaxe
+        ItemEnum.APPLE_SAPLING -> MaterializedItem.AppleSapling(quantity!!)
+        ItemEnum.TOMATO_SEED -> MaterializedItem.TomatoSeed(quantity!!)
+        ItemEnum.APPLE -> MaterializedItem.Apple(quantity!!)
+        ItemEnum.TOMATO -> MaterializedItem.Tomato(quantity!!)
     }
 }
 

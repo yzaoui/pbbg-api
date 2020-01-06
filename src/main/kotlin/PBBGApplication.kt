@@ -7,6 +7,8 @@ import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
+import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable
+import com.bitwiserain.pbbg.db.repository.farm.PlotTable
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
@@ -36,6 +38,7 @@ import io.ktor.routing.routing
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.Clock
 
 enum class ApplicationEnvironment {
     DEV,
@@ -45,6 +48,10 @@ lateinit var appEnvironment: ApplicationEnvironment
 lateinit var API_ROOT: String
 
 fun Application.main() {
+    mainWithDependencies(Clock.systemUTC())
+}
+
+fun Application.mainWithDependencies(clock: Clock) {
     appEnvironment = when (environment.config.propertyOrNull("ktor.environment")?.getString()) {
         "dev" -> ApplicationEnvironment.DEV
         "prod" -> ApplicationEnvironment.PROD
@@ -71,11 +78,12 @@ fun Application.main() {
 
     install(CallLogging)
 
-    val userUC = UserUCImpl(db)
+    val userUC = UserUCImpl(db, clock)
     val marketUC = MarketUCImpl(db)
     val inventoryUC = InventoryUCImpl(db)
     val itemUC = ItemUCImpl(db)
-    val miningUC = MiningUCImpl(db)
+    val miningUC = MiningUCImpl(db, clock)
+    val farmUC = FarmUCImpl(db, clock)
     val equipmentUC = EquipmentUCImpl(db)
     val unitUC = UnitUCImpl(db)
     val battleUC = BattleUCImpl(db)
@@ -126,6 +134,7 @@ fun Application.main() {
                 market(marketUC)
                 battleAPI(battleUC)
                 mine(miningUC)
+                farm(farmUC, clock)
                 dexAPI(dexUC)
                 squadAPI(unitUC)
                 settings(userUC)
@@ -179,14 +188,16 @@ object SchemaHelper {
     fun createTables(db: Database) = transaction(db) {
         SchemaUtils.create(
             UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable,
-            SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable
+            SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable,
+            PlotTable, MaterializedPlantTable
         )
     }
 
     fun dropTables(db: Database) = transaction(db) {
         SchemaUtils.drop(
             UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable,
-            SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable
+            SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable,
+            PlotTable, MaterializedPlantTable
         )
     }
 }
