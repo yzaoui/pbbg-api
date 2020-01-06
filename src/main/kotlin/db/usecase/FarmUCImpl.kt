@@ -13,6 +13,7 @@ import com.bitwiserain.pbbg.domain.model.farm.IBasePlant
 import com.bitwiserain.pbbg.domain.model.farm.IMaterializedPlant
 import com.bitwiserain.pbbg.domain.model.farm.MaterializedPlant
 import com.bitwiserain.pbbg.domain.model.farm.Plot
+import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
@@ -74,6 +75,13 @@ class FarmUCImpl(private val db: Database, private val clock: Clock) : FarmUC {
 
         /* Make sure plant can be harvested */
         if (!plant.canBeHarvested(now)) throw PlantNotHarvestableException()
+
+        val crop: MaterializedItem = when (plant) {
+            is MaterializedPlant.AppleTree -> MaterializedItem.Apple(1)
+            is MaterializedPlant.TomatoPlant -> MaterializedItem.Tomato(1)
+        }
+
+        storeInInventoryReturnItemID(db, now, EntityID(userId, UserTable), crop, ItemHistoryInfo.FirstHarvested(userId))
 
         if (plant is IMaterializedPlant.Maturable) {
             /* For maturable plants, start new cycle and harvest */

@@ -12,6 +12,7 @@ import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem.Stackable
 import com.bitwiserain.pbbg.domain.model.Point
+import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.model.mine.*
 import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.dao.EntityID
@@ -121,7 +122,7 @@ class MiningUCImpl(private val db: Database, private val clock: Clock) : MiningU
             val exp = mineEntity.exp * (if (item is Stackable) item.quantity else 1)
 
             // TODO: Store items in batch
-            val itemId = storeInInventoryReturnItemID(db, now, userId, item)
+            val itemId = storeInInventoryReturnItemID(db, now, userId, item, ItemHistoryInfo.FirstMined(userId.value))
 
             minedItemResults.add(MinedItemResult(itemId.value, item, mineEntity.exp))
             totalExp += exp
