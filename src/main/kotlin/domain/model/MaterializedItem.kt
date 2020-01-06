@@ -45,4 +45,9 @@ sealed class MaterializedItem {
         override val base get() = BaseItem.Seed.TomatoSeed
         override fun copy(quantity: Int): Stackable = TomatoSeed(quantity)
     }
+
+    class Apple(override val quantity: Int) : MaterializedItem(), Stackable {
+        override val base get() = BaseItem.Apple
+        override fun copy(quantity: Int): Stackable = Apple(quantity)
+    }
 }

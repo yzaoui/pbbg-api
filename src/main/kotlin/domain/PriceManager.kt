@@ -11,6 +11,7 @@ object PriceManager {
         is SquarePickaxe -> 10
         is AppleSapling -> 8
         is TomatoSeed -> 3
+        is Apple -> 3
     }
 
     fun getBuyPrice(item: MaterializedItem): Int = when (item) {
@@ -20,5 +21,6 @@ object PriceManager {
         is SquarePickaxe -> 25
         is AppleSapling -> 20
         is TomatoSeed -> 10
+        is Apple -> 5
     }
 }

@@ -96,13 +96,20 @@ sealed class BaseItem {
     }
 
     sealed class Seed : BaseItem(), Stackable, Plantable {
-        object TomatoSeed: Seed() {
+        object TomatoSeed : Seed() {
             override val enum: ItemEnum get() = ItemEnum.TOMATO_SEED
             override val friendlyName: String get() = "Tomato Seed"
             override val spriteName: String get() = "tomato-seed"
             override val description: String get() = "Tomato seed description here."
             override val basePlant: BasePlant get() = BasePlant.TomatoPlant
         }
+    }
+
+    object Apple : BaseItem(), Stackable {
+        override val enum: ItemEnum get() = ItemEnum.APPLE
+        override val friendlyName: String get() = "Apple"
+        override val spriteName: String get() = "apple"
+        override val description: String get() = "Apple description here."
     }
 }
 
