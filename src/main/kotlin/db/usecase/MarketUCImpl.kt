@@ -127,10 +127,12 @@ class MarketUCImpl(private val db: Database) : MarketUC {
             gold = gold,
             userMarket = Market(
                 Joins.getInventoryItems(userId)
+                    .filterOutZeroQuantityItems()
                     .mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }
             ),
             gameMarket = Market(
                 Joins.Market.getItems(userId)
+                    .filterOutZeroQuantityItems()
                     .mapValues { MarketItem(it.value, PriceManager.getBuyPrice(it.value)) }
             )
         )
@@ -212,10 +214,12 @@ class MarketUCImpl(private val db: Database) : MarketUC {
             gold = gold,
             userMarket = Market(
                 Joins.getInventoryItems(userId)
+                    .filterOutZeroQuantityItems()
                     .mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }
             ),
             gameMarket = Market(
                 Joins.Market.getItems(userId)
+                    .filterOutZeroQuantityItems()
                     .mapValues { MarketItem(it.value, PriceManager.getBuyPrice(it.value)) }
             )
         )
