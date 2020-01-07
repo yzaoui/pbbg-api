@@ -12,9 +12,7 @@ import com.bitwiserain.pbbg.domain.model.UserStats
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.usecase.*
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -52,10 +50,10 @@ class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
         listOf(MaterializedItem.IcePick, MaterializedItem.AppleSapling(2), MaterializedItem.TomatoSeed(5)).forEach { item ->
             val itemId = MaterializedItemTable.insertItemAndGetId(item)
             ItemHistoryTable.insertItemHistory(
-                itemId = itemId.value,
+                itemId = itemId,
                 itemHistory = ItemHistory(
                     date = now,
-                    info = ItemHistoryInfo.CreatedWithUser(userId.value)
+                    info = ItemHistoryInfo.CreatedWithUser(userId)
                 )
             )
             InventoryTable.insertItem(userId, itemId, item.base)
@@ -63,15 +61,14 @@ class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
         }
 
         /* Create user's market */
-        val marketId = MarketTable.insertAndGetId {
-            it[MarketTable.userId] = userId
-        }
+        val marketId = MarketTable.createMarketAndGetId(userId)
+
         // Fill market with three pickaxe types
         listOf(MaterializedItem.PlusPickaxe, MaterializedItem.CrossPickaxe, MaterializedItem.SquarePickaxe).forEach { item ->
             val itemId = MaterializedItemTable.insertItemAndGetId(item)
             MarketInventoryTable.insertItem(marketId, itemId)
             ItemHistoryTable.insertItemHistory(
-                itemId = itemId.value,
+                itemId = itemId,
                 itemHistory = ItemHistory(
                     date = now,
                     info = ItemHistoryInfo.CreatedInMarket
@@ -93,9 +90,9 @@ class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
         }
 
         /* Create user farm */
-        PlotTable.createAndGetEmptyPlot(userId.value)
+        PlotTable.createAndGetEmptyPlot(userId)
 
-        return@transaction userId.value
+        return@transaction userId
     }
 
     override fun getUserIdByCredentials(username: String, password: String): Int? {
@@ -112,7 +109,7 @@ class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
 
     override fun getUserStatsByUserId(userId: Int): UserStats = transaction(db) {
         // TODO: Consider checking if user exists
-        UserStatsTable.getUserStats(EntityID(userId, UserTable))
+        UserStatsTable.getUserStats(userId)
     }
 
     override fun changePassword(userId: Int, currentPassword: String, newPassword: String, confirmNewPassword: String): Unit = transaction(db) {

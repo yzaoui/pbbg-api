@@ -9,14 +9,14 @@ object InventoryTable : Table() {
     val materializedItem = reference("materialized_item", MaterializedItemTable).primaryKey()
     val equipped = bool("equipped").nullable()
 
-    fun insertItem(userId: EntityID<Int>, itemId: EntityID<Long>, baseItem: BaseItem) = insert {
-        it[InventoryTable.userId] = userId
-        it[InventoryTable.materializedItem] = itemId
+    fun insertItem(userId: Int, itemId: Long, baseItem: BaseItem) = insert {
+        it[InventoryTable.userId] = EntityID(userId, UserTable)
+        it[InventoryTable.materializedItem] = EntityID(itemId, MaterializedItemTable)
         if (baseItem is BaseItem.Equippable) it[InventoryTable.equipped] = false
     }
 
-    fun insertItems(userId: EntityID<Int>, itemEntries: Map<Long, BaseItem>) = batchInsert(itemEntries.asIterable()) { entry ->
-        this[InventoryTable.userId] = userId
+    fun insertItems(userId: Int, itemEntries: Map<Long, BaseItem>) = batchInsert(itemEntries.asIterable()) { entry ->
+        this[InventoryTable.userId] = EntityID(userId, UserTable)
         this[InventoryTable.materializedItem] = EntityID(entry.key, MaterializedItemTable)
         if (entry.value is BaseItem.Equippable) this[InventoryTable.equipped] = false
     }
@@ -25,7 +25,7 @@ object InventoryTable : Table() {
         InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.eq(itemId)
     }
 
-    fun removeItems(userId: EntityID<Int>, itemIds: Iterable<Long>) = deleteWhere {
+    fun removeItems(userId: Int, itemIds: Iterable<Long>) = deleteWhere {
         InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.inList(itemIds)
     }
 }

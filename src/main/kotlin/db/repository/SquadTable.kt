@@ -32,10 +32,10 @@ object SquadTable : LongIdTable() {
             .map { it.toMyUnit() }
     }
 
-    fun insertUnits(userId: EntityID<Int>, unitIds: Iterable<EntityID<Long>>) {
+    fun insertUnits(userId: Int, unitIds: Iterable<Long>) {
         batchInsert(unitIds) { unitId ->
-            this[SquadTable.user] = userId
-            this[SquadTable.unit] = unitId
+            this[SquadTable.user] = EntityID(userId, UserTable)
+            this[SquadTable.unit] = EntityID(unitId, UnitTable)
         }
     }
 }

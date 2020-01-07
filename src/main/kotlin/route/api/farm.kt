@@ -1,7 +1,10 @@
 package com.bitwiserain.pbbg.route.api
 
 import com.bitwiserain.pbbg.API_ROOT
-import com.bitwiserain.pbbg.domain.model.farm.*
+import com.bitwiserain.pbbg.domain.model.farm.IBasePlant
+import com.bitwiserain.pbbg.domain.model.farm.IMaterializedPlant
+import com.bitwiserain.pbbg.domain.model.farm.MaterializedPlant
+import com.bitwiserain.pbbg.domain.model.farm.Plot
 import com.bitwiserain.pbbg.domain.usecase.FarmUC
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.user

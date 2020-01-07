@@ -2,7 +2,6 @@ package com.bitwiserain.pbbg.db.repository.farm
 
 import com.bitwiserain.pbbg.domain.model.farm.MaterializedPlant
 import com.bitwiserain.pbbg.domain.model.farm.PlantEnum
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.LongIdTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.deleteWhere
@@ -15,11 +14,11 @@ object MaterializedPlantTable : LongIdTable() {
     val cycleStart = long("cycle_start")
     val isFirstHarvest = bool("is_first_harvest").nullable()
 
-    fun insertPlantAndGetId(plant: PlantForm): EntityID<Long> = insertAndGetId {
+    fun insertPlantAndGetId(plant: PlantForm): Long = insertAndGetId {
         it[MaterializedPlantTable.plantEnum] = plant.enum
         it[MaterializedPlantTable.cycleStart] = plant.cycleStart.epochSecond
         if (plant.isMaturable) it[MaterializedPlantTable.isFirstHarvest] = true
-    }
+    }.value
 
     fun setNewPlantCycleAndHarvest(plantId: Long, newCycleStart: Instant) {
         update({ MaterializedPlantTable.id.eq(plantId) }) {

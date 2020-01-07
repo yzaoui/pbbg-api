@@ -4,7 +4,6 @@ import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.domain.PriceManager
 import com.bitwiserain.pbbg.domain.model.BaseItem
-import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.market.Market
@@ -13,14 +12,11 @@ import com.bitwiserain.pbbg.domain.model.market.MarketOrder
 import com.bitwiserain.pbbg.domain.model.market.UserAndGameMarkets
 import com.bitwiserain.pbbg.domain.usecase.MarketUC
 import com.bitwiserain.pbbg.domain.usecase.NotEnoughGoldException
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class MarketUCImpl(private val db: Database) : MarketUC {
     override fun getMarkets(userId: Int): UserAndGameMarkets = transaction(db) {
-        val userId = EntityID(userId, UserTable)
-
         val gold = UserStatsTable.getUserStats(userId).gold
 
         val userMarket = Market(
@@ -39,8 +35,6 @@ class MarketUCImpl(private val db: Database) : MarketUC {
     }
 
     override fun buy(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction(db) {
-        val userId = EntityID(userId, UserTable)
-
         var gold = UserStatsTable.getUserStats(userId).gold
         val userMarket = Joins.getInventoryItems(userId).toMutableMap()
         val gameMarket = Joins.Market.getItems(userId).toMutableMap()
@@ -110,7 +104,7 @@ class MarketUCImpl(private val db: Database) : MarketUC {
         userStackableItemsToCreate.forEach {
             val item = it as MaterializedItem
 
-            userItemsToInsert[MaterializedItemTable.insertItemAndGetId(item).value] = item.base
+            userItemsToInsert[MaterializedItemTable.insertItemAndGetId(item)] = item.base
         }
         /* Insert items into user's inventory */
         InventoryTable.insertItems(userId, userItemsToInsert)
@@ -139,8 +133,6 @@ class MarketUCImpl(private val db: Database) : MarketUC {
     }
 
     override fun sell(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction(db) {
-        val userId = EntityID(userId, UserTable)
-
         var gold = UserStatsTable.getUserStats(userId).gold
         val userMarket = Joins.getInventoryItems(userId).toMutableMap()
         val gameMarket = Joins.Market.getItems(userId).toMutableMap()
@@ -199,7 +191,7 @@ class MarketUCImpl(private val db: Database) : MarketUC {
         gameStackableItemsToCreate.forEach {
             val item = it as MaterializedItem
 
-            gameItemsToInsert.add(MaterializedItemTable.insertItemAndGetId(item).value)
+            gameItemsToInsert.add(MaterializedItemTable.insertItemAndGetId(item))
         }
         /* Insert items into game's market */
         Joins.Market.insertItems(userId, gameItemsToInsert)

@@ -6,14 +6,12 @@ import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.usecase.UserUCImpl
-import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.usecase.*
 import com.bitwiserain.pbbg.test.MutableClock
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Test
@@ -36,7 +34,7 @@ class UserUCImplTests {
         fun `When registering a new user, the user should have 0 gold and 0 mining exp`() {
             val userId = userUC.registerUser("username", "password")
 
-            val stats = transaction(db) { UserStatsTable.getUserStats(EntityID(userId, UserTable)) }
+            val stats = transaction(db) { UserStatsTable.getUserStats(userId) }
 
             assertEquals(0, stats.gold)
             assertEquals(0, stats.miningExp)
@@ -46,7 +44,7 @@ class UserUCImplTests {
         fun `When registering a new user, the user's inventory should contain 1 ice pick, 2 apple saplings, 5 tomato seeds`() {
             val userId = userUC.registerUser("username", "password")
 
-            val inventoryItems = transaction(db) { Joins.getInventoryItems(EntityID(userId, UserTable)) }
+            val inventoryItems = transaction(db) { Joins.getInventoryItems(userId) }
 
             assertEquals(3, inventoryItems.count())
             // TODO: Finish this test
@@ -56,7 +54,7 @@ class UserUCImplTests {
         fun `When registering a new user, the user's market should have plus pickaxe, cross pickaxe, and square pickaxe`() {
             val userId = userUC.registerUser("username", "password")
 
-            val marketItems = transaction(db) { Joins.Market.getItems(EntityID(userId, UserTable)) }
+            val marketItems = transaction(db) { Joins.Market.getItems(userId) }
 
             assertEquals(3, marketItems.count())
             assertTrue(
@@ -135,7 +133,7 @@ class UserUCImplTests {
     inner class ByCredentials {
         @Test
         fun `Given an existing user, when getting the user's ID by correct credentials, the ID should return`() {
-            val expectedUserId = createTestUserAndGetId(db, username = "username24", password = "pass123").value
+            val expectedUserId = createTestUserAndGetId(db, username = "username24", password = "pass123")
 
             val actualUserId = userUC.getUserIdByCredentials("username24", "pass123")
 
@@ -144,7 +142,7 @@ class UserUCImplTests {
 
         @Test
         fun `Given an existing user, when getting the user's ID by incorrect credentials, no ID should be returned`() {
-            val expectedUserId = createTestUserAndGetId(db, username = "username24", password = "pass123").value
+            val expectedUserId = createTestUserAndGetId(db, username = "username24", password = "pass123")
 
             /* Test incorrect username */
             assertNull(userUC.getUserIdByCredentials("incorrecto17", "pass123"))
@@ -169,7 +167,7 @@ class UserUCImplTests {
                 UserStatsTable.updateMiningExp(userId, 500)
             }
 
-            val stats = userUC.getUserStatsByUserId(userId.value)
+            val stats = userUC.getUserStatsByUserId(userId)
 
             assertEquals(20, stats.gold)
             assertEquals(500, stats.miningExp)
@@ -180,7 +178,7 @@ class UserUCImplTests {
     inner class ChangePassword {
         @Test
         fun `Given an existing user, when changing password with correct parameters, password should be changed`() {
-            val userId = createTestUserAndGetId(db, "user", "pass123").value
+            val userId = createTestUserAndGetId(db, "user", "pass123")
 
             val newPassword = "new27pas".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
 
@@ -196,7 +194,7 @@ class UserUCImplTests {
         @Test
         fun `Given an existing user, when changing password with an incorrect current password parameter, WrongCurrentPasswordException should be thrown`() {
             val originalPassword = "pass123".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-            val userId = createTestUserAndGetId(db, "usr71", originalPassword).value
+            val userId = createTestUserAndGetId(db, "usr71", originalPassword)
 
             val newPassword = "5fkd^s91$-".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
 
@@ -214,7 +212,7 @@ class UserUCImplTests {
         @Test
         fun `Given an existing user, when changing password with an incorrectly confirmed new password parameter, UnconfirmedNewPasswordException should be thrown`() {
             val originalPassword = "pass123".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-            val userId = createTestUserAndGetId(db, "usr71", originalPassword).value
+            val userId = createTestUserAndGetId(db, "usr71", originalPassword)
 
             val newPassword = "5fkd^s91$-".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
             val confirmNewPassword = "differ3nt".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
@@ -233,7 +231,7 @@ class UserUCImplTests {
         @Test
         fun `Given an existing user, when changing password reusing the old password, NewPasswordNotNewException should be thrown`() {
             val originalPassword = "pass123".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-            val userId = createTestUserAndGetId(db, "usr71", originalPassword).value
+            val userId = createTestUserAndGetId(db, "usr71", originalPassword)
 
             assertThrows<NewPasswordNotNewException>("New password being the same as the old one should throw UnconfirmedNewPasswordException.") {
                 userUC.changePassword(userId, originalPassword, originalPassword, originalPassword)
@@ -249,7 +247,7 @@ class UserUCImplTests {
         @Test
         fun `Given an existing user, when changing password using an invalid password, IllegalPasswordException should be thrown`() {
             val originalPassword = "pass123".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-            val userId = createTestUserAndGetId(db, "usr71", originalPassword).value
+            val userId = createTestUserAndGetId(db, "usr71", originalPassword)
 
             val newInvalidPassword = "a".also { assertFalse(it.matches(PASSWORD_REGEX.toRegex())) }
 

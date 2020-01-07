@@ -5,6 +5,7 @@ import com.bitwiserain.pbbg.domain.model.battle.BattleQueue
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.LongIdTable
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 
@@ -12,13 +13,18 @@ object BattleSessionTable : LongIdTable() {
     val userId = reference("user_id", UserTable)
     val battleQueue = text("battle_queue")
 
+    fun createBattleSessionAndGetId(userId: Int): Long = insertAndGetId {
+        it[BattleSessionTable.userId] = EntityID(userId, UserTable)
+        it[BattleSessionTable.battleQueue] = ""
+    }.value
+
     /**
      * Get a user's battle session ID, if any.
      */
-    fun getBattleSessionId(userId: Int): EntityID<Long>? {
+    fun getBattleSessionId(userId: Int): Long? {
         return select { BattleSessionTable.userId eq userId }
             .singleOrNull()
-            ?.get(id)
+            ?.run { get(BattleSessionTable.id).value }
     }
 
     fun isBattleInProgress(userId: Int): Boolean {
@@ -28,11 +34,11 @@ object BattleSessionTable : LongIdTable() {
     /**
      * Delete a battle session entry.
      */
-    fun deleteBattle(battleSession: EntityID<Long>) {
+    fun deleteBattle(battleSession: Long) {
         deleteWhere { id eq battleSession }
     }
 
-    fun getBattleQueue(battleSession: EntityID<Long>): BattleQueue {
+    fun getBattleQueue(battleSession: Long): BattleQueue {
         val turnsString = select { id eq battleSession}
             .single()
             .get(battleQueue)
@@ -40,7 +46,7 @@ object BattleSessionTable : LongIdTable() {
         return BattleQueue.fromJSON(turnsString)
     }
 
-    fun updateBattleQueue(battleSession: EntityID<Long>, battleQueue: BattleQueue) {
+    fun updateBattleQueue(battleSession: Long, battleQueue: BattleQueue) {
         update({ id eq battleSession }) {
             it[this.battleQueue] = battleQueue.toJSON()
         }

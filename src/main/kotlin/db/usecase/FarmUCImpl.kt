@@ -3,7 +3,6 @@ package com.bitwiserain.pbbg.db.usecase
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
-import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable
 import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable.PlantForm
 import com.bitwiserain.pbbg.db.repository.farm.PlotTable
@@ -15,7 +14,6 @@ import com.bitwiserain.pbbg.domain.model.farm.MaterializedPlant
 import com.bitwiserain.pbbg.domain.model.farm.Plot
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.usecase.*
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Clock
@@ -35,7 +33,7 @@ class FarmUCImpl(private val db: Database, private val clock: Clock) : FarmUC {
         if (plot.plant != null) throw OccupiedPlotException()
 
         /* Make sure user owns this item */
-        val item = (Joins.getInventoryItem(EntityID(userId, UserTable), itemId) ?: throw InventoryItemNotFoundException(itemId)).item
+        val item = (Joins.getInventoryItem(userId, itemId) ?: throw InventoryItemNotFoundException(itemId)).item
         /* and that there is at least 1 item */
         if (item is MaterializedItem.Stackable && item.quantity < 1) throw InsufficientItemQuantity()
 
@@ -49,7 +47,7 @@ class FarmUCImpl(private val db: Database, private val clock: Clock) : FarmUC {
             enum = baseItem.basePlant.enum,
             cycleStart = now,
             isMaturable = baseItem.basePlant is IBasePlant.Maturable
-        )).value
+        ))
 
         /* Update plot that was planted into */
         PlotTable.updatePlot(userId, plot.id, plantId)
@@ -81,7 +79,7 @@ class FarmUCImpl(private val db: Database, private val clock: Clock) : FarmUC {
             is MaterializedPlant.TomatoPlant -> MaterializedItem.Tomato(1)
         }
 
-        storeInInventoryReturnItemID(db, now, EntityID(userId, UserTable), crop, ItemHistoryInfo.FirstHarvested(userId))
+        storeInInventoryReturnItemID(db, now, userId, crop, ItemHistoryInfo.FirstHarvested(userId))
 
         if (plant is IMaterializedPlant.Maturable) {
             /* For maturable plants, start new cycle and harvest */

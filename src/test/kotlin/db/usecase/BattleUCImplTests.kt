@@ -11,7 +11,6 @@ import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
@@ -37,7 +36,7 @@ class BattleUCImplTests {
 
             val allies = insertAndGetAllies(userId)
 
-            val battle = battleUC.generateBattle(userId.value)
+            val battle = battleUC.generateBattle(userId)
 
             assertFalse(battle.allies.isEmpty(), "There should be allies in the battle.")
             assertFalse(battle.enemies.isEmpty(), "There should be enemies in the battle.")
@@ -50,7 +49,7 @@ class BattleUCImplTests {
                 insertAndGetAllies(it)
             }
 
-            val battle = battleUC.generateBattle(userId.value)
+            val battle = battleUC.generateBattle(userId)
 
             val queueIds = battle.battleQueue.turns.map { it.unitId }.sorted()
             val unitIds = battle.run { allies + enemies }.map { it.id }.sorted()
@@ -66,11 +65,11 @@ class BattleUCImplTests {
             insertAndGetAllies(userId)
 
             // Generate a battle
-            battleUC.generateBattle(userId.value)
+            battleUC.generateBattle(userId)
 
             // Attempt to generate another battle while the first is in progress
             assertFailsWith<BattleAlreadyInProgressException>("Generating a new battle should fail if one is currently in progress") {
-                battleUC.generateBattle(userId.value)
+                battleUC.generateBattle(userId)
             }
         }
 
@@ -82,7 +81,7 @@ class BattleUCImplTests {
                 listOf(MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1))
                     .map { UnitTable.insertUnitAndGetId(it) }
                     .also { SquadTable.insertUnits(userId, it) }
-                val allies = SquadTable.getAllies(userId.value)
+                val allies = SquadTable.getAllies(userId)
 
                 // Kill the only unit in squad
                 UnitTable.updateUnit(allies[0].id, allies[0].receiveDamage(allies[0].hp))
@@ -90,7 +89,7 @@ class BattleUCImplTests {
 
             // Attempt to generate battle with a wiped out squad
             assertFailsWith<NoAlliesAliveException> ("Generating a new battle should fail if user's squad is wiped out") {
-                battleUC.generateBattle(userId.value)
+                battleUC.generateBattle(userId)
             }
         }
     }
@@ -101,16 +100,16 @@ class BattleUCImplTests {
         fun `When generating a battle and requesting the current battle, it should be returned`() {
             val userId = createTestUserAndGetId(db)
             insertAndGetAllies(userId)
-            battleUC.generateBattle(userId.value)
+            battleUC.generateBattle(userId)
 
-            val battle = battleUC.getCurrentBattle(userId.value)
+            val battle = battleUC.getCurrentBattle(userId)
 
             assertNotNull(battle, "User should have a battle in session.")
         }
 
         @Test
         fun `Given an out-of-battle user, when their current battle is requested, null should be returned`() {
-            val userId = createTestUserAndGetId(db).value
+            val userId = createTestUserAndGetId(db)
 
             val battle = battleUC.getCurrentBattle(userId)
 
@@ -118,7 +117,7 @@ class BattleUCImplTests {
         }
     }
 
-    private fun insertAndGetAllies(userId: EntityID<Int>) = transaction(db) {
+    private fun insertAndGetAllies(userId: Int) = transaction(db) {
         listOf(
             MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 2),
             MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 1),
@@ -129,6 +128,6 @@ class BattleUCImplTests {
             SquadTable.insertUnits(userId, it)
         }
 
-        return@transaction SquadTable.getAllies(userId.value)
+        return@transaction SquadTable.getAllies(userId)
     }
 }
