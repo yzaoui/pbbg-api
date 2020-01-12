@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.test.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.form.MyUnitForm
+import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.usecase.BattleUCImpl
@@ -78,7 +78,7 @@ class BattleUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             transaction(db) {
-                listOf(MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1))
+                listOf(UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1))
                     .map { UnitTable.insertUnitAndGetId(it) }
                     .also { SquadTable.insertUnits(userId, it) }
                 val allies = SquadTable.getAllies(userId)
@@ -119,9 +119,9 @@ class BattleUCImplTests {
 
     private fun insertAndGetAllies(userId: Int) = transaction(db) {
         listOf(
-            MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 2),
-            MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 1),
-            MyUnitForm(MyUnitEnum.TWOLIP, 11, 2, 1)
+            UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 2),
+            UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 1),
+            UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1)
         ).map {
             UnitTable.insertUnitAndGetId(it)
         }.also {

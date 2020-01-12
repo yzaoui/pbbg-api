@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.db.repository.battle
 
-import com.bitwiserain.pbbg.db.form.MyUnitForm
+import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.repository.toMyUnit
 import com.bitwiserain.pbbg.domain.model.MyUnit
@@ -35,7 +35,7 @@ object BattleEnemyTable : Table() {
     /**
      * Inserts new enemy units into a battle session.
      */
-    fun insertEnemies(battleSession: Long, enemies: List<MyUnitForm>) {
+    fun insertEnemies(battleSession: Long, enemies: List<UnitForm>) {
         // TODO: There's gotta be a way to do this in batch :/
         for (enemy in enemies) {
             // Create enemy unit in unit table

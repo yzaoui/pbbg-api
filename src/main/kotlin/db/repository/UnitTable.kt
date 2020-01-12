@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.db.repository
 
-import com.bitwiserain.pbbg.db.form.MyUnitForm
 import com.bitwiserain.pbbg.domain.model.MyUnit
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import org.jetbrains.exposed.dao.LongIdTable
@@ -19,7 +18,7 @@ object UnitTable : LongIdTable() {
     /**
      * Inserts a new unit and returns its ID.
      */
-    fun insertUnitAndGetId(unit: MyUnitForm): Long = insertAndGetId {
+    fun insertUnitAndGetId(unit: UnitForm): Long = insertAndGetId {
         it[UnitTable.unit] = unit.enum
         it[UnitTable.hp] = unit.hp
         it[UnitTable.maxHP] = unit.hp
@@ -43,3 +42,14 @@ object UnitTable : LongIdTable() {
         .singleOrNull()
         ?.toMyUnit()
 }
+
+/**
+ * The form of fields required to create a new unit.
+ * The new unit will start with 0 exp, and be at full HP.
+ */
+data class UnitForm(
+    val enum: MyUnitEnum,
+    val hp: Int,
+    val atk: Int,
+    val def: Int
+)

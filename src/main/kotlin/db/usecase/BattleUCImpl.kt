@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.db.usecase
 
-import com.bitwiserain.pbbg.db.form.MyUnitForm
+import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
@@ -33,10 +33,10 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         val battleSession = BattleSessionTable.createBattleSessionAndGetId(userId)
 
-        val newEnemies = mutableListOf<MyUnitForm>()
+        val newEnemies = mutableListOf<UnitForm>()
         // Add 1-3 new enemies
         for (i in 0 until (1..3).random()) {
-            newEnemies.add(MyUnitForm(MyUnitEnum.values().random(), (7..11).random(), (1..2).random(), (1..2).random()))
+            newEnemies.add(UnitForm(MyUnitEnum.values().random(), (7..11).random(), (1..2).random(), (1..2).random()))
         }
         BattleEnemyTable.insertEnemies(battleSession, newEnemies)
 

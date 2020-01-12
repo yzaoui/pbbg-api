@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.test.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.form.MyUnitForm
+import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
@@ -77,9 +77,9 @@ class UnitUCImplTests {
     private fun createUnitsAndSquad(userId: Int) = transaction(db) {
         transaction(db) {
             listOf(
-                MyUnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1),
-                MyUnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2),
-                MyUnitForm(MyUnitEnum.TWOLIP, 11, 2, 1)
+                UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1),
+                UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2),
+                UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1)
             )
                 .map { UnitTable.insertUnitAndGetId(it) }
                 .also { SquadTable.insertUnits(userId, it) }
