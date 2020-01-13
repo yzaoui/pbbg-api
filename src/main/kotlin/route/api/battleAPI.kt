@@ -20,9 +20,7 @@ fun Route.battleAPI(battleUC: BattleUC) = route("/battle") {
          *   [null] when no battle is in session.
          */
         get {
-            val loggedInUser = call.user
-
-            val battle = battleUC.getCurrentBattle(loggedInUser.id)
+            val battle = battleUC.getCurrentBattle(call.user.id)
 
             call.respondSuccess(battle?.toJSON())
         }
@@ -38,9 +36,7 @@ fun Route.battleAPI(battleUC: BattleUC) = route("/battle") {
              */
             post {
                 try {
-                    val loggedInUser = call.user
-
-                    val battle = battleUC.generateBattle(loggedInUser.id)
+                    val battle = battleUC.generateBattle(call.user.id)
 
                     call.respondSuccess(battle.toJSON())
                 } catch (e: BattleAlreadyInProgressException) {
@@ -61,11 +57,9 @@ fun Route.battleAPI(battleUC: BattleUC) = route("/battle") {
          *   [BattleActionResultJSON]
          */
         post {
-            val loggedInUser = call.user
-
             val params = call.receive<AttackParams>()
 
-            val result = battleUC.allyTurn(loggedInUser.id, BattleAction.Attack(params.targetUnitId))
+            val result = battleUC.allyTurn(call.user.id, BattleAction.Attack(params.targetUnitId))
 
             call.respondSuccess(result.toJSON())
         }
@@ -77,9 +71,7 @@ fun Route.battleAPI(battleUC: BattleUC) = route("/battle") {
          *   [BattleActionResultJSON]
          */
         post {
-            val loggedInUser = call.user
-
-            val result = battleUC.enemyTurn(loggedInUser.id)
+            val result = battleUC.enemyTurn(call.user.id)
 
             call.respondSuccess(result.toJSON())
         }

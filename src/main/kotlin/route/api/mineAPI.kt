@@ -27,9 +27,7 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
      *   null When user does not have a mine in session.
      */
     get {
-        val loggedInUser = call.user
-
-        val mine = miningUC.getMine(loggedInUser.id)
+        val mine = miningUC.getMine(call.user.id)
 
         call.respondSuccess(mine?.toJSON())
     }
@@ -48,11 +46,9 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
          */
         post {
             try {
-                val loggedInUser = call.user
-
                 val (x: Int, y: Int) = call.receive(MinePositionParams::class)
 
-                val mineActionResult = miningUC.submitMineAction(loggedInUser.id, x, y).toJSON()
+                val mineActionResult = miningUC.submitMineAction(call.user.id, x, y).toJSON()
 
                 call.respondSuccess(mineActionResult)
             } catch (e: ContentTransformationException) {
@@ -83,11 +79,9 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
          */
         post {
             try {
-                val loggedInUser = call.user
-
                 val (mineTypeId: Int) = call.receive<MineGenerateParams>()
 
-                val mine = miningUC.generateMine(loggedInUser.id, mineTypeId, 30, 20)
+                val mine = miningUC.generateMine(call.user.id, mineTypeId, 30, 20)
 
                 call.respondSuccess(mine.toJSON())
             } catch (e: AlreadyInMineException) {
@@ -106,10 +100,8 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
          *   null
          */
         post {
-            val loggedInUser = call.user
-
             // TODO: Maybe throw an exception if not currently in a mine
-            miningUC.exitMine(loggedInUser.id)
+            miningUC.exitMine(call.user.id)
 
             call.respondSuccess()
         }
@@ -121,9 +113,7 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
          *   [MineTypeListJSON]
          */
         get {
-            val loggedInUser = call.user
-
-            val result = miningUC.getAvailableMines(loggedInUser.id).let {
+            val result = miningUC.getAvailableMines(call.user.id).let {
                 MineTypeListJSON(
                     types = it.mines.map { it.toJSON() },
                     nextUnlockLevel = it.nextUnlockLevel

@@ -24,9 +24,7 @@ fun Route.market(marketUC: MarketUC) = route("/market") {
      *   [UserAndGameMarketsJSON]
      */
     get {
-        val loggedInUser = call.user
-
-        val markets = marketUC.getMarkets(loggedInUser.id)
+        val markets = marketUC.getMarkets(call.user.id)
 
         call.respondSuccess(markets.toJSON())
     }
@@ -40,11 +38,9 @@ fun Route.market(marketUC: MarketUC) = route("/market") {
      */
     post("/buy") {
         try {
-            val loggedInUser = call.user
-
             val params = call.receive<MarketOrderListParams>()
 
-            val markets = marketUC.buy(loggedInUser.id, params.orders.map { MarketOrder(it.id, it.quantity) })
+            val markets = marketUC.buy(call.user.id, params.orders.map { MarketOrder(it.id, it.quantity) })
 
             call.respondSuccess(markets.toJSON())
         } catch (e: NotEnoughGoldException) {
@@ -60,11 +56,9 @@ fun Route.market(marketUC: MarketUC) = route("/market") {
      *   [UserAndGameMarketsJSON]
      */
     post("/sell") {
-        val loggedInUser = call.user
-
         val params = call.receive<MarketOrderListParams>()
 
-        val markets = marketUC.sell(loggedInUser.id, params.orders.map { MarketOrder(it.id, it.quantity) })
+        val markets = marketUC.sell(call.user.id, params.orders.map { MarketOrder(it.id, it.quantity) })
 
         call.respondSuccess(markets.toJSON())
     }

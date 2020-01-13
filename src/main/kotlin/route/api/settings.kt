@@ -13,8 +13,6 @@ import io.ktor.routing.route
 fun Route.settings(userUC: UserUC) = route("/settings") {
     post("/change-password") {
         try {
-            val loggedInUser = call.user
-
             val params = call.receive<Map<String, Any>>()
 
             val currentPassword = params["currentPassword"]
@@ -25,7 +23,7 @@ fun Route.settings(userUC: UserUC) = route("/settings") {
                 return@post call.respondFail("Missing parameter(s).")
             }
 
-            userUC.changePassword(loggedInUser.id, currentPassword, newPassword, confirmNewPassword)
+            userUC.changePassword(call.user.id, currentPassword, newPassword, confirmNewPassword)
 
             call.respondSuccess("Password successfully changed.")
         } catch (e: WrongCurrentPasswordException) {
