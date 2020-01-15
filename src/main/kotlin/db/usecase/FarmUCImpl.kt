@@ -84,7 +84,7 @@ class FarmUCImpl(private val db: Database, private val clock: Clock) : FarmUC {
         if (plant is IMaterializedPlant.Maturable) {
             /* For maturable plants, start new cycle and harvest */
             val harvestedPlant = when (plant) {
-                is MaterializedPlant.AppleTree -> plant.copy(cycleStart = now)
+                is MaterializedPlant.AppleTree -> plant.copy(cycleStart = now, isFirstHarvest = false)
                 else -> throw IllegalStateException()
             }
 

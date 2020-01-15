@@ -5,11 +5,11 @@ import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.dex.DexItems
+import com.bitwiserain.pbbg.domain.model.dex.DexPlants
 import com.bitwiserain.pbbg.domain.model.dex.DexUnits
-import com.bitwiserain.pbbg.domain.usecase.DexUC
-import com.bitwiserain.pbbg.domain.usecase.InvalidItemException
-import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
-import com.bitwiserain.pbbg.domain.usecase.ItemUndiscoveredException
+import com.bitwiserain.pbbg.domain.model.farm.BasePlant
+import com.bitwiserain.pbbg.domain.model.farm.PlantEnum
+import com.bitwiserain.pbbg.domain.usecase.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -46,5 +46,19 @@ class DexUCImpl(private val db: Database) : DexUC {
         if (unitEnumId !in MyUnitEnum.values().indices) throw InvalidUnitException()
 
         return MyUnitEnum.values()[unitEnumId]
+    }
+
+    override fun getDexPlants(userId: Int): DexPlants {
+        // TODO: Make sure user has discovered these plants
+        return DexPlants(
+            discoveredPlants = PlantEnum.values().associate { it.ordinal + 1 to it.basePlant }
+        )
+    }
+
+    override fun getDexPlant(userId: Int, plantId: Int): BasePlant {
+        val plantEnumOrdinal = plantId - 1
+        if (plantEnumOrdinal !in PlantEnum.values().indices) throw InvalidPlantException()
+
+        return PlantEnum.values()[plantEnumOrdinal].basePlant
     }
 }

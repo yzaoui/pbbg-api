@@ -3,7 +3,9 @@ package com.bitwiserain.pbbg.domain.usecase
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.dex.DexItems
+import com.bitwiserain.pbbg.domain.model.dex.DexPlants
 import com.bitwiserain.pbbg.domain.model.dex.DexUnits
+import com.bitwiserain.pbbg.domain.model.farm.BasePlant
 
 interface DexUC {
     /**
@@ -30,8 +32,21 @@ interface DexUC {
      * @throws InvalidUnitException when [unitEnumId] is invalid.
      */
     fun getDexUnit(userId: Int, unitEnumId: Int): MyUnitEnum
+
+    /**
+     * The dex entries of plants this user has harvested.
+     */
+    fun getDexPlants(userId: Int): DexPlants
+
+    /**
+     * Detailed entry of a plant.
+     *
+     * @throws InvalidPlantException when [plantId] is invalid.
+     */
+    fun getDexPlant(userId: Int, plantId: Int): BasePlant
 }
 
 class InvalidItemException : Exception()
 class ItemUndiscoveredException : Exception()
 class InvalidUnitException : Exception()
+class InvalidPlantException : Exception()
