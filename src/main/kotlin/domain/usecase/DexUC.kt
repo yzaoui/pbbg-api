@@ -16,10 +16,10 @@ interface DexUC {
     /**
      * Detailed entry of an item this user has discovered.
      *
-     * @throws InvalidItemException when [itemEnumId] is invalid.
+     * @throws InvalidItemException when [itemId] is invalid.
      * @throws ItemUndiscoveredException when this item has not been discovered by this user.
      */
-    fun getIndividualDexBaseItem(userId: Int, itemEnumId: Int): BaseItem
+    fun getIndividualDexBaseItem(userId: Int, itemId: Int): BaseItem
 
     /**
      * The dex entries of all units.
@@ -29,9 +29,9 @@ interface DexUC {
     /**
      * Detailed entry of a unit.
      *
-     * @throws InvalidUnitException when [unitEnumId] is invalid.
+     * @throws InvalidUnitException when [unitId] is invalid.
      */
-    fun getDexUnit(userId: Int, unitEnumId: Int): MyUnitEnum
+    fun getDexUnit(userId: Int, unitId: Int): MyUnitEnum
 
     /**
      * The dex entries of plants this user has harvested.

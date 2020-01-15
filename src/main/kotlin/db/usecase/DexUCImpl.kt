@@ -23,10 +23,11 @@ class DexUCImpl(private val db: Database) : DexUC {
         )
     }
 
-    override fun getIndividualDexBaseItem(userId: Int, itemEnumId: Int): BaseItem = transaction(db) {
-        if (itemEnumId !in ItemEnum.values().indices) throw InvalidItemException()
+    override fun getIndividualDexBaseItem(userId: Int, itemId: Int): BaseItem = transaction(db) {
+        val itemEnumOrdinal = itemId - 1
+        if (itemEnumOrdinal !in ItemEnum.values().indices) throw InvalidItemException()
 
-        val enum = ItemEnum.values()[itemEnumId]
+        val enum = ItemEnum.values()[itemEnumOrdinal]
 
         if (!DexTable.hasEntry(userId, enum)) throw ItemUndiscoveredException()
 
@@ -42,10 +43,11 @@ class DexUCImpl(private val db: Database) : DexUC {
         )
     }
 
-    override fun getDexUnit(userId: Int, unitEnumId: Int): MyUnitEnum {
-        if (unitEnumId !in MyUnitEnum.values().indices) throw InvalidUnitException()
+    override fun getDexUnit(userId: Int, unitId: Int): MyUnitEnum {
+        val unitEnumOrdinal = unitId - 1
+        if (unitEnumOrdinal !in MyUnitEnum.values().indices) throw InvalidUnitException()
 
-        return MyUnitEnum.values()[unitEnumId]
+        return MyUnitEnum.values()[unitEnumOrdinal]
     }
 
     override fun getDexPlants(userId: Int): DexPlants {
