@@ -104,14 +104,15 @@ fun MyUnitEnum.toJSON() = MyUnitEnumJSON(
 
 private fun DexItems.toJSON() = DexItemsJSON(
     discoveredItems = discoveredItems.associate { it.ordinal + 1 to it.baseItem.toJSON() }.toSortedMap(),
-    lastItemIsDiscovered = lastItemIsDiscovered
+    lastItemId = lastItemId
 )
 
 private fun DexUnits.toJSON() = DexUnitsJSON(
     discoveredUnits = discoveredUnits.associate { it.ordinal + 1 to it.toJSON() }.toSortedMap(),
-    lastUnitIsDiscovered = lastUnitIsDiscovered
+    lastUnitId = lastUnitId
 )
 
 private fun DexPlants.toJSON() = DexPlantsJSON(
-    discoveredPlants = discoveredPlants.mapValues { it.value.toJSON() }.toSortedMap()
+    discoveredPlants = discoveredPlants.mapValues { it.value.toJSON() }.toSortedMap(),
+    lastPlantId = lastPlantId
 )

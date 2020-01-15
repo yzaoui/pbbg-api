@@ -4,5 +4,5 @@ import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 
 data class DexUnits(
     val discoveredUnits: Set<MyUnitEnum>,
-    val lastUnitIsDiscovered: Boolean
+    val lastUnitId: Int
 )

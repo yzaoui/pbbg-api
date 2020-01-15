@@ -19,7 +19,7 @@ class DexUCImpl(private val db: Database) : DexUC {
 
         return@transaction DexItems(
             discoveredItems = discoveredItems,
-            lastItemIsDiscovered = discoveredItems.contains(ItemEnum.values().last())
+            lastItemId = ItemEnum.values().lastIndex + 1
         )
     }
 
@@ -39,7 +39,7 @@ class DexUCImpl(private val db: Database) : DexUC {
 
         return@transaction DexUnits(
             discoveredUnits = discoveredUnits,
-            lastUnitIsDiscovered = true
+            lastUnitId = MyUnitEnum.values().lastIndex + 1
         )
     }
 
@@ -53,7 +53,8 @@ class DexUCImpl(private val db: Database) : DexUC {
     override fun getDexPlants(userId: Int): DexPlants {
         // TODO: Make sure user has discovered these plants
         return DexPlants(
-            discoveredPlants = PlantEnum.values().associate { it.ordinal + 1 to it.basePlant }
+            discoveredPlants = PlantEnum.values().associate { it.ordinal + 1 to it.basePlant },
+            lastPlantId = PlantEnum.values().lastIndex + 1
         )
     }
 

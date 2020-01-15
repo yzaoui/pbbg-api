@@ -6,9 +6,8 @@ import java.util.*
 
 /**
  * Client equivalent of [com.bitwiserain.pbbg.domain.model.dex.DexPlants].
- *
- * @property discoveredPlants The plants that the user has ever harvested, associated by plant ID.
  */
 data class DexPlantsJSON(
-    @SerializedName("discoveredPlants") val discoveredPlants: SortedMap<Int, BasePlantJSON>
+    @SerializedName("discoveredPlants") val discoveredPlants: SortedMap<Int, BasePlantJSON>,
+    @SerializedName("lastPlantId") val lastPlantId: Int
 )

@@ -8,9 +8,9 @@ import java.util.*
  * Client equivalent of [com.bitwiserain.pbbg.domain.model.dex.DexItems].
  *
  * @property discoveredItems The items that the user has discovered, associated by item ID.
- * @property lastItemIsDiscovered See [com.bitwiserain.pbbg.domain.model.dex.DexItems.lastItemIsDiscovered]
+ * @property lastItemId See [com.bitwiserain.pbbg.domain.model.dex.DexItems.lastItemId]
  */
 data class DexItemsJSON(
     @SerializedName("discoveredItems") val discoveredItems: SortedMap<Int, BaseItemJSON>,
-    @SerializedName("lastItemIsDiscovered") val lastItemIsDiscovered: Boolean
+    @SerializedName("lastItemId") val lastItemId: Int
 )
