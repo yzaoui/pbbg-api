@@ -120,6 +120,7 @@ fun MaterializedItem.toJSON(id: Long) = MaterializedItemJSON(
 )
 
 fun BaseItem.toJSON() = BaseItemJSON(
+    id = enum.ordinal,
     friendlyName = friendlyName,
     img16 = "$API_ROOT/img/item/$spriteName-16.png",
     img32 = "$API_ROOT/img/item/$spriteName-32.png",
