@@ -27,15 +27,13 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
      */
     optionalParam("filter") {
         get {
-            val loggedInUser = call.user
-
             val filter = when (call.request.queryParameters["filter"]) {
                 "plantable" -> PLANTABLE
                 null -> null
                 else -> throw Exception()
             }
 
-            val inventory = inventoryUC.getInventory(loggedInUser.id, filter)
+            val inventory = inventoryUC.getInventory(call.user.id, filter)
 
             call.respondSuccess(inventory.toJSON())
         }
@@ -67,20 +65,18 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
                         return@post call.respondFail("Missing equip query parameter")
                     }
 
-                    val loggedInUser = call.user
-
                     val body = call.receive<EquipmentActionParams>()
 
                     when (equipAction) {
                         "equip" -> {
-                            equipmentUC.equip(loggedInUser.id, body.inventoryItemId)
+                            equipmentUC.equip(call.user.id, body.inventoryItemId)
 
-                            call.respondSuccess(inventoryUC.getInventory(loggedInUser.id).toJSON())
+                            call.respondSuccess(inventoryUC.getInventory(call.user.id).toJSON())
                         }
                         "unequip" -> {
-                            equipmentUC.unequip(loggedInUser.id, body.inventoryItemId)
+                            equipmentUC.unequip(call.user.id, body.inventoryItemId)
 
-                            call.respondSuccess(inventoryUC.getInventory(loggedInUser.id).toJSON())
+                            call.respondSuccess(inventoryUC.getInventory(call.user.id).toJSON())
                         }
                     }
                 } catch (e: InventoryItemNotFoundException) {

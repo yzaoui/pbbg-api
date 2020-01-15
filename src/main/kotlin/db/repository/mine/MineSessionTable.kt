@@ -16,18 +16,18 @@ object MineSessionTable : IntIdTable() {
     val height = integer("height")
     val mineType = enumeration("mine_type", MineType::class)
 
-    fun insertSessionAndGetId(userId: EntityID<Int>, width: Int, height: Int, mineType: MineType) = insertAndGetId {
-        it[MineSessionTable.userId] = userId
+    fun insertSessionAndGetId(userId: Int, width: Int, height: Int, mineType: MineType) = insertAndGetId {
+        it[MineSessionTable.userId] = EntityID(userId, UserTable)
         it[MineSessionTable.width] = width
         it[MineSessionTable.height] = height
         it[MineSessionTable.mineType] = mineType
     }
 
-    fun getSession(userId: EntityID<Int>) = select { MineSessionTable.userId.eq(userId) }
+    fun getSession(userId: Int) = select { MineSessionTable.userId.eq(userId) }
         .map { it.toMineSession() }
         .singleOrNull()
 
-    fun deleteSession(userId: EntityID<Int>) = deleteWhere {
+    fun deleteSession(userId: Int) = deleteWhere {
         MineSessionTable.userId.eq(userId)
     }
 

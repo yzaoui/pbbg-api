@@ -1,9 +1,8 @@
 package com.bitwiserain.pbbg.db.usecase
 
-import com.bitwiserain.pbbg.db.form.MyUnitForm
+import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UnitTable
-import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
 import com.bitwiserain.pbbg.db.repository.execAndMap
@@ -14,9 +13,7 @@ import com.bitwiserain.pbbg.domain.usecase.BattleAlreadyInProgressException
 import com.bitwiserain.pbbg.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.domain.usecase.NoBattleInSessionException
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class BattleUCImpl(private val db: Database) : BattleUC {
@@ -34,15 +31,12 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         // There must be allies alive to start a battle
         if (allies.none { it.alive }) throw NoAlliesAliveException()
 
-        val battleSession = BattleSessionTable.insertAndGetId {
-            it[BattleSessionTable.userId] = EntityID(userId, UserTable)
-            it[BattleSessionTable.battleQueue] = ""
-        }
+        val battleSession = BattleSessionTable.createBattleSessionAndGetId(userId)
 
-        val newEnemies = mutableListOf<MyUnitForm>()
+        val newEnemies = mutableListOf<UnitForm>()
         // Add 1-3 new enemies
         for (i in 0 until (1..3).random()) {
-            newEnemies.add(MyUnitForm(MyUnitEnum.values().random(), (7..11).random(), (1..2).random(), (1..2).random()))
+            newEnemies.add(UnitForm(MyUnitEnum.values().random(), (7..11).random(), (1..2).random(), (1..2).random()))
         }
         BattleEnemyTable.insertEnemies(battleSession, newEnemies)
 
@@ -92,7 +86,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         return@transaction act(userId, battleSession, enemy, action)
     }
 
-    private fun act(userId: Int, battleSession: EntityID<Long>, actingUnit: MyUnit, action: BattleAction): BattleActionResult {
+    private fun act(userId: Int, battleSession: Long, actingUnit: MyUnit, action: BattleAction): BattleActionResult {
         val queue = BattleSessionTable.getBattleQueue(battleSession)
         val unitsToRemove: MutableList<Long> = mutableListOf()
         val effects: MutableMap<Long, UnitEffect> = mutableMapOf()
@@ -139,7 +133,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         return BattleActionResult(updatedBattle, effects, reward)
     }
 
-    private fun getBattle(userId: Int, battleSession: EntityID<Long>) = Battle(
+    private fun getBattle(userId: Int, battleSession: Long) = Battle(
         allies = SquadTable.getAllies(userId),
         enemies = BattleEnemyTable.getEnemies(battleSession),
         battleQueue = BattleSessionTable.getBattleQueue(battleSession)
@@ -149,7 +143,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         return battle.allies.none { it.alive } || battle.enemies.none { it.alive }
     }
 
-    private fun deleteBattle(battle: Battle, battleSession: EntityID<Long>) = transaction(db) {
+    private fun deleteBattle(battle: Battle, battleSession: Long) = transaction(db) {
         // Delete enemies, since they only exist within this battle
         val enemyIdCSV = battle.enemies.asSequence().map { it.id }.joinToString()
 

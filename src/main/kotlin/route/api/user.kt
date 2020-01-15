@@ -18,12 +18,10 @@ fun Route.user(userUC: UserUC) = route("/user") {
      *   [UserStatsJSON]
      */
     get {
-        val loggedInUser = call.user
-
-        val userStats = userUC.getUserStatsByUserId(loggedInUser.id)
+        val userStats = userUC.getUserStatsByUserId(call.user.id)
 
         val response = UserStatsJSON(
-            username = loggedInUser.username,
+            username = call.user.username,
             gold = userStats.gold,
             miningLvlProgress = MiningExperienceManager.getLevelProgress(userStats.miningExp).toJSON()
         )

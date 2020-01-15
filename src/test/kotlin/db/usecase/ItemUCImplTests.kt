@@ -33,7 +33,7 @@ class ItemUCImplTests {
     fun `Given an item in existence with a history, when calling for its details, should return all its expected details`() {
         val creationDate = Instant.ofEpochSecond(946684800L)
         val users = listOf("user1", "user2", "user3")
-            .associateBy { createTestUserAndGetId(db, it).value }
+            .associateBy { createTestUserAndGetId(db, it) }
 
         val itemId = transaction(db) {
             val itemId = MaterializedItemTable.insertItemAndGetId(MaterializedItem.Stone(quantity = 3))
@@ -48,13 +48,13 @@ class ItemUCImplTests {
                 date = creationDate.plusSeconds(120),
                 info = ItemHistoryInfo.CreatedWithUser(3)
             )).forEach {
-                ItemHistoryTable.insertItemHistory(itemId.value, it)
+                ItemHistoryTable.insertItemHistory(itemId, it)
             }
 
             return@transaction itemId
         }
 
-        val actualItem = itemUC.getItemDetails(itemId.value)
+        val actualItem = itemUC.getItemDetails(itemId)
 
         val actualMaterializedItem = actualItem.item
         val actualHistory = actualItem.history

@@ -35,7 +35,7 @@ class InventoryUCImplTests {
 
         val (expectedInventory, actualInventory) = transaction(db) {
             val itemsById = listOf(MaterializedItem.CrossPickaxe, MaterializedItem.CopperOre(quantity = 5), MaterializedItem.IcePick)
-                .associateBy { MaterializedItemTable.insertItemAndGetId(it).value }
+                .associateBy { MaterializedItemTable.insertItemAndGetId(it) }
             // Insert items
             InventoryTable.insertItems(userId, itemsById.mapValues { it.value.base })
             // Get cross pickaxe ID
@@ -43,7 +43,7 @@ class InventoryUCImplTests {
             // Equip cross pickaxe
             InventoryTable.update({ InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.eq(pickId) }) { it[equipped] = true }
 
-            return@transaction Inventory(Joins.getInventoryItems(userId)) to inventoryUC.getInventory(userId.value)
+            return@transaction Inventory(Joins.getInventoryItems(userId)) to inventoryUC.getInventory(userId)
         }
 
         // TODO: Better assertions, not testing equality here

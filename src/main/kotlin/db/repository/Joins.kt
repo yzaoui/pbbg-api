@@ -11,43 +11,44 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 
 object Joins {
-    fun getHeldItemsOfBaseKind(userId: EntityID<Int>, itemEnum: ItemEnum) =
+    fun getHeldItemsOfBaseKind(userId: Int, itemEnum: ItemEnum) =
         (InventoryTable innerJoin MaterializedItemTable)
             .select { InventoryTable.userId.eq(userId) and MaterializedItemTable.itemEnum.eq(itemEnum) }
-            .associate { it[MaterializedItemTable.id] to it.toMaterializedItem() }
+            .associate { it[MaterializedItemTable.id].value to it.toMaterializedItem() }
 
-    fun getInventoryItems(userId: EntityID<Int>): Map<Long, InventoryItem> =
+    fun getInventoryItems(userId: Int): Map<Long, InventoryItem> =
         (InventoryTable innerJoin MaterializedItemTable)
             .select { InventoryTable.userId.eq(userId) }
             .associate { it[MaterializedItemTable.id].value to it.toInventoryItem() }
 
-    fun getInventoryItem(userId: EntityID<Int>, itemId: Long): InventoryItem? =
+    fun getInventoryItem(userId: Int, itemId: Long): InventoryItem? =
         (InventoryTable innerJoin MaterializedItemTable)
             .select { InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.eq(itemId) }
             .singleOrNull()
             ?.toInventoryItem()
 
-    fun setItemEquipped(userId: EntityID<Int>, itemId: Long, equipped: Boolean) =
+    fun setItemEquipped(userId: Int, itemId: Long, equipped: Boolean) =
         InventoryTable.update({ InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.eq(itemId) }) {
             it[InventoryTable.equipped] = equipped
         }
 
     object Market {
-        private fun getMarketId(userId: EntityID<Int>) =
+        private fun getMarketId(userId: Int) =
             MarketTable.select { MarketTable.userId.eq(userId) }
                 .map { it[MarketTable.id] }
                 .single()
+                .value
 
-        fun getItems(userId: EntityID<Int>) =
+        fun getItems(userId: Int) =
             (MarketInventoryTable innerJoin MaterializedItemTable innerJoin MarketTable)
                 .select { MarketTable.userId.eq(userId) }
                 .associate { it[MaterializedItemTable.id].value to it.toMaterializedItem() }
 
-        fun insertItems(userId: EntityID<Int>, itemIds: Iterable<Long>) {
+        fun insertItems(userId: Int, itemIds: Iterable<Long>) {
             val marketId = getMarketId(userId)
 
             MarketInventoryTable.batchInsert(itemIds) { itemid ->
-                this[MarketInventoryTable.marketId] = marketId
+                this[MarketInventoryTable.marketId] = EntityID(marketId, MarketTable)
                 this[MarketInventoryTable.materializedItem] = EntityID(itemid, MaterializedItemTable)
             }
         }

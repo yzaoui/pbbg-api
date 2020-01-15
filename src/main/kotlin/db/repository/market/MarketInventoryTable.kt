@@ -10,9 +10,9 @@ object MarketInventoryTable: Table() {
     val marketId = reference("market_id", MarketTable).primaryKey()
     val materializedItem = reference("materialized_item", MaterializedItemTable).primaryKey()
 
-    fun insertItem(marketId: EntityID<Int>, itemId: EntityID<Long>) = insert {
-        it[MarketInventoryTable.marketId] = marketId
-        it[MarketInventoryTable.materializedItem] = itemId
+    fun insertItem(marketId: Int, itemId: Long) = insert {
+        it[MarketInventoryTable.marketId] = EntityID(marketId, MarketTable)
+        it[MarketInventoryTable.materializedItem] = EntityID(itemId, MaterializedItemTable)
     }
 
     fun removeItems(itemIds: Set<Long>) = deleteWhere {

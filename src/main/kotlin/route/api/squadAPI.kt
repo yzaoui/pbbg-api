@@ -22,9 +22,7 @@ fun Route.squadAPI(unitUC: UnitUC) = route("/squad") {
      *   [SquadJSON]
      */
     get {
-        val loggedInUser = call.user
-
-        val squad = unitUC.getSquad(loggedInUser.id)
+        val squad = unitUC.getSquad(call.user.id)
 
         call.respondSuccess(squad.toJSON())
     }
@@ -39,9 +37,7 @@ fun Route.squadAPI(unitUC: UnitUC) = route("/squad") {
          */
         post {
             try {
-                val loggedInUser = call.user
-
-                val healedSquad = unitUC.healSquad(loggedInUser.id)
+                val healedSquad = unitUC.healSquad(call.user.id)
 
                 call.respondSuccess(healedSquad.toJSON())
             } catch (e: SquadInBattleException) {

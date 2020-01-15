@@ -4,15 +4,14 @@ import com.bitwiserain.pbbg.db.repository.*
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
-fun storeInInventoryReturnItemID(db: Database, now: Instant, userId: EntityID<Int>, itemToStore: MaterializedItem, historyInfo: ItemHistoryInfo): EntityID<Long> = transaction(db) {
+fun storeInInventoryReturnItemID(db: Database, now: Instant, userId: Int, itemToStore: MaterializedItem, historyInfo: ItemHistoryInfo): Long = transaction(db) {
     val heldItems = Joins.getHeldItemsOfBaseKind(userId, itemToStore.enum)
 
-    val itemId: EntityID<Long>
+    val itemId: Long
 
     if (heldItems.count() == 1 && heldItems.values.single() is MaterializedItem.Stackable) {
         itemToStore as MaterializedItem.Stackable
@@ -26,7 +25,7 @@ fun storeInInventoryReturnItemID(db: Database, now: Instant, userId: EntityID<In
 
         if (heldItems.count() == 0) {
             // TODO: For now, assume only stackable items are MineEntity
-            ItemHistoryTable.insertItemHistory(itemId.value, ItemHistory(
+            ItemHistoryTable.insertItemHistory(itemId, ItemHistory(
                 date = now,
                 info = historyInfo
             ))

@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.domain.model.farm
 
-import com.bitwiserain.pbbg.domain.model.BaseItem
 import java.time.Duration
 
 interface IBasePlant {

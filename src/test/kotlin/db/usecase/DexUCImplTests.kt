@@ -41,7 +41,7 @@ class DexUCImplTests {
                 DexTable.insertDiscovered(userId, discoveredItemEnums)
             }
 
-            val dexItems = dexUC.getDexItems(userId.value)
+            val dexItems = dexUC.getDexItems(userId)
 
             assertEquals(dexItems.discoveredItems, discoveredItemEnums)
         }
@@ -56,7 +56,7 @@ class DexUCImplTests {
                 DexTable.insertDiscovered(userId, discoveredItemEnums)
             }
 
-            val dexItems = dexUC.getDexItems(userId.value)
+            val dexItems = dexUC.getDexItems(userId)
 
             assertFalse(dexItems.lastItemIsDiscovered)
         }
@@ -71,7 +71,7 @@ class DexUCImplTests {
                 DexTable.insertDiscovered(userId, discoveredItemEnums)
             }
 
-            val dexItems = dexUC.getDexItems(userId.value)
+            val dexItems = dexUC.getDexItems(userId)
 
             assertTrue(dexItems.lastItemIsDiscovered)
         }
@@ -89,7 +89,7 @@ class DexUCImplTests {
                 DexTable.insertDiscovered(userId, discoveredItem.enum)
             }
 
-            val dexItem = dexUC.getIndividualDexBaseItem(userId.value, discoveredItem.enum.ordinal)
+            val dexItem = dexUC.getIndividualDexBaseItem(userId, discoveredItem.enum.ordinal)
 
             assertEquals(dexItem, discoveredItem)
         }
@@ -99,7 +99,7 @@ class DexUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             assertFailsWith<InvalidItemException> {
-                dexUC.getIndividualDexBaseItem(userId.value, ItemEnum.values().size + 7)
+                dexUC.getIndividualDexBaseItem(userId, ItemEnum.values().size + 7)
             }
         }
 
@@ -108,7 +108,7 @@ class DexUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             assertFailsWith<ItemUndiscoveredException> {
-                dexUC.getIndividualDexBaseItem(userId.value, ItemEnum.COPPER_ORE.ordinal)
+                dexUC.getIndividualDexBaseItem(userId, ItemEnum.COPPER_ORE.ordinal)
             }
         }
     }
@@ -119,7 +119,7 @@ class DexUCImplTests {
         fun `When calling getDexUnits(), all dex units should be returned`() {
             val userId = createTestUserAndGetId(db)
 
-            val dexUnits = dexUC.getDexUnits(userId.value)
+            val dexUnits = dexUC.getDexUnits(userId)
 
             assertEquals(MyUnitEnum.values().toSet(), dexUnits.discoveredUnits)
         }
@@ -131,7 +131,7 @@ class DexUCImplTests {
         fun `Given a dex unit ID, when calling getDexUnit(), that dex unit should be returned`() {
             val userId = createTestUserAndGetId(db)
 
-            val dexUnit = dexUC.getDexUnit(userId.value, 2)
+            val dexUnit = dexUC.getDexUnit(userId, 2)
 
             assertEquals(MyUnitEnum.values()[2], dexUnit)
         }
@@ -141,7 +141,7 @@ class DexUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             assertThrows<InvalidUnitException> {
-                dexUC.getDexUnit(userId.value, 5000)
+                dexUC.getDexUnit(userId, 5000)
             }
         }
     }

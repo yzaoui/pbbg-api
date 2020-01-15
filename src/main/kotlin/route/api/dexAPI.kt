@@ -23,19 +23,17 @@ import io.ktor.routing.route
 fun Route.dexAPI(dexUC: DexUC) = route("/dex") {
     route("/items/{id?}") {
         get {
-            val loggedInUser = call.user
-
             val itemEnumId = call.parameters["id"]?.toInt()
 
             if (itemEnumId == null) {
                 // Calling for entire item dex
-                val dex = dexUC.getDexItems(loggedInUser.id)
+                val dex = dexUC.getDexItems(call.user.id)
 
                 call.respondSuccess(dex.toJSON())
             } else {
                 // Calling for specific item
                 try {
-                    val item = dexUC.getIndividualDexBaseItem(loggedInUser.id, itemEnumId)
+                    val item = dexUC.getIndividualDexBaseItem(call.user.id, itemEnumId)
 
                     call.respondSuccess(item.toJSON())
                 } catch (e: InvalidItemException) {
@@ -50,19 +48,17 @@ fun Route.dexAPI(dexUC: DexUC) = route("/dex") {
 
     route("/units/{id?}") {
         get {
-            val loggedInUser = call.user
-
             val unitEnumId = call.parameters["id"]?.toInt()
 
             if (unitEnumId == null) {
                 // Calling for entire unit dex
-                val dex = dexUC.getDexUnits(loggedInUser.id)
+                val dex = dexUC.getDexUnits(call.user.id)
 
                 call.respondSuccess(dex.toJSON())
             } else {
                 // Calling for specific unit
                 try {
-                    val unit = dexUC.getDexUnit(loggedInUser.id, unitEnumId)
+                    val unit = dexUC.getDexUnit(call.user.id, unitEnumId)
 
                     call.respondSuccess(unit.toJSON())
                 } catch (e: InvalidUnitException) {

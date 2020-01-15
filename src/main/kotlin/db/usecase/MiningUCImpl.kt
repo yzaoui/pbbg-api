@@ -3,7 +3,6 @@ package com.bitwiserain.pbbg.db.usecase
 import com.bitwiserain.pbbg.db.model.MineCell
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
-import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
@@ -15,7 +14,6 @@ import com.bitwiserain.pbbg.domain.model.Point
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.model.mine.*
 import com.bitwiserain.pbbg.domain.usecase.*
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Clock
@@ -23,8 +21,6 @@ import kotlin.random.Random
 
 class MiningUCImpl(private val db: Database, private val clock: Clock) : MiningUC {
     override fun getMine(userId: Int): Mine? = transaction(db) {
-        val userId = EntityID(userId, UserTable)
-
         /* Get currently running mine session */
         val mineSession = MineSessionTable.getSession(userId) ?: return@transaction null
 
@@ -64,7 +60,7 @@ class MiningUCImpl(private val db: Database, private val clock: Clock) : MiningU
                 requiredMinimumLevel = mineType.minLevel
             )
 
-            val mineSessionId = MineSessionTable.insertSessionAndGetId(EntityID(userId, UserTable), width, height, mineType)
+            val mineSessionId = MineSessionTable.insertSessionAndGetId(userId, width, height, mineType)
 
             MineCellTable.batchInsert(itemEntries.asIterable()) { (pos, entity) ->
                 this[MineCellTable.mineId] = mineSessionId
@@ -78,12 +74,11 @@ class MiningUCImpl(private val db: Database, private val clock: Clock) : MiningU
     }
 
     override fun exitMine(userId: Int): Unit = transaction(db) {
-        MineSessionTable.deleteSession(EntityID(userId, UserTable))
+        MineSessionTable.deleteSession(userId)
     }
 
     override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction(db) {
         val now = clock.instant()
-        val userId = EntityID(userId, UserTable)
 
         /* Get currently running mine session */
         val mineSession = MineSessionTable.getSession(userId) ?: throw NotInMineSessionException()
@@ -122,9 +117,9 @@ class MiningUCImpl(private val db: Database, private val clock: Clock) : MiningU
             val exp = mineEntity.exp * (if (item is Stackable) item.quantity else 1)
 
             // TODO: Store items in batch
-            val itemId = storeInInventoryReturnItemID(db, now, userId, item, ItemHistoryInfo.FirstMined(userId.value))
+            val itemId = storeInInventoryReturnItemID(db, now, userId, item, ItemHistoryInfo.FirstMined(userId))
 
-            minedItemResults.add(MinedItemResult(itemId.value, item, mineEntity.exp))
+            minedItemResults.add(MinedItemResult(itemId, item, mineEntity.exp))
             totalExp += exp
         }
 
