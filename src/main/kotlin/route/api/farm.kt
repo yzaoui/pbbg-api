@@ -68,7 +68,11 @@ private fun MaterializedPlant.toJSON(now: Instant) = MaterializedPlantJSON(
     isMature = if (this is IMaterializedPlant.Maturable) isMature(now) else null
 )
 
-private fun IBasePlant.toJSON() = BasePlantJSON(
+fun IBasePlant.toJSON() = BasePlantJSON(
+    id = enum.ordinal + 1,
+    name = friendlyName,
+    description = description,
+    icon = "$API_ROOT/img/plant-icon/$spriteName.png",
     growingPeriod = growingPeriod.seconds,
     growingSprite = "$API_ROOT/img/plant/$spriteName-growing.gif",
     maturePeriod = if (this is IBasePlant.Maturable) maturePeriod.seconds else null,

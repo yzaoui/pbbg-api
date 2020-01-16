@@ -3,6 +3,7 @@ package com.bitwiserain.pbbg.route.api
 import com.bitwiserain.pbbg.API_ROOT
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.dex.DexItems
+import com.bitwiserain.pbbg.domain.model.dex.DexPlants
 import com.bitwiserain.pbbg.domain.model.dex.DexUnits
 import com.bitwiserain.pbbg.domain.usecase.DexUC
 import com.bitwiserain.pbbg.domain.usecase.InvalidItemException
@@ -13,6 +14,7 @@ import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.MyUnitEnumJSON
 import com.bitwiserain.pbbg.view.model.dex.DexItemsJSON
+import com.bitwiserain.pbbg.view.model.dex.DexPlantsJSON
 import com.bitwiserain.pbbg.view.model.dex.DexUnitsJSON
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -67,23 +69,50 @@ fun Route.dexAPI(dexUC: DexUC) = route("/dex") {
             }
         }
     }
+
+    route("/plants/{id?}") {
+        get {
+            val plantId = call.parameters["id"]?.toInt()
+
+            if (plantId == null) {
+                // Calling for entire plant dex
+                val dex = dexUC.getDexPlants(call.user.id)
+
+                call.respondSuccess(dex.toJSON())
+            } else {
+                // Calling for specific plant
+                try {
+                    val plant = dexUC.getDexPlant(call.user.id, plantId)
+
+                    call.respondSuccess(plant.toJSON())
+                } catch (e: Exception) {
+                    call.respondFail(HttpStatusCode.NotFound)
+                }
+            }
+        }
+    }
 }
 
 // TODO: Find appropriate place for this adapter
 fun MyUnitEnum.toJSON() = MyUnitEnumJSON(
-    id = ordinal,
+    id = ordinal + 1,
     friendlyName = friendlyName,
     description = description,
     fullURL = "$API_ROOT/img/unit/$spriteName.gif",
     iconURL = "$API_ROOT/img/unit-icon/$spriteName.png"
 )
 
-private fun DexUnits.toJSON() = DexUnitsJSON(
-    discoveredUnits = discoveredUnits.associate { it.ordinal to it.toJSON() }.toSortedMap(),
-    lastUnitIsDiscovered = lastUnitIsDiscovered
+private fun DexItems.toJSON() = DexItemsJSON(
+    discoveredItems = discoveredItems.associate { it.ordinal + 1 to it.baseItem.toJSON() }.toSortedMap(),
+    lastItemId = lastItemId
 )
 
-private fun DexItems.toJSON() = DexItemsJSON(
-    discoveredItems = discoveredItems.associate { it.ordinal to it.baseItem.toJSON() }.toSortedMap(),
-    lastItemIsDiscovered = lastItemIsDiscovered
+private fun DexUnits.toJSON() = DexUnitsJSON(
+    discoveredUnits = discoveredUnits.associate { it.ordinal + 1 to it.toJSON() }.toSortedMap(),
+    lastUnitId = lastUnitId
+)
+
+private fun DexPlants.toJSON() = DexPlantsJSON(
+    discoveredPlants = discoveredPlants.mapValues { it.value.toJSON() }.toSortedMap(),
+    lastPlantId = lastPlantId
 )

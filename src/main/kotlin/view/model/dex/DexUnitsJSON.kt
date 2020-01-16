@@ -6,5 +6,5 @@ import java.util.*
 
 data class DexUnitsJSON(
     @SerializedName("discoveredUnits") val discoveredUnits: SortedMap<Int, MyUnitEnumJSON>,
-    @SerializedName("lastUnitIsDiscovered") val lastUnitIsDiscovered: Boolean
+    @SerializedName("lastUnitId") val lastUnitId: Int
 )

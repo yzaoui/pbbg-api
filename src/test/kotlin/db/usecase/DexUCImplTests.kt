@@ -43,37 +43,16 @@ class DexUCImplTests {
 
             val dexItems = dexUC.getDexItems(userId)
 
-            assertEquals(dexItems.discoveredItems, discoveredItemEnums)
+            assertEquals(discoveredItemEnums, dexItems.discoveredItems)
         }
 
         @Test
-        fun `Given a user who hasn't discovered the last item, when calling for dex items, lastItemIsDiscovered should be false`() {
+        fun `When calling for dex items, lastItemId should be 11`() {
             val userId = createTestUserAndGetId(db)
-
-            val discoveredItemEnums = setOf(ItemEnum.COPPER_ORE, ItemEnum.ICE_PICK).minus(ItemEnum.values().last())
-
-            transaction(db) {
-                DexTable.insertDiscovered(userId, discoveredItemEnums)
-            }
 
             val dexItems = dexUC.getDexItems(userId)
 
-            assertFalse(dexItems.lastItemIsDiscovered)
-        }
-
-        @Test
-        fun `Given a user who has discovered the last item, when calling for dex items, lastItemIsDiscovered should be true`() {
-            val userId = createTestUserAndGetId(db)
-
-            val discoveredItemEnums = setOf(ItemEnum.COPPER_ORE, ItemEnum.ICE_PICK).plus(ItemEnum.values().last())
-
-            transaction(db) {
-                DexTable.insertDiscovered(userId, discoveredItemEnums)
-            }
-
-            val dexItems = dexUC.getDexItems(userId)
-
-            assertTrue(dexItems.lastItemIsDiscovered)
+            assertEquals(11, dexItems.lastItemId)
         }
     }
 
@@ -89,7 +68,7 @@ class DexUCImplTests {
                 DexTable.insertDiscovered(userId, discoveredItem.enum)
             }
 
-            val dexItem = dexUC.getIndividualDexBaseItem(userId, discoveredItem.enum.ordinal)
+            val dexItem = dexUC.getIndividualDexBaseItem(userId, discoveredItem.id)
 
             assertEquals(dexItem, discoveredItem)
         }
@@ -108,7 +87,7 @@ class DexUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             assertFailsWith<ItemUndiscoveredException> {
-                dexUC.getIndividualDexBaseItem(userId, ItemEnum.COPPER_ORE.ordinal)
+                dexUC.getIndividualDexBaseItem(userId, BaseItem.Material.CopperOre.id)
             }
         }
     }
@@ -133,7 +112,7 @@ class DexUCImplTests {
 
             val dexUnit = dexUC.getDexUnit(userId, 2)
 
-            assertEquals(MyUnitEnum.values()[2], dexUnit)
+            assertEquals(MyUnitEnum.values()[1], dexUnit)
         }
 
         @Test
