@@ -7,5 +7,6 @@ import kotlinx.serialization.Serializable
 data class UserStats(
     @SerialName("username") val username: String,
     @SerialName("gold") val gold: Long,
-    @SerialName("mining") val mining: LevelProgress
+    @SerialName("mining") val mining: LevelProgress,
+    @SerialName("farming") val farming: LevelProgress
 )

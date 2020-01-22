@@ -31,13 +31,14 @@ class UserUCImplTests {
     @Nested
     inner class SuccessfulRegistration {
         @Test
-        fun `When registering a new user, the user should have 0 gold and 0 mining exp`() {
+        fun `When registering a new user, the user should have 0 gold, 0 mining exp, and 0 farming exp`() {
             val userId = userUC.registerUser("username", "password")
 
             val stats = transaction(db) { UserStatsTable.getUserStats(userId) }
 
             assertEquals(0, stats.gold)
             assertEquals(0, stats.miningExp)
+            assertEquals(0, stats.farmingExp)
         }
 
         @Test

@@ -3,6 +3,7 @@ package com.bitwiserain.pbbg.db.usecase
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
+import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable
 import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable.PlantForm
 import com.bitwiserain.pbbg.db.repository.farm.PlotTable
@@ -74,12 +75,16 @@ class FarmUCImpl(private val db: Database, private val clock: Clock) : FarmUC {
         /* Make sure plant can be harvested */
         if (!plant.canBeHarvested(now)) throw PlantNotHarvestableException()
 
+        /* Store crop */
         val crop: MaterializedItem = when (plant) {
             is MaterializedPlant.AppleTree -> MaterializedItem.Apple(1)
             is MaterializedPlant.TomatoPlant -> MaterializedItem.Tomato(1)
         }
-
         storeInInventoryReturnItemID(db, now, userId, crop, ItemHistoryInfo.FirstHarvested(userId))
+
+        /* Gain farming exp */
+        val currentFarmingExp = UserStatsTable.getUserStats(userId).farmingExp
+        UserStatsTable.updateFarmingExp(userId, currentFarmingExp + 2) // TODO: Proper exp system
 
         if (plant is IMaterializedPlant.Maturable) {
             /* For maturable plants, start new cycle and harvest */
