@@ -126,9 +126,7 @@ class MiningUCImpl(private val db: Database, private val clock: Clock) : MiningU
         // Remove mined cells from database
         MineCellTable.deleteWhere { MineCellTable.id.inList(reachableCellsWithContent.map { it.id }) }
 
-        val userCurrentMiningExp = UserStatsTable.select { UserStatsTable.userId.eq(userId) }
-            .single()
-            .get(UserStatsTable.miningExp)
+        val userCurrentMiningExp = UserStatsTable.getUserStats(userId).miningExp
 
         val currentLevelProgress = MiningExperienceManager.getLevelProgress(userCurrentMiningExp)
         val newLevelProgress = MiningExperienceManager.getLevelProgress(userCurrentMiningExp + totalExp)

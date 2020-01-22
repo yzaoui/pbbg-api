@@ -26,6 +26,10 @@ object UserStatsTable : Table() {
         it[UserStatsTable.miningExp] = miningExp
     }
 
+    fun updateFarmingExp(userId: Int, farmingExp: Long) = update({ UserStatsTable.userId.eq(userId) }) {
+        it[UserStatsTable.farmingExp] = farmingExp
+    }
+
     private fun ResultRow.toUserStats(): UserStats = UserStats(
         gold = this[gold],
         miningExp = this[miningExp],
