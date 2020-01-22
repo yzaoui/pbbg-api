@@ -8,6 +8,7 @@ object UserStatsTable : Table() {
     val userId = reference("user_id", UserTable)
     val gold = long("gold").default(0)
     val miningExp = long("mining_exp").default(0)
+    val farmingExp = long("farming_exp").default(0)
 
     fun createUserStats(userId: Int) = insert {
         it[UserStatsTable.userId] = EntityID(userId, UserTable)
@@ -27,6 +28,7 @@ object UserStatsTable : Table() {
 
     private fun ResultRow.toUserStats(): UserStats = UserStats(
         gold = this[gold],
-        miningExp = this[miningExp]
+        miningExp = this[miningExp],
+        farmingExp = this[farmingExp]
     )
 }

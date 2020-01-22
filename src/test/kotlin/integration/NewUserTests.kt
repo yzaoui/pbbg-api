@@ -65,7 +65,7 @@ class NewUserTests {
     }
 
     @Test
-    fun `When registering successfully, user should have 0 gold and 0 mining exp`() = testApp(clock) {
+    fun `When registering successfully, user should have 0 gold, 0 mining exp, and 0 farming exp`() = testApp(clock) {
         handleRequest(HttpMethod.Get, "/api/user") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             addHeader(HttpHeaders.Authorization, "Bearer ${registerUserAndGetToken()}")
@@ -80,6 +80,8 @@ class NewUserTests {
             assertEquals(0, userStats.gold, "Gold amount should be 0.")
             assertEquals(1, userStats.mining.level, "Mining level should be 1.")
             assertEquals(0, userStats.mining.relativeExp, "Mining experience should be 0.")
+            assertEquals(1, userStats.farming.level, "Farming level should be 1.")
+            assertEquals(0, userStats.farming.relativeExp, "Farming experience should be 0.")
         }
     }
 

@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.route.api
 
+import com.bitwiserain.pbbg.domain.FarmingExperienceManager
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.LevelProgress
 import com.bitwiserain.pbbg.domain.usecase.UserUC
@@ -23,7 +24,8 @@ fun Route.user(userUC: UserUC) = route("/user") {
         val response = UserStatsJSON(
             username = call.user.username,
             gold = userStats.gold,
-            miningLvlProgress = MiningExperienceManager.getLevelProgress(userStats.miningExp).toJSON()
+            miningLvlProgress = MiningExperienceManager.getLevelProgress(userStats.miningExp).toJSON(),
+            farmingLvlProgress = FarmingExperienceManager.getLevelProgress(userStats.farmingExp).toJSON()
         )
 
         call.respondSuccess(response)
