@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.domain.model.dex.DexItem
 import com.bitwiserain.pbbg.domain.model.dex.DexItems
 import com.bitwiserain.pbbg.domain.model.dex.DexPlants
 import com.bitwiserain.pbbg.domain.model.dex.DexUnits
@@ -17,9 +17,8 @@ interface DexUC {
      * Detailed entry of an item this user has discovered.
      *
      * @throws InvalidItemException when [itemId] is invalid.
-     * @throws ItemUndiscoveredException when this item has not been discovered by this user.
      */
-    fun getIndividualDexBaseItem(userId: Int, itemId: Int): BaseItem
+    fun getIndividualDexBaseItem(userId: Int, itemId: Int): DexItem
 
     /**
      * The dex entries of all units.
@@ -47,6 +46,5 @@ interface DexUC {
 }
 
 class InvalidItemException : Exception()
-class ItemUndiscoveredException : Exception()
 class InvalidUnitException : Exception()
 class InvalidPlantException : Exception()

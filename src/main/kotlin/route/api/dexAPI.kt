@@ -2,17 +2,18 @@ package com.bitwiserain.pbbg.route.api
 
 import com.bitwiserain.pbbg.API_ROOT
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.domain.model.dex.DexItem
 import com.bitwiserain.pbbg.domain.model.dex.DexItems
 import com.bitwiserain.pbbg.domain.model.dex.DexPlants
 import com.bitwiserain.pbbg.domain.model.dex.DexUnits
 import com.bitwiserain.pbbg.domain.usecase.DexUC
 import com.bitwiserain.pbbg.domain.usecase.InvalidItemException
 import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
-import com.bitwiserain.pbbg.domain.usecase.ItemUndiscoveredException
 import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.MyUnitEnumJSON
+import com.bitwiserain.pbbg.view.model.dex.DexItemJSON
 import com.bitwiserain.pbbg.view.model.dex.DexItemsJSON
 import com.bitwiserain.pbbg.view.model.dex.DexPlantsJSON
 import com.bitwiserain.pbbg.view.model.dex.DexUnitsJSON
@@ -39,9 +40,6 @@ fun Route.dexAPI(dexUC: DexUC) = route("/dex") {
 
                     call.respondSuccess(item.toJSON())
                 } catch (e: InvalidItemException) {
-                    call.respondFail(HttpStatusCode.NotFound)
-                } catch (e: ItemUndiscoveredException) {
-                    // TODO: This is leaking information due to difference in response timing
                     call.respondFail(HttpStatusCode.NotFound)
                 }
             }
@@ -102,17 +100,22 @@ fun MyUnitEnum.toJSON() = MyUnitEnumJSON(
     iconURL = "$API_ROOT/img/unit-icon/$spriteName.png"
 )
 
-private fun DexItems.toJSON() = DexItemsJSON(
+private fun DexItems.toJSON(): DexItemsJSON = DexItemsJSON(
     discoveredItems = discoveredItems.associate { it.ordinal + 1 to it.baseItem.toJSON() }.toSortedMap(),
     lastItemId = lastItemId
 )
 
-private fun DexUnits.toJSON() = DexUnitsJSON(
+private fun DexItem.toJSON(): DexItemJSON = when (this) {
+    is DexItem.DiscoveredDexItem -> DexItemJSON.DiscoveredDexItemJSON(baseItem.toJSON())
+    is DexItem.UndiscoveredDexItem -> DexItemJSON.UndiscoveredDexItemJSON(id)
+}
+
+private fun DexUnits.toJSON(): DexUnitsJSON = DexUnitsJSON(
     discoveredUnits = discoveredUnits.associate { it.ordinal + 1 to it.toJSON() }.toSortedMap(),
     lastUnitId = lastUnitId
 )
 
-private fun DexPlants.toJSON() = DexPlantsJSON(
+private fun DexPlants.toJSON(): DexPlantsJSON = DexPlantsJSON(
     discoveredPlants = discoveredPlants.mapValues { it.value.toJSON() }.toSortedMap(),
     lastPlantId = lastPlantId
 )
