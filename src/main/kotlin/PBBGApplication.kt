@@ -129,7 +129,7 @@ fun Application.mainWithDependencies(clock: Clock) {
             loginAPI(userUC)
             item(itemUC)
             authenticate {
-                user(userUC)
+                userStats(userUC)
                 inventoryAPI(inventoryUC, equipmentUC)
                 market(marketUC)
                 battleAPI(battleUC)

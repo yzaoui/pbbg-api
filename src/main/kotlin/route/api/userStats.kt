@@ -13,7 +13,7 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 
-fun Route.user(userUC: UserUC) = route("/user") {
+fun Route.userStats(userUC: UserUC) = route("/user-stats") {
     /**
      * On success:
      *   [UserStatsJSON]
