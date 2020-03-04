@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.db.repository.DexTable
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.domain.model.dex.DexItem
 import com.bitwiserain.pbbg.domain.model.dex.DexItems
 import com.bitwiserain.pbbg.domain.model.dex.DexPlants
 import com.bitwiserain.pbbg.domain.model.dex.DexUnits
@@ -23,15 +24,15 @@ class DexUCImpl(private val db: Database) : DexUC {
         )
     }
 
-    override fun getIndividualDexBaseItem(userId: Int, itemId: Int): BaseItem = transaction(db) {
+    override fun getIndividualDexBaseItem(userId: Int, itemId: Int): DexItem = transaction(db) {
         val itemEnumOrdinal = itemId - 1
         if (itemEnumOrdinal !in ItemEnum.values().indices) throw InvalidItemException()
 
         val enum = ItemEnum.values()[itemEnumOrdinal]
 
-        if (!DexTable.hasEntry(userId, enum)) throw ItemUndiscoveredException()
+        if (!DexTable.hasEntry(userId, enum)) return@transaction DexItem.UndiscoveredDexItem(itemId)
 
-        return@transaction enum.baseItem
+        return@transaction DexItem.DiscoveredDexItem(enum.baseItem)
     }
 
     override fun getDexUnits(userId: Int): DexUnits = transaction(db ) {

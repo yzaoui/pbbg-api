@@ -6,17 +6,17 @@ import com.bitwiserain.pbbg.db.usecase.DexUCImpl
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.domain.model.dex.DexItem
 import com.bitwiserain.pbbg.domain.usecase.DexUC
 import com.bitwiserain.pbbg.domain.usecase.InvalidItemException
 import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
-import com.bitwiserain.pbbg.domain.usecase.ItemUndiscoveredException
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.assertFalse
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -70,7 +70,8 @@ class DexUCImplTests {
 
             val dexItem = dexUC.getIndividualDexBaseItem(userId, discoveredItem.id)
 
-            assertEquals(dexItem, discoveredItem)
+            assertTrue(dexItem is DexItem.DiscoveredDexItem)
+            assertEquals(dexItem.baseItem, discoveredItem)
         }
 
         @Test
@@ -83,12 +84,13 @@ class DexUCImplTests {
         }
 
         @Test
-        fun `Given a user who hasn't discovered an item, when calling for said item by its ID, an ItemUndiscoveredException should be thrown`() {
+        fun `Given a user who hasn't discovered an item, when calling for said item by its ID, it should be undiscovered`() {
             val userId = createTestUserAndGetId(db)
 
-            assertFailsWith<ItemUndiscoveredException> {
-                dexUC.getIndividualDexBaseItem(userId, BaseItem.Material.CopperOre.id)
-            }
+            val dexItem = dexUC.getIndividualDexBaseItem(userId, BaseItem.Material.CopperOre.id)
+
+            assertTrue(dexItem is DexItem.UndiscoveredDexItem)
+            assertEquals(BaseItem.Material.CopperOre.id, dexItem.id)
         }
     }
 
