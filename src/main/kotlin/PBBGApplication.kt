@@ -88,6 +88,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     val unitUC = UnitUCImpl(db)
     val battleUC = BattleUCImpl(db)
     val dexUC = DexUCImpl(db)
+    val userProfileUC = UserProfileUCImpl(db)
 
     install(ContentNegotiation) {
         // Handles "application/json" content type
@@ -128,7 +129,7 @@ fun Application.mainWithDependencies(clock: Clock) {
             registerAPI(userUC)
             loginAPI(userUC)
             item(itemUC)
-            authenticate {
+            authenticate(optional = false) {
                 userStats(userUC)
                 inventoryAPI(inventoryUC, equipmentUC)
                 market(marketUC)
@@ -138,6 +139,9 @@ fun Application.mainWithDependencies(clock: Clock) {
                 dexAPI(dexUC)
                 squadAPI(unitUC)
                 settings(userUC)
+            }
+            authenticate(optional = true) {
+                user(userProfileUC)
             }
         }
         static("img") {
@@ -168,6 +172,9 @@ suspend inline fun ApplicationCall.respondError(message: String = "", status: Ht
 val ApplicationCall.user
     get() = authentication.principal<User>()!!
 
+val ApplicationCall.userOptional
+    get() = authentication.principal<User>()
+
 fun Application.makeToken(userId: Int): String = JWT.create()
     .withIssuer(environment.config.property("jwt.issuer").getString())
     .withClaim("user.id", userId)
@@ -189,7 +196,7 @@ object SchemaHelper {
         SchemaUtils.create(
             UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable,
             SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable,
-            PlotTable, MaterializedPlantTable
+            PlotTable, MaterializedPlantTable, FriendsTable
         )
     }
 
@@ -197,7 +204,7 @@ object SchemaHelper {
         SchemaUtils.drop(
             UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable,
             SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable,
-            PlotTable, MaterializedPlantTable
+            PlotTable, MaterializedPlantTable, FriendsTable
         )
     }
 }

@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.domain.model.itemdetails.ItemDetails
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.domain.usecase.ItemUC
+import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.view.model.itemdetails.ItemDetailsJSON
 import com.bitwiserain.pbbg.view.model.itemdetails.ItemHistoryInfoJSON
@@ -17,7 +18,7 @@ private const val ITEM_ID_PARAM = "id"
 
 fun Route.item(itemUC: ItemUC) = route("/item/{$ITEM_ID_PARAM}") {
     get {
-        val itemId = call.parameters[ITEM_ID_PARAM]?.toLongOrNull() ?: throw Exception() //TODO: Exception
+        val itemId = call.parameters[ITEM_ID_PARAM]?.toLongOrNull() ?: return@get call.respondFail()
 
         val itemdetails = itemUC.getItemDetails(itemId)
 
