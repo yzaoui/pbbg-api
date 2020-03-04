@@ -13,6 +13,9 @@ class UserProfileUCImpl(private val db: Database) : UserProfileUC {
     override fun getUserProfile(targetUserId: Int, currentUser: User?): UserProfile = transaction(db) {
         val targetUser = UserTable.getUserById(targetUserId) ?: throw TargetUserDoesNotExistException
 
-        return@transaction UserProfile(targetUser.username, currentUser?.let { currentUser -> FriendsTable.areFriends(targetUser.id, currentUser.id) })
+        return@transaction UserProfile(
+            username = targetUser.username,
+            friendship = currentUser?.let { currentUser -> FriendsTable.getFriendship(currentUser.id, targetUser.id) }
+        )
     }
 }

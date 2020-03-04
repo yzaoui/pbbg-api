@@ -89,6 +89,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     val battleUC = BattleUCImpl(db)
     val dexUC = DexUCImpl(db)
     val userProfileUC = UserProfileUCImpl(db)
+    val friendsUC = FriendsUCImpl(db)
 
     install(ContentNegotiation) {
         // Handles "application/json" content type
@@ -138,6 +139,7 @@ fun Application.mainWithDependencies(clock: Clock) {
                 farm(farmUC, clock)
                 dexAPI(dexUC)
                 squadAPI(unitUC)
+                friends(friendsUC)
                 settings(userUC)
             }
             authenticate(optional = true) {

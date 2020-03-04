@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.db.repository
 
+import com.bitwiserain.pbbg.domain.model.friends.Friendship
 import org.jetbrains.exposed.sql.*
 
 object FriendsTable : Table() {
@@ -7,10 +8,34 @@ object FriendsTable : Table() {
     val userId2 = reference("user_id_2", UserTable).primaryKey()
     val confirmed = bool("confirmed")
 
-    fun areFriends(userId1: Int, userId2: Int): Boolean = select(exists(
-        select {
-            ((FriendsTable.userId1.eq(userId1) and FriendsTable.userId2.eq(userId2)) or (FriendsTable.userId1.eq(userId2) and FriendsTable.userId2.eq(userId1)))
-                .and(FriendsTable.confirmed.eq(true))
+    fun getFriendship(currentUserId: Int, targetUserId: Int): Friendship {
+        val row = select { (FriendsTable.userId1.eq(currentUserId) and FriendsTable.userId2.eq(targetUserId)) or (FriendsTable.userId1.eq(targetUserId) and FriendsTable.userId2.eq(currentUserId)) }
+            .singleOrNull()
+
+        return when {
+            row == null -> Friendship.NONE
+            row[FriendsTable.confirmed] -> Friendship.CONFIRMED
+            row[FriendsTable.userId1].value == currentUserId -> Friendship.REQUEST_SENT
+            row[FriendsTable.userId2].value == currentUserId -> Friendship.REQUEST_RECEIVED
+            else -> throw IllegalStateException()
         }
-    )).any()
+    }
+
+    fun getFriends(userId: Int): List<UserFriendship> = select { FriendsTable.userId1.eq(userId) or FriendsTable.userId2.eq(userId) }
+        .map { if (it[FriendsTable.userId1].value == userId)
+            UserFriendship(
+                userId = it[FriendsTable.userId2].value,
+                friendship = if (it[FriendsTable.confirmed]) Friendship.CONFIRMED else Friendship.REQUEST_SENT
+            )
+        else
+            UserFriendship(
+                userId = it[FriendsTable.userId1].value,
+                friendship = if (it[FriendsTable.confirmed]) Friendship.CONFIRMED else Friendship.REQUEST_RECEIVED
+            )
+        }
 }
+
+data class UserFriendship(
+    val userId: Int,
+    val friendship: Friendship
+)
