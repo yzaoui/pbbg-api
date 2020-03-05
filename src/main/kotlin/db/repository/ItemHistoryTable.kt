@@ -7,7 +7,7 @@ import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfoEnum
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfoEnum.*
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.dao.EntityID
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert

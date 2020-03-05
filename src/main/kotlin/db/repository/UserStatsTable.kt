@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.db.repository
 
 import com.bitwiserain.pbbg.domain.model.UserStats
-import org.jetbrains.exposed.dao.EntityID
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 
 object UserStatsTable : Table() {

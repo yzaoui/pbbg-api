@@ -1,8 +1,8 @@
 package com.bitwiserain.pbbg.db.repository
 
 import com.bitwiserain.pbbg.domain.model.MyUnit
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.LongIdTable
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.select

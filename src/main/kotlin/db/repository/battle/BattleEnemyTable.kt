@@ -4,7 +4,7 @@ import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.repository.toMyUnit
 import com.bitwiserain.pbbg.domain.model.MyUnit
-import org.jetbrains.exposed.dao.EntityID
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 
 object BattleEnemyTable : Table() {

@@ -3,8 +3,8 @@ package com.bitwiserain.pbbg.db.repository.farm
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable.toMaterializedPlant
 import com.bitwiserain.pbbg.domain.model.farm.Plot
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.LongIdTable
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.*
 
 object PlotTable : LongIdTable() {
@@ -17,7 +17,7 @@ object PlotTable : LongIdTable() {
         Plot(it.value, null)
     }
 
-    fun updatePlot(userId: Int, plotId: Long, plantId: Long?) = update({ PlotTable.userId.eq(userId) and PlotTable.id.eq(plotId) }) {
+    fun updatePlot(userId: Int, plotId: Long, plantId: Long) = update({ PlotTable.userId.eq(userId) and PlotTable.id.eq(plotId) }) {
         it[PlotTable.plantId] = EntityID(plantId, MaterializedPlantTable)
     }
 
