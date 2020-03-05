@@ -31,6 +31,7 @@ fun Route.user(userProfileUC: UserProfileUC) = route("/user/{$USER_ID_PARAM}") {
 }
 
 private fun UserProfile.toJSON() = UserProfileJSON(
+    id = id,
     username = username,
     friendship = friendship?.toJSON()
 )

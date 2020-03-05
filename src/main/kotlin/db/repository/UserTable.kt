@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.USERNAME_MAX_LENGTH
 import com.bitwiserain.pbbg.db.model.User
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 
@@ -28,6 +29,12 @@ object UserTable : IntIdTable() {
 
     fun getUsersById(userIds: Iterable<Int>): Map<Int, User> = select { UserTable.id.inList(userIds) }
         .associate { it[UserTable.id].value to it.toUser() }
+
+    fun userExists(userId: Int): Boolean = select(
+        exists(
+            select { UserTable.id.eq(userId) }
+        )
+    ).any()
 
     private fun ResultRow.toUser() = User(this[id].value, this[username], this[passwordHash])
 }

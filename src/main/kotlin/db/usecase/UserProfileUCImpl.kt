@@ -14,6 +14,7 @@ class UserProfileUCImpl(private val db: Database) : UserProfileUC {
         val targetUser = UserTable.getUserById(targetUserId) ?: throw TargetUserDoesNotExistException
 
         return@transaction UserProfile(
+            id = targetUser.id,
             username = targetUser.username,
             friendship = currentUser?.let { currentUser -> FriendsTable.getFriendship(currentUser.id, targetUser.id) }
         )
