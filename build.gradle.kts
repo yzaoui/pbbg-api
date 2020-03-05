@@ -5,6 +5,7 @@ import java.net.URI
 object Versions {
     const val KOTLIN = "1.3.70"
     const val KTOR = "1.2.5"
+    const val EXPOSED = "0.21.1"
 }
 
 group = "com.bitwiserain"
@@ -35,7 +36,8 @@ dependencies {
     implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version = Versions.KOTLIN)
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-runtime", version = "0.20.0")
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-html-jvm", version = "0.6.10")
-    implementation(group = "org.jetbrains.exposed", name = "exposed-core", version = "0.21.1")
+    implementation(group = "org.jetbrains.exposed", name = "exposed-core", version = Versions.EXPOSED)
+    implementation(group = "org.jetbrains.exposed", name = "exposed-jdbc", version = Versions.EXPOSED)
     implementation(group = "at.favre.lib", name = "bcrypt", version = "0.9.0")
     implementation(group = "io.ktor", name = "ktor-server-netty", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-html-builder", version = Versions.KTOR)
