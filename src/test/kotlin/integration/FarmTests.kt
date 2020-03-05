@@ -12,13 +12,11 @@ import com.bitwiserain.pbbg.test.integration.requestbody.PlantRequest
 import com.bitwiserain.pbbg.test.registerUserAndGetToken
 import com.bitwiserain.pbbg.test.testApp
 import io.ktor.http.HttpStatusCode
-import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.content
-import kotlinx.serialization.list
-import kotlinx.serialization.parse
-import kotlinx.serialization.stringify
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -27,7 +25,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-@ImplicitReflectionSerializer
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class FarmTests {
     private val clock = MutableClock()
@@ -43,11 +40,11 @@ class FarmTests {
         val response = GETPlots(registerUserAndGetToken())
         assertEquals(HttpStatusCode.OK, response.status())
 
-        val body = Json.parse<JsonObject>(response.content.orEmpty())
+        val body = Json.parse(JsonObject.serializer(), response.content.orEmpty())
         assertEquals("success", body["status"]?.content)
 
         val plots: List<Plot> = assertDoesNotThrow {
-            Json.parse(Plot.serializer().list, Json.stringify(body["data"]!!))
+            Json.parse(Plot.serializer().list, Json.stringify(JsonElement.serializer(), body.getValue("data")))
         }
 
         assertEquals(1, plots.size, "There should initially be 1 plot")
@@ -59,17 +56,12 @@ class FarmTests {
         val token = registerUserAndGetToken()
 
         val plot = GETPlots(token).run {
-            Json.parse(
-                Plot.serializer().list,
-                Json.stringify(
-                    Json.parse<JsonObject>(content.orEmpty())["data"]!!
-                )
-            ).single()
+            Json.parse(Plot.serializer().list, Json.stringify(JsonElement.serializer(), Json.parse(JsonObject.serializer(), content.orEmpty()).getValue("data"))).single()
         }
 
         /* Retrieve apple sapling from initial inventory */
         val appleSaplingInInventory = GETInventory(token, filter = "plantable").run {
-            Json.parse<Inventory>(Json.stringify(Json.parse<JsonObject>(content.orEmpty())["data"]!!))
+            Json.parse(Inventory.serializer(), Json.stringify(JsonElement.serializer(), Json.parse(JsonObject.serializer(), content.orEmpty()).getValue("data")))
                 .items.single { it.item.baseItem.friendlyName == "Apple Sapling" }.item
         }
         val initialAppleSaplingQuantity = appleSaplingInInventory.quantity!!
@@ -81,18 +73,18 @@ class FarmTests {
         ))
 
         assertEquals(HttpStatusCode.OK, plantResponse.status())
-        val plantResponseBody = Json.parse<JsonObject>(plantResponse.content.orEmpty())
+        val plantResponseBody = Json.parse(JsonObject.serializer(), plantResponse.content.orEmpty())
         assertEquals("success", plantResponseBody["status"]?.content)
 
         val occupiedPlot = assertDoesNotThrow {
-            Json.parse<Plot>(Json.stringify(plantResponseBody["data"]!!))
+            Json.parse(Plot.serializer(), Json.stringify(JsonElement.serializer(), plantResponseBody.getValue("data")))
         }
 
         assertNotNull(occupiedPlot.plant, "Plot should be occupied after planting.")
 
         /* Check apple sapling was depleted */
         val newAppleSaplingQuantity = GETInventory(token).run {
-            Json.parse<Inventory>(Json.stringify(Json.parse<JsonObject>(content.orEmpty())["data"]!!))
+            Json.parse(Inventory.serializer(), Json.stringify(JsonElement.serializer(), Json.parse(JsonObject.serializer(), content.orEmpty()).getValue("data")))
                 .items.single { it.item.baseItem.friendlyName == "Apple Sapling" }.item.quantity!!
         }
 

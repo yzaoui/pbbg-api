@@ -15,13 +15,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
-import io.ktor.util.KtorExperimentalAPI
-import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.content
-import kotlinx.serialization.parse
-import kotlinx.serialization.stringify
+import kotlinx.serialization.json.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -31,8 +25,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-@ImplicitReflectionSerializer
-@KtorExperimentalAPI
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class NewUserTests {
     private val db = initDatabase()
@@ -48,18 +40,19 @@ class NewUserTests {
         handleRequest(HttpMethod.Post, "/api/register") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(
-                Json.stringify(mapOf(
-                    "username" to "username",
+                json {
+                    "username" to "username"
                     "password" to "password"
-                )))
+                }.toString()
+            )
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
 
-            val body = Json.parse<JsonObject>(response.content.orEmpty())
+            val body = Json.parse(JsonObject.serializer(), response.content.orEmpty())
             assertEquals("success", body["status"]?.content)
 
             assertDoesNotThrow {
-                Json.parse<RegisterResponse>(Json.stringify(body["data"]!!))
+                Json.parse(RegisterResponse.serializer(), Json.stringify(JsonElement.serializer(), body.getValue("data")))
             }
         }
     }
@@ -70,11 +63,11 @@ class NewUserTests {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             addHeader(HttpHeaders.Authorization, "Bearer ${registerUserAndGetToken()}")
         }.apply {
-            val body = Json.parse<JsonObject>(response.content.orEmpty())
+            val body = Json.parse(JsonObject.serializer(), response.content.orEmpty())
             assertEquals("success", body["status"]?.content)
 
             val userStats = assertDoesNotThrow {
-                Json.parse<UserResponse>(Json.stringify(body["data"]!!))
+                Json.parse(UserResponse.serializer(), Json.stringify(JsonElement.serializer(), body.getValue("data")))
             }
 
             assertEquals(0, userStats.gold, "Gold amount should be 0.")
@@ -89,10 +82,10 @@ class NewUserTests {
     fun `When registering successfully, user should have 1 ice pick, 2 apple saplings, 5 tomato seeds, and nothing equipped`() = testApp(clock) {
         val inventoryResponse = GETInventory(registerUserAndGetToken())
 
-        val body = Json.parse<JsonObject>(inventoryResponse.content.orEmpty())
+        val body = Json.parse(JsonObject.serializer(), inventoryResponse.content.orEmpty())
 
         val inventory = assertDoesNotThrow {
-            Json.parse<Inventory>(Json.stringify(body["data"]!!))
+            Json.parse(Inventory.serializer(), Json.stringify(JsonElement.serializer(), body.getValue("data")))
         }
 
         assertEquals(3, inventory.items.size, "Should have 3 items in inventory.")
