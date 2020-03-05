@@ -8,8 +8,8 @@ import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.*
 
 object PlotTable : LongIdTable() {
-    val userId = reference("user_id", UserTable).primaryKey()
-    val plantId = reference("plant_id", MaterializedPlantTable, ReferenceOption.SET_NULL).primaryKey().nullable()
+    val userId = reference("user_id", UserTable)
+    val plantId = reference("plant_id", MaterializedPlantTable, ReferenceOption.SET_NULL).nullable()
 
     fun createAndGetEmptyPlot(userId: Int): Plot = insertAndGetId {
         it[PlotTable.userId] = EntityID(userId, UserTable)

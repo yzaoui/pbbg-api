@@ -5,8 +5,10 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 
 object DexTable : Table() {
-    val userId = reference("user_id", UserTable).primaryKey()
-    val item = enumeration("base_item_ordinal", ItemEnum::class).primaryKey()
+    val userId = reference("user_id", UserTable)
+    val item = enumeration("base_item_ordinal", ItemEnum::class)
+
+    override val primaryKey = PrimaryKey(userId, item)
 
     fun hasEntry(userId: Int, item: ItemEnum): Boolean = select { DexTable.userId.eq(userId) and DexTable.item.eq(item) }.singleOrNull() != null
 
