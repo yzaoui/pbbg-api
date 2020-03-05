@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.db.repository.mine
 
 import com.bitwiserain.pbbg.domain.model.mine.MineEntity
-import org.jetbrains.exposed.dao.IntIdTable
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.select
 

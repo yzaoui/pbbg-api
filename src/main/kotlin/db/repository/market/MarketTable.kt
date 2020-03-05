@@ -1,8 +1,8 @@
 package com.bitwiserain.pbbg.db.repository.market
 
 import com.bitwiserain.pbbg.db.repository.UserTable
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntIdTable
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.insertAndGetId
 
 object MarketTable: IntIdTable() {

@@ -2,7 +2,7 @@ package com.bitwiserain.pbbg.db.repository.farm
 
 import com.bitwiserain.pbbg.domain.model.farm.MaterializedPlant
 import com.bitwiserain.pbbg.domain.model.farm.PlantEnum
-import org.jetbrains.exposed.dao.LongIdTable
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertAndGetId

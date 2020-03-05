@@ -2,8 +2,8 @@ package com.bitwiserain.pbbg.db.repository.battle
 
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.battle.BattleQueue
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.LongIdTable
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select

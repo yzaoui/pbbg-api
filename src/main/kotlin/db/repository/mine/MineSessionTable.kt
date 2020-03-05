@@ -3,8 +3,8 @@ package com.bitwiserain.pbbg.db.repository.mine
 import com.bitwiserain.pbbg.db.model.MineSession
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.mine.MineType
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntIdTable
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertAndGetId

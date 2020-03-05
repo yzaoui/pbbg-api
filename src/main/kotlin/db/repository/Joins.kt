@@ -4,7 +4,7 @@ import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
-import org.jetbrains.exposed.dao.EntityID
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.select
