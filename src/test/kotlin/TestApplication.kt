@@ -12,12 +12,10 @@ import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
-import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonLiteral
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.parse
-import kotlinx.serialization.stringify
+import kotlinx.serialization.json.json
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -30,16 +28,16 @@ fun createTestUserAndGetId(db: Database, username: String = "username", password
     UserTable.createUserAndGetId(username, BCryptHelper.hashPassword(password))
 }
 
-@ImplicitReflectionSerializer
 fun TestApplicationEngine.registerUserAndGetToken(username: String = "username", password: String = "password") = handleRequest(HttpMethod.Post, "/api/register") {
     addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     setBody(
-        Json.stringify(mapOf(
-            "username" to username,
+        json {
+            "username" to username
             "password" to password
-        )))
+        }.toString()
+    )
 }.run {
-    (Json.parse<JsonObject>(response.content.orEmpty())["data"]!!.jsonObject.getAs<JsonLiteral>("token")).content
+    (Json.parse(JsonObject.serializer(), response.content.orEmpty()).getValue("data").jsonObject.getAs<JsonLiteral>("token")).content
 }
 
 fun testApp(clock: Clock, block: TestApplicationEngine.() -> Unit) {
