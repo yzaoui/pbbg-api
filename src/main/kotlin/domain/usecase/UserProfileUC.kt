@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.domain.usecase
 
-import com.bitwiserain.pbbg.db.model.User
 import com.bitwiserain.pbbg.domain.model.UserProfile
+import com.bitwiserain.pbbg.domain.model.friends.FriendInfo
 
 interface UserProfileUC {
     /**
@@ -9,7 +9,9 @@ interface UserProfileUC {
      *
      * @throws TargetUserDoesNotExistException when the target user does not exist.
      */
-    fun getUserProfile(targetUserId: Int, currentUser: User?): UserProfile
+    fun getUserProfile(targetUserId: Int, currentUserId: Int?): UserProfile
+
+    fun searchUsers(userId: Int, text: String): List<FriendInfo>
 }
 
 object TargetUserDoesNotExistException : Exception()

@@ -62,7 +62,7 @@ private fun Friends.toJSON() = FriendsJSON(
     friendInfos = friendInfos.map { it.toJSON() }
 )
 
-private fun FriendInfo.toJSON() = FriendInfoJSON(
+fun FriendInfo.toJSON() = FriendInfoJSON(
     userId = userId,
     username = username,
     friendship = friendship.toJSON()

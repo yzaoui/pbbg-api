@@ -3,10 +3,7 @@ package com.bitwiserain.pbbg.db.repository
 import com.bitwiserain.pbbg.USERNAME_MAX_LENGTH
 import com.bitwiserain.pbbg.db.model.User
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.exists
-import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 
 object UserTable : IntIdTable() {
     val username = varchar("username", USERNAME_MAX_LENGTH).uniqueIndex()
@@ -35,6 +32,10 @@ object UserTable : IntIdTable() {
             select { UserTable.id.eq(userId) }
         )
     ).any()
+
+    fun searchUsers(text: String): List<User> = selectAll()
+        .map { it.toUser() }
+        .filter { it.username.contains(text, ignoreCase = true) }
 
     private fun ResultRow.toUser() = User(this[id].value, this[username], this[passwordHash])
 }
