@@ -59,7 +59,7 @@ class NewUserTests {
 
     @Test
     fun `When registering successfully, user should have 0 gold, 0 mining exp, and 0 farming exp`() = testApp(clock) {
-        handleRequest(HttpMethod.Get, "/api/user") {
+        handleRequest(HttpMethod.Get, "/api/user-stats") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             addHeader(HttpHeaders.Authorization, "Bearer ${registerUserAndGetToken()}")
         }.apply {
