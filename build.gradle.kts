@@ -58,7 +58,12 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-tasks.withType<ShadowJar> {
+tasks.named<ShadowJar>("shadowJar") {
+    archiveClassifier.set("")
+    archiveVersion.set("")
+}
+
+tasks.register<ShadowJar>("shadowJarWithVersion") {
     archiveClassifier.set("")
 }
 

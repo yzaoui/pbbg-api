@@ -23,6 +23,7 @@ import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
 import io.ktor.auth.authentication
 import io.ktor.auth.jwt.jwt
+import io.ktor.config.ApplicationConfigurationException
 import io.ktor.features.CORS
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
@@ -44,7 +45,7 @@ enum class ApplicationEnvironment {
     DEV,
     PROD
 }
-lateinit var appEnvironment: ApplicationEnvironment
+lateinit var APP_ENVIRONMENT: ApplicationEnvironment
 lateinit var API_ROOT: String
 
 fun Application.main() {
@@ -52,16 +53,13 @@ fun Application.main() {
 }
 
 fun Application.mainWithDependencies(clock: Clock) {
-    appEnvironment = when (environment.config.propertyOrNull("ktor.environment")?.getString()) {
+    APP_ENVIRONMENT = when (environment.config.propertyOrNull("ktor.environment")?.getString()) {
         "dev" -> ApplicationEnvironment.DEV
         "prod" -> ApplicationEnvironment.PROD
-        else -> throw RuntimeException("Environment (KTOR_ENV) must be either dev or prod.")
+        else -> throw ApplicationConfigurationException("Environment (KTOR_ENV) must be either dev or prod.")
     }
 
-    API_ROOT = when(appEnvironment) {
-        ApplicationEnvironment.DEV -> "http://localhost:${environment.config.property("ktor.deployment.port").getString()}"
-        ApplicationEnvironment.PROD -> "https://pbbg-api.bitwiserain.com"
-    }
+    API_ROOT = environment.config.propertyOrNull("ktor.deployment.root")?.getString() ?: throw ApplicationConfigurationException("API_ROOT must be provided.")
 
     /*************
      * Set up db *
