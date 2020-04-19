@@ -141,6 +141,7 @@ fun Application.mainWithDependencies(clock: Clock) {
                 squadAPI(unitUC)
                 friends(friendsUC)
                 settings(userUC)
+                version()
             }
             authenticate(optional = true) {
                 user(userProfileUC)

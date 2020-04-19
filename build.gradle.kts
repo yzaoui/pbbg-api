@@ -10,7 +10,7 @@ object Versions {
 }
 
 group = "com.bitwiserain"
-version = "0.3.1"
+version = "0.3.1" // should mirror version in Const.kt
 
 plugins {
     application
