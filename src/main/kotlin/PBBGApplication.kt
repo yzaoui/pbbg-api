@@ -141,6 +141,7 @@ fun Application.mainWithDependencies(clock: Clock) {
                 squadAPI(unitUC)
                 friends(friendsUC)
                 settings(userUC)
+                about()
             }
             authenticate(optional = true) {
                 user(userProfileUC)
@@ -208,5 +209,14 @@ object SchemaHelper {
             SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable,
             PlotTable, MaterializedPlantTable, FriendsTable
         )
+    }
+}
+
+/***************
+ * Patch Notes *
+ ***************/
+object PatchNotesHelper {
+    fun getAll(): List<String> {
+        return APP_VERSIONS.reversed().map { javaClass.getResource("/patch-notes/${it}.md").readText() }
     }
 }
