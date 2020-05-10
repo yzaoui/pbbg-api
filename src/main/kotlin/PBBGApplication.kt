@@ -90,6 +90,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     val dexUC = DexUCImpl(db)
     val userProfileUC = UserProfileUCImpl(db)
     val friendsUC = FriendsUCImpl(db)
+    val aboutUC = AboutUCImpl()
 
     install(ContentNegotiation) {
         // Handles "application/json" content type
@@ -141,7 +142,7 @@ fun Application.mainWithDependencies(clock: Clock) {
                 squadAPI(unitUC)
                 friends(friendsUC)
                 settings(userUC)
-                about()
+                about(aboutUC)
             }
             authenticate(optional = true) {
                 user(userProfileUC)
