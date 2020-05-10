@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.test.db.usecase
+package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.DexTable
