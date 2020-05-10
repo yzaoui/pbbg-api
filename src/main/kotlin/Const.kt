@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg
 
 const val APP_VERSION = "0.3.1" // should mirror version in build.gradle.kts
+val APP_VERSIONS = arrayOf("0.1.0", "0.2.0", "0.3.0", APP_VERSION)
 
 const val USERNAME_MIN_LENGTH = 1
 const val USERNAME_MAX_LENGTH = 15
