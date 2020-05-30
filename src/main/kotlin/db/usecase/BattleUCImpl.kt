@@ -114,7 +114,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
                     unitsToRemove.add(target.id)
                 }
 
-                effects[target.id] = UnitEffect.Health(-actingUnit.atk)
+                effects[target.id] = UnitEffect.Health(updatedTarget.hp - target.hp)
             }
             else -> throw RuntimeException() // All actions should be accounted for
         }
