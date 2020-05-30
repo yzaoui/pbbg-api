@@ -36,7 +36,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         val newEnemies = mutableListOf<UnitForm>()
         // Add 1-3 new enemies
         for (i in 0 until (1..3).random()) {
-            newEnemies.add(UnitForm(MyUnitEnum.values().random(), (7..11).random(), (1..2).random(), (1..2).random()))
+            newEnemies.add(UnitForm(MyUnitEnum.values().random(), (7..14).random(), (5..7).random(), (5..7).random(), (6..8).random(), (4..7).random()))
         }
         BattleEnemyTable.insertEnemies(battleSession, newEnemies)
 
@@ -103,7 +103,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
                 // Can't attack dead units
                 if (target.dead) throw Exception()
 
-                val updatedTarget = target.receiveDamage(actingUnit.atk)
+                val (updatedTarget, damage) = target.receiveDamage(actingUnit.atk)
                 UnitTable.updateUnit(target.id, updatedTarget)
 
                 // Gain experience if target is defeated
@@ -114,9 +114,8 @@ class BattleUCImpl(private val db: Database) : BattleUC {
                     unitsToRemove.add(target.id)
                 }
 
-                effects[target.id] = UnitEffect.Health(updatedTarget.hp - target.hp)
+                effects[target.id] = UnitEffect.Health(damage)
             }
-            else -> throw RuntimeException() // All actions should be accounted for
         }
 
         val updatedQueue = queue.endTurn(unitsToRemove)

@@ -1,8 +1,14 @@
 package com.bitwiserain.pbbg.domain.usecase
 
+import com.bitwiserain.pbbg.domain.model.MyUnit
 import com.bitwiserain.pbbg.domain.model.Squad
 
 interface UnitUC {
+    /**
+     * @throws UnitNotFoundException when unit with this ID does not exist.
+     */
+    fun getUnit(unitId: Long): MyUnit
+
     /**
      * User's squad.
      */
@@ -16,4 +22,5 @@ interface UnitUC {
     fun healSquad(userId: Int): Squad
 }
 
-class SquadInBattleException : Exception()
+object UnitNotFoundException : Exception()
+object SquadInBattleException : Exception()

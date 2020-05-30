@@ -22,13 +22,15 @@ fun ResultRow.toMyUnit(): MyUnit {
     val maxHP = this[UnitTable.maxHP]
     val atk = this[UnitTable.atk]
     val def = this[UnitTable.def]
+    val int = this[UnitTable.int]
+    val res = this[UnitTable.res]
     val exp = this[UnitTable.exp]
 
     return when (unitEnum) {
-        MyUnitEnum.ICE_CREAM_WIZARD -> MyUnit.IceCreamWizard(id, hp, maxHP, atk, def, exp)
-        MyUnitEnum.TWOLIP -> MyUnit.Twolip(id, hp, maxHP, atk, def, exp)
-        MyUnitEnum.CARPSHOOTER -> MyUnit.Carpshooter(id, hp, maxHP, atk, def, exp)
-        MyUnitEnum.FLAMANGO -> MyUnit.Flamango(id, hp, maxHP, atk, def, exp)
+        MyUnitEnum.ICE_CREAM_WIZARD -> MyUnit.IceCreamWizard(id, hp, maxHP, atk, def, int, res, exp)
+        MyUnitEnum.TWOLIP -> MyUnit.Twolip(id, hp, maxHP, atk, def, int, res, exp)
+        MyUnitEnum.CARPSHOOTER -> MyUnit.Carpshooter(id, hp, maxHP, atk, def, int, res, exp)
+        MyUnitEnum.FLAMANGO -> MyUnit.Flamango(id, hp, maxHP, atk, def, int, res, exp)
     }
 }
 

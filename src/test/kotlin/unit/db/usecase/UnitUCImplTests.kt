@@ -51,7 +51,7 @@ class UnitUCImplTests {
 
         val healedUnits = transaction(db) {
             // Damage all units
-            units.forEach { UnitTable.updateUnit(it.id, it.receiveDamage(4)) }
+            units.forEach { UnitTable.updateUnit(it.id, it.receiveDamage(4).updatedUnit) }
 
             unitUC.healSquad(userId)
 
@@ -77,9 +77,9 @@ class UnitUCImplTests {
     private fun createUnitsAndSquad(userId: Int) = transaction(db) {
         transaction(db) {
             listOf(
-                UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1),
-                UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2),
-                UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1)
+                UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1, 1, 1),
+                UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2, 1, 1),
+                UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1, 1, 1)
             )
                 .map { UnitTable.insertUnitAndGetId(it) }
                 .also { SquadTable.insertUnits(userId, it) }

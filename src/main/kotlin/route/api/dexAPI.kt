@@ -97,7 +97,12 @@ fun MyUnitEnum.toJSON() = MyUnitEnumJSON(
     friendlyName = friendlyName,
     description = description,
     fullURL = "$API_ROOT/img/unit/$spriteName.gif",
-    iconURL = "$API_ROOT/img/unit-icon/$spriteName.png"
+    iconURL = "$API_ROOT/img/unit-icon/$spriteName.png",
+    baseHP = baseHP,
+    baseAtk = baseAtk,
+    baseDef = baseDef,
+    baseInt = baseInt,
+    baseRes = baseRes
 )
 
 private fun DexItems.toJSON(): DexItemsJSON = DexItemsJSON(
