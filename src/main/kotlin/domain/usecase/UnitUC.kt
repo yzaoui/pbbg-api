@@ -16,4 +16,4 @@ interface UnitUC {
     fun healSquad(userId: Int): Squad
 }
 
-class SquadInBattleException : Exception()
+object SquadInBattleException : Exception()

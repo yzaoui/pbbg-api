@@ -3,6 +3,7 @@ package com.bitwiserain.pbbg.domain.model
 import com.bitwiserain.pbbg.domain.BattleManager
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum.*
 
+// TODO: Maybe get rid of this sealed class stuff and just have a default unit data class with an enum property?
 sealed class MyUnit {
     abstract val id: Long
     abstract val enum: MyUnitEnum
@@ -10,6 +11,8 @@ sealed class MyUnit {
     abstract val maxHP: Int
     abstract val atk: Int
     abstract val def: Int
+    abstract val int: Int
+    abstract val res: Int
     abstract val exp: Long
     val alive: Boolean
         get() = hp > 0
@@ -18,42 +21,44 @@ sealed class MyUnit {
 
     data class IceCreamWizard(
         override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
-        override val def: Int, override val exp: Long
+        override val def: Int, override val int: Int, override val res: Int, override val exp: Long
     ) : MyUnit() {
         override val enum get() = ICE_CREAM_WIZARD
     }
 
     data class Twolip(
         override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
-        override val def: Int, override val exp: Long
+        override val def: Int, override val int: Int, override val res: Int, override val exp: Long
     ) : MyUnit() {
         override val enum get() = TWOLIP
     }
 
     data class Carpshooter(
         override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
-        override val def: Int, override val exp: Long
+        override val def: Int, override val int: Int, override val res: Int, override val exp: Long
     ) : MyUnit() {
         override val enum get() = CARPSHOOTER
     }
 
     data class Flamango(
         override val id: Long, override val hp: Int, override val maxHP: Int, override val atk: Int,
-        override val def: Int, override val exp: Long
+        override val def: Int, override val int: Int, override val res: Int, override val exp: Long
     ) : MyUnit() {
         override val enum get() = FLAMANGO
     }
 
-    fun receiveDamage(attackerAtk: Int): MyUnit {
+    fun receiveDamage(attackerAtk: Int): DamageResult {
         val damage = BattleManager.calculateDamage(attackerAtk, this.def)
         val newHp = (hp - damage).coerceIn(0..this.maxHP)
 
-        return when (this) {
+        val updatedUnit = when (this) {
             is IceCreamWizard -> copy(hp = newHp)
             is Twolip -> copy(hp = newHp)
             is Carpshooter -> copy(hp = newHp)
             is Flamango -> copy(hp = newHp)
         }
+
+        return DamageResult(updatedUnit, damage)
     }
 
     fun gainExperience(gainedExp: Long): MyUnit {
@@ -76,3 +81,5 @@ sealed class MyUnit {
         }
     }
 }
+
+data class DamageResult(val updatedUnit: MyUnit, val damage: Int)

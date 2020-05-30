@@ -78,13 +78,13 @@ class BattleUCImplTests {
             val userId = createTestUserAndGetId(db)
 
             transaction(db) {
-                listOf(UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1))
+                listOf(UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1, 1, 1))
                     .map { UnitTable.insertUnitAndGetId(it) }
                     .also { SquadTable.insertUnits(userId, it) }
                 val allies = SquadTable.getAllies(userId)
 
                 // Kill the only unit in squad
-                UnitTable.updateUnit(allies[0].id, allies[0].receiveDamage(allies[0].hp))
+                UnitTable.updateUnit(allies[0].id, allies[0].receiveDamage(allies[0].hp).updatedUnit)
             }
 
             // Attempt to generate battle with a wiped out squad
@@ -119,9 +119,9 @@ class BattleUCImplTests {
 
     private fun insertAndGetAllies(userId: Int) = transaction(db) {
         listOf(
-            UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 2),
-            UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 1),
-            UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1)
+            UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 2, 1, 1),
+            UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 1, 1, 1),
+            UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1, 1, 1)
         ).map {
             UnitTable.insertUnitAndGetId(it)
         }.also {

@@ -7,6 +7,7 @@ import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.domain.model.MyUnitEnum.*
 import com.bitwiserain.pbbg.domain.model.UserStats
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
@@ -77,9 +78,9 @@ class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
 
         /* Create user squad */
         listOf(
-            UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1),
-            UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2),
-            UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1)
+            UnitForm(ICE_CREAM_WIZARD, ICE_CREAM_WIZARD.baseHP, ICE_CREAM_WIZARD.baseAtk, ICE_CREAM_WIZARD.baseDef, ICE_CREAM_WIZARD.baseInt, ICE_CREAM_WIZARD.baseRes),
+            UnitForm(CARPSHOOTER, CARPSHOOTER.baseHP, CARPSHOOTER.baseAtk, CARPSHOOTER.baseDef, CARPSHOOTER.baseInt, CARPSHOOTER.baseRes),
+            UnitForm(TWOLIP, TWOLIP.baseHP, TWOLIP.baseAtk, TWOLIP.baseDef, TWOLIP.baseInt, TWOLIP.baseRes)
         ).map {
             // Create initial units
             UnitTable.insertUnitAndGetId(it)

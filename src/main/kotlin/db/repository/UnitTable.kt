@@ -13,6 +13,8 @@ object UnitTable : LongIdTable() {
     val maxHP = integer("max_hp")
     val atk = integer("atk")
     val def = integer("def")
+    val int = integer("int")
+    val res = integer("res")
     val exp = long("exp")
 
     /**
@@ -24,6 +26,8 @@ object UnitTable : LongIdTable() {
         it[UnitTable.maxHP] = unit.hp
         it[UnitTable.atk] = unit.atk
         it[UnitTable.def] = unit.def
+        it[UnitTable.int] = unit.int
+        it[UnitTable.res] = unit.res
         it[UnitTable.exp] = 0L
     }.value
 
@@ -35,6 +39,8 @@ object UnitTable : LongIdTable() {
         it[UnitTable.maxHP] = unit.maxHP
         it[UnitTable.atk] = unit.atk
         it[UnitTable.def] = unit.def
+        it[UnitTable.int] = unit.int
+        it[UnitTable.res] = unit.res
         it[UnitTable.exp] = unit.exp
     }
 
@@ -51,5 +57,7 @@ data class UnitForm(
     val enum: MyUnitEnum,
     val hp: Int,
     val atk: Int,
-    val def: Int
+    val def: Int,
+    val int: Int,
+    val res: Int
 )

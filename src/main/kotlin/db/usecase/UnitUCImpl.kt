@@ -17,7 +17,7 @@ class UnitUCImpl(private val db: Database) : UnitUC {
     }
 
     override fun healSquad(userId: Int): Squad = transaction(db) {
-        if (BattleSessionTable.isBattleInProgress(userId)) throw SquadInBattleException()
+        if (BattleSessionTable.isBattleInProgress(userId)) throw SquadInBattleException
 
         val allies = SquadTable.getAllies(userId)
 
