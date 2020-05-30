@@ -131,6 +131,7 @@ fun Application.mainWithDependencies(clock: Clock) {
             registerAPI(userUC)
             loginAPI(userUC)
             item(itemUC)
+            unit(unitUC)
             authenticate(optional = false) {
                 userStats(userUC)
                 inventoryAPI(inventoryUC, equipmentUC)
