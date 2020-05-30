@@ -3,6 +3,7 @@ package com.bitwiserain.pbbg.route.api
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemDetails
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
+import com.bitwiserain.pbbg.domain.usecase.ItemNotFoundException
 import com.bitwiserain.pbbg.domain.usecase.ItemUC
 import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
@@ -20,9 +21,13 @@ fun Route.item(itemUC: ItemUC) = route("/item/{$ITEM_ID_PARAM}") {
     get {
         val itemId = call.parameters[ITEM_ID_PARAM]?.toLongOrNull() ?: return@get call.respondFail()
 
-        val itemdetails = itemUC.getItemDetails(itemId)
+        try {
+            val itemDetails = itemUC.getItemDetails(itemId)
 
-        call.respondSuccess(itemdetails.toJSON(itemId))
+            call.respondSuccess(itemDetails.toJSON(itemId))
+        } catch (e: ItemNotFoundException) {
+            call.respondFail("Item with this ID does not exist.")
+        }
     }
 }
 
