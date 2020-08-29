@@ -5,8 +5,9 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 
 object FriendsTable : Table() {
-    val initiatorUserId = reference("initiator_user_id", UserTable).primaryKey()
-    val receiverUserId = reference("receiver_user_id", UserTable).primaryKey()
+    val initiatorUserId = reference("initiator_user_id", UserTable)
+    val receiverUserId = reference("receiver_user_id", UserTable)
+    override val primaryKey = PrimaryKey(initiatorUserId, receiverUserId)
     val confirmed = bool("confirmed").default(false)
 
     fun getFriendship(currentUserId: Int, targetUserId: Int): Friendship {

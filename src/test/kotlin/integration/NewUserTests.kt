@@ -40,19 +40,19 @@ class NewUserTests {
         handleRequest(HttpMethod.Post, "/api/register") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(
-                json {
-                    "username" to "username"
-                    "password" to "password"
+                buildJsonObject {
+                    put("username", "username")
+                    put("password", "password")
                 }.toString()
             )
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
 
-            val body = Json.parse(JsonObject.serializer(), response.content.orEmpty())
-            assertEquals("success", body["status"]?.content)
+            val body = Json.parseToJsonElement(response.content.orEmpty()).jsonObject
+            assertEquals("success", body["status"]?.let { it.jsonPrimitive.content })
 
             assertDoesNotThrow {
-                Json.parse(RegisterResponse.serializer(), Json.stringify(JsonElement.serializer(), body.getValue("data")))
+                Json.decodeFromJsonElement<RegisterResponse>(body.getValue("data"))
             }
         }
     }
@@ -63,11 +63,11 @@ class NewUserTests {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             addHeader(HttpHeaders.Authorization, "Bearer ${registerUserAndGetToken()}")
         }.apply {
-            val body = Json.parse(JsonObject.serializer(), response.content.orEmpty())
-            assertEquals("success", body["status"]?.content)
+            val body = Json.parseToJsonElement(response.content.orEmpty()).jsonObject
+            assertEquals("success", body["status"]?.let { it.jsonPrimitive.content })
 
             val userStats = assertDoesNotThrow {
-                Json.parse(UserResponse.serializer(), Json.stringify(JsonElement.serializer(), body.getValue("data")))
+                Json.decodeFromJsonElement<UserResponse>(body.getValue("data"))
             }
 
             assertEquals(0, userStats.gold, "Gold amount should be 0.")
@@ -82,10 +82,10 @@ class NewUserTests {
     fun `When registering successfully, user should have 1 ice pick, 2 apple saplings, 5 tomato seeds, and nothing equipped`() = testApp(clock) {
         val inventoryResponse = GETInventory(registerUserAndGetToken())
 
-        val body = Json.parse(JsonObject.serializer(), inventoryResponse.content.orEmpty())
+        val body = Json.parseToJsonElement(inventoryResponse.content.orEmpty()).jsonObject
 
         val inventory = assertDoesNotThrow {
-            Json.parse(Inventory.serializer(), Json.stringify(JsonElement.serializer(), body.getValue("data")))
+            Json.decodeFromJsonElement<Inventory>(body.getValue("data"))
         }
 
         assertEquals(3, inventory.items.size, "Should have 3 items in inventory.")
