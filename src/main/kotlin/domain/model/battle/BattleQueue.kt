@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.domain.model.battle
 
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
 class BattleQueue(val turns: List<Turn>) {
@@ -14,12 +14,12 @@ class BattleQueue(val turns: List<Turn>) {
     )
 
     fun toJSON(): String {
-        return Json.stringify(Turn.serializer().list, turns)
+        return Json.encodeToString(ListSerializer(Turn.serializer()), turns)
     }
 
     companion object {
         fun fromJSON(turnsJson: String): BattleQueue {
-            return BattleQueue(Json.parse(Turn.serializer().list, turnsJson))
+            return BattleQueue(Json.decodeFromString(ListSerializer(Turn.serializer()), turnsJson))
         }
     }
 }

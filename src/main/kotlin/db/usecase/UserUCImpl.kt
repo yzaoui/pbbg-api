@@ -6,7 +6,6 @@ import com.bitwiserain.pbbg.db.repository.farm.PlotTable
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
-import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum.*
 import com.bitwiserain.pbbg.domain.model.UserStats
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
