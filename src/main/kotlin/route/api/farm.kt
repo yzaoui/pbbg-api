@@ -65,7 +65,8 @@ private fun Plot.toJSON(now: Instant) = PlotJSON(
 private fun MaterializedPlant.toJSON(now: Instant) = MaterializedPlantJSON(
     basePlant = basePlant.toJSON(),
     cycleStart = cycleStart.toString(),
-    isMature = if (this is IMaterializedPlant.Maturable) isMature(now) else null
+    isMature = (this as? IMaterializedPlant.Maturable)?.isMature(now),
+    harvests = (this as? IMaterializedPlant.Maturable)?.harvests
 )
 
 fun IBasePlant.toJSON() = BasePlantJSON(
