@@ -7,5 +7,6 @@ import kotlinx.serialization.Serializable
 data class MaterializedPlant(
     @SerialName("basePlant") val basePlant: BasePlant,
     @SerialName("cycleStart") val cycleStart: String,
-    @SerialName("isMature") val isMature: Boolean?
+    @SerialName("isMature") val isMature: Boolean?,
+    @SerialName("harvests") val harvests: Int?
 )
