@@ -20,9 +20,6 @@ import java.time.temporal.ChronoUnit
 
 class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
     override fun registerUser(username: String, password: String): Int = transaction(db) {
-        /* Make sure username is available */
-        if (UserTable.getUserByUsername(username) != null) throw UsernameNotAvailableException(username)
-
         /* Make sure username & password are valid */
         run {
             val usernameInvalid = !username.matches(USERNAME_REGEX.toRegex())
@@ -33,6 +30,9 @@ class UserUCImpl(private val db: Database, private val clock: Clock) : UserUC {
                 passwordError = if (passwordInvalid) PASSWORD_REGEX_DESCRIPTION else null
             )
         }
+
+        /* Make sure username is available */
+        if (UserTable.getUserByUsername(username) != null) throw UsernameNotAvailableException(username)
 
         val now = clock.instant().truncatedTo(ChronoUnit.SECONDS)
 
