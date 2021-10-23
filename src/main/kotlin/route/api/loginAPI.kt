@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.route.api
 
-import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.domain.usecase.LoginUC
 import com.bitwiserain.pbbg.makeToken
 import com.bitwiserain.pbbg.respondFail
 import com.bitwiserain.pbbg.respondSuccess
@@ -10,7 +10,7 @@ import io.ktor.request.receive
 import io.ktor.routing.Route
 import io.ktor.routing.post
 
-fun Route.loginAPI(userUC: UserUC) = post("/login") {
+fun Route.loginAPI(login: LoginUC) = post("/login") {
     val params = call.receive<Map<String, Any>>()
 
     val errors = mutableMapOf<String, String>()
@@ -34,14 +34,14 @@ fun Route.loginAPI(userUC: UserUC) = post("/login") {
 
     if (errors.isNotEmpty()) return@post call.respondFail(errors)
 
-    val userId = userUC.getUserIdByCredentials(
-        username = usernameParam as String,
-        password = passwordParam as String
-    )
+    val result = login(username = usernameParam as String, password = passwordParam as String)
 
-    if (userId == null) {
-        call.respondFail("Credentials do not match an existing account")
-    } else {
-        call.respondSuccess(mapOf("token" to application.makeToken(userId)))
+    when (result) {
+        is LoginUC.Result.Success -> {
+            call.respondSuccess(mapOf("token" to application.makeToken(result.userId)))
+        }
+        LoginUC.Result.CredentialsDontMatchError -> {
+            call.respondFail("Credentials do not match an existing account")
+        }
     }
 }

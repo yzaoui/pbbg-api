@@ -4,7 +4,15 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.bitwiserain.pbbg.db.model.User
-import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.db.repository.DexTable
+import com.bitwiserain.pbbg.db.repository.FriendsTable
+import com.bitwiserain.pbbg.db.repository.InventoryTable
+import com.bitwiserain.pbbg.db.repository.ItemHistoryTable
+import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
+import com.bitwiserain.pbbg.db.repository.SquadTable
+import com.bitwiserain.pbbg.db.repository.UnitTable
+import com.bitwiserain.pbbg.db.repository.UserStatsTable
+import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
 import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable
@@ -13,8 +21,38 @@ import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
-import com.bitwiserain.pbbg.db.usecase.*
-import com.bitwiserain.pbbg.route.api.*
+import com.bitwiserain.pbbg.db.usecase.AboutUCImpl
+import com.bitwiserain.pbbg.db.usecase.BattleUCImpl
+import com.bitwiserain.pbbg.db.usecase.DexUCImpl
+import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
+import com.bitwiserain.pbbg.db.usecase.FarmUCImpl
+import com.bitwiserain.pbbg.db.usecase.FriendsUCImpl
+import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
+import com.bitwiserain.pbbg.db.usecase.ItemUCImpl
+import com.bitwiserain.pbbg.db.usecase.MarketUCImpl
+import com.bitwiserain.pbbg.db.usecase.MiningUCImpl
+import com.bitwiserain.pbbg.db.usecase.UnitUCImpl
+import com.bitwiserain.pbbg.db.usecase.UserProfileUCImpl
+import com.bitwiserain.pbbg.domain.usecase.ChangePasswordUCImpl
+import com.bitwiserain.pbbg.domain.usecase.GetUserStatsUCImpl
+import com.bitwiserain.pbbg.domain.usecase.LoginUCImpl
+import com.bitwiserain.pbbg.domain.usecase.RegisterUserUCImpl
+import com.bitwiserain.pbbg.route.api.about
+import com.bitwiserain.pbbg.route.api.battleAPI
+import com.bitwiserain.pbbg.route.api.dexAPI
+import com.bitwiserain.pbbg.route.api.farm
+import com.bitwiserain.pbbg.route.api.friends
+import com.bitwiserain.pbbg.route.api.inventoryAPI
+import com.bitwiserain.pbbg.route.api.item
+import com.bitwiserain.pbbg.route.api.loginAPI
+import com.bitwiserain.pbbg.route.api.market
+import com.bitwiserain.pbbg.route.api.mine
+import com.bitwiserain.pbbg.route.api.registerAPI
+import com.bitwiserain.pbbg.route.api.settings
+import com.bitwiserain.pbbg.route.api.squadAPI
+import com.bitwiserain.pbbg.route.api.unit
+import com.bitwiserain.pbbg.route.api.user
+import com.bitwiserain.pbbg.route.api.userStats
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
@@ -78,7 +116,10 @@ fun Application.mainWithDependencies(clock: Clock) {
 
     install(CallLogging)
 
-    val userUC = UserUCImpl(db, clock)
+    val getUserStats = GetUserStatsUCImpl(db)
+    val changePassword = ChangePasswordUCImpl(db)
+    val registerUser = RegisterUserUCImpl(db, clock)
+    val login = LoginUCImpl(db)
     val marketUC = MarketUCImpl(db)
     val inventoryUC = InventoryUCImpl(db)
     val itemUC = ItemUCImpl(db)
@@ -128,12 +169,12 @@ fun Application.mainWithDependencies(clock: Clock) {
     }
     routing {
         route("/api") {
-            registerAPI(userUC)
-            loginAPI(userUC)
+            registerAPI(registerUser)
+            loginAPI(login)
             item(itemUC)
             unit(unitUC)
             authenticate(optional = false) {
-                userStats(userUC)
+                userStats(getUserStats)
                 inventoryAPI(inventoryUC, equipmentUC)
                 market(marketUC)
                 battleAPI(battleUC)
@@ -142,7 +183,7 @@ fun Application.mainWithDependencies(clock: Clock) {
                 dexAPI(dexUC)
                 squadAPI(unitUC)
                 friends(friendsUC)
-                settings(userUC)
+                settings(changePassword)
                 about(aboutUC)
             }
             authenticate(optional = true) {
