@@ -35,8 +35,8 @@ fun ResultRow.toMyUnit(): MyUnit {
 }
 
 fun ResultRow.toMaterializedItem(): MaterializedItem {
-    val itemEnum = this[MaterializedItemTable.itemEnum]
-    val quantity = this[MaterializedItemTable.quantity]
+    val itemEnum = this[MaterializedItemTableImpl.Exposed.itemEnum]
+    val quantity = this[MaterializedItemTableImpl.Exposed.quantity]
 
     // TODO: Find a way to preserve a single source of truth, so that quantity isn't asserted separately here
     return when (itemEnum) {

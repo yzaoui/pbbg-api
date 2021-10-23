@@ -10,10 +10,10 @@ import com.bitwiserain.pbbg.domain.usecase.ItemUC
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class ItemUCImpl(private val db: Database, private val itemHistoryTable: ItemHistoryTable) : ItemUC {
+class ItemUCImpl(private val db: Database, private val itemHistoryTable: ItemHistoryTable, private val materializedItemTable: MaterializedItemTable) : ItemUC {
 
     override fun getItemDetails(itemId: Long): ItemDetails = transaction(db) {
-        val item = MaterializedItemTable.getItem(itemId) ?: throw ItemNotFoundException(itemId)
+        val item = materializedItemTable.getItem(itemId) ?: throw ItemNotFoundException(itemId)
 
         val itemHistory = itemHistoryTable.getItemHistoryList(itemId)
 

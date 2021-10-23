@@ -21,14 +21,14 @@ interface ItemHistoryTable {
 class ItemHistoryTableImpl : ItemHistoryTable {
 
     object Exposed : Table(name = "ItemHistory") {
-        val itemId = reference("item_id", MaterializedItemTable)
+        val itemId = reference("item_id", MaterializedItemTableImpl.Exposed)
         val date = long("date")
         val info = text("info")
     }
 
     override fun insertItemHistory(itemId: Long, itemHistory: ItemHistory) {
         Exposed.insert {
-            it[Exposed.itemId] = EntityID(itemId, MaterializedItemTable)
+            it[Exposed.itemId] = EntityID(itemId, MaterializedItemTableImpl.Exposed)
             it[Exposed.date] = itemHistory.date.epochSecond
             it[Exposed.info] = Json.encodeToString(itemHistory.info)
         }

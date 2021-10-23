@@ -9,7 +9,14 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
 fun storeInInventoryReturnItemID(
-    db: Database, now: Instant, userId: Int, itemToStore: MaterializedItem, historyInfo: ItemHistoryInfo, dexTable: DexTable, itemHistoryTable: ItemHistoryTable
+    db: Database,
+    now: Instant,
+    userId: Int,
+    itemToStore: MaterializedItem,
+    historyInfo: ItemHistoryInfo,
+    dexTable: DexTable,
+    itemHistoryTable: ItemHistoryTable,
+    materializedItemTable: MaterializedItemTable,
 ): Long = transaction(db) {
     val heldItems = Joins.getHeldItemsOfBaseKind(userId, itemToStore.enum)
 
@@ -19,10 +26,10 @@ fun storeInInventoryReturnItemID(
         itemToStore as MaterializedItem.Stackable
         // If this item is currently held and Stackable, increase its quantity
         itemId = heldItems.keys.single()
-        MaterializedItemTable.updateQuantity(heldItems.keys.single(), itemToStore.quantity)
+        materializedItemTable.updateQuantity(heldItems.keys.single(), itemToStore.quantity)
     } else {
         // If this item isn't already stored, or it can't be stacked, create a new entry for it
-        itemId = MaterializedItemTable.insertItemAndGetId(itemToStore)
+        itemId = materializedItemTable.insertItemAndGetId(itemToStore)
         InventoryTable.insertItem(userId, itemId, itemToStore.base)
 
         if (heldItems.count() == 0) {

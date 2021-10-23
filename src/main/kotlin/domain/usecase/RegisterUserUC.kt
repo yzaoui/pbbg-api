@@ -62,6 +62,7 @@ class RegisterUserUCImpl(
     private val itemHistoryTable: ItemHistoryTable,
     private val marketTable: MarketTable,
     private val marketInventoryTable: MarketInventoryTable,
+    private val materializedItemTable: MaterializedItemTable,
     private val plotTable: PlotTable,
     private val squadTable: SquadTable,
 ) : RegisterUserUC {
@@ -95,7 +96,7 @@ class RegisterUserUCImpl(
 
             /* Add ice pick, apple saplings, tomato seeds to inventory */
             listOf(MaterializedItem.IcePick, MaterializedItem.AppleSapling(2), MaterializedItem.TomatoSeed(5)).forEach { item ->
-                val itemId = MaterializedItemTable.insertItemAndGetId(item)
+                val itemId = materializedItemTable.insertItemAndGetId(item)
                 itemHistoryTable.insertItemHistory(
                     itemId = itemId,
                     itemHistory = ItemHistory(
@@ -112,7 +113,7 @@ class RegisterUserUCImpl(
 
             // Fill market with three pickaxe types
             listOf(MaterializedItem.PlusPickaxe, MaterializedItem.CrossPickaxe, MaterializedItem.SquarePickaxe).forEach { item ->
-                val itemId = MaterializedItemTable.insertItemAndGetId(item)
+                val itemId = materializedItemTable.insertItemAndGetId(item)
                 marketInventoryTable.insertItem(marketId, itemId)
                 itemHistoryTable.insertItemHistory(
                     itemId = itemId,

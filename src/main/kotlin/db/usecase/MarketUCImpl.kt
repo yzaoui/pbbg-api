@@ -1,6 +1,10 @@
 package com.bitwiserain.pbbg.db.usecase
 
-import com.bitwiserain.pbbg.db.repository.*
+import com.bitwiserain.pbbg.db.repository.DexTable
+import com.bitwiserain.pbbg.db.repository.InventoryTable
+import com.bitwiserain.pbbg.db.repository.Joins
+import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
+import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.domain.PriceManager
 import com.bitwiserain.pbbg.domain.model.BaseItem
@@ -15,7 +19,13 @@ import com.bitwiserain.pbbg.domain.usecase.NotEnoughGoldException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class MarketUCImpl(private val db: Database, private val dexTable: DexTable, private val marketInventoryTable: MarketInventoryTable) : MarketUC {
+class MarketUCImpl(
+    private val db: Database,
+    private val dexTable: DexTable,
+    private val marketInventoryTable: MarketInventoryTable,
+    private val materializedItemTable: MaterializedItemTable,
+) : MarketUC {
+
     override fun getMarkets(userId: Int): UserAndGameMarkets = transaction(db) {
         val gold = UserStatsTable.getUserStats(userId).gold
 
@@ -104,18 +114,18 @@ class MarketUCImpl(private val db: Database, private val dexTable: DexTable, pri
         userStackableItemsToCreate.forEach {
             val item = it as MaterializedItem
 
-            userItemsToInsert[MaterializedItemTable.insertItemAndGetId(item)] = item.base
+            userItemsToInsert[materializedItemTable.insertItemAndGetId(item)] = item.base
         }
         /* Insert items into user's inventory */
         InventoryTable.insertItems(userId, userItemsToInsert)
         /* Insert items into user's dex */
         dexTable.insertDiscovered(userId, dexItemsToInsert)
         /* Update quantity of user's items */
-        userItemsToUpdateQuantity.forEach { MaterializedItemTable.updateQuantity(it.key, it.value) }
+        userItemsToUpdateQuantity.forEach { materializedItemTable.updateQuantity(it.key, it.value) }
         /* Remove game's items */
         marketInventoryTable.removeItems(gameItemsToRemove)
         /* Update quantity of game's items */
-        gameItemsToUpdateQuantity.forEach { MaterializedItemTable.updateQuantity(it.key, it.value) }
+        gameItemsToUpdateQuantity.forEach { materializedItemTable.updateQuantity(it.key, it.value) }
 
         return@transaction UserAndGameMarkets(
             gold = gold,
@@ -191,16 +201,16 @@ class MarketUCImpl(private val db: Database, private val dexTable: DexTable, pri
         gameStackableItemsToCreate.forEach {
             val item = it as MaterializedItem
 
-            gameItemsToInsert.add(MaterializedItemTable.insertItemAndGetId(item))
+            gameItemsToInsert.add(materializedItemTable.insertItemAndGetId(item))
         }
         /* Insert items into game's market */
         Joins.Market.insertItems(userId, gameItemsToInsert)
         /* Update quantity of game's items */
-        gameItemsToUpdateQuantity.forEach { MaterializedItemTable.updateQuantity(it.key, it.value) }
+        gameItemsToUpdateQuantity.forEach { materializedItemTable.updateQuantity(it.key, it.value) }
         /* Remove user's items */
         InventoryTable.removeItems(userId, userItemsToRemove)
         /* Update quantity of user's items */
-        userItemsToUpdateQuantity.forEach { MaterializedItemTable.updateQuantity(it.key, it.value) }
+        userItemsToUpdateQuantity.forEach { materializedItemTable.updateQuantity(it.key, it.value) }
 
         return@transaction UserAndGameMarkets(
             gold = gold,

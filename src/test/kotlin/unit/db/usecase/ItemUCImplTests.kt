@@ -2,7 +2,7 @@ package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.ItemHistoryTableImpl
-import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
+import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
 import com.bitwiserain.pbbg.db.usecase.ItemUCImpl
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
@@ -24,7 +24,8 @@ class ItemUCImplTests {
 
     private val db = initDatabase()
     private val itemHistoryTable = ItemHistoryTableImpl()
-    private val itemUC: ItemUC = ItemUCImpl(db, itemHistoryTable)
+    private val materializedItemTable = MaterializedItemTableImpl()
+    private val itemUC: ItemUC = ItemUCImpl(db, itemHistoryTable, materializedItemTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -38,7 +39,7 @@ class ItemUCImplTests {
             .associateBy { createTestUserAndGetId(db, it) }
 
         val itemId = transaction(db) {
-            val itemId = MaterializedItemTable.insertItemAndGetId(MaterializedItem.Stone(quantity = 3))
+            val itemId = materializedItemTable.insertItemAndGetId(MaterializedItem.Stone(quantity = 3))
 
             listOf(ItemHistory(
                 date = creationDate,

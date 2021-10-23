@@ -3,6 +3,7 @@ package com.bitwiserain.pbbg.db.usecase
 import com.bitwiserain.pbbg.db.repository.DexTable
 import com.bitwiserain.pbbg.db.repository.ItemHistoryTable
 import com.bitwiserain.pbbg.db.repository.Joins
+import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
@@ -36,6 +37,7 @@ class MiningUCImpl(
     private val clock: Clock,
     private val dexTable: DexTable,
     private val itemHistoryTable: ItemHistoryTable,
+    private val materializedItemTable: MaterializedItemTable,
     private val mineCellTable: MineCellTable,
     private val mineSessionTable: MineSessionTable,
 ) : MiningUC {
@@ -131,7 +133,7 @@ class MiningUCImpl(
             val exp = mineEntity.exp * (if (item is Stackable) item.quantity else 1)
 
             // TODO: Store items in batch
-            val itemId = storeInInventoryReturnItemID(db, now, userId, item, ItemHistoryInfo.FirstMined(userId), dexTable, itemHistoryTable)
+            val itemId = storeInInventoryReturnItemID(db, now, userId, item, ItemHistoryInfo.FirstMined(userId), dexTable, itemHistoryTable, materializedItemTable)
 
             minedItemResults.add(MinedItemResult(itemId, item, mineEntity.exp))
             totalExp += exp

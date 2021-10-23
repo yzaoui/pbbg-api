@@ -3,25 +3,35 @@ package com.bitwiserain.pbbg.test.unit.db.usecase
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.Joins
-import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
+import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
 import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.InventoryItem.EquippableInventoryItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem.*
-import com.bitwiserain.pbbg.domain.usecase.*
+import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemAlreadyEquippedException
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotEquippableException
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotEquippedException
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotFoundException
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class EquipmentUCImplTests {
+
     private val db = initDatabase()
+    private val materializedItemTable = MaterializedItemTableImpl()
     private val equipmentUC: EquipmentUC = EquipmentUCImpl(db)
 
     @AfterEach
@@ -193,7 +203,7 @@ class EquipmentUCImplTests {
 
     fun createItem(userId: Int, item: MaterializedItem, inInventory: Boolean, equipped: Boolean? = null): Pair<Long, InventoryItem?> {
         val itemId = transaction(db) {
-            val id = MaterializedItemTable.insertItemAndGetId(item)
+            val id = materializedItemTable.insertItemAndGetId(item)
             if (inInventory) {
                 InventoryTable.insertItem(userId, id, item.base)
                 if (item.base is BaseItem.Equippable) Joins.setItemEquipped(userId, id, equipped!!)

@@ -3,7 +3,7 @@ package com.bitwiserain.pbbg.test.unit.db.usecase
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.Joins
-import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
+import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
 import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.Inventory
@@ -21,7 +21,9 @@ import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class InventoryUCImplTests {
+
     private val db = initDatabase()
+    private val materializedItemTable = MaterializedItemTableImpl()
     private val inventoryUC: InventoryUC = InventoryUCImpl(db)
 
     @AfterEach
@@ -35,7 +37,7 @@ class InventoryUCImplTests {
 
         val (expectedInventory, actualInventory) = transaction(db) {
             val itemsById = listOf(MaterializedItem.CrossPickaxe, MaterializedItem.CopperOre(quantity = 5), MaterializedItem.IcePick)
-                .associateBy { MaterializedItemTable.insertItemAndGetId(it) }
+                .associateBy { materializedItemTable.insertItemAndGetId(it) }
             // Insert items
             InventoryTable.insertItems(userId, itemsById.mapValues { it.value.base })
             // Get cross pickaxe ID
