@@ -3,7 +3,7 @@ package com.bitwiserain.pbbg.route.api
 import com.bitwiserain.pbbg.domain.FarmingExperienceManager
 import com.bitwiserain.pbbg.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.domain.model.LevelProgress
-import com.bitwiserain.pbbg.domain.usecase.UserUC
+import com.bitwiserain.pbbg.domain.usecase.GetUserStatsUC
 import com.bitwiserain.pbbg.respondSuccess
 import com.bitwiserain.pbbg.user
 import com.bitwiserain.pbbg.view.model.LevelProgressJSON
@@ -13,13 +13,13 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 
-fun Route.userStats(userUC: UserUC) = route("/user-stats") {
+fun Route.userStats(getUserStats: GetUserStatsUC) = route("/user-stats") {
     /**
      * On success:
      *   [UserStatsJSON]
      */
     get {
-        val userStats = userUC.getUserStatsByUserId(call.user.id)
+        val userStats = getUserStats(call.user.id)
 
         val response = UserStatsJSON(
             username = call.user.username,
