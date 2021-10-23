@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
 fun storeInInventoryReturnItemID(
-    db: Database, now: Instant, userId: Int, itemToStore: MaterializedItem, historyInfo: ItemHistoryInfo, dexTable: DexTable
+    db: Database, now: Instant, userId: Int, itemToStore: MaterializedItem, historyInfo: ItemHistoryInfo, dexTable: DexTable, itemHistoryTable: ItemHistoryTable
 ): Long = transaction(db) {
     val heldItems = Joins.getHeldItemsOfBaseKind(userId, itemToStore.enum)
 
@@ -27,7 +27,7 @@ fun storeInInventoryReturnItemID(
 
         if (heldItems.count() == 0) {
             // TODO: For now, assume only stackable items are MineEntity
-            ItemHistoryTable.insertItemHistory(itemId, ItemHistory(
+            itemHistoryTable.insertItemHistory(itemId, ItemHistory(
                 date = now,
                 info = historyInfo
             ))

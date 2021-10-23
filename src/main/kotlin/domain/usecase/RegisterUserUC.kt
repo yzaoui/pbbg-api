@@ -59,6 +59,7 @@ class RegisterUserUCImpl(
     private val db: Database,
     private val clock: Clock,
     private val dexTable: DexTable,
+    private val itemHistoryTable: ItemHistoryTable,
     private val marketTable: MarketTable,
     private val marketInventoryTable: MarketInventoryTable,
     private val plotTable: PlotTable,
@@ -95,7 +96,7 @@ class RegisterUserUCImpl(
             /* Add ice pick, apple saplings, tomato seeds to inventory */
             listOf(MaterializedItem.IcePick, MaterializedItem.AppleSapling(2), MaterializedItem.TomatoSeed(5)).forEach { item ->
                 val itemId = MaterializedItemTable.insertItemAndGetId(item)
-                ItemHistoryTable.insertItemHistory(
+                itemHistoryTable.insertItemHistory(
                     itemId = itemId,
                     itemHistory = ItemHistory(
                         date = now,
@@ -113,7 +114,7 @@ class RegisterUserUCImpl(
             listOf(MaterializedItem.PlusPickaxe, MaterializedItem.CrossPickaxe, MaterializedItem.SquarePickaxe).forEach { item ->
                 val itemId = MaterializedItemTable.insertItemAndGetId(item)
                 marketInventoryTable.insertItem(marketId, itemId)
-                ItemHistoryTable.insertItemHistory(
+                itemHistoryTable.insertItemHistory(
                     itemId = itemId,
                     itemHistory = ItemHistory(
                         date = now,

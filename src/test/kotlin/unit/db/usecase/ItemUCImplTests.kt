@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.ItemHistoryTable
+import com.bitwiserain.pbbg.db.repository.ItemHistoryTableImpl
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.db.usecase.ItemUCImpl
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
@@ -21,8 +21,10 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class ItemUCImplTests {
+
     private val db = initDatabase()
-    private val itemUC: ItemUC = ItemUCImpl(db)
+    private val itemHistoryTable = ItemHistoryTableImpl()
+    private val itemUC: ItemUC = ItemUCImpl(db, itemHistoryTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -48,7 +50,7 @@ class ItemUCImplTests {
                 date = creationDate.plusSeconds(120),
                 info = ItemHistoryInfo.CreatedWithUser(3)
             )).forEach {
-                ItemHistoryTable.insertItemHistory(itemId, it)
+                itemHistoryTable.insertItemHistory(itemId, it)
             }
 
             return@transaction itemId
