@@ -1,14 +1,12 @@
-package com.bitwiserain.pbbg.test.domain.usecase
+package com.bitwiserain.pbbg.domain.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.domain.usecase.LoginUC
-import com.bitwiserain.pbbg.domain.usecase.LoginUCImpl
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class LoginUCImplTest {
 
@@ -26,8 +24,8 @@ class LoginUCImplTest {
 
         val result = login("username24", "pass123")
 
-        assertTrue(result is LoginUC.Result.Success)
-        assertEquals(expectedUserId, result.userId)
+        result.shouldBeTypeOf<LoginUC.Result.Success>()
+        result.userId shouldBe expectedUserId
     }
 
     @Test
@@ -35,12 +33,12 @@ class LoginUCImplTest {
         val expectedUserId = createTestUserAndGetId(db, username = "username24", password = "pass123")
 
         /* Test incorrect username */
-        assertEquals(LoginUC.Result.CredentialsDontMatchError, login("incorrecto17", "pass123"))
+        login("incorrecto17", "pass123").shouldBeTypeOf<LoginUC.Result.CredentialsDontMatchError>()
 
         /* Test incorrect password */
-        assertEquals(LoginUC.Result.CredentialsDontMatchError, login("username24", "pass12345"))
+        login("username24", "pass12345").shouldBeTypeOf<LoginUC.Result.CredentialsDontMatchError>()
 
         /* Test incorrect username & password */
-        assertEquals(LoginUC.Result.CredentialsDontMatchError, login("incorrecto17", "pass12345"))
+        login("incorrecto17", "pass12345").shouldBeTypeOf<LoginUC.Result.CredentialsDontMatchError>()
     }
 }

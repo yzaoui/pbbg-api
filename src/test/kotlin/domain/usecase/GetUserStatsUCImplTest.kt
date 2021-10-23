@@ -1,14 +1,14 @@
-package com.bitwiserain.pbbg.test.domain.usecase
+package com.bitwiserain.pbbg.domain.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
-import com.bitwiserain.pbbg.domain.usecase.GetUserStatsUCImpl
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
+import io.kotest.assertions.assertSoftly
+import io.kotest.matchers.shouldBe
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 class GetUserStatsUCImplTest {
 
@@ -32,7 +32,9 @@ class GetUserStatsUCImplTest {
 
         val stats = getUserStats(userId)
 
-        assertEquals(20, stats.gold)
-        assertEquals(500, stats.miningExp)
+        assertSoftly(stats) {
+            gold shouldBe 20
+            miningExp shouldBe 500
+        }
     }
 }

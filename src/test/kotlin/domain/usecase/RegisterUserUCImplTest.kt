@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.test.domain.usecase
+package com.bitwiserain.pbbg.domain.usecase
 
 import com.bitwiserain.pbbg.PASSWORD_REGEX
 import com.bitwiserain.pbbg.PASSWORD_REGEX_DESCRIPTION
@@ -11,18 +11,20 @@ import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.usecase.RegisterUserUC.Result
-import com.bitwiserain.pbbg.domain.usecase.RegisterUserUCImpl
 import com.bitwiserain.pbbg.test.MutableClock
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
+import io.kotest.assertions.assertSoftly
+import io.kotest.matchers.collections.shouldExist
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.maps.shouldHaveSize
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class RegisterUserUCImplTest {
 
@@ -43,9 +45,11 @@ class RegisterUserUCImplTest {
 
             val stats = transaction(db) { UserStatsTable.getUserStats(userId) }
 
-            assertEquals(0, stats.gold)
-            assertEquals(0, stats.miningExp)
-            assertEquals(0, stats.farmingExp)
+            assertSoftly(stats) {
+                gold shouldBe 0
+                miningExp shouldBe 0
+                farmingExp shouldBe 0
+            }
         }
 
         @Test
@@ -54,7 +58,7 @@ class RegisterUserUCImplTest {
 
             val inventoryItems = transaction(db) { Joins.getInventoryItems(userId) }
 
-            assertEquals(3, inventoryItems.count())
+            inventoryItems shouldHaveSize 3
             // TODO: Finish this test
         }
 
@@ -64,12 +68,10 @@ class RegisterUserUCImplTest {
 
             val marketItems = transaction(db) { Joins.Market.getItems(userId) }
 
-            assertEquals(3, marketItems.count())
-            assertTrue(
-                marketItems.any { it.value.enum == ItemEnum.PLUS_PICKAXE } &&
-                        marketItems.any { it.value.enum == ItemEnum.CROSS_PICKAXE } &&
-                        marketItems.any { it.value.enum == ItemEnum.SQUARE_PICKAXE }
-            )
+            marketItems shouldHaveSize 3
+            marketItems.values.shouldExist { it.enum == ItemEnum.PLUS_PICKAXE }
+            marketItems.values.shouldExist { it.enum == ItemEnum.CROSS_PICKAXE }
+            marketItems.values.shouldExist { it.enum == ItemEnum.SQUARE_PICKAXE }
         }
 
         @Test
@@ -78,12 +80,12 @@ class RegisterUserUCImplTest {
 
             val units = transaction(db) { SquadTable.getAllies(userId) }
 
-            assertEquals(3, units.count())
-            assertTrue(
-                units.any { it.enum == MyUnitEnum.ICE_CREAM_WIZARD } &&
-                        units.any { it.enum == MyUnitEnum.TWOLIP } &&
-                        units.any { it.enum == MyUnitEnum.CARPSHOOTER }
-            )
+            assertSoftly(units) {
+                shouldHaveSize(3)
+                shouldExist { it.enum == MyUnitEnum.ICE_CREAM_WIZARD }
+                shouldExist { it.enum == MyUnitEnum.TWOLIP }
+                shouldExist { it.enum == MyUnitEnum.CARPSHOOTER }
+            }
         }
     }
 
@@ -93,7 +95,7 @@ class RegisterUserUCImplTest {
         fun `Given an existing user, when registering a new user with the same username, UsernameNotAvailableError should be returned`() {
             createTestUserAndGetId(db, username = "username")
 
-            assertTrue(registerUser("username", "password") is Result.UsernameNotAvailableError)
+            registerUser("username", "password").shouldBeTypeOf<Result.UsernameNotAvailableError>()
         }
 
         @Test
@@ -104,28 +106,32 @@ class RegisterUserUCImplTest {
             val validPassword = "password"
 
             /* Make sure test isn't wrong */
-            assertFalse(invalidUsername.matches(USERNAME_REGEX.toRegex()))
-            assertFalse(invalidPassword.matches(PASSWORD_REGEX.toRegex()))
-            assertTrue(validUsername.matches(USERNAME_REGEX.toRegex()))
-            assertTrue(validPassword.matches(USERNAME_REGEX.toRegex()))
+            assert(!invalidUsername.matches(USERNAME_REGEX.toRegex()))
+            assert(!invalidPassword.matches(PASSWORD_REGEX.toRegex()))
+            assert(validUsername.matches(USERNAME_REGEX.toRegex()))
+            assert(validPassword.matches(USERNAME_REGEX.toRegex()))
 
             /* Test invalid username, valid password */
-            val result1 = registerUser(invalidUsername, validPassword)
-            assertTrue(result1 is Result.CredentialsFormatError)
-            assertEquals(USERNAME_REGEX_DESCRIPTION, result1.usernameError)
-            assertNull(result1.passwordError)
+            assertSoftly(registerUser(invalidUsername, validPassword)) {
+                shouldBeTypeOf<Result.CredentialsFormatError>()
+                usernameError shouldBe USERNAME_REGEX_DESCRIPTION
+                passwordError.shouldBeNull()
+            }
 
             /* Test valid username, invalid password */
-            val result2 = registerUser(validUsername, invalidPassword)
-            assertTrue(result2 is Result.CredentialsFormatError)
-            assertNull(result2.usernameError)
-            assertEquals(PASSWORD_REGEX_DESCRIPTION, result2.passwordError)
+            assertSoftly(registerUser(validUsername, invalidPassword)) {
+                shouldBeTypeOf<Result.CredentialsFormatError>()
+                usernameError.shouldBeNull()
+                passwordError shouldBe PASSWORD_REGEX_DESCRIPTION
+            }
+
 
             /* Test invalid username, invalid password */
-            val result3 = registerUser(invalidUsername, invalidPassword)
-            assertTrue(result3 is Result.CredentialsFormatError)
-            assertEquals(USERNAME_REGEX_DESCRIPTION, result3.usernameError)
-            assertEquals(PASSWORD_REGEX_DESCRIPTION, result3.passwordError)
+            assertSoftly(registerUser(invalidUsername, invalidPassword)) {
+                shouldBeTypeOf<Result.CredentialsFormatError>()
+                usernameError shouldBe USERNAME_REGEX_DESCRIPTION
+                passwordError shouldBe PASSWORD_REGEX_DESCRIPTION
+            }
         }
     }
 }
