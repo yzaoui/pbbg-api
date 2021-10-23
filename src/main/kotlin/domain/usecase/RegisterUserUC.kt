@@ -55,7 +55,7 @@ interface RegisterUserUC {
     }
 }
 
-class RegisterUserUCImpl(private val db: Database, private val clock: Clock, private val dexTable: DexTable) : RegisterUserUC {
+class RegisterUserUCImpl(private val db: Database, private val clock: Clock, private val dexTable: DexTable, private val squadTable: SquadTable) : RegisterUserUC {
 
     override fun invoke(username: String, password: String): Result {
         /* Make sure username & password are valid */
@@ -124,7 +124,7 @@ class RegisterUserUCImpl(private val db: Database, private val clock: Clock, pri
                 UnitTable.insertUnitAndGetId(it)
             }.also {
                 // Add them to new user's squad
-                SquadTable.insertUnits(userId, it)
+                squadTable.insertUnits(userId, it)
             }
 
             /* Create user farm */

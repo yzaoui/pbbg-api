@@ -11,13 +11,13 @@ import com.bitwiserain.pbbg.domain.usecase.UnitUC
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class UnitUCImpl(private val db: Database) : UnitUC {
+class UnitUCImpl(private val db: Database, private val squadTable: SquadTable) : UnitUC {
     override fun getUnit(unitId: Long): MyUnit = transaction(db) {
         UnitTable.getUnit(unitId) ?: throw UnitNotFoundException
     }
 
     override fun getSquad(userId: Int): Squad = transaction(db) {
-        val allies = SquadTable.getAllies(userId)
+        val allies = squadTable.getAllies(userId)
 
         Squad(allies)
     }
@@ -25,12 +25,12 @@ class UnitUCImpl(private val db: Database) : UnitUC {
     override fun healSquad(userId: Int): Squad = transaction(db) {
         if (BattleSessionTable.isBattleInProgress(userId)) throw SquadInBattleException
 
-        val allies = SquadTable.getAllies(userId)
+        val allies = squadTable.getAllies(userId)
 
         for (unit in allies) {
             UnitTable.updateUnit(unit.id, unit.maxHeal())
         }
 
-        return@transaction Squad(SquadTable.getAllies(userId))
+        return@transaction Squad(squadTable.getAllies(userId))
     }
 }

@@ -16,7 +16,7 @@ import com.bitwiserain.pbbg.domain.usecase.NoBattleInSessionException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class BattleUCImpl(private val db: Database) : BattleUC {
+class BattleUCImpl(private val db: Database, private val squadTable: SquadTable) : BattleUC {
     override fun getCurrentBattle(userId: Int): Battle? = transaction(db) {
         return@transaction BattleSessionTable.getBattleSessionId(userId)?.let { battleSession ->
             getBattle(userId, battleSession)
@@ -26,7 +26,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
     override fun generateBattle(userId: Int): Battle = transaction(db) {
         if (BattleSessionTable.isBattleInProgress(userId)) throw BattleAlreadyInProgressException()
 
-        val allies = SquadTable.getAllies(userId)
+        val allies = squadTable.getAllies(userId)
 
         // There must be allies alive to start a battle
         if (allies.none { it.alive }) throw NoAlliesAliveException()
@@ -63,7 +63,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
         val queue = BattleSessionTable.getBattleQueue(battleSession)
 
         // Ally should be next in queue
-        val ally = SquadTable.getAlly(userId, queue.peek()) ?: throw Exception()
+        val ally = squadTable.getAlly(userId, queue.peek()) ?: throw Exception()
 
         // Make sure this ally can perform this action
         // TODO: Only current action is attack, which is available to every unit
@@ -81,7 +81,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
 
         // Pick an action
         // TODO: Only current action is attack, so pick a random target
-        val action = BattleAction.Attack(SquadTable.getAllies(userId).filter { it.alive }.random().id)
+        val action = BattleAction.Attack(squadTable.getAllies(userId).filter { it.alive }.random().id)
 
         return@transaction act(userId, battleSession, enemy, action)
     }
@@ -133,7 +133,7 @@ class BattleUCImpl(private val db: Database) : BattleUC {
     }
 
     private fun getBattle(userId: Int, battleSession: Long) = Battle(
-        allies = SquadTable.getAllies(userId),
+        allies = squadTable.getAllies(userId),
         enemies = BattleEnemyTable.getEnemies(battleSession),
         battleQueue = BattleSessionTable.getBattleQueue(battleSession)
     )

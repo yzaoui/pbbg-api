@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.SquadTable
+import com.bitwiserain.pbbg.db.repository.SquadTableImpl
 import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.usecase.BattleUCImpl
@@ -16,12 +16,18 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class BattleUCImplTests {
+
     private val db = initDatabase()
-    private val battleUC: BattleUC = BattleUCImpl(db)
+    private val squadTable = SquadTableImpl()
+    private val battleUC: BattleUC = BattleUCImpl(db, squadTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -80,8 +86,8 @@ class BattleUCImplTests {
             transaction(db) {
                 listOf(UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1, 1, 1))
                     .map { UnitTable.insertUnitAndGetId(it) }
-                    .also { SquadTable.insertUnits(userId, it) }
-                val allies = SquadTable.getAllies(userId)
+                    .also { squadTable.insertUnits(userId, it) }
+                val allies = squadTable.getAllies(userId)
 
                 // Kill the only unit in squad
                 UnitTable.updateUnit(allies[0].id, allies[0].receiveDamage(allies[0].hp).updatedUnit)
@@ -125,9 +131,9 @@ class BattleUCImplTests {
         ).map {
             UnitTable.insertUnitAndGetId(it)
         }.also {
-            SquadTable.insertUnits(userId, it)
+            squadTable.insertUnits(userId, it)
         }
 
-        return@transaction SquadTable.getAllies(userId)
+        return@transaction squadTable.getAllies(userId)
     }
 }

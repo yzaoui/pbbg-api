@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.SquadTable
+import com.bitwiserain.pbbg.db.repository.SquadTableImpl
 import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
@@ -22,8 +22,10 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class UnitUCImplTests {
+
     private val db = initDatabase()
-    private val unitUC: UnitUC = UnitUCImpl(db)
+    private val squadTable = SquadTableImpl()
+    private val unitUC: UnitUC = UnitUCImpl(db, squadTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -55,7 +57,7 @@ class UnitUCImplTests {
 
             unitUC.healSquad(userId)
 
-            return@transaction SquadTable.getAllies(userId)
+            return@transaction squadTable.getAllies(userId)
         }
 
         assertTrue(healedUnits.all { it.hp == it.maxHP }, "All units should be fully healed after healSquad().")
@@ -82,7 +84,7 @@ class UnitUCImplTests {
                 UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1, 1, 1)
             )
                 .map { UnitTable.insertUnitAndGetId(it) }
-                .also { SquadTable.insertUnits(userId, it) }
+                .also { squadTable.insertUnits(userId, it) }
                 .map { UnitTable.getUnit(it)!! }
         }
     }

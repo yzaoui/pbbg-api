@@ -7,7 +7,7 @@ import com.bitwiserain.pbbg.USERNAME_REGEX
 import com.bitwiserain.pbbg.USERNAME_REGEX_DESCRIPTION
 import com.bitwiserain.pbbg.db.repository.DexTableImpl
 import com.bitwiserain.pbbg.db.repository.Joins
-import com.bitwiserain.pbbg.db.repository.SquadTable
+import com.bitwiserain.pbbg.db.repository.SquadTableImpl
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
@@ -32,7 +32,8 @@ class RegisterUserUCImplTest {
     private val db = initDatabase()
     private val clock = MutableClock()
     private val dexTable = DexTableImpl()
-    private val registerUser = RegisterUserUCImpl(db, clock, dexTable)
+    private val squadTable = SquadTableImpl()
+    private val registerUser = RegisterUserUCImpl(db, clock, dexTable, squadTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -80,7 +81,7 @@ class RegisterUserUCImplTest {
         fun `When registering a new user, the user's squad should consist of Ice-Cream Wizard, Twolip, and Carpshooter`() {
             val userId = (registerUser("username", "password") as Result.Success).userId
 
-            val units = transaction(db) { SquadTable.getAllies(userId) }
+            val units = transaction(db) { squadTable.getAllies(userId) }
 
             assertSoftly(units) {
                 shouldHaveSize(3)
