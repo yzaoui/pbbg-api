@@ -23,7 +23,7 @@ class MineCellTableImpl : MineCellTable {
 
     object Exposed : IntIdTable(name = "MineCell") {
 
-        val mineId = reference("mine_id", MineSessionTable, ReferenceOption.CASCADE)
+        val mineId = reference("mine_id", MineSessionTableImpl.Exposed, ReferenceOption.CASCADE)
         val x = integer("x")
         val y = integer("y")
         val mineEntity = enumeration("mine_entity", MineEntity::class)

@@ -30,10 +30,13 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Clock
 import kotlin.random.Random
 
-class MiningUCImpl(private val db: Database, private val clock: Clock, private val dexTable: DexTable, private val mineCellTable: MineCellTable) : MiningUC {
+class MiningUCImpl(
+    private val db: Database, private val clock: Clock, private val dexTable: DexTable, private val mineCellTable: MineCellTable, private val mineSessionTable: MineSessionTable
+) : MiningUC {
+
     override fun getMine(userId: Int): Mine? = transaction(db) {
         /* Get currently running mine session */
-        val mineSession = MineSessionTable.getSession(userId) ?: return@transaction null
+        val mineSession = mineSessionTable.getSession(userId) ?: return@transaction null
 
         val grid = mineCellTable.getGrid(mineSession.id)
 
@@ -71,23 +74,23 @@ class MiningUCImpl(private val db: Database, private val clock: Clock, private v
                 requiredMinimumLevel = mineType.minLevel
             )
 
-            val mineSessionId = MineSessionTable.insertSessionAndGetId(userId, width, height, mineType)
+            val mineSessionId = mineSessionTable.insertSessionAndGetId(userId, width, height, mineType)
 
-            mineCellTable.insertCells(mineSessionId.value, itemEntries)
+            mineCellTable.insertCells(mineSessionId, itemEntries)
         }
 
         return Mine(width, height, itemEntries, mineType)
     }
 
     override fun exitMine(userId: Int): Unit = transaction(db) {
-        MineSessionTable.deleteSession(userId)
+        mineSessionTable.deleteSession(userId)
     }
 
     override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction(db) {
         val now = clock.instant()
 
         /* Get currently running mine session */
-        val mineSession = MineSessionTable.getSession(userId) ?: throw NotInMineSessionException()
+        val mineSession = mineSessionTable.getSession(userId) ?: throw NotInMineSessionException()
 
         val inventoryItems = Joins.getInventoryItems(userId)
 
