@@ -1,8 +1,7 @@
-package com.bitwiserain.pbbg.test.domain.usecase
+package com.bitwiserain.pbbg.domain.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
-import com.bitwiserain.pbbg.domain.usecase.GetUserStatsUCImpl
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.transactions.transaction

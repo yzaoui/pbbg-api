@@ -1,11 +1,10 @@
-package com.bitwiserain.pbbg.test.domain.usecase
+package com.bitwiserain.pbbg.domain.usecase
 
 import com.bitwiserain.pbbg.BCryptHelper
 import com.bitwiserain.pbbg.PASSWORD_REGEX
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.usecase.ChangePasswordUC.Result
-import com.bitwiserain.pbbg.domain.usecase.ChangePasswordUCImpl
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.transactions.transaction

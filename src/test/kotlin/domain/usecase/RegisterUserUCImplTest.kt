@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.test.domain.usecase
+package com.bitwiserain.pbbg.domain.usecase
 
 import com.bitwiserain.pbbg.PASSWORD_REGEX
 import com.bitwiserain.pbbg.PASSWORD_REGEX_DESCRIPTION
@@ -11,7 +11,6 @@ import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.usecase.RegisterUserUC.Result
-import com.bitwiserain.pbbg.domain.usecase.RegisterUserUCImpl
 import com.bitwiserain.pbbg.test.MutableClock
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
