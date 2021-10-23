@@ -8,30 +8,53 @@ import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 
-object InventoryTable : Table() {
-    val userId = reference("user_id", UserTable)
-    val materializedItem = reference("materialized_item", MaterializedItemTableImpl.Exposed)
-    val equipped = bool("equipped").nullable()
+interface InventoryTable {
 
-    override val primaryKey = PrimaryKey(userId, materializedItem)
+    fun insertItem(userId: Int, itemId: Long, baseItem: BaseItem)
 
-    fun insertItem(userId: Int, itemId: Long, baseItem: BaseItem) = insert {
-        it[InventoryTable.userId] = EntityID(userId, UserTable)
-        it[InventoryTable.materializedItem] = EntityID(itemId, MaterializedItemTableImpl.Exposed)
-        if (baseItem is BaseItem.Equippable) it[InventoryTable.equipped] = false
+    fun insertItems(userId: Int, itemEntries: Map<Long, BaseItem>)
+
+    fun removeItem(userId: Int, itemId: Long)
+
+    fun removeItems(userId: Int, itemIds: Iterable<Long>)
+}
+
+class InventoryTableImpl : InventoryTable {
+
+    object Exposed : Table(name = "Inventory") {
+
+        val userId = reference("user_id", UserTable)
+        val materializedItem = reference("materialized_item", MaterializedItemTableImpl.Exposed)
+        val equipped = bool("equipped").nullable()
+
+        override val primaryKey = PrimaryKey(userId, materializedItem)
     }
 
-    fun insertItems(userId: Int, itemEntries: Map<Long, BaseItem>) = batchInsert(itemEntries.asIterable()) { entry ->
-        this[InventoryTable.userId] = EntityID(userId, UserTable)
-        this[InventoryTable.materializedItem] = EntityID(entry.key, MaterializedItemTableImpl.Exposed)
-        if (entry.value is BaseItem.Equippable) this[InventoryTable.equipped] = false
+    override fun insertItem(userId: Int, itemId: Long, baseItem: BaseItem) {
+        Exposed.insert {
+            it[Exposed.userId] = EntityID(userId, UserTable)
+            it[Exposed.materializedItem] = EntityID(itemId, MaterializedItemTableImpl.Exposed)
+            if (baseItem is BaseItem.Equippable) it[Exposed.equipped] = false
+        }
     }
 
-    fun removeItem(userId: Int, itemId: Long) = deleteWhere {
-        InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.eq(itemId)
+    override fun insertItems(userId: Int, itemEntries: Map<Long, BaseItem>) {
+        Exposed.batchInsert(itemEntries.asIterable()) { entry ->
+            this[Exposed.userId] = EntityID(userId, UserTable)
+            this[Exposed.materializedItem] = EntityID(entry.key, MaterializedItemTableImpl.Exposed)
+            if (entry.value is BaseItem.Equippable) this[Exposed.equipped] = false
+        }
     }
 
-    fun removeItems(userId: Int, itemIds: Iterable<Long>) = deleteWhere {
-        InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.inList(itemIds)
+    override fun removeItem(userId: Int, itemId: Long) {
+        Exposed.deleteWhere {
+            Exposed.userId.eq(userId) and Exposed.materializedItem.eq(itemId)
+        }
+    }
+
+    override fun removeItems(userId: Int, itemIds: Iterable<Long>) {
+        Exposed.deleteWhere {
+            Exposed.userId.eq(userId) and Exposed.materializedItem.inList(itemIds)
+        }
     }
 }

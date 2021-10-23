@@ -2,6 +2,7 @@ package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.InventoryTable
+import com.bitwiserain.pbbg.db.repository.InventoryTableImpl
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
 import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
@@ -31,6 +32,7 @@ import kotlin.test.assertTrue
 class EquipmentUCImplTests {
 
     private val db = initDatabase()
+    private val inventoryTable = InventoryTableImpl()
     private val materializedItemTable = MaterializedItemTableImpl()
     private val equipmentUC: EquipmentUC = EquipmentUCImpl(db)
 
@@ -205,7 +207,7 @@ class EquipmentUCImplTests {
         val itemId = transaction(db) {
             val id = materializedItemTable.insertItemAndGetId(item)
             if (inInventory) {
-                InventoryTable.insertItem(userId, id, item.base)
+                inventoryTable.insertItem(userId, id, item.base)
                 if (item.base is BaseItem.Equippable) Joins.setItemEquipped(userId, id, equipped!!)
             }
 

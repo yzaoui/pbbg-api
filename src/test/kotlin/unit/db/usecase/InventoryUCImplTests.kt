@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.InventoryTable
+import com.bitwiserain.pbbg.db.repository.InventoryTableImpl
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
 import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
@@ -23,6 +23,7 @@ import kotlin.test.assertEquals
 class InventoryUCImplTests {
 
     private val db = initDatabase()
+    private val inventoryTable = InventoryTableImpl()
     private val materializedItemTable = MaterializedItemTableImpl()
     private val inventoryUC: InventoryUC = InventoryUCImpl(db)
 
@@ -39,11 +40,11 @@ class InventoryUCImplTests {
             val itemsById = listOf(MaterializedItem.CrossPickaxe, MaterializedItem.CopperOre(quantity = 5), MaterializedItem.IcePick)
                 .associateBy { materializedItemTable.insertItemAndGetId(it) }
             // Insert items
-            InventoryTable.insertItems(userId, itemsById.mapValues { it.value.base })
+            inventoryTable.insertItems(userId, itemsById.mapValues { it.value.base })
             // Get cross pickaxe ID
             val pickId = itemsById.filterValues { it.base is BaseItem.Pickaxe.CrossPickaxe }.asSequence().single().key
             // Equip cross pickaxe
-            InventoryTable.update({ InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.eq(pickId) }) { it[equipped] = true }
+            InventoryTableImpl.Exposed.update({ InventoryTableImpl.Exposed.userId.eq(userId) and InventoryTableImpl.Exposed.materializedItem.eq(pickId) }) { it[equipped] = true }
 
             return@transaction Inventory(Joins.getInventoryItems(userId)) to inventoryUC.getInventory(userId)
         }

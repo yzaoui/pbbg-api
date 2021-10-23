@@ -22,6 +22,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 class MarketUCImpl(
     private val db: Database,
     private val dexTable: DexTable,
+    private val inventoryTable: InventoryTable,
     private val marketInventoryTable: MarketInventoryTable,
     private val materializedItemTable: MaterializedItemTable,
 ) : MarketUC {
@@ -117,7 +118,7 @@ class MarketUCImpl(
             userItemsToInsert[materializedItemTable.insertItemAndGetId(item)] = item.base
         }
         /* Insert items into user's inventory */
-        InventoryTable.insertItems(userId, userItemsToInsert)
+        inventoryTable.insertItems(userId, userItemsToInsert)
         /* Insert items into user's dex */
         dexTable.insertDiscovered(userId, dexItemsToInsert)
         /* Update quantity of user's items */
@@ -208,7 +209,7 @@ class MarketUCImpl(
         /* Update quantity of game's items */
         gameItemsToUpdateQuantity.forEach { materializedItemTable.updateQuantity(it.key, it.value) }
         /* Remove user's items */
-        InventoryTable.removeItems(userId, userItemsToRemove)
+        inventoryTable.removeItems(userId, userItemsToRemove)
         /* Update quantity of user's items */
         userItemsToUpdateQuantity.forEach { materializedItemTable.updateQuantity(it.key, it.value) }
 

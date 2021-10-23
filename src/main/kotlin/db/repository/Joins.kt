@@ -12,24 +12,24 @@ import org.jetbrains.exposed.sql.update
 
 object Joins {
     fun getHeldItemsOfBaseKind(userId: Int, itemEnum: ItemEnum) =
-        (InventoryTable innerJoin MaterializedItemTableImpl.Exposed)
-            .select { InventoryTable.userId.eq(userId) and MaterializedItemTableImpl.Exposed.itemEnum.eq(itemEnum) }
+        (InventoryTableImpl.Exposed innerJoin MaterializedItemTableImpl.Exposed)
+            .select { InventoryTableImpl.Exposed.userId.eq(userId) and MaterializedItemTableImpl.Exposed.itemEnum.eq(itemEnum) }
             .associate { it[MaterializedItemTableImpl.Exposed.id].value to it.toMaterializedItem() }
 
     fun getInventoryItems(userId: Int): Map<Long, InventoryItem> =
-        (InventoryTable innerJoin MaterializedItemTableImpl.Exposed)
-            .select { InventoryTable.userId.eq(userId) }
+        (InventoryTableImpl.Exposed innerJoin MaterializedItemTableImpl.Exposed)
+            .select { InventoryTableImpl.Exposed.userId.eq(userId) }
             .associate { it[MaterializedItemTableImpl.Exposed.id].value to it.toInventoryItem() }
 
     fun getInventoryItem(userId: Int, itemId: Long): InventoryItem? =
-        (InventoryTable innerJoin MaterializedItemTableImpl.Exposed)
-            .select { InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.eq(itemId) }
+        (InventoryTableImpl.Exposed innerJoin MaterializedItemTableImpl.Exposed)
+            .select { InventoryTableImpl.Exposed.userId.eq(userId) and InventoryTableImpl.Exposed.materializedItem.eq(itemId) }
             .singleOrNull()
             ?.toInventoryItem()
 
     fun setItemEquipped(userId: Int, itemId: Long, equipped: Boolean) =
-        InventoryTable.update({ InventoryTable.userId.eq(userId) and InventoryTable.materializedItem.eq(itemId) }) {
-            it[InventoryTable.equipped] = equipped
+        InventoryTableImpl.Exposed.update({ InventoryTableImpl.Exposed.userId.eq(userId) and InventoryTableImpl.Exposed.materializedItem.eq(itemId) }) {
+            it[InventoryTableImpl.Exposed.equipped] = equipped
         }
 
     object Market {

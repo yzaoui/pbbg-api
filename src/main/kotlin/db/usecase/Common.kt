@@ -15,6 +15,7 @@ fun storeInInventoryReturnItemID(
     itemToStore: MaterializedItem,
     historyInfo: ItemHistoryInfo,
     dexTable: DexTable,
+    inventoryTable: InventoryTable,
     itemHistoryTable: ItemHistoryTable,
     materializedItemTable: MaterializedItemTable,
 ): Long = transaction(db) {
@@ -30,7 +31,7 @@ fun storeInInventoryReturnItemID(
     } else {
         // If this item isn't already stored, or it can't be stacked, create a new entry for it
         itemId = materializedItemTable.insertItemAndGetId(itemToStore)
-        InventoryTable.insertItem(userId, itemId, itemToStore.base)
+        inventoryTable.insertItem(userId, itemId, itemToStore.base)
 
         if (heldItems.count() == 0) {
             // TODO: For now, assume only stackable items are MineEntity

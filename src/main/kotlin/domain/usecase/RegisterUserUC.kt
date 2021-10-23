@@ -59,6 +59,7 @@ class RegisterUserUCImpl(
     private val db: Database,
     private val clock: Clock,
     private val dexTable: DexTable,
+    private val inventoryTable: InventoryTable,
     private val itemHistoryTable: ItemHistoryTable,
     private val marketTable: MarketTable,
     private val marketInventoryTable: MarketInventoryTable,
@@ -104,7 +105,7 @@ class RegisterUserUCImpl(
                         info = ItemHistoryInfo.CreatedWithUser(userId)
                     )
                 )
-                InventoryTable.insertItem(userId, itemId, item.base)
+                inventoryTable.insertItem(userId, itemId, item.base)
                 dexTable.insertDiscovered(userId, item.enum)
             }
 

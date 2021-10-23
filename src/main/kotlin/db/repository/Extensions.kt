@@ -58,7 +58,7 @@ fun ResultRow.toInventoryItem(): InventoryItem {
     val materializedItem = toMaterializedItem()
 
     return if (materializedItem.base is BaseItem.Equippable) {
-        val equipped = this[InventoryTable.equipped]!!
+        val equipped = this[InventoryTableImpl.Exposed.equipped]!!
 
         InventoryItem.EquippableInventoryItem(materializedItem, equipped)
     } else {

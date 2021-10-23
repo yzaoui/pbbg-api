@@ -6,6 +6,7 @@ import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.USERNAME_REGEX
 import com.bitwiserain.pbbg.USERNAME_REGEX_DESCRIPTION
 import com.bitwiserain.pbbg.db.repository.DexTableImpl
+import com.bitwiserain.pbbg.db.repository.InventoryTableImpl
 import com.bitwiserain.pbbg.db.repository.ItemHistoryTableImpl
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
@@ -37,13 +38,16 @@ class RegisterUserUCImplTest {
     private val db = initDatabase()
     private val clock = MutableClock()
     private val dexTable = DexTableImpl()
+    private val inventoryTable = InventoryTableImpl()
     private val itemHistoryTable = ItemHistoryTableImpl()
     private val marketTable = MarketTableImpl()
     private val marketInventoryTable = MarketInventoryTableImpl()
     private val materializedItemTable = MaterializedItemTableImpl()
     private val plotTable = PlotTableImpl()
     private val squadTable = SquadTableImpl()
-    private val registerUser = RegisterUserUCImpl(db, clock, dexTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable)
+    private val registerUser = RegisterUserUCImpl(
+        db, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable
+    )
 
     @AfterEach
     fun dropDatabase() {

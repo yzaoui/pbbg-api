@@ -32,6 +32,7 @@ class FarmUCImpl(
     private val db: Database,
     private val clock: Clock,
     private val dexTable: DexTable,
+    private val inventoryTable: InventoryTable,
     private val itemHistoryTable: ItemHistoryTable,
     private val materializedItemTable: MaterializedItemTable,
     private val materializedPlantTable: MaterializedPlantTable,
@@ -75,7 +76,7 @@ class FarmUCImpl(
         if (item is MaterializedItem.Stackable) {
             materializedItemTable.updateQuantity(itemId, -1)
         } else {
-            InventoryTable.removeItem(userId, itemId)
+            inventoryTable.removeItem(userId, itemId)
         }
 
         return@transaction plotTable.getPlot(userId, plot.id)!!
@@ -98,7 +99,7 @@ class FarmUCImpl(
             is MaterializedPlant.AppleTree -> MaterializedItem.Apple(1)
             is MaterializedPlant.TomatoPlant -> MaterializedItem.Tomato(1)
         }
-        storeInInventoryReturnItemID(db, now, userId, crop, ItemHistoryInfo.FirstHarvested(userId), dexTable, itemHistoryTable, materializedItemTable)
+        storeInInventoryReturnItemID(db, now, userId, crop, ItemHistoryInfo.FirstHarvested(userId), dexTable, inventoryTable, itemHistoryTable, materializedItemTable)
 
         /* Gain farming exp */
         val currentFarmingExp = UserStatsTable.getUserStats(userId).farmingExp
