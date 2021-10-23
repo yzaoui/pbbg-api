@@ -4,14 +4,6 @@ import com.bitwiserain.pbbg.domain.model.UserStats
 
 interface UserUC {
     /**
-     * Registers a user.
-     *
-     * @throws UsernameNotAvailableException if [username] is not available.
-     * @throws CredentialsFormatException if [username] or [password] don't match the required formats.
-     */
-    fun registerUser(username: String, password: String): Int
-
-    /**
      * Gets user by credentials (username + password).
      */
     fun getUserIdByCredentials(username: String, password: String): Int?
@@ -32,8 +24,6 @@ interface UserUC {
     fun changePassword(userId: Int, currentPassword: String, newPassword: String, confirmNewPassword: String)
 }
 
-class UsernameNotAvailableException(val username: String) : Exception()
-class CredentialsFormatException(val usernameError: String?, val passwordError: String?) : Exception()
 class WrongCurrentPasswordException : Exception()
 class UnconfirmedNewPasswordException : Exception()
 class NewPasswordNotNewException : Exception()

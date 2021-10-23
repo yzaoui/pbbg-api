@@ -14,6 +14,7 @@ import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.db.usecase.*
+import com.bitwiserain.pbbg.domain.usecase.RegisterUserUCImpl
 import com.bitwiserain.pbbg.route.api.*
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
@@ -78,7 +79,8 @@ fun Application.mainWithDependencies(clock: Clock) {
 
     install(CallLogging)
 
-    val userUC = UserUCImpl(db, clock)
+    val userUC = UserUCImpl(db)
+    val registerUser = RegisterUserUCImpl(db, clock)
     val marketUC = MarketUCImpl(db)
     val inventoryUC = InventoryUCImpl(db)
     val itemUC = ItemUCImpl(db)
@@ -128,7 +130,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     }
     routing {
         route("/api") {
-            registerAPI(userUC)
+            registerAPI(registerUser)
             loginAPI(userUC)
             item(itemUC)
             unit(unitUC)
