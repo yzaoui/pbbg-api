@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class UserUCImplTests {
@@ -22,32 +21,6 @@ class UserUCImplTests {
     @AfterEach
     fun dropDatabase() {
         SchemaHelper.dropTables(db)
-    }
-
-    @Nested
-    inner class ByCredentials {
-        @Test
-        fun `Given an existing user, when getting the user's ID by correct credentials, the ID should return`() {
-            val expectedUserId = createTestUserAndGetId(db, username = "username24", password = "pass123")
-
-            val actualUserId = userUC.getUserIdByCredentials("username24", "pass123")
-
-            assertEquals(expectedUserId, actualUserId)
-        }
-
-        @Test
-        fun `Given an existing user, when getting the user's ID by incorrect credentials, no ID should be returned`() {
-            val expectedUserId = createTestUserAndGetId(db, username = "username24", password = "pass123")
-
-            /* Test incorrect username */
-            assertNull(userUC.getUserIdByCredentials("incorrecto17", "pass123"))
-
-            /* Test incorrect password */
-            assertNull(userUC.getUserIdByCredentials("username24", "pass12345"))
-
-            /* Test incorrect username & password */
-            assertNull(userUC.getUserIdByCredentials("incorrecto17", "pass12345"))
-        }
     }
 
     @Nested

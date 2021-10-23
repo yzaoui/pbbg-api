@@ -15,6 +15,7 @@ import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.db.usecase.*
 import com.bitwiserain.pbbg.domain.usecase.ChangePasswordUCImpl
+import com.bitwiserain.pbbg.domain.usecase.LoginUCImpl
 import com.bitwiserain.pbbg.domain.usecase.RegisterUserUCImpl
 import com.bitwiserain.pbbg.route.api.*
 import io.ktor.application.Application
@@ -83,6 +84,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     val userUC = UserUCImpl(db)
     val changePassword = ChangePasswordUCImpl(db)
     val registerUser = RegisterUserUCImpl(db, clock)
+    val login = LoginUCImpl(db)
     val marketUC = MarketUCImpl(db)
     val inventoryUC = InventoryUCImpl(db)
     val itemUC = ItemUCImpl(db)
@@ -133,7 +135,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     routing {
         route("/api") {
             registerAPI(registerUser)
-            loginAPI(userUC)
+            loginAPI(login)
             item(itemUC)
             unit(unitUC)
             authenticate(optional = false) {
