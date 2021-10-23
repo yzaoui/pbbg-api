@@ -14,6 +14,7 @@ import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.db.usecase.*
+import com.bitwiserain.pbbg.domain.usecase.ChangePasswordUCImpl
 import com.bitwiserain.pbbg.domain.usecase.RegisterUserUCImpl
 import com.bitwiserain.pbbg.route.api.*
 import io.ktor.application.Application
@@ -80,6 +81,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     install(CallLogging)
 
     val userUC = UserUCImpl(db)
+    val changePassword = ChangePasswordUCImpl(db)
     val registerUser = RegisterUserUCImpl(db, clock)
     val marketUC = MarketUCImpl(db)
     val inventoryUC = InventoryUCImpl(db)
@@ -144,7 +146,7 @@ fun Application.mainWithDependencies(clock: Clock) {
                 dexAPI(dexUC)
                 squadAPI(unitUC)
                 friends(friendsUC)
-                settings(userUC)
+                settings(changePassword)
                 about(aboutUC)
             }
             authenticate(optional = true) {

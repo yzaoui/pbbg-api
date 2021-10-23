@@ -12,19 +12,4 @@ interface UserUC {
      * Gets a user's stats by ID.
      */
     fun getUserStatsByUserId(userId: Int): UserStats
-
-    /**
-     * Change a user's password.
-     *
-     * @throws WrongCurrentPasswordException if [currentPassword] does not match the user's current password.
-     * @throws UnconfirmedNewPasswordException if [confirmNewPassword] does not match [newPassword].
-     * @throws NewPasswordNotNewException if [newPassword] is not different from [currentPassword].
-     * @throws IllegalPasswordException if new password doesn't fulfill password format requirement.
-     */
-    fun changePassword(userId: Int, currentPassword: String, newPassword: String, confirmNewPassword: String)
 }
-
-class WrongCurrentPasswordException : Exception()
-class UnconfirmedNewPasswordException : Exception()
-class NewPasswordNotNewException : Exception()
-class IllegalPasswordException : Exception()

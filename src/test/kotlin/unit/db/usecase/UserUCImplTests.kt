@@ -1,21 +1,18 @@
 package com.bitwiserain.pbbg.test.unit.db.usecase
 
-import com.bitwiserain.pbbg.*
-import com.bitwiserain.pbbg.db.repository.Joins
-import com.bitwiserain.pbbg.db.repository.SquadTable
+import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
-import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.usecase.UserUCImpl
-import com.bitwiserain.pbbg.domain.model.ItemEnum
-import com.bitwiserain.pbbg.domain.model.MyUnitEnum
-import com.bitwiserain.pbbg.domain.usecase.*
-import com.bitwiserain.pbbg.test.MutableClock
+import com.bitwiserain.pbbg.domain.usecase.UserUC
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import kotlin.test.*
+import org.junit.jupiter.api.TestInstance
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class UserUCImplTests {
@@ -69,95 +66,6 @@ class UserUCImplTests {
 
             assertEquals(20, stats.gold)
             assertEquals(500, stats.miningExp)
-        }
-    }
-
-    @Nested
-    inner class ChangePassword {
-        @Test
-        fun `Given an existing user, when changing password with correct parameters, password should be changed`() {
-            val userId = createTestUserAndGetId(db, "user", "pass123")
-
-            val newPassword = "new27pas".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-
-            userUC.changePassword(userId, currentPassword = "pass123", newPassword = newPassword, confirmNewPassword = newPassword)
-
-            val changedUser = transaction(db) { UserTable.getUserById(userId) }
-
-            assertNotNull(changedUser)
-            assertEquals("user", changedUser.username)
-            assertTrue(BCryptHelper.verifyPassword(newPassword, changedUser.passwordHash))
-        }
-
-        @Test
-        fun `Given an existing user, when changing password with an incorrect current password parameter, WrongCurrentPasswordException should be thrown`() {
-            val originalPassword = "pass123".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-            val userId = createTestUserAndGetId(db, "usr71", originalPassword)
-
-            val newPassword = "5fkd^s91$-".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-
-            assertThrows<WrongCurrentPasswordException> {
-                userUC.changePassword(userId, "inc0rrect4", newPassword, newPassword)
-            }
-
-            val latestUser = transaction(db) { UserTable.getUserById(userId) }
-
-            assertNotNull(latestUser)
-            assertEquals("usr71", latestUser.username)
-            assertTrue(BCryptHelper.verifyPassword(originalPassword, latestUser.passwordHash))
-        }
-
-        @Test
-        fun `Given an existing user, when changing password with an incorrectly confirmed new password parameter, UnconfirmedNewPasswordException should be thrown`() {
-            val originalPassword = "pass123".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-            val userId = createTestUserAndGetId(db, "usr71", originalPassword)
-
-            val newPassword = "5fkd^s91$-".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-            val confirmNewPassword = "differ3nt".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-
-            assertThrows<UnconfirmedNewPasswordException>("New password not matching its confirmation should throw UnconfirmedNewPasswordException.") {
-                userUC.changePassword(userId, originalPassword, newPassword, confirmNewPassword)
-            }
-
-            val latestUser = transaction(db) { UserTable.getUserById(userId) }
-
-            assertNotNull(latestUser)
-            assertEquals("usr71", latestUser.username)
-            assertTrue(BCryptHelper.verifyPassword(originalPassword, latestUser.passwordHash))
-        }
-
-        @Test
-        fun `Given an existing user, when changing password reusing the old password, NewPasswordNotNewException should be thrown`() {
-            val originalPassword = "pass123".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-            val userId = createTestUserAndGetId(db, "usr71", originalPassword)
-
-            assertThrows<NewPasswordNotNewException>("New password being the same as the old one should throw UnconfirmedNewPasswordException.") {
-                userUC.changePassword(userId, originalPassword, originalPassword, originalPassword)
-            }
-
-            val latestUser = transaction(db) { UserTable.getUserById(userId) }
-
-            assertNotNull(latestUser)
-            assertEquals("usr71", latestUser.username)
-            assertTrue(BCryptHelper.verifyPassword(originalPassword, latestUser.passwordHash))
-        }
-
-        @Test
-        fun `Given an existing user, when changing password using an invalid password, IllegalPasswordException should be thrown`() {
-            val originalPassword = "pass123".also { assertTrue(it.matches(PASSWORD_REGEX.toRegex())) }
-            val userId = createTestUserAndGetId(db, "usr71", originalPassword)
-
-            val newInvalidPassword = "a".also { assertFalse(it.matches(PASSWORD_REGEX.toRegex())) }
-
-            assertThrows<IllegalPasswordException>("New password being invalid should throw IllegalPasswordException.") {
-                userUC.changePassword(userId, originalPassword, newInvalidPassword, newInvalidPassword)
-            }
-
-            val latestUser = transaction(db) { UserTable.getUserById(userId) }
-
-            assertNotNull(latestUser)
-            assertEquals("usr71", latestUser.username)
-            assertTrue(BCryptHelper.verifyPassword(originalPassword, latestUser.passwordHash))
         }
     }
 }
