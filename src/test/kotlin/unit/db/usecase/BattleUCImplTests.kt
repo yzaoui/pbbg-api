@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.SquadTableImpl
 import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
+import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTableImpl
 import com.bitwiserain.pbbg.db.usecase.BattleUCImpl
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.usecase.BattleAlreadyInProgressException
@@ -26,8 +27,9 @@ import kotlin.test.assertNull
 class BattleUCImplTests {
 
     private val db = initDatabase()
+    private val battleEnemyTable = BattleEnemyTableImpl()
     private val squadTable = SquadTableImpl()
-    private val battleUC: BattleUC = BattleUCImpl(db, squadTable)
+    private val battleUC: BattleUC = BattleUCImpl(db, battleEnemyTable, squadTable)
 
     @AfterEach
     fun dropDatabase() {

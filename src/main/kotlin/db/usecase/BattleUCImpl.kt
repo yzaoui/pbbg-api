@@ -16,7 +16,7 @@ import com.bitwiserain.pbbg.domain.usecase.NoBattleInSessionException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class BattleUCImpl(private val db: Database, private val squadTable: SquadTable) : BattleUC {
+class BattleUCImpl(private val db: Database, private val battleEnemyTable: BattleEnemyTable, private val squadTable: SquadTable) : BattleUC {
     override fun getCurrentBattle(userId: Int): Battle? = transaction(db) {
         return@transaction BattleSessionTable.getBattleSessionId(userId)?.let { battleSession ->
             getBattle(userId, battleSession)
@@ -38,9 +38,9 @@ class BattleUCImpl(private val db: Database, private val squadTable: SquadTable)
         for (i in 0 until (1..3).random()) {
             newEnemies.add(UnitForm(MyUnitEnum.values().random(), (7..14).random(), (5..7).random(), (5..7).random(), (6..8).random(), (4..7).random()))
         }
-        BattleEnemyTable.insertEnemies(battleSession, newEnemies)
+        battleEnemyTable.insertEnemies(battleSession, newEnemies)
 
-        val enemies = BattleEnemyTable.getEnemies(battleSession)
+        val enemies = battleEnemyTable.getEnemies(battleSession)
 
         // TODO: Temporary function to get around test coverage failing when sortedByDescending is involved directly
         fun List<Turn>.sortedByDescendingCounter() = sortedByDescending { it.counter }
@@ -77,7 +77,7 @@ class BattleUCImpl(private val db: Database, private val squadTable: SquadTable)
         val queue = BattleSessionTable.getBattleQueue(battleSession)
 
         // Enemy should be next in queue
-        val enemy = BattleEnemyTable.getEnemy(battleSession, queue.peek()) ?: throw Exception()
+        val enemy = battleEnemyTable.getEnemy(battleSession, queue.peek()) ?: throw Exception()
 
         // Pick an action
         // TODO: Only current action is attack, so pick a random target
@@ -134,7 +134,7 @@ class BattleUCImpl(private val db: Database, private val squadTable: SquadTable)
 
     private fun getBattle(userId: Int, battleSession: Long) = Battle(
         allies = squadTable.getAllies(userId),
-        enemies = BattleEnemyTable.getEnemies(battleSession),
+        enemies = battleEnemyTable.getEnemies(battleSession),
         battleQueue = BattleSessionTable.getBattleQueue(battleSession)
     )
 
