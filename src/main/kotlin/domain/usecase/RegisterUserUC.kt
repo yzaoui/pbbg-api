@@ -59,6 +59,7 @@ class RegisterUserUCImpl(
     private val db: Database,
     private val clock: Clock,
     private val dexTable: DexTable,
+    private val marketTable: MarketTable,
     private val marketInventoryTable: MarketInventoryTable,
     private val squadTable: SquadTable,
 ) : RegisterUserUC {
@@ -105,7 +106,7 @@ class RegisterUserUCImpl(
             }
 
             /* Create user's market */
-            val marketId = MarketTable.createMarketAndGetId(userId)
+            val marketId = marketTable.createMarketAndGetId(userId)
 
             // Fill market with three pickaxe types
             listOf(MaterializedItem.PlusPickaxe, MaterializedItem.CrossPickaxe, MaterializedItem.SquarePickaxe).forEach { item ->

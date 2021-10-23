@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.db.repository
 
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTableImpl
-import com.bitwiserain.pbbg.db.repository.market.MarketTable
+import com.bitwiserain.pbbg.db.repository.market.MarketTableImpl
 import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import org.jetbrains.exposed.dao.id.EntityID
@@ -34,21 +34,21 @@ object Joins {
 
     object Market {
         private fun getMarketId(userId: Int) =
-            MarketTable.select { MarketTable.userId.eq(userId) }
-                .map { it[MarketTable.id] }
+            MarketTableImpl.Exposed.select { MarketTableImpl.Exposed.userId.eq(userId) }
+                .map { it[MarketTableImpl.Exposed.id] }
                 .single()
                 .value
 
         fun getItems(userId: Int) =
-            (MarketInventoryTableImpl.Exposed innerJoin MaterializedItemTable innerJoin MarketTable)
-                .select { MarketTable.userId.eq(userId) }
+            (MarketInventoryTableImpl.Exposed innerJoin MaterializedItemTable innerJoin MarketTableImpl.Exposed)
+                .select { MarketTableImpl.Exposed.userId.eq(userId) }
                 .associate { it[MaterializedItemTable.id].value to it.toMaterializedItem() }
 
         fun insertItems(userId: Int, itemIds: Iterable<Long>) {
             val marketId = getMarketId(userId)
 
             MarketInventoryTableImpl.Exposed.batchInsert(itemIds) { itemid ->
-                this[MarketInventoryTableImpl.Exposed.marketId] = EntityID(marketId, MarketTable)
+                this[MarketInventoryTableImpl.Exposed.marketId] = EntityID(marketId, MarketTableImpl.Exposed)
                 this[MarketInventoryTableImpl.Exposed.materializedItem] = EntityID(itemid, MaterializedItemTable)
             }
         }

@@ -17,7 +17,7 @@ class MarketInventoryTableImpl : MarketInventoryTable {
 
     object Exposed : Table(name = "MarketInventory") {
 
-        val marketId = reference("market_id", MarketTable)
+        val marketId = reference("market_id", MarketTableImpl.Exposed)
         val materializedItem = reference("materialized_item", MaterializedItemTable)
 
         override val primaryKey = PrimaryKey(marketId, materializedItem)
@@ -25,7 +25,7 @@ class MarketInventoryTableImpl : MarketInventoryTable {
 
     override fun insertItem(marketId: Int, itemId: Long) {
         Exposed.insert {
-            it[Exposed.marketId] = EntityID(marketId, MarketTable)
+            it[Exposed.marketId] = EntityID(marketId, MarketTableImpl.Exposed)
             it[Exposed.materializedItem] = EntityID(itemId, MaterializedItemTable)
         }
     }

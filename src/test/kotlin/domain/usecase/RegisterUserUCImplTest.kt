@@ -10,6 +10,7 @@ import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.SquadTableImpl
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTableImpl
+import com.bitwiserain.pbbg.db.repository.market.MarketTableImpl
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.usecase.RegisterUserUC.Result
@@ -33,9 +34,10 @@ class RegisterUserUCImplTest {
     private val db = initDatabase()
     private val clock = MutableClock()
     private val dexTable = DexTableImpl()
+    private val marketTable = MarketTableImpl()
     private val marketInventoryTable = MarketInventoryTableImpl()
     private val squadTable = SquadTableImpl()
-    private val registerUser = RegisterUserUCImpl(db, clock, dexTable, marketInventoryTable, squadTable)
+    private val registerUser = RegisterUserUCImpl(db, clock, dexTable, marketTable, marketInventoryTable, squadTable)
 
     @AfterEach
     fun dropDatabase() {
