@@ -9,45 +9,68 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 
-object BattleSessionTable : LongIdTable() {
-    val userId = reference("user_id", UserTable)
-    val battleQueue = text("battle_queue")
+interface BattleSessionTable {
 
-    fun createBattleSessionAndGetId(userId: Int): Long = insertAndGetId {
-        it[BattleSessionTable.userId] = EntityID(userId, UserTable)
-        it[BattleSessionTable.battleQueue] = ""
+    fun createBattleSessionAndGetId(userId: Int): Long
+
+    /**
+     * Get a user's battle session ID, if any.
+     */
+    fun getBattleSessionId(userId: Int): Long?
+
+    fun isBattleInProgress(userId: Int): Boolean
+
+    /**
+     * Delete a battle session entry.
+     */
+    fun deleteBattle(battleSession: Long)
+
+    fun getBattleQueue(battleSession: Long): BattleQueue
+
+    fun updateBattleQueue(battleSession: Long, battleQueue: BattleQueue)
+}
+
+class BattleSessionTableImpl : BattleSessionTable {
+
+    object Exposed : LongIdTable(name = "BattleSession") {
+
+        val userId = reference("user_id", UserTable)
+        val battleQueue = text("battle_queue")
+    }
+
+    override fun createBattleSessionAndGetId(userId: Int): Long = Exposed.insertAndGetId {
+        it[Exposed.userId] = EntityID(userId, UserTable)
+        it[Exposed.battleQueue] = ""
     }.value
 
     /**
      * Get a user's battle session ID, if any.
      */
-    fun getBattleSessionId(userId: Int): Long? {
-        return select { BattleSessionTable.userId eq userId }
-            .singleOrNull()
-            ?.run { get(BattleSessionTable.id).value }
-    }
+    override fun getBattleSessionId(userId: Int): Long? = Exposed
+        .select { Exposed.userId eq userId }
+        .singleOrNull()
+        ?.run { get(Exposed.id).value }
 
-    fun isBattleInProgress(userId: Int): Boolean {
-        return select { BattleSessionTable.userId eq userId }.count() > 0
-    }
+    override fun isBattleInProgress(userId: Int): Boolean = Exposed
+        .select { Exposed.userId eq userId }.count() > 0
 
     /**
      * Delete a battle session entry.
      */
-    fun deleteBattle(battleSession: Long) {
-        deleteWhere { id eq battleSession }
+    override fun deleteBattle(battleSession: Long) {
+        Exposed.deleteWhere { Exposed.id eq battleSession }
     }
 
-    fun getBattleQueue(battleSession: Long): BattleQueue {
-        val turnsString = select { id eq battleSession}
+    override fun getBattleQueue(battleSession: Long): BattleQueue {
+        val turnsString = Exposed.select { Exposed.id eq battleSession}
             .single()
-            .get(battleQueue)
+            .get(Exposed.battleQueue)
 
         return BattleQueue.fromJSON(turnsString)
     }
 
-    fun updateBattleQueue(battleSession: Long, battleQueue: BattleQueue) {
-        update({ id eq battleSession }) {
+    override fun updateBattleQueue(battleSession: Long, battleQueue: BattleQueue) {
+        Exposed.update({ Exposed.id eq battleSession }) {
             it[this.battleQueue] = battleQueue.toJSON()
         }
     }

@@ -4,7 +4,7 @@ import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.SquadTableImpl
 import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
-import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
+import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTableImpl
 import com.bitwiserain.pbbg.db.usecase.UnitUCImpl
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.Squad
@@ -24,8 +24,9 @@ import kotlin.test.assertTrue
 class UnitUCImplTests {
 
     private val db = initDatabase()
+    private val battleSessionTable = BattleSessionTableImpl()
     private val squadTable = SquadTableImpl()
-    private val unitUC: UnitUC = UnitUCImpl(db, squadTable)
+    private val unitUC: UnitUC = UnitUCImpl(db, battleSessionTable, squadTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -68,7 +69,7 @@ class UnitUCImplTests {
         val userId = createTestUserAndGetId(db)
 
         transaction {
-            BattleSessionTable.createBattleSessionAndGetId(userId)
+            battleSessionTable.createBattleSessionAndGetId(userId)
         }
 
         assertThrows<SquadInBattleException> {

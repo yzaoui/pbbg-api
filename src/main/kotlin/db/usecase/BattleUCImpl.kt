@@ -16,22 +16,28 @@ import com.bitwiserain.pbbg.domain.usecase.NoBattleInSessionException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class BattleUCImpl(private val db: Database, private val battleEnemyTable: BattleEnemyTable, private val squadTable: SquadTable) : BattleUC {
+class BattleUCImpl(
+    private val db: Database,
+    private val battleEnemyTable: BattleEnemyTable,
+    private val battleSessionTable: BattleSessionTable,
+    private val squadTable: SquadTable,
+) : BattleUC {
+
     override fun getCurrentBattle(userId: Int): Battle? = transaction(db) {
-        return@transaction BattleSessionTable.getBattleSessionId(userId)?.let { battleSession ->
+        return@transaction battleSessionTable.getBattleSessionId(userId)?.let { battleSession ->
             getBattle(userId, battleSession)
         }
     }
 
     override fun generateBattle(userId: Int): Battle = transaction(db) {
-        if (BattleSessionTable.isBattleInProgress(userId)) throw BattleAlreadyInProgressException()
+        if (battleSessionTable.isBattleInProgress(userId)) throw BattleAlreadyInProgressException()
 
         val allies = squadTable.getAllies(userId)
 
         // There must be allies alive to start a battle
         if (allies.none { it.alive }) throw NoAlliesAliveException()
 
-        val battleSession = BattleSessionTable.createBattleSessionAndGetId(userId)
+        val battleSession = battleSessionTable.createBattleSessionAndGetId(userId)
 
         val newEnemies = mutableListOf<UnitForm>()
         // Add 1-3 new enemies
@@ -52,15 +58,15 @@ class BattleUCImpl(private val db: Database, private val battleEnemyTable: Battl
                 .sortedByDescendingCounter()
         )
 
-        BattleSessionTable.updateBattleQueue(battleSession, battleQueue)
+        battleSessionTable.updateBattleQueue(battleSession, battleQueue)
 
         return@transaction Battle(allies = allies, enemies = enemies, battleQueue = battleQueue)
     }
 
     override fun allyTurn(userId: Int, action: BattleAction): BattleActionResult = transaction(db) {
-        val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw NoBattleInSessionException()
+        val battleSession = battleSessionTable.getBattleSessionId(userId) ?: throw NoBattleInSessionException()
 
-        val queue = BattleSessionTable.getBattleQueue(battleSession)
+        val queue = battleSessionTable.getBattleQueue(battleSession)
 
         // Ally should be next in queue
         val ally = squadTable.getAlly(userId, queue.peek()) ?: throw Exception()
@@ -72,9 +78,9 @@ class BattleUCImpl(private val db: Database, private val battleEnemyTable: Battl
     }
 
     override fun enemyTurn(userId: Int): BattleActionResult = transaction(db) {
-        val battleSession = BattleSessionTable.getBattleSessionId(userId) ?: throw NoBattleInSessionException()
+        val battleSession = battleSessionTable.getBattleSessionId(userId) ?: throw NoBattleInSessionException()
 
-        val queue = BattleSessionTable.getBattleQueue(battleSession)
+        val queue = battleSessionTable.getBattleQueue(battleSession)
 
         // Enemy should be next in queue
         val enemy = battleEnemyTable.getEnemy(battleSession, queue.peek()) ?: throw Exception()
@@ -87,7 +93,7 @@ class BattleUCImpl(private val db: Database, private val battleEnemyTable: Battl
     }
 
     private fun act(userId: Int, battleSession: Long, actingUnit: MyUnit, action: BattleAction): BattleActionResult {
-        val queue = BattleSessionTable.getBattleQueue(battleSession)
+        val queue = battleSessionTable.getBattleQueue(battleSession)
         val unitsToRemove: MutableList<Long> = mutableListOf()
         val effects: MutableMap<Long, UnitEffect> = mutableMapOf()
         var reward: BattleReward? = null
@@ -119,7 +125,7 @@ class BattleUCImpl(private val db: Database, private val battleEnemyTable: Battl
         }
 
         val updatedQueue = queue.endTurn(unitsToRemove)
-        BattleSessionTable.updateBattleQueue(battleSession, updatedQueue)
+        battleSessionTable.updateBattleQueue(battleSession, updatedQueue)
 
         val updatedBattle = getBattle(userId, battleSession)
 
@@ -135,7 +141,7 @@ class BattleUCImpl(private val db: Database, private val battleEnemyTable: Battl
     private fun getBattle(userId: Int, battleSession: Long) = Battle(
         allies = squadTable.getAllies(userId),
         enemies = battleEnemyTable.getEnemies(battleSession),
-        battleQueue = BattleSessionTable.getBattleQueue(battleSession)
+        battleQueue = battleSessionTable.getBattleQueue(battleSession)
     )
 
     private fun isBattleOver(battle: Battle): Boolean {
@@ -146,7 +152,7 @@ class BattleUCImpl(private val db: Database, private val battleEnemyTable: Battl
         // Delete enemies, since they only exist within this battle
         val enemyIdCSV = battle.enemies.asSequence().map { it.id }.joinToString()
 
-        BattleSessionTable.deleteBattle(battleSession)
+        battleSessionTable.deleteBattle(battleSession)
 
         "DELETE FROM ${UnitTable.tableName} WHERE ${UnitTable.id.name} IN ($enemyIdCSV)".execAndMap {}
     }

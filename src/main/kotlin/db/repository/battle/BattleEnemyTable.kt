@@ -5,8 +5,11 @@ import com.bitwiserain.pbbg.db.repository.UnitTable
 import com.bitwiserain.pbbg.db.repository.toMyUnit
 import com.bitwiserain.pbbg.domain.model.MyUnit
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.ReferenceOption
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 
 interface BattleEnemyTable {
 
@@ -30,7 +33,7 @@ class BattleEnemyTableImpl : BattleEnemyTable {
 
     object Exposed : Table(name = "BattleEnemy") {
 
-        val battle = reference("battle_session_id", BattleSessionTable, ReferenceOption.CASCADE)
+        val battle = reference("battle_session_id", BattleSessionTableImpl.Exposed, ReferenceOption.CASCADE)
         val unit = reference("unit_id", UnitTable, ReferenceOption.CASCADE)
     }
 
@@ -57,7 +60,7 @@ class BattleEnemyTableImpl : BattleEnemyTable {
 
             // Connect newly created enemy to this battle session
             Exposed.insert {
-                it[Exposed.battle] = EntityID(battleSession, BattleSessionTable)
+                it[Exposed.battle] = EntityID(battleSession, BattleSessionTableImpl.Exposed)
                 it[Exposed.unit] = EntityID(enemyId, UnitTable)
             }
         }
