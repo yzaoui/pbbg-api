@@ -33,6 +33,7 @@ class FarmUCImpl(
     private val clock: Clock,
     private val dexTable: DexTable,
     private val itemHistoryTable: ItemHistoryTable,
+    private val materializedPlantTable: MaterializedPlantTable,
     private val plotTable: PlotTable
 ) : FarmUC {
 
@@ -60,7 +61,7 @@ class FarmUCImpl(
         if (baseItem !is BaseItem.Plantable) throw ItemNotPlantableException()
 
         /* Create plant in database */
-        val plantId = MaterializedPlantTable.insertPlantAndGetId(PlantForm(
+        val plantId = materializedPlantTable.insertPlantAndGetId(PlantForm(
             enum = baseItem.basePlant.enum,
             cycleStart = now,
             isMaturable = baseItem.basePlant is IBasePlant.Maturable
@@ -109,12 +110,12 @@ class FarmUCImpl(
                 else -> throw IllegalStateException()
             }
 
-            MaterializedPlantTable.setNewPlantCycleAndHarvest(plantId, harvestedPlant.cycleStart, harvestedPlant.harvests)
+            materializedPlantTable.setNewPlantCycleAndHarvest(plantId, harvestedPlant.cycleStart, harvestedPlant.harvests)
 
             return@transaction plot.copy(plant = plantId to harvestedPlant)
         } else {
             /* For non-maturable plants, delete */
-            MaterializedPlantTable.deletePlant(plantId)
+            materializedPlantTable.deletePlant(plantId)
 
             return@transaction plot.copy(plant = null)
         }

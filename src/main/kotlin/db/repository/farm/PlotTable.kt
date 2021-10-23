@@ -1,7 +1,6 @@
 package com.bitwiserain.pbbg.db.repository.farm
 
 import com.bitwiserain.pbbg.db.repository.UserTable
-import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable.toMaterializedPlant
 import com.bitwiserain.pbbg.domain.model.farm.Plot
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
@@ -28,7 +27,7 @@ class PlotTableImpl : PlotTable {
     object Exposed : LongIdTable(name = "Plot") {
 
         val userId = reference("user_id", UserTable)
-        val plantId = reference("plant_id", MaterializedPlantTable, ReferenceOption.SET_NULL).nullable()
+        val plantId = reference("plant_id", MaterializedPlantTableImpl.Exposed, ReferenceOption.SET_NULL).nullable()
     }
 
     override fun createAndGetEmptyPlot(userId: Int): Plot = Exposed.insertAndGetId {
@@ -39,17 +38,17 @@ class PlotTableImpl : PlotTable {
 
     override fun updatePlot(userId: Int, plotId: Long, plantId: Long) {
         Exposed.update({ Exposed.userId.eq(userId) and Exposed.id.eq(plotId) }) {
-            it[Exposed.plantId] = EntityID(plantId, MaterializedPlantTable)
+            it[Exposed.plantId] = EntityID(plantId, MaterializedPlantTableImpl.Exposed)
         }
     }
 
     override fun getPlots(userId: Int): List<Plot> =
-        (Exposed leftJoin MaterializedPlantTable)
+        (Exposed leftJoin MaterializedPlantTableImpl.Exposed)
             .select { Exposed.userId.eq(userId) }
             .map { it.toPlot() }
 
     override fun getPlot(userId: Int, plotId: Long) =
-        (Exposed leftJoin MaterializedPlantTable)
+        (Exposed leftJoin MaterializedPlantTableImpl.Exposed)
             .select { Exposed.userId.eq(userId) and Exposed.id.eq(plotId) }
             .singleOrNull()
             ?.toPlot()

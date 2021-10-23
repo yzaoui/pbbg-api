@@ -15,7 +15,7 @@ import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTableImpl
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTableImpl
-import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable
+import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTableImpl
 import com.bitwiserain.pbbg.db.repository.farm.PlotTableImpl
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTableImpl
 import com.bitwiserain.pbbg.db.repository.market.MarketTableImpl
@@ -123,6 +123,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     val itemHistoryTable = ItemHistoryTableImpl()
     val marketTable = MarketTableImpl()
     val marketInventoryTable = MarketInventoryTableImpl()
+    val materializedPlantTable = MaterializedPlantTableImpl()
     val mineCellTable = MineCellTableImpl()
     val mineSessionTable = MineSessionTableImpl()
     val plotTable = PlotTableImpl()
@@ -136,7 +137,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     val inventoryUC = InventoryUCImpl(db)
     val itemUC = ItemUCImpl(db, itemHistoryTable)
     val miningUC = MiningUCImpl(db, clock, dexTable, itemHistoryTable, mineCellTable, mineSessionTable)
-    val farmUC = FarmUCImpl(db, clock, dexTable, itemHistoryTable, plotTable)
+    val farmUC = FarmUCImpl(db, clock, dexTable, itemHistoryTable, materializedPlantTable, plotTable)
     val equipmentUC = EquipmentUCImpl(db)
     val unitUC = UnitUCImpl(db, battleSessionTable, squadTable)
     val battleUC = BattleUCImpl(db, battleEnemyTable, battleSessionTable, squadTable)
@@ -254,7 +255,7 @@ object SchemaHelper {
         SchemaUtils.create(
             UserTable, MineSessionTableImpl.Exposed, MineCellTableImpl.Exposed, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable, SquadTableImpl.Exposed,
             BattleSessionTableImpl.Exposed, BattleEnemyTableImpl.Exposed, DexTableImpl.Exposed, MarketTableImpl.Exposed, MarketInventoryTableImpl.Exposed,
-            ItemHistoryTableImpl.Exposed, PlotTableImpl.Exposed, MaterializedPlantTable, FriendsTable
+            ItemHistoryTableImpl.Exposed, PlotTableImpl.Exposed, MaterializedPlantTableImpl.Exposed, FriendsTable
         )
     }
 
@@ -262,7 +263,7 @@ object SchemaHelper {
         SchemaUtils.drop(
             UserTable, MineSessionTableImpl.Exposed, MineCellTableImpl.Exposed, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable, SquadTableImpl.Exposed,
             BattleSessionTableImpl.Exposed, BattleEnemyTableImpl.Exposed, DexTableImpl.Exposed, MarketTableImpl.Exposed, MarketInventoryTableImpl.Exposed,
-            ItemHistoryTableImpl.Exposed, PlotTableImpl.Exposed, MaterializedPlantTable, FriendsTable
+            ItemHistoryTableImpl.Exposed, PlotTableImpl.Exposed, MaterializedPlantTableImpl.Exposed, FriendsTable
         )
     }
 }
