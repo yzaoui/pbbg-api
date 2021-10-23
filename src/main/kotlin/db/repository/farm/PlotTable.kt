@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.db.repository.farm
 
-import com.bitwiserain.pbbg.db.repository.UserTable
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.domain.model.farm.Plot
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
@@ -26,12 +26,12 @@ class PlotTableImpl : PlotTable {
 
     object Exposed : LongIdTable(name = "Plot") {
 
-        val userId = reference("user_id", UserTable)
+        val userId = reference("user_id", UserTableImpl.Exposed)
         val plantId = reference("plant_id", MaterializedPlantTableImpl.Exposed, ReferenceOption.SET_NULL).nullable()
     }
 
     override fun createAndGetEmptyPlot(userId: Int): Plot = Exposed.insertAndGetId {
-        it[Exposed.userId] = EntityID(userId, UserTable)
+        it[Exposed.userId] = EntityID(userId, UserTableImpl.Exposed)
     }.let {
         Plot(it.value, null)
     }

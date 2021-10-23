@@ -5,8 +5,8 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 
 object FriendsTable : Table() {
-    val initiatorUserId = reference("initiator_user_id", UserTable)
-    val receiverUserId = reference("receiver_user_id", UserTable)
+    val initiatorUserId = reference("initiator_user_id", UserTableImpl.Exposed)
+    val receiverUserId = reference("receiver_user_id", UserTableImpl.Exposed)
     override val primaryKey = PrimaryKey(initiatorUserId, receiverUserId)
     val confirmed = bool("confirmed").default(false)
 
@@ -37,8 +37,8 @@ object FriendsTable : Table() {
         }
 
     fun insertRequest(currentUserId: Int, targetUserId: Int) = insert {
-        it[FriendsTable.initiatorUserId] = EntityID(currentUserId, UserTable)
-        it[FriendsTable.receiverUserId] = EntityID(targetUserId, UserTable)
+        it[FriendsTable.initiatorUserId] = EntityID(currentUserId, UserTableImpl.Exposed)
+        it[FriendsTable.receiverUserId] = EntityID(targetUserId, UserTableImpl.Exposed)
     }
 
     fun deleteFriendship(currentUserId: Int, targetUserId: Int) = deleteWhere {

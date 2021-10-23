@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.db.repository.battle
 
-import com.bitwiserain.pbbg.db.repository.UserTable
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.domain.model.battle.BattleQueue
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
@@ -34,12 +34,12 @@ class BattleSessionTableImpl : BattleSessionTable {
 
     object Exposed : LongIdTable(name = "BattleSession") {
 
-        val userId = reference("user_id", UserTable)
+        val userId = reference("user_id", UserTableImpl.Exposed)
         val battleQueue = text("battle_queue")
     }
 
     override fun createBattleSessionAndGetId(userId: Int): Long = Exposed.insertAndGetId {
-        it[Exposed.userId] = EntityID(userId, UserTable)
+        it[Exposed.userId] = EntityID(userId, UserTableImpl.Exposed)
         it[Exposed.battleQueue] = ""
     }.value
 

@@ -23,7 +23,7 @@ class InventoryTableImpl : InventoryTable {
 
     object Exposed : Table(name = "Inventory") {
 
-        val userId = reference("user_id", UserTable)
+        val userId = reference("user_id", UserTableImpl.Exposed)
         val materializedItem = reference("materialized_item", MaterializedItemTableImpl.Exposed)
         val equipped = bool("equipped").nullable()
 
@@ -32,7 +32,7 @@ class InventoryTableImpl : InventoryTable {
 
     override fun insertItem(userId: Int, itemId: Long, baseItem: BaseItem) {
         Exposed.insert {
-            it[Exposed.userId] = EntityID(userId, UserTable)
+            it[Exposed.userId] = EntityID(userId, UserTableImpl.Exposed)
             it[Exposed.materializedItem] = EntityID(itemId, MaterializedItemTableImpl.Exposed)
             if (baseItem is BaseItem.Equippable) it[Exposed.equipped] = false
         }
@@ -40,7 +40,7 @@ class InventoryTableImpl : InventoryTable {
 
     override fun insertItems(userId: Int, itemEntries: Map<Long, BaseItem>) {
         Exposed.batchInsert(itemEntries.asIterable()) { entry ->
-            this[Exposed.userId] = EntityID(userId, UserTable)
+            this[Exposed.userId] = EntityID(userId, UserTableImpl.Exposed)
             this[Exposed.materializedItem] = EntityID(entry.key, MaterializedItemTableImpl.Exposed)
             if (entry.value is BaseItem.Equippable) this[Exposed.equipped] = false
         }

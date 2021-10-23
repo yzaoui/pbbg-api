@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.InventoryTableImpl
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.db.usecase.InventoryUCImpl
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.Inventory
@@ -25,6 +26,7 @@ class InventoryUCImplTests {
     private val db = initDatabase()
     private val inventoryTable = InventoryTableImpl()
     private val materializedItemTable = MaterializedItemTableImpl()
+    private val userTable = UserTableImpl()
     private val inventoryUC: InventoryUC = InventoryUCImpl(db)
 
     @AfterEach
@@ -34,7 +36,7 @@ class InventoryUCImplTests {
 
     @Test
     fun `Given a user with items, when calling for inventory, those items should return`() {
-        val userId = createTestUserAndGetId(db)
+        val userId = createTestUserAndGetId(db, userTable)
 
         val (expectedInventory, actualInventory) = transaction(db) {
             val itemsById = listOf(MaterializedItem.CrossPickaxe, MaterializedItem.CopperOre(quantity = 5), MaterializedItem.IcePick)

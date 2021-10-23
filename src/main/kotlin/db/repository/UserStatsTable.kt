@@ -24,7 +24,7 @@ interface UserStatsTable {
 class UserStatsTableImpl : UserStatsTable {
 
     object Exposed : Table(name = "UserStats") {
-        val userId = reference("user_id", UserTable)
+        val userId = reference("user_id", UserTableImpl.Exposed)
         val gold = long("gold").default(0)
         val miningExp = long("mining_exp").default(0)
         val farmingExp = long("farming_exp").default(0)
@@ -32,7 +32,7 @@ class UserStatsTableImpl : UserStatsTable {
 
     override fun createUserStats(userId: Int) {
         Exposed.insert {
-            it[Exposed.userId] = EntityID(userId, UserTable)
+            it[Exposed.userId] = EntityID(userId, UserTableImpl.Exposed)
         }
     }
 

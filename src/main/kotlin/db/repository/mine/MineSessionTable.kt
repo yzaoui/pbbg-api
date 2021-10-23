@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.db.repository.mine
 
 import com.bitwiserain.pbbg.db.model.MineSession
-import com.bitwiserain.pbbg.db.repository.UserTable
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.domain.model.mine.MineType
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
@@ -22,14 +22,14 @@ class MineSessionTableImpl : MineSessionTable {
 
     object Exposed : IntIdTable(name = "MineSession") {
 
-        val userId = reference("user_id", UserTable).uniqueIndex()
+        val userId = reference("user_id", UserTableImpl.Exposed).uniqueIndex()
         val width = integer("width")
         val height = integer("height")
         val mineType = enumeration("mine_type", MineType::class)
     }
 
     override fun insertSessionAndGetId(userId: Int, width: Int, height: Int, mineType: MineType): Int = Exposed.insertAndGetId {
-        it[Exposed.userId] = EntityID(userId, UserTable)
+        it[Exposed.userId] = EntityID(userId, UserTableImpl.Exposed)
         it[Exposed.width] = width
         it[Exposed.height] = height
         it[Exposed.mineType] = mineType

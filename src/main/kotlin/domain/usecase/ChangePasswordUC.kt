@@ -5,9 +5,7 @@ import com.bitwiserain.pbbg.PASSWORD_REGEX
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.usecase.ChangePasswordUC.Result
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 
 /**
  * Changes a user's password.
@@ -43,13 +41,11 @@ interface ChangePasswordUC {
     }
 }
 
-class ChangePasswordUCImpl(private val db: Database) : ChangePasswordUC {
+class ChangePasswordUCImpl(private val db: Database, private val userTable: UserTable) : ChangePasswordUC {
 
     override fun invoke(userId: Int, currentPassword: String, newPassword: String, confirmNewPassword: String): Result = transaction(db) {
         // TODO: Consider checking if user exists
-        val expectedPasswordHash = UserTable.select { UserTable.id.eq(userId) }
-            .map { it[UserTable.passwordHash] }
-            .single()
+        val expectedPasswordHash = userTable.getUserById(userId)!!.passwordHash
 
         // Make sure current password matches
         if (!BCryptHelper.verifyPassword(currentPassword, expectedPasswordHash)) return@transaction Result.WrongCurrentPasswordError
@@ -64,9 +60,7 @@ class ChangePasswordUCImpl(private val db: Database) : ChangePasswordUC {
         if (!newPassword.matches(PASSWORD_REGEX.toRegex())) return@transaction Result.IllegalPasswordError
 
         // At this point, new password is legal, so update
-        UserTable.update({ UserTable.id.eq(userId) }) {
-            it[passwordHash] = BCryptHelper.hashPassword(newPassword)
-        }
+        userTable.updatePassword(userId, BCryptHelper.hashPassword(newPassword))
 
         return@transaction Result.Success
     }

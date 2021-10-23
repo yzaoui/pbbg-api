@@ -21,8 +21,8 @@ import java.time.Clock
 fun initDatabase(): Database = Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", Driver::class.qualifiedName!!)
     .also { SchemaHelper.createTables(it) }
 
-fun createTestUserAndGetId(db: Database, username: String = "username", password: String = "password"): Int = transaction(db) {
-    UserTable.createUserAndGetId(username, BCryptHelper.hashPassword(password))
+fun createTestUserAndGetId(db: Database, userTable: UserTable, username: String = "username", password: String = "password"): Int = transaction(db) {
+    userTable.createUserAndGetId(username, BCryptHelper.hashPassword(password))
 }
 
 fun TestApplicationEngine.registerUserAndGetToken(username: String = "username", password: String = "password") = handleRequest(HttpMethod.Post, "/api/register") {

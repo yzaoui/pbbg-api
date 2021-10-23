@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.SquadTableImpl
 import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTableImpl
 import com.bitwiserain.pbbg.db.usecase.UnitUCImpl
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
@@ -26,6 +27,7 @@ class UnitUCImplTests {
     private val db = initDatabase()
     private val battleSessionTable = BattleSessionTableImpl()
     private val squadTable = SquadTableImpl()
+    private val userTable = UserTableImpl()
     private val unitUC: UnitUC = UnitUCImpl(db, battleSessionTable, squadTable)
 
     @AfterEach
@@ -35,7 +37,7 @@ class UnitUCImplTests {
 
     @Test
     fun `When calling getSquad(), should return the user's squad`() {
-        val userId = createTestUserAndGetId(db)
+        val userId = createTestUserAndGetId(db, userTable)
 
         val units = createUnitsAndSquad(userId)
 
@@ -48,7 +50,7 @@ class UnitUCImplTests {
 
     @Test
     fun `Given a damaged squad out of battle, when healing it, all units should be fully healed`() {
-        val userId = createTestUserAndGetId(db)
+        val userId = createTestUserAndGetId(db, userTable)
 
         val units = createUnitsAndSquad(userId)
 
@@ -66,7 +68,7 @@ class UnitUCImplTests {
 
     @Test
     fun `Given a user in battle, when healing squad, SquadInBattleException should be thrown`() {
-        val userId = createTestUserAndGetId(db)
+        val userId = createTestUserAndGetId(db, userTable)
 
         transaction {
             battleSessionTable.createBattleSessionAndGetId(userId)

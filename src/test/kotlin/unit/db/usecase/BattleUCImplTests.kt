@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.SquadTableImpl
 import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTableImpl
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTableImpl
 import com.bitwiserain.pbbg.db.usecase.BattleUCImpl
@@ -31,6 +32,7 @@ class BattleUCImplTests {
     private val battleEnemyTable = BattleEnemyTableImpl()
     private val battleSessionTable = BattleSessionTableImpl()
     private val squadTable = SquadTableImpl()
+    private val userTable = UserTableImpl()
     private val battleUC: BattleUC = BattleUCImpl(db, battleEnemyTable, battleSessionTable, squadTable)
 
     @AfterEach
@@ -42,7 +44,7 @@ class BattleUCImplTests {
     inner class BattleGeneration {
         @Test
         fun `Given an out-of-battle user, when generating a new battle, a battle containing the squad and 1+ enemies should return`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             val allies = insertAndGetAllies(userId)
 
@@ -55,7 +57,7 @@ class BattleUCImplTests {
 
         @Test
         fun `Given an out-of-battle user, when generating a battle, its battle queue should include every ally and enemy exactly once`() {
-            val userId = createTestUserAndGetId(db).also {
+            val userId = createTestUserAndGetId(db, userTable).also {
                 insertAndGetAllies(it)
             }
 
@@ -69,7 +71,7 @@ class BattleUCImplTests {
 
         @Test
         fun `Given an in-battle user, when generating a new battle, BattleAlreadyInProgressException should be thrown`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             // Give user a squad
             insertAndGetAllies(userId)
@@ -85,7 +87,7 @@ class BattleUCImplTests {
 
         @Test
         fun `Given a user with only dead units, when generating a new battle, NoAlliesAliveException should be thrown`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             transaction(db) {
                 listOf(UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1, 1, 1))
@@ -108,7 +110,7 @@ class BattleUCImplTests {
     inner class BattleRetrieval {
         @Test
         fun `When generating a battle and requesting the current battle, it should be returned`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
             insertAndGetAllies(userId)
             battleUC.generateBattle(userId)
 
@@ -119,7 +121,7 @@ class BattleUCImplTests {
 
         @Test
         fun `Given an out-of-battle user, when their current battle is requested, null should be returned`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             val battle = battleUC.getCurrentBattle(userId)
 

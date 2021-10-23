@@ -66,6 +66,7 @@ class RegisterUserUCImpl(
     private val materializedItemTable: MaterializedItemTable,
     private val plotTable: PlotTable,
     private val squadTable: SquadTable,
+    private val userTable: UserTable,
     private val userStatsTable: UserStatsTable,
 ) : RegisterUserUC {
 
@@ -83,12 +84,12 @@ class RegisterUserUCImpl(
 
         return transaction(db) {
             /* Make sure username is available */
-            if (UserTable.getUserByUsername(username) != null) return@transaction Result.UsernameNotAvailableError
+            if (userTable.getUserByUsername(username) != null) return@transaction Result.UsernameNotAvailableError
 
             val now = clock.instant().truncatedTo(ChronoUnit.SECONDS)
 
             /* Create user */
-            val userId = UserTable.createUserAndGetId(
+            val userId = userTable.createUserAndGetId(
                 username = username,
                 passwordHash = BCryptHelper.hashPassword(password)
             )

@@ -26,7 +26,7 @@ class SquadTableImpl : SquadTable {
 
     object Exposed : LongIdTable(name = "Squad") {
 
-        val user = reference("user_id", UserTable)
+        val user = reference("user_id", UserTableImpl.Exposed)
         val unit = reference("unit_id", UnitTable)
     }
 
@@ -45,7 +45,7 @@ class SquadTableImpl : SquadTable {
 
     override fun insertUnits(userId: Int, unitIds: Iterable<Long>) {
         Exposed.batchInsert(unitIds) { unitId ->
-            this[Exposed.user] = EntityID(userId, UserTable)
+            this[Exposed.user] = EntityID(userId, UserTableImpl.Exposed)
             this[Exposed.unit] = EntityID(unitId, UnitTable)
         }
     }

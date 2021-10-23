@@ -12,6 +12,7 @@ import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
 import com.bitwiserain.pbbg.db.repository.SquadTableImpl
 import com.bitwiserain.pbbg.db.repository.UserStatsTableImpl
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.db.repository.farm.PlotTableImpl
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTableImpl
 import com.bitwiserain.pbbg.db.repository.market.MarketTableImpl
@@ -45,9 +46,10 @@ class RegisterUserUCImplTest {
     private val materializedItemTable = MaterializedItemTableImpl()
     private val plotTable = PlotTableImpl()
     private val squadTable = SquadTableImpl()
+    private val userTable = UserTableImpl()
     private val userStatsTable = UserStatsTableImpl()
     private val registerUser = RegisterUserUCImpl(
-        db, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable, userStatsTable
+        db, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable, userTable, userStatsTable
     )
 
     @AfterEach
@@ -111,7 +113,7 @@ class RegisterUserUCImplTest {
     inner class FailedRegistration {
         @Test
         fun `Given an existing user, when registering a new user with the same username, UsernameNotAvailableError should be returned`() {
-            createTestUserAndGetId(db, username = "username")
+            createTestUserAndGetId(db, userTable, username = "username")
 
             registerUser("username", "password").shouldBeTypeOf<Result.UsernameNotAvailableError>()
         }
