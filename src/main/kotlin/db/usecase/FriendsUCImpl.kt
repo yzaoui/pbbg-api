@@ -5,15 +5,21 @@ import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.domain.model.friends.FriendInfo
 import com.bitwiserain.pbbg.domain.model.friends.Friends
 import com.bitwiserain.pbbg.domain.model.friends.Friendship
-import com.bitwiserain.pbbg.domain.usecase.*
+import com.bitwiserain.pbbg.domain.usecase.FriendsUC
+import com.bitwiserain.pbbg.domain.usecase.FriendshipNotConfirmedException
+import com.bitwiserain.pbbg.domain.usecase.FriendshipNotNoneException
+import com.bitwiserain.pbbg.domain.usecase.FriendshipNotRequestReceivedException
+import com.bitwiserain.pbbg.domain.usecase.FriendshipNotRequestSentException
+import com.bitwiserain.pbbg.domain.usecase.SelfFriendshipException
+import com.bitwiserain.pbbg.domain.usecase.TargetUserDoesNotExistException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class FriendsUCImpl(private val db: Database, private val userTable: UserTable) : FriendsUC {
+class FriendsUCImpl(private val db: Database, private val friendsTable: FriendsTable, private val userTable: UserTable) : FriendsUC {
 
     override fun getFriends(userId: Int): Friends = transaction(db) {
         // TODO: Could combine these into a single query
-        val friendships = FriendsTable.getFriends(userId)
+        val friendships = friendsTable.getFriends(userId)
         val users = userTable.getUsersById(friendships.map { it.userId })
 
         Friends(friendships.map { FriendInfo(it.userId, users.getValue(it.userId).username, it.friendship) })
@@ -22,9 +28,9 @@ class FriendsUCImpl(private val db: Database, private val userTable: UserTable) 
     override fun addFriend(currentUserId: Int, targetUserId: Int): Friendship = transaction(db) {
         if (currentUserId == targetUserId) throw SelfFriendshipException
         if (!userTable.userExists(targetUserId)) throw TargetUserDoesNotExistException
-        if (FriendsTable.getFriendship(currentUserId, targetUserId) != Friendship.NONE) throw FriendshipNotNoneException
+        if (friendsTable.getFriendship(currentUserId, targetUserId) != Friendship.NONE) throw FriendshipNotNoneException
 
-        FriendsTable.insertRequest(currentUserId, targetUserId)
+        friendsTable.insertRequest(currentUserId, targetUserId)
 
         return@transaction Friendship.REQUEST_SENT
     }
@@ -32,9 +38,9 @@ class FriendsUCImpl(private val db: Database, private val userTable: UserTable) 
     override fun removeFriend(currentUserId: Int, targetUserId: Int): Friendship = transaction(db) {
         if (currentUserId == targetUserId) throw SelfFriendshipException
         if (!userTable.userExists(targetUserId)) throw TargetUserDoesNotExistException
-        if (FriendsTable.getFriendship(currentUserId, targetUserId) != Friendship.CONFIRMED) throw FriendshipNotConfirmedException
+        if (friendsTable.getFriendship(currentUserId, targetUserId) != Friendship.CONFIRMED) throw FriendshipNotConfirmedException
 
-        FriendsTable.deleteFriendship(currentUserId, targetUserId)
+        friendsTable.deleteFriendship(currentUserId, targetUserId)
 
         return@transaction Friendship.NONE
     }
@@ -42,9 +48,9 @@ class FriendsUCImpl(private val db: Database, private val userTable: UserTable) 
     override fun acceptRequest(currentUserId: Int, targetUserId: Int): Friendship = transaction(db) {
         if (currentUserId == targetUserId) throw SelfFriendshipException
         if (!userTable.userExists(targetUserId)) throw TargetUserDoesNotExistException
-        if (FriendsTable.getFriendship(currentUserId, targetUserId) != Friendship.REQUEST_RECEIVED) throw FriendshipNotRequestReceivedException
+        if (friendsTable.getFriendship(currentUserId, targetUserId) != Friendship.REQUEST_RECEIVED) throw FriendshipNotRequestReceivedException
 
-        FriendsTable.confirmRequest(currentUserId, targetUserId)
+        friendsTable.confirmRequest(currentUserId, targetUserId)
 
         return@transaction Friendship.CONFIRMED
     }
@@ -52,9 +58,9 @@ class FriendsUCImpl(private val db: Database, private val userTable: UserTable) 
     override fun cancelRequest(currentUserId: Int, targetUserId: Int): Friendship = transaction(db) {
         if (currentUserId == targetUserId) throw SelfFriendshipException
         if (!userTable.userExists(targetUserId)) throw TargetUserDoesNotExistException
-        if (FriendsTable.getFriendship(currentUserId, targetUserId) != Friendship.REQUEST_SENT) throw FriendshipNotRequestSentException
+        if (friendsTable.getFriendship(currentUserId, targetUserId) != Friendship.REQUEST_SENT) throw FriendshipNotRequestSentException
 
-        FriendsTable.cancelRequest(currentUserId, targetUserId)
+        friendsTable.cancelRequest(currentUserId, targetUserId)
 
         return@transaction Friendship.NONE
     }
