@@ -61,6 +61,7 @@ class RegisterUserUCImpl(
     private val dexTable: DexTable,
     private val marketTable: MarketTable,
     private val marketInventoryTable: MarketInventoryTable,
+    private val plotTable: PlotTable,
     private val squadTable: SquadTable,
 ) : RegisterUserUC {
 
@@ -135,7 +136,7 @@ class RegisterUserUCImpl(
             }
 
             /* Create user farm */
-            PlotTable.createAndGetEmptyPlot(userId)
+            plotTable.createAndGetEmptyPlot(userId)
 
             return@transaction Result.Success(userId)
         }

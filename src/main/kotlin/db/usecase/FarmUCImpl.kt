@@ -15,21 +15,29 @@ import com.bitwiserain.pbbg.domain.model.farm.IMaterializedPlant
 import com.bitwiserain.pbbg.domain.model.farm.MaterializedPlant
 import com.bitwiserain.pbbg.domain.model.farm.Plot
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
-import com.bitwiserain.pbbg.domain.usecase.*
+import com.bitwiserain.pbbg.domain.usecase.EmptyPlotException
+import com.bitwiserain.pbbg.domain.usecase.FarmUC
+import com.bitwiserain.pbbg.domain.usecase.InsufficientItemQuantity
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotFoundException
+import com.bitwiserain.pbbg.domain.usecase.ItemNotPlantableException
+import com.bitwiserain.pbbg.domain.usecase.OccupiedPlotException
+import com.bitwiserain.pbbg.domain.usecase.PlantNotHarvestableException
+import com.bitwiserain.pbbg.domain.usecase.UserPlotNotFoundException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Clock
 
-class FarmUCImpl(private val db: Database, private val clock: Clock, private val dexTable: DexTable) : FarmUC {
+class FarmUCImpl(private val db: Database, private val clock: Clock, private val dexTable: DexTable, private val plotTable: PlotTable) : FarmUC {
+
     override fun getPlots(userId: Int): List<Plot> = transaction(db) {
-        return@transaction PlotTable.getPlots(userId)
+        return@transaction plotTable.getPlots(userId)
     }
 
     override fun plant(userId: Int, plotId: Long, itemId: Long): Plot = transaction(db) {
         val now = clock.instant()
 
         /* Make sure user owns this plot */
-        val plot = PlotTable.getPlot(userId, plotId) ?: throw UserPlotNotFoundException()
+        val plot = plotTable.getPlot(userId, plotId) ?: throw UserPlotNotFoundException()
 
         /* Make sure plot is empty */
         if (plot.plant != null) throw OccupiedPlotException()
@@ -52,7 +60,7 @@ class FarmUCImpl(private val db: Database, private val clock: Clock, private val
         ))
 
         /* Update plot that was planted into */
-        PlotTable.updatePlot(userId, plot.id, plantId)
+        plotTable.updatePlot(userId, plot.id, plantId)
 
         /* Remove plantable item that was used */
         if (item is MaterializedItem.Stackable) {
@@ -61,14 +69,14 @@ class FarmUCImpl(private val db: Database, private val clock: Clock, private val
             InventoryTable.removeItem(userId, itemId)
         }
 
-        return@transaction PlotTable.getPlot(userId, plot.id)!!
+        return@transaction plotTable.getPlot(userId, plot.id)!!
     }
 
     override fun harvest(userId: Int, plotId: Long): Plot = transaction(db) {
         val now = clock.instant()
 
         /* Make sure user owns this plot */
-        val plot = PlotTable.getPlot(userId, plotId) ?: throw UserPlotNotFoundException()
+        val plot = plotTable.getPlot(userId, plotId) ?: throw UserPlotNotFoundException()
 
         /* Make sure plot is not empty */
         val (plantId, plant) = plot.plant ?: throw EmptyPlotException()
@@ -106,6 +114,6 @@ class FarmUCImpl(private val db: Database, private val clock: Clock, private val
     }
 
     override fun expand(userId: Int): Plot = transaction(db) {
-        return@transaction PlotTable.createAndGetEmptyPlot(userId)
+        return@transaction plotTable.createAndGetEmptyPlot(userId)
     }
 }
