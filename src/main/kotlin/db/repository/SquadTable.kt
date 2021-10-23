@@ -27,26 +27,26 @@ class SquadTableImpl : SquadTable {
     object Exposed : LongIdTable(name = "Squad") {
 
         val user = reference("user_id", UserTableImpl.Exposed)
-        val unit = reference("unit_id", UnitTable)
+        val unit = reference("unit_id", UnitTableImpl.Exposed)
     }
 
     override fun getAlly(userId: Int, allyId: Long): MyUnit? = Exposed
-        .innerJoin(UnitTable)
-        .slice(UnitTable.columns)
-        .select { Exposed.user.eq(userId) and UnitTable.id.eq(allyId) }
+        .innerJoin(UnitTableImpl.Exposed)
+        .slice(UnitTableImpl.Exposed.columns)
+        .select { Exposed.user.eq(userId) and UnitTableImpl.Exposed.id.eq(allyId) }
         .singleOrNull()
         ?.toMyUnit()
 
     override fun getAllies(userId: Int): List<MyUnit> = Exposed
-        .innerJoin(UnitTable)
-        .slice(UnitTable.columns)
+        .innerJoin(UnitTableImpl.Exposed)
+        .slice(UnitTableImpl.Exposed.columns)
         .select { Exposed.user.eq(userId) }
         .map { it.toMyUnit() }
 
     override fun insertUnits(userId: Int, unitIds: Iterable<Long>) {
         Exposed.batchInsert(unitIds) { unitId ->
             this[Exposed.user] = EntityID(userId, UserTableImpl.Exposed)
-            this[Exposed.unit] = EntityID(unitId, UnitTable)
+            this[Exposed.unit] = EntityID(unitId, UnitTableImpl.Exposed)
         }
     }
 }

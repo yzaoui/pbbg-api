@@ -1,7 +1,7 @@
 package com.bitwiserain.pbbg.db.repository.battle
 
-import com.bitwiserain.pbbg.db.repository.UnitForm
-import com.bitwiserain.pbbg.db.repository.UnitTable
+import com.bitwiserain.pbbg.db.repository.UnitTable.UnitForm
+import com.bitwiserain.pbbg.db.repository.UnitTableImpl
 import com.bitwiserain.pbbg.db.repository.toMyUnit
 import com.bitwiserain.pbbg.domain.model.MyUnit
 import org.jetbrains.exposed.dao.id.EntityID
@@ -24,9 +24,9 @@ interface BattleEnemyTable {
     fun getEnemies(battleSession: Long): List<MyUnit>
 
     /**
-     * Inserts new enemy units into a battle session.
+     * Inserts new enemy unit into a battle session.
      */
-    fun insertEnemies(battleSession: Long, enemies: List<UnitForm>)
+    fun insertEnemy(battleSession: Long, enemy: UnitForm, unitId: Long)
 }
 
 class BattleEnemyTableImpl : BattleEnemyTable {
@@ -34,35 +34,28 @@ class BattleEnemyTableImpl : BattleEnemyTable {
     object Exposed : Table(name = "BattleEnemy") {
 
         val battle = reference("battle_session_id", BattleSessionTableImpl.Exposed, ReferenceOption.CASCADE)
-        val unit = reference("unit_id", UnitTable, ReferenceOption.CASCADE)
+        val unit = reference("unit_id", UnitTableImpl.Exposed, ReferenceOption.CASCADE)
     }
 
     override fun getEnemy(battleSession: Long, enemyId: Long): MyUnit? {
-        return Exposed.innerJoin(UnitTable)
-            .slice(UnitTable.columns)
-            .select { Exposed.battle.eq(battleSession) and UnitTable.id.eq(enemyId) }
+        return Exposed.innerJoin(UnitTableImpl.Exposed)
+            .slice(UnitTableImpl.Exposed.columns)
+            .select { Exposed.battle.eq(battleSession) and UnitTableImpl.Exposed.id.eq(enemyId) }
             .singleOrNull()
             ?.toMyUnit()
     }
 
     override fun getEnemies(battleSession: Long): List<MyUnit> {
-        return Exposed.innerJoin(UnitTable)
-            .slice(UnitTable.columns)
+        return Exposed.innerJoin(UnitTableImpl.Exposed)
+            .slice(UnitTableImpl.Exposed.columns)
             .select { Exposed.battle.eq(battleSession) }
             .map { it.toMyUnit() }
     }
 
-    override fun insertEnemies(battleSession: Long, enemies: List<UnitForm>) {
-        // TODO: There's gotta be a way to do this in batch :/
-        for (enemy in enemies) {
-            // Create enemy unit in unit table
-            val enemyId = UnitTable.insertUnitAndGetId(enemy)
-
-            // Connect newly created enemy to this battle session
-            Exposed.insert {
-                it[Exposed.battle] = EntityID(battleSession, BattleSessionTableImpl.Exposed)
-                it[Exposed.unit] = EntityID(enemyId, UnitTable)
-            }
+    override fun insertEnemy(battleSession: Long, enemy: UnitForm, unitId: Long) {
+        Exposed.insert {
+            it[Exposed.battle] = EntityID(battleSession, BattleSessionTableImpl.Exposed)
+            it[Exposed.unit] = EntityID(unitId, UnitTableImpl.Exposed)
         }
     }
 }

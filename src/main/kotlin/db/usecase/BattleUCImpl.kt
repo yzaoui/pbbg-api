@@ -1,8 +1,9 @@
 package com.bitwiserain.pbbg.db.usecase
 
 import com.bitwiserain.pbbg.db.repository.SquadTable
-import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
+import com.bitwiserain.pbbg.db.repository.UnitTable.UnitForm
+import com.bitwiserain.pbbg.db.repository.UnitTableImpl
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
 import com.bitwiserain.pbbg.db.repository.execAndMap
@@ -21,6 +22,7 @@ class BattleUCImpl(
     private val battleEnemyTable: BattleEnemyTable,
     private val battleSessionTable: BattleSessionTable,
     private val squadTable: SquadTable,
+    private val unitTable: UnitTable,
 ) : BattleUC {
 
     override fun getCurrentBattle(userId: Int): Battle? = transaction(db) {
@@ -44,7 +46,13 @@ class BattleUCImpl(
         for (i in 0 until (1..3).random()) {
             newEnemies.add(UnitForm(MyUnitEnum.values().random(), (7..14).random(), (5..7).random(), (5..7).random(), (6..8).random(), (4..7).random()))
         }
-        battleEnemyTable.insertEnemies(battleSession, newEnemies)
+        // TODO: There's gotta be a way to do this in batch :/
+        for (enemy in newEnemies) {
+            // Create enemy unit in unit table
+            val unitId = unitTable.insertUnitAndGetId(enemy)
+            // Connect newly created enemy to this battle session
+            battleEnemyTable.insertEnemy(battleSession, enemy, unitId)
+        }
 
         val enemies = battleEnemyTable.getEnemies(battleSession)
 
@@ -101,7 +109,7 @@ class BattleUCImpl(
         when (action) {
             is BattleAction.Attack -> {
                 // Unit should exist
-                val target = UnitTable.getUnit(action.targetUnitId) ?: throw Exception()
+                val target = unitTable.getUnit(action.targetUnitId) ?: throw Exception()
                 // Can't attack self
                 if (target.id == actingUnit.id) throw Exception()
                 // Can't attack units not in this battle
@@ -110,12 +118,12 @@ class BattleUCImpl(
                 if (target.dead) throw Exception()
 
                 val (updatedTarget, damage) = target.receiveDamage(actingUnit.atk)
-                UnitTable.updateUnit(target.id, updatedTarget)
+                unitTable.updateUnit(target.id, updatedTarget)
 
                 // Gain experience if target is defeated
                 if (updatedTarget.dead) {
                     val updatedActingUnit = actingUnit.gainExperience(2L)
-                    UnitTable.updateUnit(actingUnit.id, updatedActingUnit)
+                    unitTable.updateUnit(actingUnit.id, updatedActingUnit)
 
                     unitsToRemove.add(target.id)
                 }
@@ -154,6 +162,6 @@ class BattleUCImpl(
 
         battleSessionTable.deleteBattle(battleSession)
 
-        "DELETE FROM ${UnitTable.tableName} WHERE ${UnitTable.id.name} IN ($enemyIdCSV)".execAndMap {}
+        "DELETE FROM ${UnitTableImpl.Exposed.tableName} WHERE ${UnitTableImpl.Exposed.id.name} IN ($enemyIdCSV)".execAndMap {}
     }
 }

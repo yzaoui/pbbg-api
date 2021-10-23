@@ -10,8 +10,8 @@ import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.ItemHistoryTable
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.db.repository.SquadTable
-import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
+import com.bitwiserain.pbbg.db.repository.UnitTable.UnitForm
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.farm.PlotTable
@@ -66,6 +66,7 @@ class RegisterUserUCImpl(
     private val materializedItemTable: MaterializedItemTable,
     private val plotTable: PlotTable,
     private val squadTable: SquadTable,
+    private val unitTable: UnitTable,
     private val userTable: UserTable,
     private val userStatsTable: UserStatsTable,
 ) : RegisterUserUC {
@@ -134,7 +135,7 @@ class RegisterUserUCImpl(
                 UnitForm(MyUnitEnum.TWOLIP, MyUnitEnum.TWOLIP.baseHP, MyUnitEnum.TWOLIP.baseAtk, MyUnitEnum.TWOLIP.baseDef, MyUnitEnum.TWOLIP.baseInt, MyUnitEnum.TWOLIP.baseRes)
             ).map {
                 // Create initial units
-                UnitTable.insertUnitAndGetId(it)
+                unitTable.insertUnitAndGetId(it)
             }.also {
                 // Add them to new user's squad
                 squadTable.insertUnits(userId, it)

@@ -2,8 +2,8 @@ package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.SquadTableImpl
-import com.bitwiserain.pbbg.db.repository.UnitForm
-import com.bitwiserain.pbbg.db.repository.UnitTable
+import com.bitwiserain.pbbg.db.repository.UnitTable.UnitForm
+import com.bitwiserain.pbbg.db.repository.UnitTableImpl
 import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTableImpl
 import com.bitwiserain.pbbg.db.usecase.UnitUCImpl
@@ -27,8 +27,9 @@ class UnitUCImplTests {
     private val db = initDatabase()
     private val battleSessionTable = BattleSessionTableImpl()
     private val squadTable = SquadTableImpl()
+    private val unitTable = UnitTableImpl()
     private val userTable = UserTableImpl()
-    private val unitUC: UnitUC = UnitUCImpl(db, battleSessionTable, squadTable)
+    private val unitUC: UnitUC = UnitUCImpl(db, battleSessionTable, squadTable, unitTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -56,7 +57,7 @@ class UnitUCImplTests {
 
         val healedUnits = transaction(db) {
             // Damage all units
-            units.forEach { UnitTable.updateUnit(it.id, it.receiveDamage(4).updatedUnit) }
+            units.forEach { unitTable.updateUnit(it.id, it.receiveDamage(4).updatedUnit) }
 
             unitUC.healSquad(userId)
 
@@ -80,15 +81,13 @@ class UnitUCImplTests {
     }
 
     private fun createUnitsAndSquad(userId: Int) = transaction(db) {
-        transaction(db) {
-            listOf(
-                UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1, 1, 1),
-                UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2, 1, 1),
-                UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1, 1, 1)
-            )
-                .map { UnitTable.insertUnitAndGetId(it) }
-                .also { squadTable.insertUnits(userId, it) }
-                .map { UnitTable.getUnit(it)!! }
-        }
+        listOf(
+            UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1, 1, 1),
+            UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2, 1, 1),
+            UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1, 1, 1)
+        )
+            .map { unitTable.insertUnitAndGetId(it) }
+            .also { squadTable.insertUnits(userId, it) }
+            .map { unitTable.getUnit(it)!! }
     }
 }

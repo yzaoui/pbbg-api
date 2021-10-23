@@ -2,8 +2,8 @@ package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.SquadTableImpl
-import com.bitwiserain.pbbg.db.repository.UnitForm
-import com.bitwiserain.pbbg.db.repository.UnitTable
+import com.bitwiserain.pbbg.db.repository.UnitTable.UnitForm
+import com.bitwiserain.pbbg.db.repository.UnitTableImpl
 import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.db.repository.battle.BattleEnemyTableImpl
 import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTableImpl
@@ -32,8 +32,9 @@ class BattleUCImplTests {
     private val battleEnemyTable = BattleEnemyTableImpl()
     private val battleSessionTable = BattleSessionTableImpl()
     private val squadTable = SquadTableImpl()
+    private val unitTable = UnitTableImpl()
     private val userTable = UserTableImpl()
-    private val battleUC: BattleUC = BattleUCImpl(db, battleEnemyTable, battleSessionTable, squadTable)
+    private val battleUC: BattleUC = BattleUCImpl(db, battleEnemyTable, battleSessionTable, squadTable, unitTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -91,12 +92,12 @@ class BattleUCImplTests {
 
             transaction(db) {
                 listOf(UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1, 1, 1))
-                    .map { UnitTable.insertUnitAndGetId(it) }
+                    .map { unitTable.insertUnitAndGetId(it) }
                     .also { squadTable.insertUnits(userId, it) }
                 val allies = squadTable.getAllies(userId)
 
                 // Kill the only unit in squad
-                UnitTable.updateUnit(allies[0].id, allies[0].receiveDamage(allies[0].hp).updatedUnit)
+                unitTable.updateUnit(allies[0].id, allies[0].receiveDamage(allies[0].hp).updatedUnit)
             }
 
             // Attempt to generate battle with a wiped out squad
@@ -135,7 +136,7 @@ class BattleUCImplTests {
             UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 1, 1, 1),
             UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1, 1, 1)
         ).map {
-            UnitTable.insertUnitAndGetId(it)
+            unitTable.insertUnitAndGetId(it)
         }.also {
             squadTable.insertUnits(userId, it)
         }
