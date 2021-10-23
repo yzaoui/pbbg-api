@@ -8,7 +8,9 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
-fun storeInInventoryReturnItemID(db: Database, now: Instant, userId: Int, itemToStore: MaterializedItem, historyInfo: ItemHistoryInfo): Long = transaction(db) {
+fun storeInInventoryReturnItemID(
+    db: Database, now: Instant, userId: Int, itemToStore: MaterializedItem, historyInfo: ItemHistoryInfo, dexTable: DexTable
+): Long = transaction(db) {
     val heldItems = Joins.getHeldItemsOfBaseKind(userId, itemToStore.enum)
 
     val itemId: Long
@@ -35,7 +37,7 @@ fun storeInInventoryReturnItemID(db: Database, now: Instant, userId: Int, itemTo
     /*************************************************
      * Update user's dex to check off this item type *
      *************************************************/
-    if (!DexTable.hasEntry(userId, itemToStore.enum)) DexTable.insertDiscovered(userId, itemToStore.enum)
+    if (!dexTable.hasEntry(userId, itemToStore.enum)) dexTable.insertDiscovered(userId, itemToStore.enum)
 
     itemId
 }

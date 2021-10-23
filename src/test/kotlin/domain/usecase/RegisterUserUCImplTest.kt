@@ -5,6 +5,7 @@ import com.bitwiserain.pbbg.PASSWORD_REGEX_DESCRIPTION
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.USERNAME_REGEX
 import com.bitwiserain.pbbg.USERNAME_REGEX_DESCRIPTION
+import com.bitwiserain.pbbg.db.repository.DexTableImpl
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.SquadTable
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
@@ -30,7 +31,8 @@ class RegisterUserUCImplTest {
 
     private val db = initDatabase()
     private val clock = MutableClock()
-    private val registerUser = RegisterUserUCImpl(db, clock)
+    private val dexTable = DexTableImpl()
+    private val registerUser = RegisterUserUCImpl(db, clock, dexTable)
 
     @AfterEach
     fun dropDatabase() {

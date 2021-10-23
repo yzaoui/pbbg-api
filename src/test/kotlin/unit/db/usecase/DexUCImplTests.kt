@@ -2,6 +2,7 @@ package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.db.repository.DexTable
+import com.bitwiserain.pbbg.db.repository.DexTableImpl
 import com.bitwiserain.pbbg.db.usecase.DexUCImpl
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
@@ -20,8 +21,10 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class DexUCImplTests {
+
     private val db = initDatabase()
-    private val dexUC: DexUC = DexUCImpl(db)
+    private val dexTable = DexTableImpl()
+    private val dexUC: DexUC = DexUCImpl(db, dexTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -37,7 +40,7 @@ class DexUCImplTests {
             val discoveredItemEnums = setOf(ItemEnum.COPPER_ORE, ItemEnum.ICE_PICK)
 
             transaction(db) {
-                DexTable.insertDiscovered(userId, discoveredItemEnums)
+                dexTable.insertDiscovered(userId, discoveredItemEnums)
             }
 
             val dexItems = dexUC.getDexItems(userId)
@@ -64,7 +67,7 @@ class DexUCImplTests {
             val discoveredItem = BaseItem.Material.Coal
 
             transaction(db) {
-                DexTable.insertDiscovered(userId, discoveredItem.enum)
+                dexTable.insertDiscovered(userId, discoveredItem.enum)
             }
 
             val dexItem = dexUC.getIndividualDexBaseItem(userId, discoveredItem.id)

@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.db.usecase
 
+import com.bitwiserain.pbbg.db.repository.DexTable
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
@@ -19,7 +20,7 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Clock
 
-class FarmUCImpl(private val db: Database, private val clock: Clock) : FarmUC {
+class FarmUCImpl(private val db: Database, private val clock: Clock, private val dexTable: DexTable) : FarmUC {
     override fun getPlots(userId: Int): List<Plot> = transaction(db) {
         return@transaction PlotTable.getPlots(userId)
     }
@@ -80,7 +81,7 @@ class FarmUCImpl(private val db: Database, private val clock: Clock) : FarmUC {
             is MaterializedPlant.AppleTree -> MaterializedItem.Apple(1)
             is MaterializedPlant.TomatoPlant -> MaterializedItem.Tomato(1)
         }
-        storeInInventoryReturnItemID(db, now, userId, crop, ItemHistoryInfo.FirstHarvested(userId))
+        storeInInventoryReturnItemID(db, now, userId, crop, ItemHistoryInfo.FirstHarvested(userId), dexTable)
 
         /* Gain farming exp */
         val currentFarmingExp = UserStatsTable.getUserStats(userId).farmingExp

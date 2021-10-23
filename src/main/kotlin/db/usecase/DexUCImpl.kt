@@ -16,9 +16,9 @@ import com.bitwiserain.pbbg.domain.usecase.InvalidUnitException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class DexUCImpl(private val db: Database) : DexUC {
+class DexUCImpl(private val db: Database, private val dexTable: DexTable) : DexUC {
     override fun getDexItems(userId: Int): DexItems = transaction(db) {
-        val discoveredItems = DexTable.getDiscovered(userId)
+        val discoveredItems = dexTable.getDiscovered(userId)
 
         return@transaction DexItems(
             discoveredItems = discoveredItems,
@@ -32,7 +32,7 @@ class DexUCImpl(private val db: Database) : DexUC {
 
         val enum = ItemEnum.values()[itemEnumOrdinal]
 
-        if (!DexTable.hasEntry(userId, enum)) return@transaction DexItem.UndiscoveredDexItem(itemId)
+        if (!dexTable.hasEntry(userId, enum)) return@transaction DexItem.UndiscoveredDexItem(itemId)
 
         return@transaction DexItem.DiscoveredDexItem(enum.baseItem)
     }

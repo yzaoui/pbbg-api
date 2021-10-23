@@ -15,7 +15,7 @@ import com.bitwiserain.pbbg.domain.usecase.NotEnoughGoldException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class MarketUCImpl(private val db: Database) : MarketUC {
+class MarketUCImpl(private val db: Database, private val dexTable: DexTable) : MarketUC {
     override fun getMarkets(userId: Int): UserAndGameMarkets = transaction(db) {
         val gold = UserStatsTable.getUserStats(userId).gold
 
@@ -38,7 +38,7 @@ class MarketUCImpl(private val db: Database) : MarketUC {
         var gold = UserStatsTable.getUserStats(userId).gold
         val userMarket = Joins.getInventoryItems(userId).toMutableMap()
         val gameMarket = Joins.Market.getItems(userId).toMutableMap()
-        val dex = DexTable.getDiscovered(userId)
+        val dex = dexTable.getDiscovered(userId)
 
         val userItemsToInsert = mutableMapOf<Long, BaseItem>()
         val userStackableItemsToCreate = mutableListOf<MaterializedItem.Stackable>()
@@ -109,7 +109,7 @@ class MarketUCImpl(private val db: Database) : MarketUC {
         /* Insert items into user's inventory */
         InventoryTable.insertItems(userId, userItemsToInsert)
         /* Insert items into user's dex */
-        DexTable.insertDiscovered(userId, dexItemsToInsert)
+        dexTable.insertDiscovered(userId, dexItemsToInsert)
         /* Update quantity of user's items */
         userItemsToUpdateQuantity.forEach { MaterializedItemTable.updateQuantity(it.key, it.value) }
         /* Remove game's items */

@@ -4,7 +4,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.bitwiserain.pbbg.db.model.User
-import com.bitwiserain.pbbg.db.repository.DexTable
+import com.bitwiserain.pbbg.db.repository.DexTableImpl
 import com.bitwiserain.pbbg.db.repository.FriendsTable
 import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.ItemHistoryTable
@@ -116,19 +116,22 @@ fun Application.mainWithDependencies(clock: Clock) {
 
     install(CallLogging)
 
+    // Tables
+    val dexTable = DexTableImpl()
+
     val getUserStats = GetUserStatsUCImpl(db)
     val changePassword = ChangePasswordUCImpl(db)
-    val registerUser = RegisterUserUCImpl(db, clock)
+    val registerUser = RegisterUserUCImpl(db, clock, dexTable)
     val login = LoginUCImpl(db)
-    val marketUC = MarketUCImpl(db)
+    val marketUC = MarketUCImpl(db, dexTable)
     val inventoryUC = InventoryUCImpl(db)
     val itemUC = ItemUCImpl(db)
-    val miningUC = MiningUCImpl(db, clock)
-    val farmUC = FarmUCImpl(db, clock)
+    val miningUC = MiningUCImpl(db, clock, dexTable)
+    val farmUC = FarmUCImpl(db, clock, dexTable)
     val equipmentUC = EquipmentUCImpl(db)
     val unitUC = UnitUCImpl(db)
     val battleUC = BattleUCImpl(db)
-    val dexUC = DexUCImpl(db)
+    val dexUC = DexUCImpl(db, dexTable)
     val userProfileUC = UserProfileUCImpl(db)
     val friendsUC = FriendsUCImpl(db)
     val aboutUC = AboutUCImpl()
@@ -241,7 +244,7 @@ object SchemaHelper {
     fun createTables(db: Database) = transaction(db) {
         SchemaUtils.create(
             UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable,
-            SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable,
+            SquadTable, BattleSessionTable, BattleEnemyTable, DexTableImpl.Exposed, MarketTable, MarketInventoryTable, ItemHistoryTable,
             PlotTable, MaterializedPlantTable, FriendsTable
         )
     }
@@ -249,7 +252,7 @@ object SchemaHelper {
     fun dropTables(db: Database) = transaction(db) {
         SchemaUtils.drop(
             UserTable, MineSessionTable, MineCellTable, MaterializedItemTable, InventoryTable, UserStatsTable, UnitTable,
-            SquadTable, BattleSessionTable, BattleEnemyTable, DexTable, MarketTable, MarketInventoryTable, ItemHistoryTable,
+            SquadTable, BattleSessionTable, BattleEnemyTable, DexTableImpl.Exposed, MarketTable, MarketInventoryTable, ItemHistoryTable,
             PlotTable, MaterializedPlantTable, FriendsTable
         )
     }

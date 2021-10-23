@@ -55,7 +55,7 @@ interface RegisterUserUC {
     }
 }
 
-class RegisterUserUCImpl(private val db: Database, private val clock: Clock) : RegisterUserUC {
+class RegisterUserUCImpl(private val db: Database, private val clock: Clock, private val dexTable: DexTable) : RegisterUserUC {
 
     override fun invoke(username: String, password: String): Result {
         /* Make sure username & password are valid */
@@ -95,7 +95,7 @@ class RegisterUserUCImpl(private val db: Database, private val clock: Clock) : R
                     )
                 )
                 InventoryTable.insertItem(userId, itemId, item.base)
-                DexTable.insertDiscovered(userId, item.enum)
+                dexTable.insertDiscovered(userId, item.enum)
             }
 
             /* Create user's market */
