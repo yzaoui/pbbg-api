@@ -12,10 +12,10 @@ interface GetUserStatsUC {
     operator fun invoke(userId: Int): UserStats
 }
 
-class GetUserStatsUCImpl(private val db: Database) : GetUserStatsUC {
+class GetUserStatsUCImpl(private val db: Database, private val userStatsTable: UserStatsTable) : GetUserStatsUC {
 
     override fun invoke(userId: Int): UserStats = transaction(db) {
         // TODO: Consider checking if user exists
-        UserStatsTable.getUserStats(userId)
+        userStatsTable.getUserStats(userId)
     }
 }

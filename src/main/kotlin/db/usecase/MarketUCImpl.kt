@@ -25,10 +25,11 @@ class MarketUCImpl(
     private val inventoryTable: InventoryTable,
     private val marketInventoryTable: MarketInventoryTable,
     private val materializedItemTable: MaterializedItemTable,
+    private val userStatsTable: UserStatsTable,
 ) : MarketUC {
 
     override fun getMarkets(userId: Int): UserAndGameMarkets = transaction(db) {
-        val gold = UserStatsTable.getUserStats(userId).gold
+        val gold = userStatsTable.getUserStats(userId).gold
 
         val userMarket = Market(
             Joins.getInventoryItems(userId)
@@ -46,7 +47,7 @@ class MarketUCImpl(
     }
 
     override fun buy(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction(db) {
-        var gold = UserStatsTable.getUserStats(userId).gold
+        var gold = userStatsTable.getUserStats(userId).gold
         val userMarket = Joins.getInventoryItems(userId).toMutableMap()
         val gameMarket = Joins.Market.getItems(userId).toMutableMap()
         val dex = dexTable.getDiscovered(userId)
@@ -109,7 +110,7 @@ class MarketUCImpl(
         if (gold < 0) throw NotEnoughGoldException()
 
         /* Update user gold */
-        UserStatsTable.updateGold(userId, gold)
+        userStatsTable.updateGold(userId, gold)
 
         /* Create new materialized items */
         userStackableItemsToCreate.forEach {
@@ -144,7 +145,7 @@ class MarketUCImpl(
     }
 
     override fun sell(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction(db) {
-        var gold = UserStatsTable.getUserStats(userId).gold
+        var gold = userStatsTable.getUserStats(userId).gold
         val userMarket = Joins.getInventoryItems(userId).toMutableMap()
         val gameMarket = Joins.Market.getItems(userId).toMutableMap()
 
@@ -196,7 +197,7 @@ class MarketUCImpl(
         }
 
         /* Update user gold */
-        UserStatsTable.updateGold(userId, gold)
+        userStatsTable.updateGold(userId, gold)
 
         /* Create new materialized items */
         gameStackableItemsToCreate.forEach {

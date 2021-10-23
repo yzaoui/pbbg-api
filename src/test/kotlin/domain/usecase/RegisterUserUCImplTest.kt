@@ -11,7 +11,7 @@ import com.bitwiserain.pbbg.db.repository.ItemHistoryTableImpl
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
 import com.bitwiserain.pbbg.db.repository.SquadTableImpl
-import com.bitwiserain.pbbg.db.repository.UserStatsTable
+import com.bitwiserain.pbbg.db.repository.UserStatsTableImpl
 import com.bitwiserain.pbbg.db.repository.farm.PlotTableImpl
 import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTableImpl
 import com.bitwiserain.pbbg.db.repository.market.MarketTableImpl
@@ -45,8 +45,9 @@ class RegisterUserUCImplTest {
     private val materializedItemTable = MaterializedItemTableImpl()
     private val plotTable = PlotTableImpl()
     private val squadTable = SquadTableImpl()
+    private val userStatsTable = UserStatsTableImpl()
     private val registerUser = RegisterUserUCImpl(
-        db, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable
+        db, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable, userStatsTable
     )
 
     @AfterEach
@@ -60,7 +61,7 @@ class RegisterUserUCImplTest {
         fun `When registering a new user, the user should have 0 gold, 0 mining exp, and 0 farming exp`() {
             val userId = (registerUser("username", "password") as Result.Success).userId
 
-            val stats = transaction(db) { UserStatsTable.getUserStats(userId) }
+            val stats = transaction(db) { userStatsTable.getUserStats(userId) }
 
             assertSoftly(stats) {
                 gold shouldBe 0

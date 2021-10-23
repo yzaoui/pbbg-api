@@ -28,7 +28,6 @@ import com.bitwiserain.pbbg.domain.usecase.NoEquippedPickaxeException
 import com.bitwiserain.pbbg.domain.usecase.NotInMineSessionException
 import com.bitwiserain.pbbg.domain.usecase.UnfulfilledLevelRequirementException
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Clock
 import kotlin.random.Random
@@ -42,6 +41,7 @@ class MiningUCImpl(
     private val materializedItemTable: MaterializedItemTable,
     private val mineCellTable: MineCellTable,
     private val mineSessionTable: MineSessionTable,
+    private val userStatsTable: UserStatsTable,
 ) : MiningUC {
 
     override fun getMine(userId: Int): Mine? = transaction(db) {
@@ -73,9 +73,8 @@ class MiningUCImpl(
         }
 
         transaction(db) {
-            val userMiningExp = UserStatsTable.select { UserStatsTable.userId.eq(userId) }
-                .single()
-                .get(UserStatsTable.miningExp)
+
+            val userMiningExp = userStatsTable.getUserStats(userId).miningExp
 
             val userMiningProgress = MiningExperienceManager.getLevelProgress(userMiningExp)
 
@@ -144,14 +143,14 @@ class MiningUCImpl(
         // Remove mined cells from database
         mineCellTable.deleteCells(reachableCellsWithContent.map { it.id })
 
-        val userCurrentMiningExp = UserStatsTable.getUserStats(userId).miningExp
+        val userCurrentMiningExp = userStatsTable.getUserStats(userId).miningExp
 
         val currentLevelProgress = MiningExperienceManager.getLevelProgress(userCurrentMiningExp)
         val newLevelProgress = MiningExperienceManager.getLevelProgress(userCurrentMiningExp + totalExp)
 
         // Increase user's mining experience from this mining operation if progress was made
         if (currentLevelProgress != newLevelProgress) {
-            UserStatsTable.updateMiningExp(userId, newLevelProgress.absoluteExp)
+            userStatsTable.updateMiningExp(userId, newLevelProgress.absoluteExp)
         }
 
         MineActionResult(
@@ -164,9 +163,7 @@ class MiningUCImpl(
 
     override fun getAvailableMines(userId: Int): AvailableMines {
         val userMiningLevel = transaction(db) {
-            UserStatsTable.select { UserStatsTable.userId.eq(userId) }
-                .single()
-                .get(UserStatsTable.miningExp)
+            userStatsTable.getUserStats(userId).miningExp
         }.let { exp ->
             MiningExperienceManager.getLevelProgress(exp)
         }.level

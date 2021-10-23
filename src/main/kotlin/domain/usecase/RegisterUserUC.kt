@@ -66,6 +66,7 @@ class RegisterUserUCImpl(
     private val materializedItemTable: MaterializedItemTable,
     private val plotTable: PlotTable,
     private val squadTable: SquadTable,
+    private val userStatsTable: UserStatsTable,
 ) : RegisterUserUC {
 
     override fun invoke(username: String, password: String): Result {
@@ -93,7 +94,7 @@ class RegisterUserUCImpl(
             )
 
             /* Create user stats */
-            UserStatsTable.createUserStats(userId)
+            userStatsTable.createUserStats(userId)
 
             /* Add ice pick, apple saplings, tomato seeds to inventory */
             listOf(MaterializedItem.IcePick, MaterializedItem.AppleSapling(2), MaterializedItem.TomatoSeed(5)).forEach { item ->

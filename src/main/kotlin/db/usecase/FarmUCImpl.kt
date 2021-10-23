@@ -36,7 +36,8 @@ class FarmUCImpl(
     private val itemHistoryTable: ItemHistoryTable,
     private val materializedItemTable: MaterializedItemTable,
     private val materializedPlantTable: MaterializedPlantTable,
-    private val plotTable: PlotTable
+    private val plotTable: PlotTable,
+    private val userStatsTable: UserStatsTable,
 ) : FarmUC {
 
     override fun getPlots(userId: Int): List<Plot> = transaction(db) {
@@ -102,8 +103,8 @@ class FarmUCImpl(
         storeInInventoryReturnItemID(db, now, userId, crop, ItemHistoryInfo.FirstHarvested(userId), dexTable, inventoryTable, itemHistoryTable, materializedItemTable)
 
         /* Gain farming exp */
-        val currentFarmingExp = UserStatsTable.getUserStats(userId).farmingExp
-        UserStatsTable.updateFarmingExp(userId, currentFarmingExp + 2) // TODO: Proper exp system
+        val currentFarmingExp = userStatsTable.getUserStats(userId).farmingExp
+        userStatsTable.updateFarmingExp(userId, currentFarmingExp + 2) // TODO: Proper exp system
 
         if (plant is IMaterializedPlant.Maturable) {
             /* For maturable plants, start new cycle and harvest */
