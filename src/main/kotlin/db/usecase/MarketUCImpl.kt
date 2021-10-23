@@ -15,7 +15,7 @@ import com.bitwiserain.pbbg.domain.usecase.NotEnoughGoldException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class MarketUCImpl(private val db: Database, private val dexTable: DexTable) : MarketUC {
+class MarketUCImpl(private val db: Database, private val dexTable: DexTable, private val marketInventoryTable: MarketInventoryTable) : MarketUC {
     override fun getMarkets(userId: Int): UserAndGameMarkets = transaction(db) {
         val gold = UserStatsTable.getUserStats(userId).gold
 
@@ -113,7 +113,7 @@ class MarketUCImpl(private val db: Database, private val dexTable: DexTable) : M
         /* Update quantity of user's items */
         userItemsToUpdateQuantity.forEach { MaterializedItemTable.updateQuantity(it.key, it.value) }
         /* Remove game's items */
-        MarketInventoryTable.removeItems(gameItemsToRemove)
+        marketInventoryTable.removeItems(gameItemsToRemove)
         /* Update quantity of game's items */
         gameItemsToUpdateQuantity.forEach { MaterializedItemTable.updateQuantity(it.key, it.value) }
 

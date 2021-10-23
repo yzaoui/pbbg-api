@@ -6,18 +6,33 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 
-object MarketInventoryTable: Table() {
-    val marketId = reference("market_id", MarketTable)
-    val materializedItem = reference("materialized_item", MaterializedItemTable)
+interface MarketInventoryTable {
 
-    override val primaryKey = PrimaryKey(marketId, materializedItem)
+    fun insertItem(marketId: Int, itemId: Long)
 
-    fun insertItem(marketId: Int, itemId: Long) = insert {
-        it[MarketInventoryTable.marketId] = EntityID(marketId, MarketTable)
-        it[MarketInventoryTable.materializedItem] = EntityID(itemId, MaterializedItemTable)
+    fun removeItems(itemIds: Set<Long>)
+}
+
+class MarketInventoryTableImpl : MarketInventoryTable {
+
+    object Exposed : Table(name = "MarketInventory") {
+
+        val marketId = reference("market_id", MarketTable)
+        val materializedItem = reference("materialized_item", MaterializedItemTable)
+
+        override val primaryKey = PrimaryKey(marketId, materializedItem)
     }
 
-    fun removeItems(itemIds: Set<Long>) = deleteWhere {
-        MarketInventoryTable.materializedItem.inList(itemIds)
+    override fun insertItem(marketId: Int, itemId: Long) {
+        Exposed.insert {
+            it[Exposed.marketId] = EntityID(marketId, MarketTable)
+            it[Exposed.materializedItem] = EntityID(itemId, MaterializedItemTable)
+        }
+    }
+
+    override fun removeItems(itemIds: Set<Long>) {
+        Exposed.deleteWhere {
+            Exposed.materializedItem.inList(itemIds)
+        }
     }
 }

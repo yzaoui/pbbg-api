@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.db.repository
 
-import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTable
+import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTableImpl
 import com.bitwiserain.pbbg.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.ItemEnum
@@ -40,16 +40,16 @@ object Joins {
                 .value
 
         fun getItems(userId: Int) =
-            (MarketInventoryTable innerJoin MaterializedItemTable innerJoin MarketTable)
+            (MarketInventoryTableImpl.Exposed innerJoin MaterializedItemTable innerJoin MarketTable)
                 .select { MarketTable.userId.eq(userId) }
                 .associate { it[MaterializedItemTable.id].value to it.toMaterializedItem() }
 
         fun insertItems(userId: Int, itemIds: Iterable<Long>) {
             val marketId = getMarketId(userId)
 
-            MarketInventoryTable.batchInsert(itemIds) { itemid ->
-                this[MarketInventoryTable.marketId] = EntityID(marketId, MarketTable)
-                this[MarketInventoryTable.materializedItem] = EntityID(itemid, MaterializedItemTable)
+            MarketInventoryTableImpl.Exposed.batchInsert(itemIds) { itemid ->
+                this[MarketInventoryTableImpl.Exposed.marketId] = EntityID(marketId, MarketTable)
+                this[MarketInventoryTableImpl.Exposed.materializedItem] = EntityID(itemid, MaterializedItemTable)
             }
         }
     }

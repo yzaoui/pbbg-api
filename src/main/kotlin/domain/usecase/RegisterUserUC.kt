@@ -55,7 +55,13 @@ interface RegisterUserUC {
     }
 }
 
-class RegisterUserUCImpl(private val db: Database, private val clock: Clock, private val dexTable: DexTable, private val squadTable: SquadTable) : RegisterUserUC {
+class RegisterUserUCImpl(
+    private val db: Database,
+    private val clock: Clock,
+    private val dexTable: DexTable,
+    private val marketInventoryTable: MarketInventoryTable,
+    private val squadTable: SquadTable,
+) : RegisterUserUC {
 
     override fun invoke(username: String, password: String): Result {
         /* Make sure username & password are valid */
@@ -104,7 +110,7 @@ class RegisterUserUCImpl(private val db: Database, private val clock: Clock, pri
             // Fill market with three pickaxe types
             listOf(MaterializedItem.PlusPickaxe, MaterializedItem.CrossPickaxe, MaterializedItem.SquarePickaxe).forEach { item ->
                 val itemId = MaterializedItemTable.insertItemAndGetId(item)
-                MarketInventoryTable.insertItem(marketId, itemId)
+                marketInventoryTable.insertItem(marketId, itemId)
                 ItemHistoryTable.insertItemHistory(
                     itemId = itemId,
                     itemHistory = ItemHistory(
