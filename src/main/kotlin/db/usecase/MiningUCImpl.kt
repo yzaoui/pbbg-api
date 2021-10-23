@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.db.usecase
 
-import com.bitwiserain.pbbg.db.model.MineCell
 import com.bitwiserain.pbbg.db.repository.DexTable
 import com.bitwiserain.pbbg.db.repository.Joins
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
@@ -13,19 +12,30 @@ import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem.Stackable
 import com.bitwiserain.pbbg.domain.model.Point
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
-import com.bitwiserain.pbbg.domain.model.mine.*
-import com.bitwiserain.pbbg.domain.usecase.*
-import org.jetbrains.exposed.sql.*
+import com.bitwiserain.pbbg.domain.model.mine.AvailableMines
+import com.bitwiserain.pbbg.domain.model.mine.Mine
+import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
+import com.bitwiserain.pbbg.domain.model.mine.MineEntity
+import com.bitwiserain.pbbg.domain.model.mine.MineType
+import com.bitwiserain.pbbg.domain.model.mine.MinedItemResult
+import com.bitwiserain.pbbg.domain.usecase.AlreadyInMineException
+import com.bitwiserain.pbbg.domain.usecase.InvalidMineTypeIdException
+import com.bitwiserain.pbbg.domain.usecase.MiningUC
+import com.bitwiserain.pbbg.domain.usecase.NoEquippedPickaxeException
+import com.bitwiserain.pbbg.domain.usecase.NotInMineSessionException
+import com.bitwiserain.pbbg.domain.usecase.UnfulfilledLevelRequirementException
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Clock
 import kotlin.random.Random
 
-class MiningUCImpl(private val db: Database, private val clock: Clock, private val dexTable: DexTable) : MiningUC {
+class MiningUCImpl(private val db: Database, private val clock: Clock, private val dexTable: DexTable, private val mineCellTable: MineCellTable) : MiningUC {
     override fun getMine(userId: Int): Mine? = transaction(db) {
         /* Get currently running mine session */
         val mineSession = MineSessionTable.getSession(userId) ?: return@transaction null
 
-        val grid = MineCellTable.getGrid(mineSession.id)
+        val grid = mineCellTable.getGrid(mineSession.id)
 
         Mine(mineSession.width, mineSession.height, grid, mineSession.mineType)
     }
@@ -63,12 +73,7 @@ class MiningUCImpl(private val db: Database, private val clock: Clock, private v
 
             val mineSessionId = MineSessionTable.insertSessionAndGetId(userId, width, height, mineType)
 
-            MineCellTable.batchInsert(itemEntries.asIterable()) { (pos, entity) ->
-                this[MineCellTable.mineId] = mineSessionId
-                this[MineCellTable.x] = pos.first
-                this[MineCellTable.y] = pos.second
-                this[MineCellTable.mineEntity] = entity
-            }
+            mineCellTable.insertCells(mineSessionId.value, itemEntries)
         }
 
         return Mine(width, height, itemEntries, mineType)
@@ -103,8 +108,7 @@ class MiningUCImpl(private val db: Database, private val clock: Clock, private v
 
         // The mine cells of this mine, filtered to only get those that are reachable with this pickaxe and location
         // TODO: Exposed isn't likely to support tuples in `WHERE IN` expressions, consider using raw SQL
-        val reachableCellsWithContent = MineCellTable.select { MineCellTable.mineId.eq(mineSession.id) }
-            .map { it.toMineCell() }
+        val reachableCellsWithContent = mineCellTable.getMineCells(mineSession.id)
             .filter { reacheableCells.contains(Point(it.x, it.y)) }
 
         // Mine entities with the quantity hit
@@ -125,7 +129,7 @@ class MiningUCImpl(private val db: Database, private val clock: Clock, private v
         }
 
         // Remove mined cells from database
-        MineCellTable.deleteWhere { MineCellTable.id.inList(reachableCellsWithContent.map { it.id }) }
+        mineCellTable.deleteCells(reachableCellsWithContent.map { it.id })
 
         val userCurrentMiningExp = UserStatsTable.getUserStats(userId).miningExp
 
@@ -140,7 +144,7 @@ class MiningUCImpl(private val db: Database, private val clock: Clock, private v
         MineActionResult(
             minedItemResults = minedItemResults,
             levelUps = MiningExperienceManager.getLevelUpResults(currentLevelProgress.level, newLevelProgress.level),
-            mine = Mine(mineSession.width, mineSession.height, MineCellTable.getGrid(mineSession.id), mineSession.mineType),
+            mine = Mine(mineSession.width, mineSession.height, mineCellTable.getGrid(mineSession.id), mineSession.mineType),
             miningLvl = newLevelProgress
         )
     }
@@ -174,13 +178,6 @@ class MiningUCImpl(private val db: Database, private val clock: Clock, private v
         MineEntity.COAL -> MaterializedItem.Coal(quantity)
         MineEntity.COPPER -> MaterializedItem.CopperOre(quantity)
     }
-
-    private fun ResultRow.toMineCell() = MineCell(
-        id = this[MineCellTable.id].value,
-        x = this[MineCellTable.x],
-        y = this[MineCellTable.y],
-        mineEntity = this[MineCellTable.mineEntity]
-    )
 
     private fun reachableCells(x: Int, y: Int, width: Int, height: Int, tiles: Set<Point>): Set<Point> {
         val cells = mutableSetOf<Point>()
