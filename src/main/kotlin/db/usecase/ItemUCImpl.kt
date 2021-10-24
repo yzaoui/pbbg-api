@@ -10,11 +10,17 @@ import com.bitwiserain.pbbg.domain.usecase.ItemUC
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class ItemUCImpl(private val db: Database) : ItemUC {
-    override fun getItemDetails(itemId: Long): ItemDetails = transaction(db) {
-        val item = MaterializedItemTable.getItem(itemId) ?: throw ItemNotFoundException(itemId)
+class ItemUCImpl(
+    private val db: Database,
+    private val itemHistoryTable: ItemHistoryTable,
+    private val materializedItemTable: MaterializedItemTable,
+    private val userTable: UserTable,
+) : ItemUC {
 
-        val itemHistory = ItemHistoryTable.getItemHistoryList(itemId)
+    override fun getItemDetails(itemId: Long): ItemDetails = transaction(db) {
+        val item = materializedItemTable.getItem(itemId) ?: throw ItemNotFoundException(itemId)
+
+        val itemHistory = itemHistoryTable.getItemHistoryList(itemId)
 
         val userSet = mutableSetOf<Int>()
 
@@ -22,7 +28,7 @@ class ItemUCImpl(private val db: Database) : ItemUC {
             if (info is ItemHistoryInfo.HasUserId) userSet.add(info.userId)
         }
 
-        val userInfo = UserTable.getUsersById(userSet).mapValues { it.value.username }
+        val userInfo = userTable.getUsersById(userSet).mapValues { it.value.username }
 
         return@transaction ItemDetails(
             item = item,

@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.domain.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
 import io.kotest.matchers.shouldBe
@@ -11,7 +12,8 @@ import org.junit.jupiter.api.Test
 class LoginUCImplTest {
 
     private val db = initDatabase()
-    private val login = LoginUCImpl(db)
+    private val userTable = UserTableImpl()
+    private val login = LoginUCImpl(db, userTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -20,7 +22,7 @@ class LoginUCImplTest {
 
     @Test
     fun `Given an existing user, when getting the user's ID by correct credentials, the ID should return`() {
-        val expectedUserId = createTestUserAndGetId(db, username = "username24", password = "pass123")
+        val expectedUserId = createTestUserAndGetId(db, userTable, username = "username24", password = "pass123")
 
         val result = login("username24", "pass123")
 
@@ -30,7 +32,7 @@ class LoginUCImplTest {
 
     @Test
     fun `Given an existing user, when getting the user's ID by incorrect credentials, no ID should be returned`() {
-        val expectedUserId = createTestUserAndGetId(db, username = "username24", password = "pass123")
+        val expectedUserId = createTestUserAndGetId(db, userTable, username = "username24", password = "pass123")
 
         /* Test incorrect username */
         login("incorrecto17", "pass123").shouldBeTypeOf<LoginUC.Result.CredentialsDontMatchError>()

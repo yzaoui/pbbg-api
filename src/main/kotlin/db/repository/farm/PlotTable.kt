@@ -1,43 +1,65 @@
 package com.bitwiserain.pbbg.db.repository.farm
 
-import com.bitwiserain.pbbg.db.repository.UserTable
-import com.bitwiserain.pbbg.db.repository.farm.MaterializedPlantTable.toMaterializedPlant
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.domain.model.farm.Plot
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.ReferenceOption
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.update
 
-object PlotTable : LongIdTable() {
-    val userId = reference("user_id", UserTable)
-    val plantId = reference("plant_id", MaterializedPlantTable, ReferenceOption.SET_NULL).nullable()
+interface PlotTable {
 
-    fun createAndGetEmptyPlot(userId: Int): Plot = insertAndGetId {
-        it[PlotTable.userId] = EntityID(userId, UserTable)
+    fun createAndGetEmptyPlot(userId: Int): Plot
+
+    fun updatePlot(userId: Int, plotId: Long, plantId: Long)
+
+    fun getPlots(userId: Int): List<Plot>
+
+    fun getPlot(userId: Int, plotId: Long): Plot?
+}
+
+class PlotTableImpl : PlotTable {
+
+    object Exposed : LongIdTable(name = "Plot") {
+
+        val userId = reference("user_id", UserTableImpl.Exposed)
+        val plantId = reference("plant_id", MaterializedPlantTableImpl.Exposed, ReferenceOption.SET_NULL).nullable()
+    }
+
+    override fun createAndGetEmptyPlot(userId: Int): Plot = Exposed.insertAndGetId {
+        it[Exposed.userId] = EntityID(userId, UserTableImpl.Exposed)
     }.let {
         Plot(it.value, null)
     }
 
-    fun updatePlot(userId: Int, plotId: Long, plantId: Long) = update({ PlotTable.userId.eq(userId) and PlotTable.id.eq(plotId) }) {
-        it[PlotTable.plantId] = EntityID(plantId, MaterializedPlantTable)
+    override fun updatePlot(userId: Int, plotId: Long, plantId: Long) {
+        Exposed.update({ Exposed.userId.eq(userId) and Exposed.id.eq(plotId) }) {
+            it[Exposed.plantId] = EntityID(plantId, MaterializedPlantTableImpl.Exposed)
+        }
     }
 
-    fun getPlots(userId: Int): List<Plot> =
-        (PlotTable leftJoin MaterializedPlantTable)
-            .select { PlotTable.userId.eq(userId) }
+    override fun getPlots(userId: Int): List<Plot> =
+        (Exposed leftJoin MaterializedPlantTableImpl.Exposed)
+            .select { Exposed.userId.eq(userId) }
             .map { it.toPlot() }
 
-    fun getPlot(userId: Int, plotId: Long) =
-        (PlotTable leftJoin MaterializedPlantTable)
-            .select { PlotTable.userId.eq(userId) and PlotTable.id.eq(plotId) }
+    override fun getPlot(userId: Int, plotId: Long) =
+        (Exposed leftJoin MaterializedPlantTableImpl.Exposed)
+            .select { Exposed.userId.eq(userId) and Exposed.id.eq(plotId) }
             .singleOrNull()
             ?.toPlot()
-}
 
-private fun ResultRow.toPlot(): Plot {
-    val plantId = this[PlotTable.plantId]?.value
 
-    return Plot(
-        id = this[PlotTable.id].value,
-        plant = if (plantId != null) plantId to toMaterializedPlant() else null
-    )
+    private fun ResultRow.toPlot(): Plot {
+        val plantId = this[Exposed.plantId]?.value
+
+        return Plot(
+            id = this[Exposed.id].value,
+            plant = if (plantId != null) plantId to toMaterializedPlant() else null
+        )
+    }
 }

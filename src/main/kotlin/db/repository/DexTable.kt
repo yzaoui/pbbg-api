@@ -2,27 +2,53 @@ package com.bitwiserain.pbbg.db.repository
 
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.batchInsert
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 
-object DexTable : Table() {
-    val userId = reference("user_id", UserTable)
-    val item = enumeration("base_item_ordinal", ItemEnum::class)
+interface DexTable {
 
-    override val primaryKey = PrimaryKey(userId, item)
+    fun hasEntry(userId: Int, item: ItemEnum): Boolean
 
-    fun hasEntry(userId: Int, item: ItemEnum): Boolean = select { DexTable.userId.eq(userId) and DexTable.item.eq(item) }.singleOrNull() != null
+    fun getDiscovered(userId: Int): Set<ItemEnum>
 
-    fun getDiscovered(userId: Int) = select { DexTable.userId.eq(userId) }
-        .map { it[DexTable.item] }
-        .toSet()
+    fun insertDiscovered(userId: Int, item: ItemEnum)
 
-    fun insertDiscovered(userId: Int, item: ItemEnum) = insert {
-        it[DexTable.userId] = EntityID(userId, UserTable)
-        it[DexTable.item] = item
+    fun insertDiscovered(userId: Int, items: Iterable<ItemEnum>)
+}
+
+class DexTableImpl : DexTable {
+
+    object Exposed : Table(name = "Dex") {
+
+        val userId = reference("user_id", UserTableImpl.Exposed)
+        val item = enumeration("base_item_ordinal", ItemEnum::class)
+
+        override val primaryKey = PrimaryKey(userId, item)
     }
 
-    fun insertDiscovered(userId: Int, items: Iterable<ItemEnum>) = batchInsert(items) { item ->
-        this[DexTable.userId] = EntityID(userId, UserTable)
-        this[DexTable.item] = item
+    override fun hasEntry(userId: Int, item: ItemEnum): Boolean = Exposed
+        .select { Exposed.userId.eq(userId) and Exposed.item.eq(item) }
+        .singleOrNull() != null
+
+    override fun getDiscovered(userId: Int): Set<ItemEnum> = Exposed
+        .select { Exposed.userId.eq(userId) }
+        .map { it[Exposed.item] }
+        .toSet()
+
+    override fun insertDiscovered(userId: Int, item: ItemEnum) {
+        Exposed.insert {
+            it[Exposed.userId] = EntityID(userId, UserTableImpl.Exposed)
+            it[Exposed.item] = item
+        }
+    }
+
+    override fun insertDiscovered(userId: Int, items: Iterable<ItemEnum>) {
+        Exposed.batchInsert(items) { item ->
+            this[Exposed.userId] = EntityID(userId, UserTableImpl.Exposed)
+            this[Exposed.item] = item
+        }
     }
 }

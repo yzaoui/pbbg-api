@@ -1,8 +1,9 @@
 package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.ItemHistoryTable
-import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
+import com.bitwiserain.pbbg.db.repository.ItemHistoryTableImpl
+import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.db.usecase.ItemUCImpl
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
@@ -21,8 +22,12 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class ItemUCImplTests {
+
     private val db = initDatabase()
-    private val itemUC: ItemUC = ItemUCImpl(db)
+    private val itemHistoryTable = ItemHistoryTableImpl()
+    private val materializedItemTable = MaterializedItemTableImpl()
+    private val userTable = UserTableImpl()
+    private val itemUC: ItemUC = ItemUCImpl(db, itemHistoryTable, materializedItemTable, userTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -33,10 +38,10 @@ class ItemUCImplTests {
     fun `Given an item in existence with a history, when calling for its details, should return all its expected details`() {
         val creationDate = Instant.ofEpochSecond(946684800L)
         val users = listOf("user1", "user2", "user3")
-            .associateBy { createTestUserAndGetId(db, it) }
+            .associateBy { createTestUserAndGetId(db, userTable, it) }
 
         val itemId = transaction(db) {
-            val itemId = MaterializedItemTable.insertItemAndGetId(MaterializedItem.Stone(quantity = 3))
+            val itemId = materializedItemTable.insertItemAndGetId(MaterializedItem.Stone(quantity = 3))
 
             listOf(ItemHistory(
                 date = creationDate,
@@ -48,7 +53,7 @@ class ItemUCImplTests {
                 date = creationDate.plusSeconds(120),
                 info = ItemHistoryInfo.CreatedWithUser(3)
             )).forEach {
-                ItemHistoryTable.insertItemHistory(itemId, it)
+                itemHistoryTable.insertItemHistory(itemId, it)
             }
 
             return@transaction itemId

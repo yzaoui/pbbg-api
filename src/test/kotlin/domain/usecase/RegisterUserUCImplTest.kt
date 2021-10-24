@@ -5,9 +5,18 @@ import com.bitwiserain.pbbg.PASSWORD_REGEX_DESCRIPTION
 import com.bitwiserain.pbbg.SchemaHelper
 import com.bitwiserain.pbbg.USERNAME_REGEX
 import com.bitwiserain.pbbg.USERNAME_REGEX_DESCRIPTION
+import com.bitwiserain.pbbg.db.repository.DexTableImpl
+import com.bitwiserain.pbbg.db.repository.InventoryTableImpl
+import com.bitwiserain.pbbg.db.repository.ItemHistoryTableImpl
 import com.bitwiserain.pbbg.db.repository.Joins
-import com.bitwiserain.pbbg.db.repository.SquadTable
-import com.bitwiserain.pbbg.db.repository.UserStatsTable
+import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
+import com.bitwiserain.pbbg.db.repository.SquadTableImpl
+import com.bitwiserain.pbbg.db.repository.UnitTableImpl
+import com.bitwiserain.pbbg.db.repository.UserStatsTableImpl
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
+import com.bitwiserain.pbbg.db.repository.farm.PlotTableImpl
+import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTableImpl
+import com.bitwiserain.pbbg.db.repository.market.MarketTableImpl
 import com.bitwiserain.pbbg.domain.model.ItemEnum
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.usecase.RegisterUserUC.Result
@@ -30,7 +39,20 @@ class RegisterUserUCImplTest {
 
     private val db = initDatabase()
     private val clock = MutableClock()
-    private val registerUser = RegisterUserUCImpl(db, clock)
+    private val dexTable = DexTableImpl()
+    private val inventoryTable = InventoryTableImpl()
+    private val itemHistoryTable = ItemHistoryTableImpl()
+    private val marketTable = MarketTableImpl()
+    private val marketInventoryTable = MarketInventoryTableImpl()
+    private val materializedItemTable = MaterializedItemTableImpl()
+    private val plotTable = PlotTableImpl()
+    private val squadTable = SquadTableImpl()
+    private val unitTable = UnitTableImpl()
+    private val userTable = UserTableImpl()
+    private val userStatsTable = UserStatsTableImpl()
+    private val registerUser = RegisterUserUCImpl(
+        db, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable, unitTable, userTable, userStatsTable
+    )
 
     @AfterEach
     fun dropDatabase() {
@@ -43,7 +65,7 @@ class RegisterUserUCImplTest {
         fun `When registering a new user, the user should have 0 gold, 0 mining exp, and 0 farming exp`() {
             val userId = (registerUser("username", "password") as Result.Success).userId
 
-            val stats = transaction(db) { UserStatsTable.getUserStats(userId) }
+            val stats = transaction(db) { userStatsTable.getUserStats(userId) }
 
             assertSoftly(stats) {
                 gold shouldBe 0
@@ -78,7 +100,7 @@ class RegisterUserUCImplTest {
         fun `When registering a new user, the user's squad should consist of Ice-Cream Wizard, Twolip, and Carpshooter`() {
             val userId = (registerUser("username", "password") as Result.Success).userId
 
-            val units = transaction(db) { SquadTable.getAllies(userId) }
+            val units = transaction(db) { squadTable.getAllies(userId) }
 
             assertSoftly(units) {
                 shouldHaveSize(3)
@@ -93,7 +115,7 @@ class RegisterUserUCImplTest {
     inner class FailedRegistration {
         @Test
         fun `Given an existing user, when registering a new user with the same username, UsernameNotAvailableError should be returned`() {
-            createTestUserAndGetId(db, username = "username")
+            createTestUserAndGetId(db, userTable, username = "username")
 
             registerUser("username", "password").shouldBeTypeOf<Result.UsernameNotAvailableError>()
         }

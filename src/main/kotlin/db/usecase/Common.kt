@@ -8,7 +8,17 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
-fun storeInInventoryReturnItemID(db: Database, now: Instant, userId: Int, itemToStore: MaterializedItem, historyInfo: ItemHistoryInfo): Long = transaction(db) {
+fun storeInInventoryReturnItemID(
+    db: Database,
+    now: Instant,
+    userId: Int,
+    itemToStore: MaterializedItem,
+    historyInfo: ItemHistoryInfo,
+    dexTable: DexTable,
+    inventoryTable: InventoryTable,
+    itemHistoryTable: ItemHistoryTable,
+    materializedItemTable: MaterializedItemTable,
+): Long = transaction(db) {
     val heldItems = Joins.getHeldItemsOfBaseKind(userId, itemToStore.enum)
 
     val itemId: Long
@@ -17,15 +27,15 @@ fun storeInInventoryReturnItemID(db: Database, now: Instant, userId: Int, itemTo
         itemToStore as MaterializedItem.Stackable
         // If this item is currently held and Stackable, increase its quantity
         itemId = heldItems.keys.single()
-        MaterializedItemTable.updateQuantity(heldItems.keys.single(), itemToStore.quantity)
+        materializedItemTable.updateQuantity(heldItems.keys.single(), itemToStore.quantity)
     } else {
         // If this item isn't already stored, or it can't be stacked, create a new entry for it
-        itemId = MaterializedItemTable.insertItemAndGetId(itemToStore)
-        InventoryTable.insertItem(userId, itemId, itemToStore.base)
+        itemId = materializedItemTable.insertItemAndGetId(itemToStore)
+        inventoryTable.insertItem(userId, itemId, itemToStore.base)
 
         if (heldItems.count() == 0) {
             // TODO: For now, assume only stackable items are MineEntity
-            ItemHistoryTable.insertItemHistory(itemId, ItemHistory(
+            itemHistoryTable.insertItemHistory(itemId, ItemHistory(
                 date = now,
                 info = historyInfo
             ))
@@ -35,7 +45,7 @@ fun storeInInventoryReturnItemID(db: Database, now: Instant, userId: Int, itemTo
     /*************************************************
      * Update user's dex to check off this item type *
      *************************************************/
-    if (!DexTable.hasEntry(userId, itemToStore.enum)) DexTable.insertDiscovered(userId, itemToStore.enum)
+    if (!dexTable.hasEntry(userId, itemToStore.enum)) dexTable.insertDiscovered(userId, itemToStore.enum)
 
     itemId
 }

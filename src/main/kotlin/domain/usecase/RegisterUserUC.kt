@@ -10,8 +10,8 @@ import com.bitwiserain.pbbg.db.repository.InventoryTable
 import com.bitwiserain.pbbg.db.repository.ItemHistoryTable
 import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.db.repository.SquadTable
-import com.bitwiserain.pbbg.db.repository.UnitForm
 import com.bitwiserain.pbbg.db.repository.UnitTable
+import com.bitwiserain.pbbg.db.repository.UnitTable.UnitForm
 import com.bitwiserain.pbbg.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.db.repository.UserTable
 import com.bitwiserain.pbbg.db.repository.farm.PlotTable
@@ -55,7 +55,21 @@ interface RegisterUserUC {
     }
 }
 
-class RegisterUserUCImpl(private val db: Database, private val clock: Clock) : RegisterUserUC {
+class RegisterUserUCImpl(
+    private val db: Database,
+    private val clock: Clock,
+    private val dexTable: DexTable,
+    private val inventoryTable: InventoryTable,
+    private val itemHistoryTable: ItemHistoryTable,
+    private val marketTable: MarketTable,
+    private val marketInventoryTable: MarketInventoryTable,
+    private val materializedItemTable: MaterializedItemTable,
+    private val plotTable: PlotTable,
+    private val squadTable: SquadTable,
+    private val unitTable: UnitTable,
+    private val userTable: UserTable,
+    private val userStatsTable: UserStatsTable,
+) : RegisterUserUC {
 
     override fun invoke(username: String, password: String): Result {
         /* Make sure username & password are valid */
@@ -71,41 +85,41 @@ class RegisterUserUCImpl(private val db: Database, private val clock: Clock) : R
 
         return transaction(db) {
             /* Make sure username is available */
-            if (UserTable.getUserByUsername(username) != null) return@transaction Result.UsernameNotAvailableError
+            if (userTable.getUserByUsername(username) != null) return@transaction Result.UsernameNotAvailableError
 
             val now = clock.instant().truncatedTo(ChronoUnit.SECONDS)
 
             /* Create user */
-            val userId = UserTable.createUserAndGetId(
+            val userId = userTable.createUserAndGetId(
                 username = username,
                 passwordHash = BCryptHelper.hashPassword(password)
             )
 
             /* Create user stats */
-            UserStatsTable.createUserStats(userId)
+            userStatsTable.createUserStats(userId)
 
             /* Add ice pick, apple saplings, tomato seeds to inventory */
             listOf(MaterializedItem.IcePick, MaterializedItem.AppleSapling(2), MaterializedItem.TomatoSeed(5)).forEach { item ->
-                val itemId = MaterializedItemTable.insertItemAndGetId(item)
-                ItemHistoryTable.insertItemHistory(
+                val itemId = materializedItemTable.insertItemAndGetId(item)
+                itemHistoryTable.insertItemHistory(
                     itemId = itemId,
                     itemHistory = ItemHistory(
                         date = now,
                         info = ItemHistoryInfo.CreatedWithUser(userId)
                     )
                 )
-                InventoryTable.insertItem(userId, itemId, item.base)
-                DexTable.insertDiscovered(userId, item.enum)
+                inventoryTable.insertItem(userId, itemId, item.base)
+                dexTable.insertDiscovered(userId, item.enum)
             }
 
             /* Create user's market */
-            val marketId = MarketTable.createMarketAndGetId(userId)
+            val marketId = marketTable.createMarketAndGetId(userId)
 
             // Fill market with three pickaxe types
             listOf(MaterializedItem.PlusPickaxe, MaterializedItem.CrossPickaxe, MaterializedItem.SquarePickaxe).forEach { item ->
-                val itemId = MaterializedItemTable.insertItemAndGetId(item)
-                MarketInventoryTable.insertItem(marketId, itemId)
-                ItemHistoryTable.insertItemHistory(
+                val itemId = materializedItemTable.insertItemAndGetId(item)
+                marketInventoryTable.insertItem(marketId, itemId)
+                itemHistoryTable.insertItemHistory(
                     itemId = itemId,
                     itemHistory = ItemHistory(
                         date = now,
@@ -121,14 +135,14 @@ class RegisterUserUCImpl(private val db: Database, private val clock: Clock) : R
                 UnitForm(MyUnitEnum.TWOLIP, MyUnitEnum.TWOLIP.baseHP, MyUnitEnum.TWOLIP.baseAtk, MyUnitEnum.TWOLIP.baseDef, MyUnitEnum.TWOLIP.baseInt, MyUnitEnum.TWOLIP.baseRes)
             ).map {
                 // Create initial units
-                UnitTable.insertUnitAndGetId(it)
+                unitTable.insertUnitAndGetId(it)
             }.also {
                 // Add them to new user's squad
-                SquadTable.insertUnits(userId, it)
+                squadTable.insertUnits(userId, it)
             }
 
             /* Create user farm */
-            PlotTable.createAndGetEmptyPlot(userId)
+            plotTable.createAndGetEmptyPlot(userId)
 
             return@transaction Result.Success(userId)
         }

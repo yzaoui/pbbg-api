@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.db.repository
 
+import com.bitwiserain.pbbg.db.repository.UnitTable.UnitForm
 import com.bitwiserain.pbbg.domain.model.MyUnit
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import org.jetbrains.exposed.dao.id.LongIdTable
@@ -7,57 +8,79 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 
-object UnitTable : LongIdTable() {
-    val unit = enumeration("unit", MyUnitEnum::class)
-    val hp = integer("hp")
-    val maxHP = integer("max_hp")
-    val atk = integer("atk")
-    val def = integer("def")
-    val int = integer("int")
-    val res = integer("res")
-    val exp = long("exp")
+interface UnitTable {
 
     /**
      * Inserts a new unit and returns its ID.
      */
-    fun insertUnitAndGetId(unit: UnitForm): Long = insertAndGetId {
-        it[UnitTable.unit] = unit.enum
-        it[UnitTable.hp] = unit.hp
-        it[UnitTable.maxHP] = unit.hp
-        it[UnitTable.atk] = unit.atk
-        it[UnitTable.def] = unit.def
-        it[UnitTable.int] = unit.int
-        it[UnitTable.res] = unit.res
-        it[UnitTable.exp] = 0L
+    fun insertUnitAndGetId(unit: UnitForm): Long
+
+    /**
+     * Updates a unit with new stats.
+     */
+    fun updateUnit(unitId: Long, unit: MyUnit)
+
+    fun getUnit(unitId: Long): MyUnit?
+
+    /**
+     * The form of fields required to create a new unit.
+     * The new unit will start with 0 exp, and be at full HP.
+     */
+    data class UnitForm(
+        val enum: MyUnitEnum,
+        val hp: Int,
+        val atk: Int,
+        val def: Int,
+        val int: Int,
+        val res: Int
+    )
+}
+
+class UnitTableImpl : UnitTable {
+
+    object Exposed : LongIdTable(name = "Unit") {
+
+        val unit = enumeration("unit", MyUnitEnum::class)
+        val hp = integer("hp")
+        val maxHP = integer("max_hp")
+        val atk = integer("atk")
+        val def = integer("def")
+        val int = integer("int")
+        val res = integer("res")
+        val exp = long("exp")
+    }
+
+    /**
+     * Inserts a new unit and returns its ID.
+     */
+    override fun insertUnitAndGetId(unit: UnitForm): Long = Exposed.insertAndGetId {
+        it[Exposed.unit] = unit.enum
+        it[Exposed.hp] = unit.hp
+        it[Exposed.maxHP] = unit.hp
+        it[Exposed.atk] = unit.atk
+        it[Exposed.def] = unit.def
+        it[Exposed.int] = unit.int
+        it[Exposed.res] = unit.res
+        it[Exposed.exp] = 0L
     }.value
 
     /**
      * Updates a unit with new stats.
      */
-    fun updateUnit(unitId: Long, unit: MyUnit) = update({ UnitTable.id.eq(unitId) }) {
-        it[UnitTable.hp] = unit.hp
-        it[UnitTable.maxHP] = unit.maxHP
-        it[UnitTable.atk] = unit.atk
-        it[UnitTable.def] = unit.def
-        it[UnitTable.int] = unit.int
-        it[UnitTable.res] = unit.res
-        it[UnitTable.exp] = unit.exp
+    override fun updateUnit(unitId: Long, unit: MyUnit) {
+        Exposed.update({ Exposed.id.eq(unitId) }) {
+            it[Exposed.hp] = unit.hp
+            it[Exposed.maxHP] = unit.maxHP
+            it[Exposed.atk] = unit.atk
+            it[Exposed.def] = unit.def
+            it[Exposed.int] = unit.int
+            it[Exposed.res] = unit.res
+            it[Exposed.exp] = unit.exp
+        }
     }
 
-    fun getUnit(unitId: Long): MyUnit? = select { id eq unitId }
+    override fun getUnit(unitId: Long): MyUnit? = Exposed
+        .select { Exposed.id eq unitId }
         .singleOrNull()
         ?.toMyUnit()
 }
-
-/**
- * The form of fields required to create a new unit.
- * The new unit will start with 0 exp, and be at full HP.
- */
-data class UnitForm(
-    val enum: MyUnitEnum,
-    val hp: Int,
-    val atk: Int,
-    val def: Int,
-    val int: Int,
-    val res: Int
-)

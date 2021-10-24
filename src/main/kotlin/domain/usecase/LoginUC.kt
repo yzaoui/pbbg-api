@@ -18,10 +18,10 @@ interface LoginUC {
     }
 }
 
-class LoginUCImpl(private val db: Database) : LoginUC {
+class LoginUCImpl(private val db: Database, private val userTable: UserTable) : LoginUC {
 
     override fun invoke(username: String, password: String): Result {
-        val user = transaction(db) { UserTable.getUserByUsername(username) }
+        val user = transaction(db) { userTable.getUserByUsername(username) }
 
         return if (user != null && BCryptHelper.verifyPassword(password, user.passwordHash)) {
             Result.Success(user.id)

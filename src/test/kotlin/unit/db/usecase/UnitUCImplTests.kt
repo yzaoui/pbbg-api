@@ -1,10 +1,11 @@
 package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.SquadTable
-import com.bitwiserain.pbbg.db.repository.UnitForm
-import com.bitwiserain.pbbg.db.repository.UnitTable
-import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
+import com.bitwiserain.pbbg.db.repository.SquadTableImpl
+import com.bitwiserain.pbbg.db.repository.UnitTable.UnitForm
+import com.bitwiserain.pbbg.db.repository.UnitTableImpl
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
+import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTableImpl
 import com.bitwiserain.pbbg.db.usecase.UnitUCImpl
 import com.bitwiserain.pbbg.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.domain.model.Squad
@@ -22,8 +23,13 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class UnitUCImplTests {
+
     private val db = initDatabase()
-    private val unitUC: UnitUC = UnitUCImpl(db)
+    private val battleSessionTable = BattleSessionTableImpl()
+    private val squadTable = SquadTableImpl()
+    private val unitTable = UnitTableImpl()
+    private val userTable = UserTableImpl()
+    private val unitUC: UnitUC = UnitUCImpl(db, battleSessionTable, squadTable, unitTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -32,7 +38,7 @@ class UnitUCImplTests {
 
     @Test
     fun `When calling getSquad(), should return the user's squad`() {
-        val userId = createTestUserAndGetId(db)
+        val userId = createTestUserAndGetId(db, userTable)
 
         val units = createUnitsAndSquad(userId)
 
@@ -45,17 +51,17 @@ class UnitUCImplTests {
 
     @Test
     fun `Given a damaged squad out of battle, when healing it, all units should be fully healed`() {
-        val userId = createTestUserAndGetId(db)
+        val userId = createTestUserAndGetId(db, userTable)
 
         val units = createUnitsAndSquad(userId)
 
         val healedUnits = transaction(db) {
             // Damage all units
-            units.forEach { UnitTable.updateUnit(it.id, it.receiveDamage(4).updatedUnit) }
+            units.forEach { unitTable.updateUnit(it.id, it.receiveDamage(4).updatedUnit) }
 
             unitUC.healSquad(userId)
 
-            return@transaction SquadTable.getAllies(userId)
+            return@transaction squadTable.getAllies(userId)
         }
 
         assertTrue(healedUnits.all { it.hp == it.maxHP }, "All units should be fully healed after healSquad().")
@@ -63,10 +69,10 @@ class UnitUCImplTests {
 
     @Test
     fun `Given a user in battle, when healing squad, SquadInBattleException should be thrown`() {
-        val userId = createTestUserAndGetId(db)
+        val userId = createTestUserAndGetId(db, userTable)
 
         transaction {
-            BattleSessionTable.createBattleSessionAndGetId(userId)
+            battleSessionTable.createBattleSessionAndGetId(userId)
         }
 
         assertThrows<SquadInBattleException> {
@@ -75,15 +81,13 @@ class UnitUCImplTests {
     }
 
     private fun createUnitsAndSquad(userId: Int) = transaction(db) {
-        transaction(db) {
-            listOf(
-                UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1, 1, 1),
-                UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2, 1, 1),
-                UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1, 1, 1)
-            )
-                .map { UnitTable.insertUnitAndGetId(it) }
-                .also { SquadTable.insertUnits(userId, it) }
-                .map { UnitTable.getUnit(it)!! }
-        }
+        listOf(
+            UnitForm(MyUnitEnum.ICE_CREAM_WIZARD, 9, 1, 1, 1, 1),
+            UnitForm(MyUnitEnum.CARPSHOOTER, 8, 1, 2, 1, 1),
+            UnitForm(MyUnitEnum.TWOLIP, 11, 2, 1, 1, 1)
+        )
+            .map { unitTable.insertUnitAndGetId(it) }
+            .also { squadTable.insertUnits(userId, it) }
+            .map { unitTable.getUnit(it)!! }
     }
 }

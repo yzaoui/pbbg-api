@@ -1,27 +1,40 @@
 package com.bitwiserain.pbbg.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.InventoryTable
+import com.bitwiserain.pbbg.db.repository.InventoryTableImpl
 import com.bitwiserain.pbbg.db.repository.Joins
-import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
+import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.domain.model.BaseItem
 import com.bitwiserain.pbbg.domain.model.InventoryItem
 import com.bitwiserain.pbbg.domain.model.InventoryItem.EquippableInventoryItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.domain.model.MaterializedItem.*
-import com.bitwiserain.pbbg.domain.usecase.*
+import com.bitwiserain.pbbg.domain.usecase.EquipmentUC
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemAlreadyEquippedException
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotEquippableException
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotEquippedException
+import com.bitwiserain.pbbg.domain.usecase.InventoryItemNotFoundException
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class EquipmentUCImplTests {
+
     private val db = initDatabase()
+    private val inventoryTable = InventoryTableImpl()
+    private val materializedItemTable = MaterializedItemTableImpl()
+    private val userTable = UserTableImpl()
     private val equipmentUC: EquipmentUC = EquipmentUCImpl(db)
 
     @AfterEach
@@ -33,7 +46,7 @@ class EquipmentUCImplTests {
     inner class Equip {
         @Test
         fun `Given a user with an equippable item in inventory that is not equipped, when equipping it, it should return equipped`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             /* Insert equippable item into inventory */
             val (itemId, oldItemInInventory) = createItem(userId, item = SquarePickaxe, inInventory = true, equipped = false)
@@ -53,7 +66,7 @@ class EquipmentUCImplTests {
 
         @Test
         fun `Given a user with a pickaxe already equipped, when equipping another one, it should replace the currently equipped one`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             /* Equip a pickaxe */
             val (oldOriginallyEquippedPickaxeId, oldOriginallyEquippedPickaxe) = createItem(userId, item = SquarePickaxe, inInventory = true, equipped = true)
@@ -89,7 +102,7 @@ class EquipmentUCImplTests {
 
         @Test
         fun `Given a user, when equipping an item not in inventory, or which doesn't exist, should throw InventoryItemNotFoundException`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             /* Create item but not placed in inventory */
             val (itemId) = createItem(userId, item = SquarePickaxe, inInventory = false, equipped = false)
@@ -105,7 +118,7 @@ class EquipmentUCImplTests {
 
         @Test
         fun `Given a user, when equipping a non-equippable held item, should throw InventoryItemNotEquippableException`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             /* Insert equippable item into inventory */
             val (nonequippableItemId) = createItem(userId, item = CopperOre(quantity = 1), inInventory = true)
@@ -117,7 +130,7 @@ class EquipmentUCImplTests {
 
         @Test
         fun `Given a user, when equipping an already equipped item, should throw InventoryItemAlreadyEquippedException`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             /* Equip item */
             val (equippedItemId) = createItem(userId, item = CrossPickaxe, inInventory = true, equipped = true)
@@ -132,7 +145,7 @@ class EquipmentUCImplTests {
     inner class Unequip {
         @Test
         fun `Given a user with an equipped item, when unequipping it, it should return unequipped`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             /* Equip item */
             val (equippedItemId, equippedItem) = createItem(userId, item = IcePick, inInventory = true, equipped = true)
@@ -152,7 +165,7 @@ class EquipmentUCImplTests {
 
         @Test
         fun `Given a user, when unequipping an item not in inventory, or which doesn't exist, should throw InventoryItemNotFoundException`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             /* Create item but not placed in inventory */
             val (itemId) = createItem(userId, item = SquarePickaxe, inInventory = false)
@@ -168,7 +181,7 @@ class EquipmentUCImplTests {
 
         @Test
         fun `Given a user, when unequipping a non-equippable held item, should throw InventoryItemNotEquippableException`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             /* Insert equippable item into inventory */
             val (nonequippableItemId) = createItem(userId, item = Stone(quantity = 1), inInventory = true)
@@ -180,7 +193,7 @@ class EquipmentUCImplTests {
 
         @Test
         fun `Given a user, when unequipping an already unequipped item, should throw InventoryItemNotEquippedException`() {
-            val userId = createTestUserAndGetId(db)
+            val userId = createTestUserAndGetId(db, userTable)
 
             /* Hold item unequipped */
             val (equippedItemId) = createItem(userId, item = CrossPickaxe, inInventory = true, equipped = false)
@@ -193,9 +206,9 @@ class EquipmentUCImplTests {
 
     fun createItem(userId: Int, item: MaterializedItem, inInventory: Boolean, equipped: Boolean? = null): Pair<Long, InventoryItem?> {
         val itemId = transaction(db) {
-            val id = MaterializedItemTable.insertItemAndGetId(item)
+            val id = materializedItemTable.insertItemAndGetId(item)
             if (inInventory) {
-                InventoryTable.insertItem(userId, id, item.base)
+                inventoryTable.insertItem(userId, id, item.base)
                 if (item.base is BaseItem.Equippable) Joins.setItemEquipped(userId, id, equipped!!)
             }
 

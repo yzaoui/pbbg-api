@@ -11,22 +11,35 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import java.time.Instant
 
-object ItemHistoryTable : Table() {
-    val itemId = reference("item_id", MaterializedItemTable)
-    val date = long("date")
-    val info = text("info")
+interface ItemHistoryTable {
 
-    fun insertItemHistory(itemId: Long, itemHistory: ItemHistory) = insert {
-        it[ItemHistoryTable.itemId] = EntityID(itemId, MaterializedItemTable)
-        it[ItemHistoryTable.date] = itemHistory.date.epochSecond
-        it[ItemHistoryTable.info] = Json.encodeToString(itemHistory.info)
+    fun insertItemHistory(itemId: Long, itemHistory: ItemHistory)
+
+    fun getItemHistoryList(itemId: Long): List<ItemHistory>
+}
+
+class ItemHistoryTableImpl : ItemHistoryTable {
+
+    object Exposed : Table(name = "ItemHistory") {
+        val itemId = reference("item_id", MaterializedItemTableImpl.Exposed)
+        val date = long("date")
+        val info = text("info")
     }
 
-    fun getItemHistoryList(itemId: Long): List<ItemHistory> = select { ItemHistoryTable.itemId.eq(itemId) }
+    override fun insertItemHistory(itemId: Long, itemHistory: ItemHistory) {
+        Exposed.insert {
+            it[Exposed.itemId] = EntityID(itemId, MaterializedItemTableImpl.Exposed)
+            it[Exposed.date] = itemHistory.date.epochSecond
+            it[Exposed.info] = Json.encodeToString(itemHistory.info)
+        }
+    }
+
+    override fun getItemHistoryList(itemId: Long): List<ItemHistory> = Exposed
+        .select { Exposed.itemId.eq(itemId) }
         .map { it.toItemHistory() }
 
     private fun ResultRow.toItemHistory() = ItemHistory(
-        date = Instant.ofEpochSecond(this[ItemHistoryTable.date]),
-        info = Json.decodeFromString(this[ItemHistoryTable.info])
+        date = Instant.ofEpochSecond(this[Exposed.date]),
+        info = Json.decodeFromString(this[Exposed.info])
     )
 }

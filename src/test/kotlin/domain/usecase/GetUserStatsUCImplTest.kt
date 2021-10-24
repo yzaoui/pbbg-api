@@ -1,7 +1,8 @@
 package com.bitwiserain.pbbg.domain.usecase
 
 import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.UserStatsTable
+import com.bitwiserain.pbbg.db.repository.UserStatsTableImpl
+import com.bitwiserain.pbbg.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.test.initDatabase
 import io.kotest.assertions.assertSoftly
@@ -13,7 +14,9 @@ import org.junit.jupiter.api.Test
 class GetUserStatsUCImplTest {
 
     private val db = initDatabase()
-    private val getUserStats = GetUserStatsUCImpl(db)
+    private val userTable = UserTableImpl()
+    private val userStatsTable = UserStatsTableImpl()
+    private val getUserStats = GetUserStatsUCImpl(db, userStatsTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -22,12 +25,12 @@ class GetUserStatsUCImplTest {
 
     @Test
     fun `When getting user stats by ID, the user stats should return`() {
-        val userId = createTestUserAndGetId(db)
+        val userId = createTestUserAndGetId(db, userTable)
 
         transaction(db) {
-            UserStatsTable.createUserStats(userId)
-            UserStatsTable.updateGold(userId, 20)
-            UserStatsTable.updateMiningExp(userId, 500)
+            userStatsTable.createUserStats(userId)
+            userStatsTable.updateGold(userId, 20)
+            userStatsTable.updateMiningExp(userId, 500)
         }
 
         val stats = getUserStats(userId)
