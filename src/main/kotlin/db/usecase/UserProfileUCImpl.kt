@@ -17,6 +17,7 @@ class UserProfileUCImpl(private val db: Database, private val friendsTable: Frie
         return@transaction UserProfile(
             id = targetUser.id,
             username = targetUser.username,
+            joinedInstant = targetUser.joinedInstant,
             friendship = currentUserId?.let { friendsTable.getFriendship(it, targetUser.id) }
         )
     }

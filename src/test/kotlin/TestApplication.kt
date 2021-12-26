@@ -22,7 +22,7 @@ fun initDatabase(): Database = Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY
     .also { SchemaHelper.createTables(it) }
 
 fun createTestUserAndGetId(db: Database, userTable: UserTable, username: String = "username", password: String = "password"): Int = transaction(db) {
-    userTable.createUserAndGetId(username, BCryptHelper.hashPassword(password))
+    userTable.createUserAndGetId(username, BCryptHelper.hashPassword(password), Clock.systemUTC().instant())
 }
 
 fun TestApplicationEngine.registerUserAndGetToken(username: String = "username", password: String = "password") = handleRequest(HttpMethod.Post, "/api/register") {

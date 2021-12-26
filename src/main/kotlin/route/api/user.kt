@@ -47,6 +47,7 @@ fun Route.user(userProfileUC: UserProfileUC) = route("/user") {
 private fun UserProfile.toJSON() = UserProfileJSON(
     id = id,
     username = username,
+    joinedDate = joinedInstant.toString(),
     friendship = friendship?.toJSON()
 )
 

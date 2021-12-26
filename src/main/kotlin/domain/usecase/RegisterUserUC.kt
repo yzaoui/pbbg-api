@@ -92,7 +92,8 @@ class RegisterUserUCImpl(
             /* Create user */
             val userId = userTable.createUserAndGetId(
                 username = username,
-                passwordHash = BCryptHelper.hashPassword(password)
+                passwordHash = BCryptHelper.hashPassword(password),
+                joinedInstant = now
             )
 
             /* Create user stats */

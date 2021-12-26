@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.net.URI
 
 object Versions {
-    const val KOTLIN = "1.5.31"
+    const val KOTLIN = "1.6.10"
     const val KTOR = "1.6.4"
     const val EXPOSED = "0.35.3"
     const val JUNIT_JUPITER = "5.8.1"
@@ -13,9 +13,9 @@ version = "0.3.1" // should mirror version in Const.kt
 
 plugins {
     application
-    kotlin("jvm").version(/*Versions.KOTLIN*/"1.5.31")
+    kotlin("jvm").version(/*Versions.KOTLIN*/"1.6.10")
     id("com.github.johnrengelman.shadow").version("7.1.0")
-    kotlin("plugin.serialization").version(/*Versions.KOTLIN*/"1.5.31")
+    kotlin("plugin.serialization").version(/*Versions.KOTLIN*/"1.6.10")
 }
 
 application {

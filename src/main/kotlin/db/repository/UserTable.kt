@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.db.repository
 
-import com.bitwiserain.pbbg.BCryptHelper
 import com.bitwiserain.pbbg.USERNAME_MAX_LENGTH
 import com.bitwiserain.pbbg.db.model.User
 import org.jetbrains.exposed.dao.id.IntIdTable
@@ -10,10 +9,11 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
+import java.time.Instant
 
 interface UserTable {
 
-    fun createUserAndGetId(username: String, passwordHash: ByteArray): Int
+    fun createUserAndGetId(username: String, passwordHash: ByteArray, joinedInstant: Instant): Int
 
     fun getUserByUsername(username: String): User?
 
@@ -34,11 +34,13 @@ class UserTableImpl : UserTable {
 
         val username = varchar("username", USERNAME_MAX_LENGTH).uniqueIndex()
         val passwordHash = binary("password_hash", 60)
+        val joinedEpochSeconds = long("joined_epoch_seconds")
     }
 
-    override fun createUserAndGetId(username: String, passwordHash: ByteArray): Int = Exposed.insertAndGetId {
+    override fun createUserAndGetId(username: String, passwordHash: ByteArray, joinedInstant: Instant): Int = Exposed.insertAndGetId {
         it[Exposed.username] = username
         it[Exposed.passwordHash] = passwordHash
+        it[Exposed.joinedEpochSeconds] = joinedInstant.epochSecond
     }.value
 
     override fun getUserByUsername(username: String): User? = Exposed
@@ -71,5 +73,10 @@ class UserTableImpl : UserTable {
         }
     }
 
-    private fun ResultRow.toUser() = User(this[Exposed.id].value, this[Exposed.username], this[Exposed.passwordHash])
+    private fun ResultRow.toUser() = User(
+        id = this[Exposed.id].value,
+        username = this[Exposed.username],
+        passwordHash = this[Exposed.passwordHash],
+        joinedInstant = this[Exposed.joinedEpochSeconds].let(Instant::ofEpochSecond)
+    )
 }
