@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.model.farm
+package com.bitwiserain.pbbg.app.domain.model.farm
 
 data class Plot(
     val id: Long,

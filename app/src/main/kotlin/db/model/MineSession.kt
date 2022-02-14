@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.db.model
+package com.bitwiserain.pbbg.app.db.model
 
-import com.bitwiserain.pbbg.domain.model.mine.MineType
+import com.bitwiserain.pbbg.app.domain.model.mine.MineType
 
 /**
  * Holds the metadata of an open mine session.

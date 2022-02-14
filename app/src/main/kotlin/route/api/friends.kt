@@ -1,16 +1,26 @@
-package com.bitwiserain.pbbg.route.api
+package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.domain.model.friends.FriendInfo
-import com.bitwiserain.pbbg.domain.model.friends.Friends
-import com.bitwiserain.pbbg.domain.usecase.*
-import com.bitwiserain.pbbg.respondFail
-import com.bitwiserain.pbbg.respondSuccess
-import com.bitwiserain.pbbg.user
-import com.bitwiserain.pbbg.view.model.friends.FriendInfoJSON
-import com.bitwiserain.pbbg.view.model.friends.FriendsJSON
+import com.bitwiserain.pbbg.app.domain.model.friends.FriendInfo
+import com.bitwiserain.pbbg.app.domain.model.friends.Friends
+import com.bitwiserain.pbbg.app.domain.usecase.FriendsUC
+import com.bitwiserain.pbbg.app.domain.usecase.FriendshipNotConfirmedException
+import com.bitwiserain.pbbg.app.domain.usecase.FriendshipNotNoneException
+import com.bitwiserain.pbbg.app.domain.usecase.FriendshipNotRequestReceivedException
+import com.bitwiserain.pbbg.app.domain.usecase.FriendshipNotRequestSentException
+import com.bitwiserain.pbbg.app.domain.usecase.SelfFriendshipException
+import com.bitwiserain.pbbg.app.domain.usecase.TargetUserDoesNotExistException
+import com.bitwiserain.pbbg.app.respondFail
+import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.user
+import com.bitwiserain.pbbg.app.view.model.friends.FriendInfoJSON
+import com.bitwiserain.pbbg.app.view.model.friends.FriendsJSON
 import io.ktor.application.call
 import io.ktor.request.receive
-import io.ktor.routing.*
+import io.ktor.routing.Route
+import io.ktor.routing.get
+import io.ktor.routing.param
+import io.ktor.routing.post
+import io.ktor.routing.route
 
 fun Route.friends(friendsUC: FriendsUC) = route("/friends") {
     get {

@@ -1,13 +1,13 @@
-package com.bitwiserain.pbbg.route.api
+package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.domain.FarmingExperienceManager
-import com.bitwiserain.pbbg.domain.MiningExperienceManager
-import com.bitwiserain.pbbg.domain.model.LevelProgress
-import com.bitwiserain.pbbg.domain.usecase.GetUserStatsUC
-import com.bitwiserain.pbbg.respondSuccess
-import com.bitwiserain.pbbg.user
-import com.bitwiserain.pbbg.view.model.LevelProgressJSON
-import com.bitwiserain.pbbg.view.model.UserStatsJSON
+import com.bitwiserain.pbbg.app.domain.FarmingExperienceManager
+import com.bitwiserain.pbbg.app.domain.MiningExperienceManager
+import com.bitwiserain.pbbg.app.domain.model.LevelProgress
+import com.bitwiserain.pbbg.app.domain.usecase.GetUserStatsUC
+import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.user
+import com.bitwiserain.pbbg.app.view.model.LevelProgressJSON
+import com.bitwiserain.pbbg.app.view.model.UserStatsJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get

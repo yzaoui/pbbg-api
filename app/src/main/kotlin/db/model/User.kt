@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.db.model
+package com.bitwiserain.pbbg.app.db.model
 
 import io.ktor.auth.Principal
 import java.time.Instant

@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.db.model
+package com.bitwiserain.pbbg.app.db.model
 
-import com.bitwiserain.pbbg.domain.model.mine.MineEntity
+import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
 
 /**
  * Represents the position and contents of a mine cell in the context of an existing mine.

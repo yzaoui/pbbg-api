@@ -1,11 +1,11 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.MyUnitEnum
-import com.bitwiserain.pbbg.domain.model.dex.DexItem
-import com.bitwiserain.pbbg.domain.model.dex.DexItems
-import com.bitwiserain.pbbg.domain.model.dex.DexPlants
-import com.bitwiserain.pbbg.domain.model.dex.DexUnits
-import com.bitwiserain.pbbg.domain.model.farm.BasePlant
+import com.bitwiserain.pbbg.app.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.app.domain.model.dex.DexItem
+import com.bitwiserain.pbbg.app.domain.model.dex.DexItems
+import com.bitwiserain.pbbg.app.domain.model.dex.DexPlants
+import com.bitwiserain.pbbg.app.domain.model.dex.DexUnits
+import com.bitwiserain.pbbg.app.domain.model.farm.BasePlant
 
 interface DexUC {
     /**

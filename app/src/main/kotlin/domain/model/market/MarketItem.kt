@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.domain.model.market
+package com.bitwiserain.pbbg.app.domain.model.market
 
-import com.bitwiserain.pbbg.domain.model.MaterializedItem
+import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 
 data class MarketItem(
     val item: MaterializedItem,

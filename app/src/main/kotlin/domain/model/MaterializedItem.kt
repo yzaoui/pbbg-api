@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.model
+package com.bitwiserain.pbbg.app.domain.model
 
 sealed class MaterializedItem {
     abstract val base: BaseItem

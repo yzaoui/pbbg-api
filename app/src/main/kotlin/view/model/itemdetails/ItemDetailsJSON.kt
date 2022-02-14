@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.view.model.itemdetails
+package com.bitwiserain.pbbg.app.view.model.itemdetails
 
-import com.bitwiserain.pbbg.view.model.MaterializedItemJSON
+import com.bitwiserain.pbbg.app.view.model.MaterializedItemJSON
 
 class ItemDetailsJSON(
     val item: MaterializedItemJSON,

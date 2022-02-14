@@ -1,15 +1,15 @@
-package com.bitwiserain.pbbg.route.api
+package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.API_ROOT
-import com.bitwiserain.pbbg.domain.UnitExperienceManager
-import com.bitwiserain.pbbg.domain.model.MyUnit
-import com.bitwiserain.pbbg.domain.model.Squad
-import com.bitwiserain.pbbg.domain.usecase.SquadInBattleException
-import com.bitwiserain.pbbg.domain.usecase.UnitUC
-import com.bitwiserain.pbbg.respondFail
-import com.bitwiserain.pbbg.respondSuccess
-import com.bitwiserain.pbbg.user
-import com.bitwiserain.pbbg.view.model.MyUnitJSON
+import com.bitwiserain.pbbg.app.API_ROOT
+import com.bitwiserain.pbbg.app.domain.UnitExperienceManager
+import com.bitwiserain.pbbg.app.domain.model.MyUnit
+import com.bitwiserain.pbbg.app.domain.model.Squad
+import com.bitwiserain.pbbg.app.domain.usecase.SquadInBattleException
+import com.bitwiserain.pbbg.app.domain.usecase.UnitUC
+import com.bitwiserain.pbbg.app.respondFail
+import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.user
+import com.bitwiserain.pbbg.app.view.model.MyUnitJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get

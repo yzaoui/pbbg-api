@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg
+package com.bitwiserain.pbbg.app
 
 const val APP_VERSION = "0.3.1" // should mirror version in build.gradle.kts
 val APP_VERSIONS = arrayOf("0.1.0", "0.2.0", "0.3.0", APP_VERSION)

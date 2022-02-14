@@ -1,9 +1,9 @@
-package com.bitwiserain.pbbg.route.api
+package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.domain.usecase.UnitNotFoundException
-import com.bitwiserain.pbbg.domain.usecase.UnitUC
-import com.bitwiserain.pbbg.respondFail
-import com.bitwiserain.pbbg.respondSuccess
+import com.bitwiserain.pbbg.app.domain.usecase.UnitNotFoundException
+import com.bitwiserain.pbbg.app.domain.usecase.UnitUC
+import com.bitwiserain.pbbg.app.respondFail
+import com.bitwiserain.pbbg.app.respondSuccess
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get

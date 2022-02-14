@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.db.repository
+package com.bitwiserain.pbbg.app.db.repository
 
-import com.bitwiserain.pbbg.domain.model.ItemEnum
+import com.bitwiserain.pbbg.app.domain.model.ItemEnum
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and

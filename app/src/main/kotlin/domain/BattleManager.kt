@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain
+package com.bitwiserain.pbbg.app.domain
 
 import kotlin.math.ceil
 

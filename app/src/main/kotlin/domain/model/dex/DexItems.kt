@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.domain.model.dex
+package com.bitwiserain.pbbg.app.domain.model.dex
 
-import com.bitwiserain.pbbg.domain.model.ItemEnum
+import com.bitwiserain.pbbg.app.domain.model.ItemEnum
 
 /**
  * The user's items dex, which lists all item types that the user has obtained at some point.

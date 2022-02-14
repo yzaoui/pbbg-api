@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.MyUnit
-import com.bitwiserain.pbbg.domain.model.Squad
+import com.bitwiserain.pbbg.app.domain.model.MyUnit
+import com.bitwiserain.pbbg.app.domain.model.Squad
 
 interface UnitUC {
     /**

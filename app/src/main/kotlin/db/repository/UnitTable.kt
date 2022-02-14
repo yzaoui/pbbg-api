@@ -1,8 +1,8 @@
-package com.bitwiserain.pbbg.db.repository
+package com.bitwiserain.pbbg.app.db.repository
 
-import com.bitwiserain.pbbg.db.repository.UnitTable.UnitForm
-import com.bitwiserain.pbbg.domain.model.MyUnit
-import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.app.db.repository.UnitTable.UnitForm
+import com.bitwiserain.pbbg.app.domain.model.MyUnit
+import com.bitwiserain.pbbg.app.domain.model.MyUnitEnum
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select

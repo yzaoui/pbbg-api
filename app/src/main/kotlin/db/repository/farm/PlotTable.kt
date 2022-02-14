@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.db.repository.farm
+package com.bitwiserain.pbbg.app.db.repository.farm
 
-import com.bitwiserain.pbbg.db.repository.UserTableImpl
-import com.bitwiserain.pbbg.domain.model.farm.Plot
+import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
+import com.bitwiserain.pbbg.app.domain.model.farm.Plot
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.ReferenceOption

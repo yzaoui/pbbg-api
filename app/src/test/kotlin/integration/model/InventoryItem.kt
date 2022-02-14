@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.test.integration.model
+package com.bitwiserain.pbbg.app.test.integration.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

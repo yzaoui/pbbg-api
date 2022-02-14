@@ -1,8 +1,8 @@
-package com.bitwiserain.pbbg.domain.model.mine
+package com.bitwiserain.pbbg.app.domain.model.mine
 
-import com.bitwiserain.pbbg.domain.model.LevelProgress
-import com.bitwiserain.pbbg.domain.model.LevelUp
-import com.bitwiserain.pbbg.domain.model.MaterializedItem
+import com.bitwiserain.pbbg.app.domain.model.LevelProgress
+import com.bitwiserain.pbbg.app.domain.model.LevelUp
+import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 
 class MineActionResult(
     val minedItemResults: List<MinedItemResult>,

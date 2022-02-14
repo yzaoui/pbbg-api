@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase
 
 interface AboutUC {
     fun getAppVersion(): String

@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.db.repository
+package com.bitwiserain.pbbg.app.db.repository
 
-import com.bitwiserain.pbbg.domain.model.UserStats
+import com.bitwiserain.pbbg.app.domain.model.UserStats
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table

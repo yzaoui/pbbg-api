@@ -1,24 +1,34 @@
-package com.bitwiserain.pbbg.route.api
+package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.API_ROOT
-import com.bitwiserain.pbbg.domain.model.BaseItem
-import com.bitwiserain.pbbg.domain.model.Inventory
-import com.bitwiserain.pbbg.domain.model.InventoryItem
-import com.bitwiserain.pbbg.domain.model.MaterializedItem
-import com.bitwiserain.pbbg.domain.usecase.*
-import com.bitwiserain.pbbg.domain.usecase.InventoryFilter.PLANTABLE
-import com.bitwiserain.pbbg.respondFail
-import com.bitwiserain.pbbg.respondSuccess
-import com.bitwiserain.pbbg.user
-import com.bitwiserain.pbbg.view.model.BaseItemJSON
-import com.bitwiserain.pbbg.view.model.EquipmentJSON
-import com.bitwiserain.pbbg.view.model.MaterializedItemJSON
-import com.bitwiserain.pbbg.view.model.PointJSON
-import com.bitwiserain.pbbg.view.model.inventory.InventoryItemJSON
-import com.bitwiserain.pbbg.view.model.inventory.InventoryJSON
+import com.bitwiserain.pbbg.app.API_ROOT
+import com.bitwiserain.pbbg.app.domain.model.BaseItem
+import com.bitwiserain.pbbg.app.domain.model.Inventory
+import com.bitwiserain.pbbg.app.domain.model.InventoryItem
+import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
+import com.bitwiserain.pbbg.app.domain.usecase.EquipmentUC
+import com.bitwiserain.pbbg.app.domain.usecase.InventoryFilter.PLANTABLE
+import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemAlreadyEquippedException
+import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippableException
+import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippedException
+import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotFoundException
+import com.bitwiserain.pbbg.app.domain.usecase.InventoryUC
+import com.bitwiserain.pbbg.app.respondFail
+import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.user
+import com.bitwiserain.pbbg.app.view.model.BaseItemJSON
+import com.bitwiserain.pbbg.app.view.model.EquipmentJSON
+import com.bitwiserain.pbbg.app.view.model.MaterializedItemJSON
+import com.bitwiserain.pbbg.app.view.model.PointJSON
+import com.bitwiserain.pbbg.app.view.model.inventory.InventoryItemJSON
+import com.bitwiserain.pbbg.app.view.model.inventory.InventoryJSON
 import io.ktor.application.call
 import io.ktor.request.receive
-import io.ktor.routing.*
+import io.ktor.routing.Route
+import io.ktor.routing.get
+import io.ktor.routing.optionalParam
+import io.ktor.routing.param
+import io.ktor.routing.post
+import io.ktor.routing.route
 
 fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = route("/inventory") {
     /**

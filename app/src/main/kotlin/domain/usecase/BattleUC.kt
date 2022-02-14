@@ -1,8 +1,8 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.battle.Battle
-import com.bitwiserain.pbbg.domain.model.battle.BattleAction
-import com.bitwiserain.pbbg.domain.model.battle.BattleActionResult
+import com.bitwiserain.pbbg.app.domain.model.battle.Battle
+import com.bitwiserain.pbbg.app.domain.model.battle.BattleAction
+import com.bitwiserain.pbbg.app.domain.model.battle.BattleActionResult
 
 interface BattleUC {
     /**

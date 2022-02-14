@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.view.model.itemdetails
+package com.bitwiserain.pbbg.app.view.model.itemdetails
 
 class ItemHistoryJSON(
     val date: Long,

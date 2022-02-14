@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.view.model.mine
+package com.bitwiserain.pbbg.app.view.model.mine
 
-import com.bitwiserain.pbbg.view.model.LevelProgressJSON
-import com.bitwiserain.pbbg.view.model.LevelUpJSON
+import com.bitwiserain.pbbg.app.view.model.LevelProgressJSON
+import com.bitwiserain.pbbg.app.view.model.LevelUpJSON
 import com.google.gson.annotations.SerializedName
 
 data class MineActionResultJSON(

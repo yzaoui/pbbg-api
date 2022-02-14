@@ -1,9 +1,9 @@
-package com.bitwiserain.pbbg.db.repository.battle
+package com.bitwiserain.pbbg.app.db.repository.battle
 
-import com.bitwiserain.pbbg.db.repository.UnitTable.UnitForm
-import com.bitwiserain.pbbg.db.repository.UnitTableImpl
-import com.bitwiserain.pbbg.db.repository.toMyUnit
-import com.bitwiserain.pbbg.domain.model.MyUnit
+import com.bitwiserain.pbbg.app.db.repository.UnitTable.UnitForm
+import com.bitwiserain.pbbg.app.db.repository.UnitTableImpl
+import com.bitwiserain.pbbg.app.db.repository.toMyUnit
+import com.bitwiserain.pbbg.app.domain.model.MyUnit
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table

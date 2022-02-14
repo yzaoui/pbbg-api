@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.domain.model
+package com.bitwiserain.pbbg.app.domain.model
 
-import com.bitwiserain.pbbg.domain.BattleManager
-import com.bitwiserain.pbbg.domain.model.MyUnitEnum.*
+import com.bitwiserain.pbbg.app.domain.BattleManager
+import com.bitwiserain.pbbg.app.domain.model.MyUnitEnum.*
 
 // TODO: Maybe get rid of this sealed class stuff and just have a default unit data class with an enum property?
 sealed class MyUnit {

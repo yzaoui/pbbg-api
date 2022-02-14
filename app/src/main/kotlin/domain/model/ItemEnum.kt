@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.model
+package com.bitwiserain.pbbg.app.domain.model
 
 enum class ItemEnum(val baseItem: BaseItem) {
     STONE(BaseItem.Material.Stone),

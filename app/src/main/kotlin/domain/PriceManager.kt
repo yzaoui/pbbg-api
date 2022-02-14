@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.domain
+package com.bitwiserain.pbbg.app.domain
 
-import com.bitwiserain.pbbg.domain.model.MaterializedItem
-import com.bitwiserain.pbbg.domain.model.MaterializedItem.*
+import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
+import com.bitwiserain.pbbg.app.domain.model.MaterializedItem.*
 
 object PriceManager {
     fun getSellPrice(item: MaterializedItem): Int = when (item) {

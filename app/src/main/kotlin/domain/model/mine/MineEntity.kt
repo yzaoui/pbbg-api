@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.model.mine
+package com.bitwiserain.pbbg.app.domain.model.mine
 
 /**
  * Entities that can be found on the mine's surface.

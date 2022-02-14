@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.view.model.inventory
+package com.bitwiserain.pbbg.app.view.model.inventory
 
-import com.bitwiserain.pbbg.view.model.MaterializedItemJSON
+import com.bitwiserain.pbbg.app.view.model.MaterializedItemJSON
 import com.google.gson.annotations.SerializedName
 
 data class InventoryItemJSON(

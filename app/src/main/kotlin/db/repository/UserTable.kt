@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.db.repository
+package com.bitwiserain.pbbg.app.db.repository
 
-import com.bitwiserain.pbbg.USERNAME_MAX_LENGTH
-import com.bitwiserain.pbbg.db.model.User
+import com.bitwiserain.pbbg.app.USERNAME_MAX_LENGTH
+import com.bitwiserain.pbbg.app.db.model.User
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.exists

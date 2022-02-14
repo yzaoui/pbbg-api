@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.db.repository
+package com.bitwiserain.pbbg.app.db.repository
 
-import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
+import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistory
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

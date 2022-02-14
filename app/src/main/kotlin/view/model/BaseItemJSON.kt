@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.view.model
+package com.bitwiserain.pbbg.app.view.model
 
 import com.google.gson.annotations.SerializedName
 

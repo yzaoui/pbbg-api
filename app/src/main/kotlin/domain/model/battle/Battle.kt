@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.domain.model.battle
+package com.bitwiserain.pbbg.app.domain.model.battle
 
-import com.bitwiserain.pbbg.domain.model.MyUnit
+import com.bitwiserain.pbbg.app.domain.model.MyUnit
 
 data class Battle(
     val allies: List<MyUnit>,

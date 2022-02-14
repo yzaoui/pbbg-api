@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.view.model.battle
+package com.bitwiserain.pbbg.app.view.model.battle
 
-import com.bitwiserain.pbbg.view.model.MyUnitJSON
+import com.bitwiserain.pbbg.app.view.model.MyUnitJSON
 import com.google.gson.annotations.SerializedName
 
 data class BattleJSON(

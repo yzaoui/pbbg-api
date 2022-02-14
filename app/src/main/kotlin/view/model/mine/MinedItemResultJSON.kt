@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.view.model.mine
+package com.bitwiserain.pbbg.app.view.model.mine
 
-import com.bitwiserain.pbbg.view.model.MaterializedItemJSON
+import com.bitwiserain.pbbg.app.view.model.MaterializedItemJSON
 import com.google.gson.annotations.SerializedName
 
 data class MinedItemResultJSON(

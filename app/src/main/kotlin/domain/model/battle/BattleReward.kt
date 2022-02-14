@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.domain.model.battle
+package com.bitwiserain.pbbg.app.domain.model.battle
 
-import com.bitwiserain.pbbg.domain.model.MaterializedItem
+import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 
 data class BattleReward(
     val gold: Int,

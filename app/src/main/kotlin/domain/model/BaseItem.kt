@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.domain.model
+package com.bitwiserain.pbbg.app.domain.model
 
-import com.bitwiserain.pbbg.domain.model.farm.BasePlant
+import com.bitwiserain.pbbg.app.domain.model.farm.BasePlant
 
 sealed class BaseItem {
     interface Stackable

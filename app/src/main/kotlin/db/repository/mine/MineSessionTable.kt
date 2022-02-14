@@ -1,8 +1,8 @@
-package com.bitwiserain.pbbg.db.repository.mine
+package com.bitwiserain.pbbg.app.db.repository.mine
 
-import com.bitwiserain.pbbg.db.model.MineSession
-import com.bitwiserain.pbbg.db.repository.UserTableImpl
-import com.bitwiserain.pbbg.domain.model.mine.MineType
+import com.bitwiserain.pbbg.app.db.model.MineSession
+import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
+import com.bitwiserain.pbbg.app.domain.model.mine.MineType
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.deleteWhere

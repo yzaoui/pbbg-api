@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.model.farm
+package com.bitwiserain.pbbg.app.domain.model.farm
 
 import java.time.Instant
 

@@ -1,13 +1,13 @@
-package com.bitwiserain.pbbg.route.api
+package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.domain.model.battle.*
-import com.bitwiserain.pbbg.domain.usecase.BattleAlreadyInProgressException
-import com.bitwiserain.pbbg.domain.usecase.BattleUC
-import com.bitwiserain.pbbg.domain.usecase.NoAlliesAliveException
-import com.bitwiserain.pbbg.respondFail
-import com.bitwiserain.pbbg.respondSuccess
-import com.bitwiserain.pbbg.user
-import com.bitwiserain.pbbg.view.model.battle.*
+import com.bitwiserain.pbbg.app.domain.model.battle.*
+import com.bitwiserain.pbbg.app.domain.usecase.BattleAlreadyInProgressException
+import com.bitwiserain.pbbg.app.domain.usecase.BattleUC
+import com.bitwiserain.pbbg.app.domain.usecase.NoAlliesAliveException
+import com.bitwiserain.pbbg.app.respondFail
+import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.user
+import com.bitwiserain.pbbg.app.view.model.battle.*
 import io.ktor.application.call
 import io.ktor.request.receive
 import io.ktor.routing.*

@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.model.battle
+package com.bitwiserain.pbbg.app.domain.model.battle
 
 data class BattleActionResult(
     val battle: Battle,

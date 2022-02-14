@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.view.model.inventory
+package com.bitwiserain.pbbg.app.view.model.inventory
 
-import com.bitwiserain.pbbg.view.model.EquipmentJSON
+import com.bitwiserain.pbbg.app.view.model.EquipmentJSON
 
 data class InventoryJSON(
     val items: List<InventoryItemJSON>,

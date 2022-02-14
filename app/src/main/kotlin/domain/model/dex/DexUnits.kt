@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.domain.model.dex
+package com.bitwiserain.pbbg.app.domain.model.dex
 
-import com.bitwiserain.pbbg.domain.model.MyUnitEnum
+import com.bitwiserain.pbbg.app.domain.model.MyUnitEnum
 
 data class DexUnits(
     val discoveredUnits: Set<MyUnitEnum>,

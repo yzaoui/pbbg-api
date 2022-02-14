@@ -1,9 +1,9 @@
-package com.bitwiserain.pbbg.route.api
+package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.domain.usecase.RegisterUserUC
-import com.bitwiserain.pbbg.makeToken
-import com.bitwiserain.pbbg.respondFail
-import com.bitwiserain.pbbg.respondSuccess
+import com.bitwiserain.pbbg.app.domain.usecase.RegisterUserUC
+import com.bitwiserain.pbbg.app.makeToken
+import com.bitwiserain.pbbg.app.respondFail
+import com.bitwiserain.pbbg.app.respondSuccess
 import io.ktor.application.application
 import io.ktor.application.call
 import io.ktor.request.receive

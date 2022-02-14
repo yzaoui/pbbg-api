@@ -1,8 +1,8 @@
-package com.bitwiserain.pbbg.db.usecase
+package com.bitwiserain.pbbg.app.db.usecase
 
-import com.bitwiserain.pbbg.APP_VERSION
-import com.bitwiserain.pbbg.PatchNotesHelper
-import com.bitwiserain.pbbg.domain.usecase.AboutUC
+import com.bitwiserain.pbbg.app.APP_VERSION
+import com.bitwiserain.pbbg.app.PatchNotesHelper
+import com.bitwiserain.pbbg.app.domain.usecase.AboutUC
 
 class AboutUCImpl : AboutUC {
     override fun getAppVersion(): String = APP_VERSION

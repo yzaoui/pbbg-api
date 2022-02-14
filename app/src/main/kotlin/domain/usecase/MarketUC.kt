@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.market.MarketOrder
-import com.bitwiserain.pbbg.domain.model.market.UserAndGameMarkets
+import com.bitwiserain.pbbg.app.domain.model.market.MarketOrder
+import com.bitwiserain.pbbg.app.domain.model.market.UserAndGameMarkets
 
 interface MarketUC {
     fun getMarkets(userId: Int): UserAndGameMarkets

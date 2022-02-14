@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.friends.Friends
-import com.bitwiserain.pbbg.domain.model.friends.Friendship
+import com.bitwiserain.pbbg.app.domain.model.friends.Friends
+import com.bitwiserain.pbbg.app.domain.model.friends.Friendship
 
 interface FriendsUC {
     /**

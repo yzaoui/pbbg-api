@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.db.repository.battle
+package com.bitwiserain.pbbg.app.db.repository.battle
 
-import com.bitwiserain.pbbg.db.repository.UserTableImpl
-import com.bitwiserain.pbbg.domain.model.battle.BattleQueue
+import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
+import com.bitwiserain.pbbg.app.domain.model.battle.BattleQueue
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.deleteWhere
@@ -71,7 +71,7 @@ class BattleSessionTableImpl : BattleSessionTable {
 
     override fun updateBattleQueue(battleSession: Long, battleQueue: BattleQueue) {
         Exposed.update({ Exposed.id eq battleSession }) {
-            it[this.battleQueue] = battleQueue.toJSON()
+            it[Exposed.battleQueue] = battleQueue.toJSON()
         }
     }
 }

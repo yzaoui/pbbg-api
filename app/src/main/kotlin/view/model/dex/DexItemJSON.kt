@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.view.model.dex
+package com.bitwiserain.pbbg.app.view.model.dex
 
-import com.bitwiserain.pbbg.view.model.BaseItemJSON
+import com.bitwiserain.pbbg.app.view.model.BaseItemJSON
 import com.google.gson.annotations.SerializedName
 
 sealed class DexItemJSON(

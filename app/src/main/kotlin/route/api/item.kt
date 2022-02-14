@@ -1,15 +1,15 @@
-package com.bitwiserain.pbbg.route.api
+package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.domain.model.itemdetails.ItemDetails
-import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistory
-import com.bitwiserain.pbbg.domain.model.itemdetails.ItemHistoryInfo
-import com.bitwiserain.pbbg.domain.usecase.ItemNotFoundException
-import com.bitwiserain.pbbg.domain.usecase.ItemUC
-import com.bitwiserain.pbbg.respondFail
-import com.bitwiserain.pbbg.respondSuccess
-import com.bitwiserain.pbbg.view.model.itemdetails.ItemDetailsJSON
-import com.bitwiserain.pbbg.view.model.itemdetails.ItemHistoryInfoJSON
-import com.bitwiserain.pbbg.view.model.itemdetails.ItemHistoryJSON
+import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemDetails
+import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistory
+import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistoryInfo
+import com.bitwiserain.pbbg.app.domain.usecase.ItemNotFoundException
+import com.bitwiserain.pbbg.app.domain.usecase.ItemUC
+import com.bitwiserain.pbbg.app.respondFail
+import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.view.model.itemdetails.ItemDetailsJSON
+import com.bitwiserain.pbbg.app.view.model.itemdetails.ItemHistoryInfoJSON
+import com.bitwiserain.pbbg.app.view.model.itemdetails.ItemHistoryJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get

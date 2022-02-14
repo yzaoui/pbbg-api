@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.itemdetails.ItemDetails
+import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemDetails
 
 interface ItemUC {
     /**

@@ -1,7 +1,6 @@
-package com.bitwiserain.pbbg.db.repository.market
+package com.bitwiserain.pbbg.app.db.repository.market
 
-import com.bitwiserain.pbbg.db.repository.MaterializedItemTable
-import com.bitwiserain.pbbg.db.repository.MaterializedItemTableImpl
+import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTableImpl
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.deleteWhere

@@ -1,11 +1,11 @@
-package com.bitwiserain.pbbg.db.usecase
+package com.bitwiserain.pbbg.app.db.usecase
 
-import com.bitwiserain.pbbg.db.repository.FriendsTable
-import com.bitwiserain.pbbg.db.repository.UserTable
-import com.bitwiserain.pbbg.domain.model.UserProfile
-import com.bitwiserain.pbbg.domain.model.friends.FriendInfo
-import com.bitwiserain.pbbg.domain.usecase.TargetUserDoesNotExistException
-import com.bitwiserain.pbbg.domain.usecase.UserProfileUC
+import com.bitwiserain.pbbg.app.db.repository.FriendsTable
+import com.bitwiserain.pbbg.app.db.repository.UserTable
+import com.bitwiserain.pbbg.app.domain.model.UserProfile
+import com.bitwiserain.pbbg.app.domain.model.friends.FriendInfo
+import com.bitwiserain.pbbg.app.domain.usecase.TargetUserDoesNotExistException
+import com.bitwiserain.pbbg.app.domain.usecase.UserProfileUC
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 

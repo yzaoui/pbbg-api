@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.domain.model
+package com.bitwiserain.pbbg.app.domain.model
 
-import com.bitwiserain.pbbg.domain.model.friends.Friendship
+import com.bitwiserain.pbbg.app.domain.model.friends.Friendship
 import java.time.Instant
 
 data class UserProfile(

@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.db.repository.mine
+package com.bitwiserain.pbbg.app.db.repository.mine
 
-import com.bitwiserain.pbbg.db.model.MineCell
-import com.bitwiserain.pbbg.domain.model.mine.MineEntity
+import com.bitwiserain.pbbg.app.db.model.MineCell
+import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.batchInsert

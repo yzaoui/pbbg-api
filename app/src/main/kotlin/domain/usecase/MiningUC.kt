@@ -1,9 +1,9 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.mine.AvailableMines
-import com.bitwiserain.pbbg.domain.model.mine.Mine
-import com.bitwiserain.pbbg.domain.model.mine.MineActionResult
-import com.bitwiserain.pbbg.domain.model.mine.MineType
+import com.bitwiserain.pbbg.app.domain.model.mine.AvailableMines
+import com.bitwiserain.pbbg.app.domain.model.mine.Mine
+import com.bitwiserain.pbbg.app.domain.model.mine.MineActionResult
+import com.bitwiserain.pbbg.app.domain.model.mine.MineType
 
 interface MiningUC {
     /**

@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.model.mine
+package com.bitwiserain.pbbg.app.domain.model.mine
 
 enum class MineType(val friendlyName: String, val minLevel: Int, val spriteName: String, private val mineEntityOdds: Map<Float, MineEntity>) {
     BEGINNER(

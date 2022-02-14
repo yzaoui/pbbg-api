@@ -1,9 +1,9 @@
-package com.bitwiserain.pbbg.test
+package com.bitwiserain.pbbg.app.test
 
-import com.bitwiserain.pbbg.BCryptHelper
-import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.UserTable
-import com.bitwiserain.pbbg.mainWithDependencies
+import com.bitwiserain.pbbg.app.BCryptHelper
+import com.bitwiserain.pbbg.app.SchemaHelper
+import com.bitwiserain.pbbg.app.db.repository.UserTable
+import com.bitwiserain.pbbg.app.mainWithDependencies
 import io.ktor.config.MapApplicationConfig
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -12,7 +12,11 @@ import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 import org.h2.Driver
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction

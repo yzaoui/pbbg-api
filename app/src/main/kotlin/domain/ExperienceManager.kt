@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.domain
+package com.bitwiserain.pbbg.app.domain
 
-import com.bitwiserain.pbbg.domain.model.LevelProgress
+import com.bitwiserain.pbbg.app.domain.model.LevelProgress
 
 abstract class ExperienceManager {
     /**

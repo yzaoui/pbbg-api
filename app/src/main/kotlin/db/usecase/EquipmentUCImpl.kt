@@ -1,9 +1,13 @@
-package com.bitwiserain.pbbg.db.usecase
+package com.bitwiserain.pbbg.app.db.usecase
 
-import com.bitwiserain.pbbg.db.repository.Joins
-import com.bitwiserain.pbbg.domain.model.BaseItem
-import com.bitwiserain.pbbg.domain.model.InventoryItem
-import com.bitwiserain.pbbg.domain.usecase.*
+import com.bitwiserain.pbbg.app.db.repository.Joins
+import com.bitwiserain.pbbg.app.domain.model.BaseItem
+import com.bitwiserain.pbbg.app.domain.model.InventoryItem
+import com.bitwiserain.pbbg.app.domain.usecase.EquipmentUC
+import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemAlreadyEquippedException
+import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippableException
+import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippedException
+import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotFoundException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 

@@ -1,8 +1,8 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase
 
-import com.bitwiserain.pbbg.BCryptHelper
-import com.bitwiserain.pbbg.db.repository.UserTable
-import com.bitwiserain.pbbg.domain.usecase.LoginUC.Result
+import com.bitwiserain.pbbg.app.BCryptHelper
+import com.bitwiserain.pbbg.app.db.repository.UserTable
+import com.bitwiserain.pbbg.app.domain.usecase.LoginUC.Result
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 

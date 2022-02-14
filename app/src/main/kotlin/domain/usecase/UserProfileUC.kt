@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase
 
-import com.bitwiserain.pbbg.domain.model.UserProfile
-import com.bitwiserain.pbbg.domain.model.friends.FriendInfo
+import com.bitwiserain.pbbg.app.domain.model.UserProfile
+import com.bitwiserain.pbbg.app.domain.model.friends.FriendInfo
 
 interface UserProfileUC {
     /**

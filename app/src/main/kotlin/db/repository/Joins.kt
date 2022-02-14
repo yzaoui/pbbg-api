@@ -1,9 +1,9 @@
-package com.bitwiserain.pbbg.db.repository
+package com.bitwiserain.pbbg.app.db.repository
 
-import com.bitwiserain.pbbg.db.repository.market.MarketInventoryTableImpl
-import com.bitwiserain.pbbg.db.repository.market.MarketTableImpl
-import com.bitwiserain.pbbg.domain.model.InventoryItem
-import com.bitwiserain.pbbg.domain.model.ItemEnum
+import com.bitwiserain.pbbg.app.db.repository.market.MarketInventoryTableImpl
+import com.bitwiserain.pbbg.app.db.repository.market.MarketTableImpl
+import com.bitwiserain.pbbg.app.domain.model.InventoryItem
+import com.bitwiserain.pbbg.app.domain.model.ItemEnum
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.batchInsert

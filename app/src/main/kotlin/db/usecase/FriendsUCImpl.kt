@@ -1,17 +1,17 @@
-package com.bitwiserain.pbbg.db.usecase
+package com.bitwiserain.pbbg.app.db.usecase
 
-import com.bitwiserain.pbbg.db.repository.FriendsTable
-import com.bitwiserain.pbbg.db.repository.UserTable
-import com.bitwiserain.pbbg.domain.model.friends.FriendInfo
-import com.bitwiserain.pbbg.domain.model.friends.Friends
-import com.bitwiserain.pbbg.domain.model.friends.Friendship
-import com.bitwiserain.pbbg.domain.usecase.FriendsUC
-import com.bitwiserain.pbbg.domain.usecase.FriendshipNotConfirmedException
-import com.bitwiserain.pbbg.domain.usecase.FriendshipNotNoneException
-import com.bitwiserain.pbbg.domain.usecase.FriendshipNotRequestReceivedException
-import com.bitwiserain.pbbg.domain.usecase.FriendshipNotRequestSentException
-import com.bitwiserain.pbbg.domain.usecase.SelfFriendshipException
-import com.bitwiserain.pbbg.domain.usecase.TargetUserDoesNotExistException
+import com.bitwiserain.pbbg.app.db.repository.FriendsTable
+import com.bitwiserain.pbbg.app.db.repository.UserTable
+import com.bitwiserain.pbbg.app.domain.model.friends.FriendInfo
+import com.bitwiserain.pbbg.app.domain.model.friends.Friends
+import com.bitwiserain.pbbg.app.domain.model.friends.Friendship
+import com.bitwiserain.pbbg.app.domain.usecase.FriendsUC
+import com.bitwiserain.pbbg.app.domain.usecase.FriendshipNotConfirmedException
+import com.bitwiserain.pbbg.app.domain.usecase.FriendshipNotNoneException
+import com.bitwiserain.pbbg.app.domain.usecase.FriendshipNotRequestReceivedException
+import com.bitwiserain.pbbg.app.domain.usecase.FriendshipNotRequestSentException
+import com.bitwiserain.pbbg.app.domain.usecase.SelfFriendshipException
+import com.bitwiserain.pbbg.app.domain.usecase.TargetUserDoesNotExistException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 

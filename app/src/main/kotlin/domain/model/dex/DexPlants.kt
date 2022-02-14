@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.domain.model.dex
+package com.bitwiserain.pbbg.app.domain.model.dex
 
-import com.bitwiserain.pbbg.domain.model.farm.BasePlant
+import com.bitwiserain.pbbg.app.domain.model.farm.BasePlant
 
 /**
  * The user's plants dex, which lists all plant types that the user has ever harvested.

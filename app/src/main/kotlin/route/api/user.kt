@@ -1,15 +1,15 @@
-package com.bitwiserain.pbbg.route.api
+package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.domain.model.UserProfile
-import com.bitwiserain.pbbg.domain.model.friends.Friendship
-import com.bitwiserain.pbbg.domain.usecase.TargetUserDoesNotExistException
-import com.bitwiserain.pbbg.domain.usecase.UserProfileUC
-import com.bitwiserain.pbbg.respondFail
-import com.bitwiserain.pbbg.respondSuccess
-import com.bitwiserain.pbbg.user
-import com.bitwiserain.pbbg.userOptional
-import com.bitwiserain.pbbg.view.model.UserProfileJSON
-import com.bitwiserain.pbbg.view.model.friends.FriendshipJSON
+import com.bitwiserain.pbbg.app.domain.model.UserProfile
+import com.bitwiserain.pbbg.app.domain.model.friends.Friendship
+import com.bitwiserain.pbbg.app.domain.usecase.TargetUserDoesNotExistException
+import com.bitwiserain.pbbg.app.domain.usecase.UserProfileUC
+import com.bitwiserain.pbbg.app.respondFail
+import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.user
+import com.bitwiserain.pbbg.app.userOptional
+import com.bitwiserain.pbbg.app.view.model.UserProfileJSON
+import com.bitwiserain.pbbg.app.view.model.friends.FriendshipJSON
 import io.ktor.application.call
 import io.ktor.routing.Route
 import io.ktor.routing.get

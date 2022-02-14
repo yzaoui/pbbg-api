@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.model.mine
+package com.bitwiserain.pbbg.app.domain.model.mine
 
 /**
  * Represents a mine entity, with dimensions and contents.

@@ -1,7 +1,7 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase
 
-import com.bitwiserain.pbbg.db.repository.UserStatsTable
-import com.bitwiserain.pbbg.domain.model.UserStats
+import com.bitwiserain.pbbg.app.db.repository.UserStatsTable
+import com.bitwiserain.pbbg.app.domain.model.UserStats
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 

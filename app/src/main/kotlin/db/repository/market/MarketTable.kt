@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.db.repository.market
+package com.bitwiserain.pbbg.app.db.repository.market
 
-import com.bitwiserain.pbbg.db.repository.UserTableImpl
+import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.insertAndGetId

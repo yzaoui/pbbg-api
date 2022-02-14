@@ -1,12 +1,13 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.test.domain.usecase
 
-import com.bitwiserain.pbbg.BCryptHelper
-import com.bitwiserain.pbbg.PASSWORD_REGEX
-import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.UserTableImpl
-import com.bitwiserain.pbbg.domain.usecase.ChangePasswordUC.Result
-import com.bitwiserain.pbbg.test.createTestUserAndGetId
-import com.bitwiserain.pbbg.test.initDatabase
+import com.bitwiserain.pbbg.app.BCryptHelper
+import com.bitwiserain.pbbg.app.PASSWORD_REGEX
+import com.bitwiserain.pbbg.app.SchemaHelper
+import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
+import com.bitwiserain.pbbg.app.domain.usecase.ChangePasswordUC.Result
+import com.bitwiserain.pbbg.app.domain.usecase.ChangePasswordUCImpl
+import com.bitwiserain.pbbg.app.test.createTestUserAndGetId
+import com.bitwiserain.pbbg.app.test.initDatabase
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldNotBeNull

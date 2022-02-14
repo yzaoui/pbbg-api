@@ -1,9 +1,11 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.test.domain.usecase
 
-import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.UserTableImpl
-import com.bitwiserain.pbbg.test.createTestUserAndGetId
-import com.bitwiserain.pbbg.test.initDatabase
+import com.bitwiserain.pbbg.app.SchemaHelper
+import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
+import com.bitwiserain.pbbg.app.domain.usecase.LoginUC
+import com.bitwiserain.pbbg.app.domain.usecase.LoginUCImpl
+import com.bitwiserain.pbbg.app.test.createTestUserAndGetId
+import com.bitwiserain.pbbg.app.test.initDatabase
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import org.junit.jupiter.api.AfterEach

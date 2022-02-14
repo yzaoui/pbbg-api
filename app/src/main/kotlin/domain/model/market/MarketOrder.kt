@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.model.market
+package com.bitwiserain.pbbg.app.domain.model.market
 
 data class MarketOrder(
     val id: Long,

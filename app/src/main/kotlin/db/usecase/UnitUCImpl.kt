@@ -1,13 +1,13 @@
-package com.bitwiserain.pbbg.db.usecase
+package com.bitwiserain.pbbg.app.db.usecase
 
-import com.bitwiserain.pbbg.db.repository.SquadTable
-import com.bitwiserain.pbbg.db.repository.UnitTable
-import com.bitwiserain.pbbg.db.repository.battle.BattleSessionTable
-import com.bitwiserain.pbbg.domain.model.MyUnit
-import com.bitwiserain.pbbg.domain.model.Squad
-import com.bitwiserain.pbbg.domain.usecase.SquadInBattleException
-import com.bitwiserain.pbbg.domain.usecase.UnitNotFoundException
-import com.bitwiserain.pbbg.domain.usecase.UnitUC
+import com.bitwiserain.pbbg.app.db.repository.SquadTable
+import com.bitwiserain.pbbg.app.db.repository.UnitTable
+import com.bitwiserain.pbbg.app.db.repository.battle.BattleSessionTable
+import com.bitwiserain.pbbg.app.domain.model.MyUnit
+import com.bitwiserain.pbbg.app.domain.model.Squad
+import com.bitwiserain.pbbg.app.domain.usecase.SquadInBattleException
+import com.bitwiserain.pbbg.app.domain.usecase.UnitNotFoundException
+import com.bitwiserain.pbbg.app.domain.usecase.UnitUC
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 

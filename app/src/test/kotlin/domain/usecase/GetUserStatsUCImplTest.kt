@@ -1,10 +1,11 @@
-package com.bitwiserain.pbbg.domain.usecase
+package com.bitwiserain.pbbg.app.test.domain.usecase
 
-import com.bitwiserain.pbbg.SchemaHelper
-import com.bitwiserain.pbbg.db.repository.UserStatsTableImpl
-import com.bitwiserain.pbbg.db.repository.UserTableImpl
-import com.bitwiserain.pbbg.test.createTestUserAndGetId
-import com.bitwiserain.pbbg.test.initDatabase
+import com.bitwiserain.pbbg.app.SchemaHelper
+import com.bitwiserain.pbbg.app.db.repository.UserStatsTableImpl
+import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
+import com.bitwiserain.pbbg.app.domain.usecase.GetUserStatsUCImpl
+import com.bitwiserain.pbbg.app.test.createTestUserAndGetId
+import com.bitwiserain.pbbg.app.test.initDatabase
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.shouldBe
 import org.jetbrains.exposed.sql.transactions.transaction

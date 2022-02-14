@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.test.integration.api
+package com.bitwiserain.pbbg.app.test.integration.api
 
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod

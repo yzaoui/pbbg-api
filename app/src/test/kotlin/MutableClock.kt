@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.test
+package com.bitwiserain.pbbg.app.test
 
 import java.time.Clock
 import java.time.Instant

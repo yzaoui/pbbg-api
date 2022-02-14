@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.view.model.dex
+package com.bitwiserain.pbbg.app.view.model.dex
 
-import com.bitwiserain.pbbg.view.model.MyUnitEnumJSON
+import com.bitwiserain.pbbg.app.view.model.MyUnitEnumJSON
 import com.google.gson.annotations.SerializedName
 import java.util.*
 

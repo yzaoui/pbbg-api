@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.domain.model.itemdetails
+package com.bitwiserain.pbbg.app.domain.model.itemdetails
 
-import com.bitwiserain.pbbg.domain.model.MaterializedItem
+import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 
 class ItemDetails(
     val item: MaterializedItem,

@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.model.itemdetails
+package com.bitwiserain.pbbg.app.domain.model.itemdetails
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.domain.model.friends
+package com.bitwiserain.pbbg.app.domain.model.friends
 
 data class FriendInfo(
     val userId: Int,
