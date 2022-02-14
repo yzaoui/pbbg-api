@@ -4,7 +4,7 @@ import java.net.URI
 object Versions {
     const val KOTLIN = "1.6.10"
     const val KTOR = "1.6.4"
-    const val EXPOSED = "0.35.3"
+    const val EXPOSED = "0.37.3"
     const val JUNIT_JUPITER = "5.8.1"
 }
 
