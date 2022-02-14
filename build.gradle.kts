@@ -17,6 +17,7 @@ plugins {
     id("com.github.johnrengelman.shadow").version("7.1.0")
     kotlin("plugin.serialization").version(/*Versions.KOTLIN*/"1.6.10")
     id("org.jetbrains.kotlinx.kover") version "0.5.0"
+    id("org.jetbrains.dokka") version /*Versions.KOTLIN*/"1.6.10"
 }
 
 application {
