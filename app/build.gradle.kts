@@ -1,4 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.gradle.ext.packagePrefix
+import org.jetbrains.gradle.ext.settings
 
 object Versions {
     const val KOTLIN = "1.6.10"
@@ -14,6 +16,7 @@ plugins {
     kotlin("plugin.serialization").version(/*Versions.KOTLIN*/"1.6.21")
     id("org.jetbrains.kotlinx.kover") version "0.5.0"
     id("org.jetbrains.dokka") version /*Versions.KOTLIN*/"1.6.21"
+    id("org.jetbrains.gradle.plugin.idea-ext")
 }
 
 application {
@@ -42,4 +45,9 @@ dependencies {
 
 tasks.withType<ShadowJar> {
     archiveClassifier.set("")
+}
+
+idea.module.settings {
+    packagePrefix["src/main/kotlin"] = "com.bitwiserain.pbbg.app"
+    packagePrefix["src/test/kotlin"] = "com.bitwiserain.pbbg.app.test"
 }
