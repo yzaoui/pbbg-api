@@ -10,3 +10,15 @@ pluginManagement {
         }
     }
 }
+
+dependencyResolutionManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven { url = java.net.URI("https://kotlin.bintray.com/ktor") }
+        maven { url = java.net.URI("https://kotlin.bintray.com/kotlinx") }
+        maven { url = java.net.URI("https://dl.bintray.com/kotlin/exposed") }
+    }
+}
+
+include("app")
