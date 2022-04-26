@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.app.test.integration.response
+package com.bitwiserain.pbbg.app.testintegration.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

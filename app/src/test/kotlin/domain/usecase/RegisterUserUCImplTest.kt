@@ -18,7 +18,6 @@ import com.bitwiserain.pbbg.app.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.app.db.repository.market.MarketTable
 import com.bitwiserain.pbbg.app.domain.usecase.RegisterUserUC.Result
 import com.bitwiserain.pbbg.app.domain.usecase.RegisterUserUCImpl
-import com.bitwiserain.pbbg.app.test.MutableClock
 import com.bitwiserain.pbbg.app.test.db.TestTransaction
 import com.bitwiserain.pbbg.app.test.db.repository.MarketTableTestImpl
 import com.bitwiserain.pbbg.app.test.db.repository.MaterializedItemTableTestImpl
@@ -37,6 +36,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.Clock
 
 class RegisterUserUCImplTest {
 
@@ -50,7 +50,7 @@ class RegisterUserUCImplTest {
 
     private val marketIds: MutableMap<Int, Int> = mutableMapOf()
 
-    private val clock = MutableClock()
+    private val clock = Clock.systemUTC()
     private val dexTable: DexTable = mockk(relaxUnitFun = true)
     private val inventoryTable: InventoryTable = mockk(relaxUnitFun = true)
     private val itemHistoryTable: ItemHistoryTable = mockk(relaxUnitFun = true)

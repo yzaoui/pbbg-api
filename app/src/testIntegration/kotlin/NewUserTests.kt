@@ -1,14 +1,10 @@
-package com.bitwiserain.pbbg.app.test.integration
+package com.bitwiserain.pbbg.app.testintegration
 
 import com.bitwiserain.pbbg.app.SchemaHelper
-import com.bitwiserain.pbbg.app.test.MutableClock
-import com.bitwiserain.pbbg.app.test.initDatabase
-import com.bitwiserain.pbbg.app.test.integration.api.GETInventory
-import com.bitwiserain.pbbg.app.test.integration.model.Inventory
-import com.bitwiserain.pbbg.app.test.integration.response.RegisterResponse
-import com.bitwiserain.pbbg.app.test.integration.response.UserResponse
-import com.bitwiserain.pbbg.app.test.registerUserAndGetToken
-import com.bitwiserain.pbbg.app.test.testApp
+import com.bitwiserain.pbbg.app.testintegration.api.GETInventory
+import com.bitwiserain.pbbg.app.testintegration.model.Inventory
+import com.bitwiserain.pbbg.app.testintegration.response.RegisterResponse
+import com.bitwiserain.pbbg.app.testintegration.response.UserResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
