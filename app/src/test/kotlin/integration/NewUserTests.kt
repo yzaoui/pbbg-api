@@ -32,12 +32,12 @@ import kotlin.test.assertNull
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class NewUserTests {
-    private val db = initDatabase()
+    private val transaction = initDatabase()
     private val clock = MutableClock()
 
     @AfterEach
     fun dropDatabase() {
-        SchemaHelper.dropTables(db)
+        SchemaHelper.dropTables(transaction)
     }
 
     @Test

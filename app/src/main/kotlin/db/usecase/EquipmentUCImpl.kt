@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.app.db.usecase
 
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.Joins
 import com.bitwiserain.pbbg.app.domain.model.BaseItem
 import com.bitwiserain.pbbg.app.domain.model.InventoryItem
@@ -8,11 +9,9 @@ import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemAlreadyEquippedExcep
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippableException
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippedException
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotFoundException
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 
-class EquipmentUCImpl(private val db: Database) : EquipmentUC {
-    override fun equip(userId: Int, itemId: Long): Unit = transaction(db) {
+class EquipmentUCImpl(private val transaction: Transaction) : EquipmentUC {
+    override fun equip(userId: Int, itemId: Long): Unit = transaction {
         val inventoryItems = Joins.getInventoryItems(userId)
 
         /* Get item from inventory table */
@@ -44,7 +43,7 @@ class EquipmentUCImpl(private val db: Database) : EquipmentUC {
         Joins.setItemEquipped(userId, itemId, equipped = true)
     }
 
-    override fun unequip(userId: Int, itemId: Long): Unit = transaction(db) {
+    override fun unequip(userId: Int, itemId: Long): Unit = transaction {
         /* Get item from inventory table */
         val item = Joins.getInventoryItem(userId, itemId) ?: throw InventoryItemNotFoundException(itemId)
 

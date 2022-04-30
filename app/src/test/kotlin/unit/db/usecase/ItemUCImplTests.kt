@@ -12,7 +12,6 @@ import com.bitwiserain.pbbg.app.domain.usecase.ItemNotFoundException
 import com.bitwiserain.pbbg.app.domain.usecase.ItemUC
 import com.bitwiserain.pbbg.app.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.app.test.initDatabase
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -23,24 +22,24 @@ import kotlin.test.assertTrue
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class ItemUCImplTests {
 
-    private val db = initDatabase()
+    private val transaction = initDatabase()
     private val itemHistoryTable = ItemHistoryTableImpl()
     private val materializedItemTable = MaterializedItemTableImpl()
     private val userTable = UserTableImpl()
-    private val itemUC: ItemUC = ItemUCImpl(db, itemHistoryTable, materializedItemTable, userTable)
+    private val itemUC: ItemUC = ItemUCImpl(transaction, itemHistoryTable, materializedItemTable, userTable)
 
     @AfterEach
     fun dropDatabase() {
-        SchemaHelper.dropTables(db)
+        SchemaHelper.dropTables(transaction)
     }
 
     @Test
     fun `Given an item in existence with a history, when calling for its details, should return all its expected details`() {
         val creationDate = Instant.ofEpochSecond(946684800L)
         val users = listOf("user1", "user2", "user3")
-            .associateBy { createTestUserAndGetId(db, userTable, it) }
+            .associateBy { createTestUserAndGetId(transaction, userTable, it) }
 
-        val itemId = transaction(db) {
+        val itemId = transaction {
             val itemId = materializedItemTable.insertItemAndGetId(MaterializedItem.Stone(quantity = 3))
 
             listOf(ItemHistory(

@@ -5,6 +5,7 @@ import com.bitwiserain.pbbg.app.PASSWORD_REGEX
 import com.bitwiserain.pbbg.app.PASSWORD_REGEX_DESCRIPTION
 import com.bitwiserain.pbbg.app.USERNAME_REGEX
 import com.bitwiserain.pbbg.app.USERNAME_REGEX_DESCRIPTION
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.DexTable
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.repository.ItemHistoryTable
@@ -22,8 +23,6 @@ import com.bitwiserain.pbbg.app.domain.model.MyUnitEnum
 import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.app.domain.usecase.RegisterUserUC.Result
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Clock
 import java.time.temporal.ChronoUnit
 
@@ -56,7 +55,7 @@ interface RegisterUserUC {
 }
 
 class RegisterUserUCImpl(
-    private val db: Database,
+    private val transaction: Transaction,
     private val clock: Clock,
     private val dexTable: DexTable,
     private val inventoryTable: InventoryTable,
@@ -83,7 +82,7 @@ class RegisterUserUCImpl(
             )
         }
 
-        return transaction(db) {
+        return transaction {
             /* Make sure username is available */
             if (userTable.getUserByUsername(username) != null) return@transaction Result.UsernameNotAvailableError
 

@@ -13,18 +13,18 @@ import org.junit.jupiter.api.Test
 
 class LoginUCImplTest {
 
-    private val db = initDatabase()
+    private val transaction = initDatabase()
     private val userTable = UserTableImpl()
-    private val login = LoginUCImpl(db, userTable)
+    private val login = LoginUCImpl(transaction, userTable)
 
     @AfterEach
     fun dropDatabase() {
-        SchemaHelper.dropTables(db)
+        SchemaHelper.dropTables(transaction)
     }
 
     @Test
     fun `Given an existing user, when getting the user's ID by correct credentials, the ID should return`() {
-        val expectedUserId = createTestUserAndGetId(db, userTable, username = "username24", password = "pass123")
+        val expectedUserId = createTestUserAndGetId(transaction, userTable, username = "username24", password = "pass123")
 
         val result = login("username24", "pass123")
 
@@ -34,7 +34,7 @@ class LoginUCImplTest {
 
     @Test
     fun `Given an existing user, when getting the user's ID by incorrect credentials, no ID should be returned`() {
-        val expectedUserId = createTestUserAndGetId(db, userTable, username = "username24", password = "pass123")
+        val expectedUserId = createTestUserAndGetId(transaction, userTable, username = "username24", password = "pass123")
 
         /* Test incorrect username */
         login("incorrecto17", "pass123").shouldBeTypeOf<LoginUC.Result.CredentialsDontMatchError>()

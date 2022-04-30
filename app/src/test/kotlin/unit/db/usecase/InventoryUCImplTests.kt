@@ -13,7 +13,6 @@ import com.bitwiserain.pbbg.app.domain.usecase.InventoryUC
 import com.bitwiserain.pbbg.app.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.app.test.initDatabase
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -23,22 +22,22 @@ import kotlin.test.assertEquals
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class InventoryUCImplTests {
 
-    private val db = initDatabase()
+    private val transaction = initDatabase()
     private val inventoryTable = InventoryTableImpl()
     private val materializedItemTable = MaterializedItemTableImpl()
     private val userTable = UserTableImpl()
-    private val inventoryUC: InventoryUC = InventoryUCImpl(db)
+    private val inventoryUC: InventoryUC = InventoryUCImpl(transaction)
 
     @AfterEach
     fun dropDatabase() {
-        SchemaHelper.dropTables(db)
+        SchemaHelper.dropTables(transaction)
     }
 
     @Test
     fun `Given a user with items, when calling for inventory, those items should return`() {
-        val userId = createTestUserAndGetId(db, userTable)
+        val userId = createTestUserAndGetId(transaction, userTable)
 
-        val (expectedInventory, actualInventory) = transaction(db) {
+        val (expectedInventory, actualInventory) = transaction {
             val itemsById = listOf(MaterializedItem.CrossPickaxe, MaterializedItem.CopperOre(quantity = 5), MaterializedItem.IcePick)
                 .associateBy { materializedItemTable.insertItemAndGetId(it) }
             // Insert items

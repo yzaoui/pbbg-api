@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.app.db.usecase
 
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.DexTable
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.repository.ItemHistoryTable
@@ -27,13 +28,11 @@ import com.bitwiserain.pbbg.app.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.app.domain.usecase.NoEquippedPickaxeException
 import com.bitwiserain.pbbg.app.domain.usecase.NotInMineSessionException
 import com.bitwiserain.pbbg.app.domain.usecase.UnfulfilledLevelRequirementException
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Clock
 import kotlin.random.Random
 
 class MiningUCImpl(
-    private val db: Database,
+    private val transaction: Transaction,
     private val clock: Clock,
     private val dexTable: DexTable,
     private val inventoryTable: InventoryTable,
@@ -44,7 +43,7 @@ class MiningUCImpl(
     private val userStatsTable: UserStatsTable,
 ) : MiningUC {
 
-    override fun getMine(userId: Int): Mine? = transaction(db) {
+    override fun getMine(userId: Int): Mine? = transaction {
         /* Get currently running mine session */
         val mineSession = mineSessionTable.getSession(userId) ?: return@transaction null
 
@@ -72,7 +71,7 @@ class MiningUCImpl(
             }
         }
 
-        transaction(db) {
+        transaction {
 
             val userMiningExp = userStatsTable.getUserStats(userId).miningExp
 
@@ -91,11 +90,11 @@ class MiningUCImpl(
         return Mine(width, height, itemEntries, mineType)
     }
 
-    override fun exitMine(userId: Int): Unit = transaction(db) {
+    override fun exitMine(userId: Int): Unit = transaction {
         mineSessionTable.deleteSession(userId)
     }
 
-    override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction(db) {
+    override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction {
         val now = clock.instant()
 
         /* Get currently running mine session */
@@ -134,7 +133,9 @@ class MiningUCImpl(
             val exp = mineEntity.exp * (if (item is Stackable) item.quantity else 1)
 
             // TODO: Store items in batch
-            val itemId = storeInInventoryReturnItemID(db, now, userId, item, ItemHistoryInfo.FirstMined(userId), dexTable, inventoryTable, itemHistoryTable, materializedItemTable)
+            val itemId = storeInInventoryReturnItemID(
+                transaction, now, userId, item, ItemHistoryInfo.FirstMined(userId), dexTable, inventoryTable, itemHistoryTable, materializedItemTable
+            )
 
             minedItemResults.add(MinedItemResult(itemId, item, mineEntity.exp))
             totalExp += exp
@@ -162,7 +163,7 @@ class MiningUCImpl(
     }
 
     override fun getAvailableMines(userId: Int): AvailableMines {
-        val userMiningLevel = transaction(db) {
+        val userMiningLevel = transaction {
             userStatsTable.getUserStats(userId).miningExp
         }.let { exp ->
             MiningExperienceManager.getLevelProgress(exp)

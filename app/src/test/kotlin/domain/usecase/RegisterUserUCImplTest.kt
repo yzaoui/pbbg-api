@@ -31,14 +31,13 @@ import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class RegisterUserUCImplTest {
 
-    private val db = initDatabase()
+    private val transaction = initDatabase()
     private val clock = MutableClock()
     private val dexTable = DexTableImpl()
     private val inventoryTable = InventoryTableImpl()
@@ -52,12 +51,13 @@ class RegisterUserUCImplTest {
     private val userTable = UserTableImpl()
     private val userStatsTable = UserStatsTableImpl()
     private val registerUser = RegisterUserUCImpl(
-        db, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable, unitTable, userTable, userStatsTable
+        transaction, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable, unitTable, userTable,
+        userStatsTable
     )
 
     @AfterEach
     fun dropDatabase() {
-        SchemaHelper.dropTables(db)
+        SchemaHelper.dropTables(transaction)
     }
 
     @Nested
@@ -66,7 +66,7 @@ class RegisterUserUCImplTest {
         fun `When registering a new user, the user should have 0 gold, 0 mining exp, and 0 farming exp`() {
             val userId = (registerUser("username", "password") as Result.Success).userId
 
-            val stats = transaction(db) { userStatsTable.getUserStats(userId) }
+            val stats = transaction { userStatsTable.getUserStats(userId) }
 
             assertSoftly(stats) {
                 gold shouldBe 0
@@ -79,7 +79,7 @@ class RegisterUserUCImplTest {
         fun `When registering a new user, the user's inventory should contain 1 ice pick, 2 apple saplings, 5 tomato seeds`() {
             val userId = (registerUser("username", "password") as Result.Success).userId
 
-            val inventoryItems = transaction(db) { Joins.getInventoryItems(userId) }
+            val inventoryItems = transaction { Joins.getInventoryItems(userId) }
 
             inventoryItems shouldHaveSize 3
             // TODO: Finish this test
@@ -89,7 +89,7 @@ class RegisterUserUCImplTest {
         fun `When registering a new user, the user's market should have plus pickaxe, cross pickaxe, and square pickaxe`() {
             val userId = (registerUser("username", "password") as Result.Success).userId
 
-            val marketItems = transaction(db) { Joins.Market.getItems(userId) }
+            val marketItems = transaction { Joins.Market.getItems(userId) }
 
             marketItems shouldHaveSize 3
             marketItems.values.shouldExist { it.enum == ItemEnum.PLUS_PICKAXE }
@@ -101,7 +101,7 @@ class RegisterUserUCImplTest {
         fun `When registering a new user, the user's squad should consist of Ice-Cream Wizard, Twolip, and Carpshooter`() {
             val userId = (registerUser("username", "password") as Result.Success).userId
 
-            val units = transaction(db) { squadTable.getAllies(userId) }
+            val units = transaction { squadTable.getAllies(userId) }
 
             assertSoftly(units) {
                 shouldHaveSize(3)
@@ -116,7 +116,7 @@ class RegisterUserUCImplTest {
     inner class FailedRegistration {
         @Test
         fun `Given an existing user, when registering a new user with the same username, UsernameNotAvailableError should be returned`() {
-            createTestUserAndGetId(db, userTable, username = "username")
+            createTestUserAndGetId(transaction, userTable, username = "username")
 
             registerUser("username", "password").shouldBeTypeOf<Result.UsernameNotAvailableError>()
         }

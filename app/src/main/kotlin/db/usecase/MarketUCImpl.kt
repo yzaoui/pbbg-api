@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.app.db.usecase
 
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.DexTable
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.repository.Joins
@@ -16,11 +17,9 @@ import com.bitwiserain.pbbg.app.domain.model.market.MarketOrder
 import com.bitwiserain.pbbg.app.domain.model.market.UserAndGameMarkets
 import com.bitwiserain.pbbg.app.domain.usecase.MarketUC
 import com.bitwiserain.pbbg.app.domain.usecase.NotEnoughGoldException
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 
 class MarketUCImpl(
-    private val db: Database,
+    private val transaction: Transaction,
     private val dexTable: DexTable,
     private val inventoryTable: InventoryTable,
     private val marketInventoryTable: MarketInventoryTable,
@@ -28,7 +27,7 @@ class MarketUCImpl(
     private val userStatsTable: UserStatsTable,
 ) : MarketUC {
 
-    override fun getMarkets(userId: Int): UserAndGameMarkets = transaction(db) {
+    override fun getMarkets(userId: Int): UserAndGameMarkets = transaction {
         val gold = userStatsTable.getUserStats(userId).gold
 
         val userMarket = Market(
@@ -46,7 +45,7 @@ class MarketUCImpl(
         return@transaction UserAndGameMarkets(gold = gold, userMarket = userMarket, gameMarket = gameMarket)
     }
 
-    override fun buy(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction(db) {
+    override fun buy(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction {
         var gold = userStatsTable.getUserStats(userId).gold
         val userMarket = Joins.getInventoryItems(userId).toMutableMap()
         val gameMarket = Joins.Market.getItems(userId).toMutableMap()
@@ -144,7 +143,7 @@ class MarketUCImpl(
         )
     }
 
-    override fun sell(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction(db) {
+    override fun sell(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction {
         var gold = userStatsTable.getUserStats(userId).gold
         val userMarket = Joins.getInventoryItems(userId).toMutableMap()
         val gameMarket = Joins.Market.getItems(userId).toMutableMap()

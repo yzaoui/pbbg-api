@@ -13,7 +13,6 @@ import com.bitwiserain.pbbg.app.domain.usecase.InvalidItemException
 import com.bitwiserain.pbbg.app.domain.usecase.InvalidUnitException
 import com.bitwiserain.pbbg.app.test.createTestUserAndGetId
 import com.bitwiserain.pbbg.app.test.initDatabase
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -26,25 +25,25 @@ import kotlin.test.assertTrue
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class DexUCImplTests {
 
-    private val db = initDatabase()
+    private val transaction = initDatabase()
     private val dexTable = DexTableImpl()
     private val userTable = UserTableImpl()
-    private val dexUC: DexUC = DexUCImpl(db, dexTable)
+    private val dexUC: DexUC = DexUCImpl(transaction, dexTable)
 
     @AfterEach
     fun dropDatabase() {
-        SchemaHelper.dropTables(db)
+        SchemaHelper.dropTables(transaction)
     }
 
     @Nested
     inner class DexItems {
         @Test
         fun `Given a user who's discovered some items, when calling for dex items, those exact ones should return`() {
-            val userId = createTestUserAndGetId(db, userTable)
+            val userId = createTestUserAndGetId(transaction, userTable)
 
             val discoveredItemEnums = setOf(ItemEnum.COPPER_ORE, ItemEnum.ICE_PICK)
 
-            transaction(db) {
+            transaction {
                 dexTable.insertDiscovered(userId, discoveredItemEnums)
             }
 
@@ -55,7 +54,7 @@ class DexUCImplTests {
 
         @Test
         fun `When calling for dex items, lastItemId should be 11`() {
-            val userId = createTestUserAndGetId(db, userTable)
+            val userId = createTestUserAndGetId(transaction, userTable)
 
             val dexItems = dexUC.getDexItems(userId)
 
@@ -67,11 +66,11 @@ class DexUCImplTests {
     inner class IndividualDexItem {
         @Test
         fun `Given a user who has discovered an item, when calling for said item by its ID, it should be returned in detail`() {
-            val userId = createTestUserAndGetId(db, userTable)
+            val userId = createTestUserAndGetId(transaction, userTable)
 
             val discoveredItem = BaseItem.Material.Coal
 
-            transaction(db) {
+            transaction {
                 dexTable.insertDiscovered(userId, discoveredItem.enum)
             }
 
@@ -83,7 +82,7 @@ class DexUCImplTests {
 
         @Test
         fun `Given a user, when calling for an invalid item by ID, an InvalidItemException should be thrown`() {
-            val userId = createTestUserAndGetId(db, userTable)
+            val userId = createTestUserAndGetId(transaction, userTable)
 
             assertFailsWith<InvalidItemException> {
                 dexUC.getIndividualDexBaseItem(userId, ItemEnum.values().size + 7)
@@ -92,7 +91,7 @@ class DexUCImplTests {
 
         @Test
         fun `Given a user who hasn't discovered an item, when calling for said item by its ID, it should be undiscovered`() {
-            val userId = createTestUserAndGetId(db, userTable)
+            val userId = createTestUserAndGetId(transaction, userTable)
 
             val dexItem = dexUC.getIndividualDexBaseItem(userId, BaseItem.Material.CopperOre.id)
 
@@ -105,7 +104,7 @@ class DexUCImplTests {
     inner class DexUnits {
         @Test
         fun `When calling getDexUnits(), all dex units should be returned`() {
-            val userId = createTestUserAndGetId(db, userTable)
+            val userId = createTestUserAndGetId(transaction, userTable)
 
             val dexUnits = dexUC.getDexUnits(userId)
 
@@ -117,7 +116,7 @@ class DexUCImplTests {
     inner class IndividualDexUnit {
         @Test
         fun `Given a dex unit ID, when calling getDexUnit(), that dex unit should be returned`() {
-            val userId = createTestUserAndGetId(db, userTable)
+            val userId = createTestUserAndGetId(transaction, userTable)
 
             val dexUnit = dexUC.getDexUnit(userId, 2)
 
@@ -126,7 +125,7 @@ class DexUCImplTests {
 
         @Test
         fun `Given an invalid dex unit ID, when calling getDexUnit(), InvalidUnitException should be thrown`() {
-            val userId = createTestUserAndGetId(db, userTable)
+            val userId = createTestUserAndGetId(transaction, userTable)
 
             assertThrows<InvalidUnitException> {
                 dexUC.getDexUnit(userId, 5000)

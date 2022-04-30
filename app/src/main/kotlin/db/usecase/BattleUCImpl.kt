@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.app.db.usecase
 
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.SquadTable
 import com.bitwiserain.pbbg.app.db.repository.UnitTable
 import com.bitwiserain.pbbg.app.db.repository.UnitTable.UnitForm
@@ -20,24 +21,22 @@ import com.bitwiserain.pbbg.app.domain.usecase.BattleAlreadyInProgressException
 import com.bitwiserain.pbbg.app.domain.usecase.BattleUC
 import com.bitwiserain.pbbg.app.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.app.domain.usecase.NoBattleInSessionException
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 
 class BattleUCImpl(
-    private val db: Database,
+    private val transaction: Transaction,
     private val battleEnemyTable: BattleEnemyTable,
     private val battleSessionTable: BattleSessionTable,
     private val squadTable: SquadTable,
     private val unitTable: UnitTable,
 ) : BattleUC {
 
-    override fun getCurrentBattle(userId: Int): Battle? = transaction(db) {
+    override fun getCurrentBattle(userId: Int): Battle? = transaction {
         return@transaction battleSessionTable.getBattleSessionId(userId)?.let { battleSession ->
             getBattle(userId, battleSession)
         }
     }
 
-    override fun generateBattle(userId: Int): Battle = transaction(db) {
+    override fun generateBattle(userId: Int): Battle = transaction {
         if (battleSessionTable.isBattleInProgress(userId)) throw BattleAlreadyInProgressException()
 
         val allies = squadTable.getAllies(userId)
@@ -77,7 +76,7 @@ class BattleUCImpl(
         return@transaction Battle(allies = allies, enemies = enemies, battleQueue = battleQueue)
     }
 
-    override fun allyTurn(userId: Int, action: BattleAction): BattleActionResult = transaction(db) {
+    override fun allyTurn(userId: Int, action: BattleAction): BattleActionResult = transaction {
         val battleSession = battleSessionTable.getBattleSessionId(userId) ?: throw NoBattleInSessionException()
 
         val queue = battleSessionTable.getBattleQueue(battleSession)
@@ -91,7 +90,7 @@ class BattleUCImpl(
         return@transaction act(userId, battleSession, ally, action)
     }
 
-    override fun enemyTurn(userId: Int): BattleActionResult = transaction(db) {
+    override fun enemyTurn(userId: Int): BattleActionResult = transaction {
         val battleSession = battleSessionTable.getBattleSessionId(userId) ?: throw NoBattleInSessionException()
 
         val queue = battleSessionTable.getBattleQueue(battleSession)
@@ -162,7 +161,7 @@ class BattleUCImpl(
         return battle.allies.none { it.alive } || battle.enemies.none { it.alive }
     }
 
-    private fun deleteBattle(battle: Battle, battleSession: Long) = transaction(db) {
+    private fun deleteBattle(battle: Battle, battleSession: Long) = transaction {
         // Delete enemies, since they only exist within this battle
         val enemyIdCSV = battle.enemies.asSequence().map { it.id }.joinToString()
 

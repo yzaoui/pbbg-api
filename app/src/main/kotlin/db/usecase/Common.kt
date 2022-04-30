@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.app.db.usecase
 
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.DexTable
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.repository.ItemHistoryTable
@@ -8,12 +9,10 @@ import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistoryInfo
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
 fun storeInInventoryReturnItemID(
-    db: Database,
+    transaction: Transaction,
     now: Instant,
     userId: Int,
     itemToStore: MaterializedItem,
@@ -22,7 +21,7 @@ fun storeInInventoryReturnItemID(
     inventoryTable: InventoryTable,
     itemHistoryTable: ItemHistoryTable,
     materializedItemTable: MaterializedItemTable,
-): Long = transaction(db) {
+): Long = transaction {
     val heldItems = Joins.getHeldItemsOfBaseKind(userId, itemToStore.enum)
 
     val itemId: Long
