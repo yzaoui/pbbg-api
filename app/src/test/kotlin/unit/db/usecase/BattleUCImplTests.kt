@@ -21,8 +21,6 @@ import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class BattleUCImplTests {
@@ -103,29 +101,6 @@ class BattleUCImplTests {
             assertFailsWith<NoAlliesAliveException> ("Generating a new battle should fail if user's squad is wiped out") {
                 battleUC.generateBattle(userId)
             }
-        }
-    }
-
-    @Nested
-    inner class BattleRetrieval {
-        @Test
-        fun `When generating a battle and requesting the current battle, it should be returned`() {
-            val userId = createTestUserAndGetId(transaction, userTable)
-            insertAndGetAllies(userId)
-            battleUC.generateBattle(userId)
-
-            val battle = battleUC.getCurrentBattle(userId)
-
-            assertNotNull(battle, "User should have a battle in session.")
-        }
-
-        @Test
-        fun `Given an out-of-battle user, when their current battle is requested, null should be returned`() {
-            val userId = createTestUserAndGetId(transaction, userTable)
-
-            val battle = battleUC.getCurrentBattle(userId)
-
-            assertNull(battle, "User should not have a battle in session without requesting one.")
         }
     }
 

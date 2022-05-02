@@ -28,6 +28,7 @@ import com.bitwiserain.pbbg.app.db.usecase.DexUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.FarmUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.FriendsUCImpl
+import com.bitwiserain.pbbg.app.db.usecase.GetBattleUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.InventoryUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.ItemUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.MarketUCImpl
@@ -155,6 +156,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     val equipmentUC = EquipmentUCImpl(transaction)
     val unitUC = UnitUCImpl(transaction, battleSessionTable, squadTable, unitTable)
     val battleUC = BattleUCImpl(transaction, battleEnemyTable, battleSessionTable, squadTable, unitTable)
+    val getBattle = GetBattleUCImpl(transaction, battleEnemyTable, battleSessionTable, squadTable)
     val dexUC = DexUCImpl(transaction, dexTable)
     val userProfileUC = UserProfileUCImpl(transaction, friendsTable, userTable)
     val friendsUC = FriendsUCImpl(transaction, friendsTable, userTable)
@@ -204,7 +206,7 @@ fun Application.mainWithDependencies(clock: Clock) {
                 userStats(getUserStats)
                 inventoryAPI(inventoryUC, equipmentUC)
                 market(marketUC)
-                battleAPI(battleUC)
+                battleAPI(battleUC, getBattle)
                 mine(miningUC)
                 farm(farmUC, clock)
                 dexAPI(dexUC)

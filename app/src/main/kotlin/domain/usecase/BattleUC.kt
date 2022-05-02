@@ -6,13 +6,6 @@ import com.bitwiserain.pbbg.app.domain.model.battle.BattleActionResult
 
 interface BattleUC {
     /**
-     * Gets the user's current battle.
-     *
-     * @return The battle in session, or null if none.
-     */
-    fun getCurrentBattle(userId: Int): Battle?
-
-    /**
      * Generates a battle and assigns it to a user.
      *
      * @return Newly created battle.

@@ -30,12 +30,6 @@ class BattleUCImpl(
     private val unitTable: UnitTable,
 ) : BattleUC {
 
-    override fun getCurrentBattle(userId: Int): Battle? = transaction {
-        return@transaction battleSessionTable.getBattleSessionId(userId)?.let { battleSession ->
-            getBattle(userId, battleSession)
-        }
-    }
-
     override fun generateBattle(userId: Int): Battle = transaction {
         if (battleSessionTable.isBattleInProgress(userId)) throw BattleAlreadyInProgressException()
 
