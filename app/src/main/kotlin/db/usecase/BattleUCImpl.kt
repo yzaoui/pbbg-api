@@ -50,7 +50,7 @@ class BattleUCImpl(
             // Create enemy unit in unit table
             val unitId = unitTable.insertUnitAndGetId(enemy)
             // Connect newly created enemy to this battle session
-            battleEnemyTable.insertEnemy(battleSession, enemy, unitId)
+            battleEnemyTable.insertEnemy(battleSession, unitId)
         }
 
         val enemies = battleEnemyTable.getEnemies(battleSession)
