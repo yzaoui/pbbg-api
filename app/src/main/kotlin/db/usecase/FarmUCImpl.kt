@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.app.db.usecase
 
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.DexTable
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.repository.ItemHistoryTable
@@ -24,12 +25,10 @@ import com.bitwiserain.pbbg.app.domain.usecase.ItemNotPlantableException
 import com.bitwiserain.pbbg.app.domain.usecase.OccupiedPlotException
 import com.bitwiserain.pbbg.app.domain.usecase.PlantNotHarvestableException
 import com.bitwiserain.pbbg.app.domain.usecase.UserPlotNotFoundException
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Clock
 
 class FarmUCImpl(
-    private val db: Database,
+    private val transaction: Transaction,
     private val clock: Clock,
     private val dexTable: DexTable,
     private val inventoryTable: InventoryTable,
@@ -40,11 +39,11 @@ class FarmUCImpl(
     private val userStatsTable: UserStatsTable,
 ) : FarmUC {
 
-    override fun getPlots(userId: Int): List<Plot> = transaction(db) {
+    override fun getPlots(userId: Int): List<Plot> = transaction {
         return@transaction plotTable.getPlots(userId)
     }
 
-    override fun plant(userId: Int, plotId: Long, itemId: Long): Plot = transaction(db) {
+    override fun plant(userId: Int, plotId: Long, itemId: Long): Plot = transaction {
         val now = clock.instant()
 
         /* Make sure user owns this plot */
@@ -83,7 +82,7 @@ class FarmUCImpl(
         return@transaction plotTable.getPlot(userId, plot.id)!!
     }
 
-    override fun harvest(userId: Int, plotId: Long): Plot = transaction(db) {
+    override fun harvest(userId: Int, plotId: Long): Plot = transaction {
         val now = clock.instant()
 
         /* Make sure user owns this plot */
@@ -100,7 +99,9 @@ class FarmUCImpl(
             is MaterializedPlant.AppleTree -> MaterializedItem.Apple(1)
             is MaterializedPlant.TomatoPlant -> MaterializedItem.Tomato(1)
         }
-        storeInInventoryReturnItemID(db, now, userId, crop, ItemHistoryInfo.FirstHarvested(userId), dexTable, inventoryTable, itemHistoryTable, materializedItemTable)
+        storeInInventoryReturnItemID(
+            transaction, now, userId, crop, ItemHistoryInfo.FirstHarvested(userId), dexTable, inventoryTable, itemHistoryTable, materializedItemTable
+        )
 
         /* Gain farming exp */
         val currentFarmingExp = userStatsTable.getUserStats(userId).farmingExp
@@ -124,7 +125,7 @@ class FarmUCImpl(
         }
     }
 
-    override fun expand(userId: Int): Plot = transaction(db) {
+    override fun expand(userId: Int): Plot = transaction {
         return@transaction plotTable.createAndGetEmptyPlot(userId)
     }
 }

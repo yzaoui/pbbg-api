@@ -28,11 +28,11 @@ import kotlin.test.assertNull
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class FarmTests {
     private val clock = MutableClock()
-    private val db = initDatabase()
+    private val transaction = initDatabase()
 
     @AfterEach
     fun dropDatabase() {
-        SchemaHelper.dropTables(db)
+        SchemaHelper.dropTables(transaction)
     }
 
     @Test

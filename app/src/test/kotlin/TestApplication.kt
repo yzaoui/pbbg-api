@@ -2,6 +2,7 @@ package com.bitwiserain.pbbg.app.test
 
 import com.bitwiserain.pbbg.app.BCryptHelper
 import com.bitwiserain.pbbg.app.SchemaHelper
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.UserTable
 import com.bitwiserain.pbbg.app.mainWithDependencies
 import io.ktor.config.MapApplicationConfig
@@ -22,10 +23,16 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Clock
 
-fun initDatabase(): Database = Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", Driver::class.qualifiedName!!)
-    .also { SchemaHelper.createTables(it) }
+fun initDatabase(): Transaction {
+    val db = Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", Driver::class.qualifiedName!!)
+    val transaction: Transaction = object : Transaction {
+        override fun <T> invoke(block: () -> T): T = transaction(db) { block() }
+    }
+    SchemaHelper.createTables(transaction)
+    return transaction
+}
 
-fun createTestUserAndGetId(db: Database, userTable: UserTable, username: String = "username", password: String = "password"): Int = transaction(db) {
+fun createTestUserAndGetId(transaction: Transaction, userTable: UserTable, username: String = "username", password: String = "password"): Int = transaction {
     userTable.createUserAndGetId(username, BCryptHelper.hashPassword(password), Clock.systemUTC().instant())
 }
 

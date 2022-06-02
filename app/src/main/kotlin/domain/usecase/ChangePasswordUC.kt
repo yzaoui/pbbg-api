@@ -2,10 +2,9 @@ package com.bitwiserain.pbbg.app.domain.usecase
 
 import com.bitwiserain.pbbg.app.BCryptHelper
 import com.bitwiserain.pbbg.app.PASSWORD_REGEX
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.UserTable
 import com.bitwiserain.pbbg.app.domain.usecase.ChangePasswordUC.Result
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 
 /**
  * Changes a user's password.
@@ -41,9 +40,9 @@ interface ChangePasswordUC {
     }
 }
 
-class ChangePasswordUCImpl(private val db: Database, private val userTable: UserTable) : ChangePasswordUC {
+class ChangePasswordUCImpl(private val transaction: Transaction, private val userTable: UserTable) : ChangePasswordUC {
 
-    override fun invoke(userId: Int, currentPassword: String, newPassword: String, confirmNewPassword: String): Result = transaction(db) {
+    override fun invoke(userId: Int, currentPassword: String, newPassword: String, confirmNewPassword: String): Result = transaction {
         // TODO: Consider checking if user exists
         val expectedPasswordHash = userTable.getUserById(userId)!!.passwordHash
 

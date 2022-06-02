@@ -3,6 +3,7 @@ package com.bitwiserain.pbbg.app
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.model.User
 import com.bitwiserain.pbbg.app.db.repository.DexTableImpl
 import com.bitwiserain.pbbg.app.db.repository.FriendsTableImpl
@@ -27,6 +28,8 @@ import com.bitwiserain.pbbg.app.db.usecase.DexUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.FarmUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.FriendsUCImpl
+import com.bitwiserain.pbbg.app.db.usecase.GenerateBattleUCImpl
+import com.bitwiserain.pbbg.app.db.usecase.GetBattleUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.InventoryUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.ItemUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.MarketUCImpl
@@ -112,7 +115,11 @@ fun Application.mainWithDependencies(clock: Clock) {
         else -> throw RuntimeException("Only H2 and PostgreSQL databases are currently supported.")
     })
 
-    SchemaHelper.createTables(db)
+    val transaction: Transaction = object : Transaction {
+        override fun <T> invoke(block: () -> T): T = transaction(db) { block() }
+    }
+
+    SchemaHelper.createTables(transaction)
 
     install(CallLogging)
 
@@ -135,23 +142,26 @@ fun Application.mainWithDependencies(clock: Clock) {
     val userTable = UserTableImpl()
     val userStatsTable = UserStatsTableImpl()
 
-    val getUserStats = GetUserStatsUCImpl(db, userStatsTable)
-    val changePassword = ChangePasswordUCImpl(db, userTable)
+    val getUserStats = GetUserStatsUCImpl(transaction, userStatsTable)
+    val changePassword = ChangePasswordUCImpl(transaction, userTable)
     val registerUser = RegisterUserUCImpl(
-        db, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable, unitTable, userTable, userStatsTable
+        transaction, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable, unitTable, userTable,
+        userStatsTable
     )
-    val login = LoginUCImpl(db, userTable)
-    val marketUC = MarketUCImpl(db, dexTable, inventoryTable, marketInventoryTable, materializedItemTable, userStatsTable)
-    val inventoryUC = InventoryUCImpl(db)
-    val itemUC = ItemUCImpl(db, itemHistoryTable, materializedItemTable, userTable)
-    val miningUC = MiningUCImpl(db, clock, dexTable, inventoryTable, itemHistoryTable, materializedItemTable, mineCellTable, mineSessionTable, userStatsTable)
-    val farmUC = FarmUCImpl(db, clock, dexTable, inventoryTable, itemHistoryTable, materializedItemTable, materializedPlantTable, plotTable, userStatsTable)
-    val equipmentUC = EquipmentUCImpl(db)
-    val unitUC = UnitUCImpl(db, battleSessionTable, squadTable, unitTable)
-    val battleUC = BattleUCImpl(db, battleEnemyTable, battleSessionTable, squadTable, unitTable)
-    val dexUC = DexUCImpl(db, dexTable)
-    val userProfileUC = UserProfileUCImpl(db, friendsTable, userTable)
-    val friendsUC = FriendsUCImpl(db, friendsTable, userTable)
+    val login = LoginUCImpl(transaction, userTable)
+    val marketUC = MarketUCImpl(transaction, dexTable, inventoryTable, marketInventoryTable, materializedItemTable, userStatsTable)
+    val inventoryUC = InventoryUCImpl(transaction)
+    val itemUC = ItemUCImpl(transaction, itemHistoryTable, materializedItemTable, userTable)
+    val miningUC = MiningUCImpl(transaction, clock, dexTable, inventoryTable, itemHistoryTable, materializedItemTable, mineCellTable, mineSessionTable, userStatsTable)
+    val farmUC = FarmUCImpl(transaction, clock, dexTable, inventoryTable, itemHistoryTable, materializedItemTable, materializedPlantTable, plotTable, userStatsTable)
+    val equipmentUC = EquipmentUCImpl(transaction)
+    val unitUC = UnitUCImpl(transaction, battleSessionTable, squadTable, unitTable)
+    val battleUC = BattleUCImpl(transaction, battleEnemyTable, battleSessionTable, squadTable, unitTable)
+    val generateBattle = GenerateBattleUCImpl(transaction, battleEnemyTable, battleSessionTable, squadTable, unitTable)
+    val getBattle = GetBattleUCImpl(transaction, battleEnemyTable, battleSessionTable, squadTable)
+    val dexUC = DexUCImpl(transaction, dexTable)
+    val userProfileUC = UserProfileUCImpl(transaction, friendsTable, userTable)
+    val friendsUC = FriendsUCImpl(transaction, friendsTable, userTable)
     val aboutUC = AboutUCImpl()
 
     install(ContentNegotiation) {
@@ -170,7 +180,7 @@ fun Application.mainWithDependencies(clock: Clock) {
             )
             validate {
                 it.payload.getClaim("user.id").asInt()?.let {
-                    transaction(db) {
+                    transaction {
                         userTable.getUserById(it)
                     }
                 }
@@ -198,7 +208,7 @@ fun Application.mainWithDependencies(clock: Clock) {
                 userStats(getUserStats)
                 inventoryAPI(inventoryUC, equipmentUC)
                 market(marketUC)
-                battleAPI(battleUC)
+                battleAPI(battleUC, generateBattle, getBattle)
                 mine(miningUC)
                 farm(farmUC, clock)
                 dexAPI(dexUC)
@@ -259,7 +269,7 @@ object BCryptHelper {
  * Schema *
  **********/
 object SchemaHelper {
-    fun createTables(db: Database) = transaction(db) {
+    fun createTables(transaction: Transaction) = transaction {
         SchemaUtils.create(
             UserTableImpl.Exposed, MineSessionTableImpl.Exposed, MineCellTableImpl.Exposed, MaterializedItemTableImpl.Exposed, InventoryTableImpl.Exposed,
             UserStatsTableImpl.Exposed, UnitTableImpl.Exposed, SquadTableImpl.Exposed, BattleSessionTableImpl.Exposed, BattleEnemyTableImpl.Exposed, DexTableImpl.Exposed,
@@ -268,7 +278,7 @@ object SchemaHelper {
         )
     }
 
-    fun dropTables(db: Database) = transaction(db) {
+    fun dropTables(transaction: Transaction) = transaction {
         SchemaUtils.drop(
             UserTableImpl.Exposed, MineSessionTableImpl.Exposed, MineCellTableImpl.Exposed, MaterializedItemTableImpl.Exposed, InventoryTableImpl.Exposed,
             UserStatsTableImpl.Exposed, UnitTableImpl.Exposed, SquadTableImpl.Exposed, BattleSessionTableImpl.Exposed, BattleEnemyTableImpl.Exposed, DexTableImpl.Exposed,

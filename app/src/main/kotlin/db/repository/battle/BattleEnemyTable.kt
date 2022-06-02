@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.app.db.repository.battle
 
-import com.bitwiserain.pbbg.app.db.repository.UnitTable.UnitForm
 import com.bitwiserain.pbbg.app.db.repository.UnitTableImpl
 import com.bitwiserain.pbbg.app.db.repository.toMyUnit
 import com.bitwiserain.pbbg.app.domain.model.MyUnit
@@ -26,7 +25,7 @@ interface BattleEnemyTable {
     /**
      * Inserts new enemy unit into a battle session.
      */
-    fun insertEnemy(battleSession: Long, enemy: UnitForm, unitId: Long)
+    fun insertEnemy(battleSession: Long, unitId: Long)
 }
 
 class BattleEnemyTableImpl : BattleEnemyTable {
@@ -52,7 +51,7 @@ class BattleEnemyTableImpl : BattleEnemyTable {
             .map { it.toMyUnit() }
     }
 
-    override fun insertEnemy(battleSession: Long, enemy: UnitForm, unitId: Long) {
+    override fun insertEnemy(battleSession: Long, unitId: Long) {
         Exposed.insert {
             it[Exposed.battle] = EntityID(battleSession, BattleSessionTableImpl.Exposed)
             it[Exposed.unit] = EntityID(unitId, UnitTableImpl.Exposed)

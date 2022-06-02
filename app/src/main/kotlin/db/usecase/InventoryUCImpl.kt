@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.app.db.usecase
 
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.Joins
 import com.bitwiserain.pbbg.app.domain.model.BaseItem
 import com.bitwiserain.pbbg.app.domain.model.Inventory
@@ -7,11 +8,9 @@ import com.bitwiserain.pbbg.app.domain.model.InventoryItem
 import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryFilter
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryUC
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 
-class InventoryUCImpl(private val db: Database) : InventoryUC {
-    override fun getInventory(userId: Int, filter: InventoryFilter?): Inventory = transaction(db) {
+class InventoryUCImpl(private val transaction: Transaction) : InventoryUC {
+    override fun getInventory(userId: Int, filter: InventoryFilter?): Inventory = transaction {
         return@transaction Joins.getInventoryItems(userId)
             .filterOutZeroQuantityItems()
             .run { if (filter != null) filter { it.value.base.matchesInventoryFilter(filter) } else this }

@@ -1,10 +1,9 @@
 package com.bitwiserain.pbbg.app.domain.usecase
 
 import com.bitwiserain.pbbg.app.BCryptHelper
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.UserTable
 import com.bitwiserain.pbbg.app.domain.usecase.LoginUC.Result
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 
 /**
  * Login user by credentials (username + password).
@@ -18,10 +17,10 @@ interface LoginUC {
     }
 }
 
-class LoginUCImpl(private val db: Database, private val userTable: UserTable) : LoginUC {
+class LoginUCImpl(private val transaction: Transaction, private val userTable: UserTable) : LoginUC {
 
     override fun invoke(username: String, password: String): Result {
-        val user = transaction(db) { userTable.getUserByUsername(username) }
+        val user = transaction { userTable.getUserByUsername(username) }
 
         return if (user != null && BCryptHelper.verifyPassword(password, user.passwordHash)) {
             Result.Success(user.id)

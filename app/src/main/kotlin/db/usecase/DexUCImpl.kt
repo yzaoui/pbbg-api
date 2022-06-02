@@ -1,5 +1,6 @@
 package com.bitwiserain.pbbg.app.db.usecase
 
+import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.DexTable
 import com.bitwiserain.pbbg.app.domain.model.ItemEnum
 import com.bitwiserain.pbbg.app.domain.model.MyUnitEnum
@@ -13,11 +14,9 @@ import com.bitwiserain.pbbg.app.domain.usecase.DexUC
 import com.bitwiserain.pbbg.app.domain.usecase.InvalidItemException
 import com.bitwiserain.pbbg.app.domain.usecase.InvalidPlantException
 import com.bitwiserain.pbbg.app.domain.usecase.InvalidUnitException
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 
-class DexUCImpl(private val db: Database, private val dexTable: DexTable) : DexUC {
-    override fun getDexItems(userId: Int): DexItems = transaction(db) {
+class DexUCImpl(private val transaction: Transaction, private val dexTable: DexTable) : DexUC {
+    override fun getDexItems(userId: Int): DexItems = transaction {
         val discoveredItems = dexTable.getDiscovered(userId)
 
         return@transaction DexItems(
@@ -26,7 +25,7 @@ class DexUCImpl(private val db: Database, private val dexTable: DexTable) : DexU
         )
     }
 
-    override fun getIndividualDexBaseItem(userId: Int, itemId: Int): DexItem = transaction(db) {
+    override fun getIndividualDexBaseItem(userId: Int, itemId: Int): DexItem = transaction {
         val itemEnumOrdinal = itemId - 1
         if (itemEnumOrdinal !in ItemEnum.values().indices) throw InvalidItemException()
 
@@ -37,7 +36,7 @@ class DexUCImpl(private val db: Database, private val dexTable: DexTable) : DexU
         return@transaction DexItem.DiscoveredDexItem(enum.baseItem)
     }
 
-    override fun getDexUnits(userId: Int): DexUnits = transaction(db ) {
+    override fun getDexUnits(userId: Int): DexUnits = transaction {
         val discoveredUnits = MyUnitEnum.values().toSet()
 
         return@transaction DexUnits(
