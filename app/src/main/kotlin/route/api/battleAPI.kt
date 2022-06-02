@@ -3,6 +3,7 @@ package com.bitwiserain.pbbg.app.route.api
 import com.bitwiserain.pbbg.app.domain.model.battle.*
 import com.bitwiserain.pbbg.app.domain.usecase.BattleAlreadyInProgressException
 import com.bitwiserain.pbbg.app.domain.usecase.BattleUC
+import com.bitwiserain.pbbg.app.domain.usecase.GenerateBattleUC
 import com.bitwiserain.pbbg.app.domain.usecase.GetBattleUC
 import com.bitwiserain.pbbg.app.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.app.respondFail
@@ -13,7 +14,7 @@ import io.ktor.application.call
 import io.ktor.request.receive
 import io.ktor.routing.*
 
-fun Route.battleAPI(battleUC: BattleUC, getBattle: GetBattleUC) = route("/battle") {
+fun Route.battleAPI(battleUC: BattleUC, generateBattle: GenerateBattleUC, getBattle: GetBattleUC) = route("/battle") {
     route("/session") {
         /**
          * On success:
@@ -37,7 +38,7 @@ fun Route.battleAPI(battleUC: BattleUC, getBattle: GetBattleUC) = route("/battle
              */
             post {
                 try {
-                    val battle = battleUC.generateBattle(call.user.id)
+                    val battle = generateBattle(call.user.id)
 
                     call.respondSuccess(battle.toJSON())
                 } catch (e: BattleAlreadyInProgressException) {
