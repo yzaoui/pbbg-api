@@ -4,9 +4,11 @@ import com.bitwiserain.pbbg.app.APP_VERSION
 import com.bitwiserain.pbbg.app.APP_VERSIONS
 import com.bitwiserain.pbbg.app.db.usecase.AboutUCImpl
 import com.bitwiserain.pbbg.app.domain.usecase.AboutUC
+import io.kotest.assertions.withClue
+import io.kotest.matchers.collections.shouldBeSameSizeAs
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class AboutUCImplTests {
@@ -14,11 +16,13 @@ class AboutUCImplTests {
 
     @Test
     fun `When requesting app version, latest app version should return`() {
-        assertEquals(APP_VERSION, aboutUC.getAppVersion())
+        aboutUC.getAppVersion() shouldBe APP_VERSION
     }
 
     @Test
     fun `When requesting patch notes, all patch notes should return`() {
-        assertEquals(APP_VERSIONS.size, aboutUC.getPatchNotes().size, "There should be one set of patch notes per app version.")
+        withClue("There should be one set of patch notes per app version.") {
+            aboutUC.getPatchNotes() shouldBeSameSizeAs APP_VERSIONS
+        }
     }
 }
