@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.6.10"/*Versions.KOTLIN*/ apply false
+    kotlin("jvm") version "1.6.21"/*Versions.KOTLIN*/ apply false
 }
 
 group = "com.bitwiserain"
