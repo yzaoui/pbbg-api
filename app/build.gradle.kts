@@ -34,7 +34,7 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation(group = "io.ktor", name = "ktor-server-test-host", version = Versions.KTOR)
-    testImplementation(group = "io.kotest", name = "kotest-assertions-core", version = "4.6.3")
+    testImplementation(group = "io.kotest", name = "kotest-assertions-core", version = "5.3.0")
     testImplementation(group = "org.junit.jupiter", name = "junit-jupiter-api", version = Versions.JUNIT_JUPITER)
     testImplementation(group = "io.mockk", name = "mockk", version = "1.12.3")
     testRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = Versions.JUNIT_JUPITER)
