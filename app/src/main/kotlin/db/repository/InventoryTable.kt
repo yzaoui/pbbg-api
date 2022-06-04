@@ -1,12 +1,15 @@
 package com.bitwiserain.pbbg.app.db.repository
 
 import com.bitwiserain.pbbg.app.domain.model.BaseItem
+import com.bitwiserain.pbbg.app.domain.model.ItemEnum
+import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 
 interface InventoryTable {
 
@@ -17,6 +20,8 @@ interface InventoryTable {
     fun removeItem(userId: Int, itemId: Long)
 
     fun removeItems(userId: Int, itemIds: Iterable<Long>)
+
+    fun getHeldItemsOfBaseKind(userId: Int, itemEnum: ItemEnum): Map<Long, MaterializedItem>
 }
 
 class InventoryTableImpl : InventoryTable {
@@ -57,4 +62,9 @@ class InventoryTableImpl : InventoryTable {
             Exposed.userId.eq(userId) and Exposed.materializedItem.inList(itemIds)
         }
     }
+
+    override fun getHeldItemsOfBaseKind(userId: Int, itemEnum: ItemEnum): Map<Long, MaterializedItem> =
+        (Exposed innerJoin MaterializedItemTableImpl.Exposed)
+            .select { Exposed.userId.eq(userId) and MaterializedItemTableImpl.Exposed.itemEnum.eq(itemEnum) }
+            .associate { it[MaterializedItemTableImpl.Exposed.id].value to it.toMaterializedItem() }
 }
