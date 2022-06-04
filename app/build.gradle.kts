@@ -11,9 +11,9 @@ plugins {
     application
     kotlin("jvm")
     id("com.github.johnrengelman.shadow").version("7.1.0")
-    kotlin("plugin.serialization").version(/*Versions.KOTLIN*/"1.6.10")
+    kotlin("plugin.serialization").version(/*Versions.KOTLIN*/"1.6.21")
     id("org.jetbrains.kotlinx.kover") version "0.5.0"
-    id("org.jetbrains.dokka") version /*Versions.KOTLIN*/"1.6.10"
+    id("org.jetbrains.dokka") version /*Versions.KOTLIN*/"1.6.21"
 }
 
 application {
@@ -32,11 +32,11 @@ dependencies {
     implementation(group = "io.ktor", name = "ktor-auth-jwt", version = Versions.KTOR)
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
 
+    testImplementation(kotlin("test"))
     testImplementation(group = "io.ktor", name = "ktor-server-test-host", version = Versions.KTOR)
     testImplementation(group = "io.kotest", name = "kotest-assertions-core", version = "4.6.3")
     testImplementation(group = "org.junit.jupiter", name = "junit-jupiter-api", version = Versions.JUNIT_JUPITER)
     testImplementation(group = "io.mockk", name = "mockk", version = "1.12.3")
-    testImplementation(kotlin("test"))
     testRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = Versions.JUNIT_JUPITER)
 }
 
