@@ -1,140 +1,102 @@
 package com.bitwiserain.pbbg.app.test.unit.db.usecase
 
-import com.bitwiserain.pbbg.app.SchemaHelper
-import com.bitwiserain.pbbg.app.db.repository.InventoryTableImpl
-import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTableImpl
-import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
+import com.bitwiserain.pbbg.app.db.Transaction
+import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.usecase.EquipmentUCImpl
-import com.bitwiserain.pbbg.app.domain.model.BaseItem
 import com.bitwiserain.pbbg.app.domain.model.InventoryItem
 import com.bitwiserain.pbbg.app.domain.model.InventoryItem.EquippableInventoryItem
-import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.app.domain.model.MaterializedItem.*
-import com.bitwiserain.pbbg.app.domain.usecase.EquipmentUC
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemAlreadyEquippedException
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippableException
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippedException
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotFoundException
-import com.bitwiserain.pbbg.app.test.createTestUserAndGetId
-import com.bitwiserain.pbbg.app.test.initDatabase
-import org.junit.jupiter.api.AfterEach
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verifySequence
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class EquipmentUCImplTests {
 
-    private val transaction = initDatabase()
-    private val inventoryTable = InventoryTableImpl()
-    private val materializedItemTable = MaterializedItemTableImpl()
-    private val userTable = UserTableImpl()
-    private val equipmentUC: EquipmentUC = EquipmentUCImpl(transaction, inventoryTable)
+    private val userId: Int = 1234
 
-    @AfterEach
-    fun dropDatabase() {
-        SchemaHelper.dropTables(transaction)
+    private val transaction: Transaction = object : Transaction {
+        override fun <T> invoke(block: () -> T): T = block()
     }
+
+    private val inventoryTable: InventoryTable = mockk(relaxUnitFun = true)
+
+    private val equipmentUC: EquipmentUCImpl = EquipmentUCImpl(transaction, inventoryTable)
 
     @Nested
     inner class Equip {
         @Test
-        fun `Given a user with an equippable item in inventory that is not equipped, when equipping it, it should return equipped`() {
-            val userId = createTestUserAndGetId(transaction, userTable)
+        fun `Given a user with an equippable item in inventory that is not equipped, when equipping it, it should be updated as equipped`() {
+            val itemId = 0L
+            every { inventoryTable.getInventoryItems(userId) } returns mapOf(
+                itemId to EquippableInventoryItem(SquarePickaxe, equipped = false)
+            )
 
-            /* Insert equippable item into inventory */
-            val (itemId, oldItemInInventory) = createItem(userId, item = SquarePickaxe, inInventory = true, equipped = false)
-
-            /* Item is initially unequipped */
-            assertFalse((oldItemInInventory as EquippableInventoryItem).equipped)
-
-            /* Equip item */
             equipmentUC.equip(userId, itemId)
 
-            /* Item should now be equipped */
-            val newItemInInventory = transaction { inventoryTable.getInventoryItem(userId, itemId) }
-
-            assertNotNull(newItemInInventory, "Item should still exist in inventory after equipping it.")
-            assertTrue((newItemInInventory as EquippableInventoryItem).equipped, "Item should be equipped after equip() call.")
+            verifySequence {
+                inventoryTable.getInventoryItems(userId)
+                inventoryTable.setItemEquipped(userId, itemId, equipped = true)
+            }
         }
 
         @Test
         fun `Given a user with a pickaxe already equipped, when equipping another one, it should replace the currently equipped one`() {
-            val userId = createTestUserAndGetId(transaction, userTable)
-
-            /* Equip a pickaxe */
-            val (oldOriginallyEquippedPickaxeId, oldOriginallyEquippedPickaxe) = createItem(userId, item = SquarePickaxe, inInventory = true, equipped = true)
-
-            /* First pickaxe is initially equipped */
-            assertTrue((oldOriginallyEquippedPickaxe as EquippableInventoryItem).equipped)
-
-            /* Store a second pickaxe in inventory */
-            val (oldPickaxeToEquipId, oldPickaxeToEquip) = createItem(userId, item = CrossPickaxe, inInventory = true, equipped = false)
-
-            /* Second pickaxe is initially unequipped */
-            assertFalse((oldPickaxeToEquip as EquippableInventoryItem).equipped)
+            val originallyEquippedItemId = 0L
+            val originallyUnequippedItemId = 1L
+            every { inventoryTable.getInventoryItems(userId) } returns mapOf(
+                originallyEquippedItemId to EquippableInventoryItem(SquarePickaxe, equipped = true),
+                originallyUnequippedItemId to EquippableInventoryItem(CrossPickaxe, equipped = false)
+            )
 
             /* Equip second pickaxe */
-            equipmentUC.equip(userId, oldPickaxeToEquipId)
+            equipmentUC.equip(userId, originallyUnequippedItemId)
 
-            /* Originally-equipped pickaxe should be in inventory and unequipped */
-            val newOriginallyEquippedPickaxe = transaction { inventoryTable.getInventoryItem(userId, oldOriginallyEquippedPickaxeId) }
-            assertNotNull(newOriginallyEquippedPickaxe, "Originally-equipped pickaxe should still be in inventory after equipping another pickaxe.")
-            assertFalse(
-                (newOriginallyEquippedPickaxe as EquippableInventoryItem).equipped,
-                "Originally-equipped pickaxe should now be unequipped after equipping another pickaxe."
-            )
-
-            /* Newly-equipped pickaxe should be in inventory and equipped */
-            val newPickaxeToEquip = transaction { inventoryTable.getInventoryItem(userId, oldPickaxeToEquipId) }
-            assertNotNull(newPickaxeToEquip, "Newly-equipped pickaxe should still be in inventory after equipping it while already having another pickaxe equipped.")
-            assertTrue(
-                (newPickaxeToEquip as EquippableInventoryItem).equipped,
-                "Newly-equipped pickaxe should now be equipped after equipping it while already having another pickaxe equipped."
-            )
+            verifySequence {
+                inventoryTable.getInventoryItems(userId)
+                inventoryTable.setItemEquipped(userId, originallyEquippedItemId, equipped = false)
+                inventoryTable.setItemEquipped(userId, originallyUnequippedItemId, equipped = true)
+            }
         }
 
         @Test
         fun `Given a user, when equipping an item not in inventory, or which doesn't exist, should throw InventoryItemNotFoundException`() {
-            val userId = createTestUserAndGetId(transaction, userTable)
-
-            /* Create item but not placed in inventory */
-            val (itemId) = createItem(userId, item = SquarePickaxe, inInventory = false, equipped = false)
+            every { inventoryTable.getInventoryItems(userId) } returns emptyMap()
 
             assertThrows<InventoryItemNotFoundException>("Equipping an item not in inventory should throw an InventoryItemNotFoundException") {
-                equipmentUC.equip(userId, itemId)
-            }
-
-            assertThrows<InventoryItemNotFoundException>("Equipping an item that does not exist should throw an InventoryItemNotFoundException") {
-                equipmentUC.equip(userId, 10)
+                equipmentUC.equip(userId, 123L)
             }
         }
 
         @Test
         fun `Given a user, when equipping a non-equippable held item, should throw InventoryItemNotEquippableException`() {
-            val userId = createTestUserAndGetId(transaction, userTable)
-
-            /* Insert equippable item into inventory */
-            val (nonequippableItemId) = createItem(userId, item = CopperOre(quantity = 1), inInventory = true)
+            val itemId = 0L
+            every { inventoryTable.getInventoryItems(userId) } returns mapOf(
+                itemId to InventoryItem(CopperOre(quantity = 5))
+            )
 
             assertThrows<InventoryItemNotEquippableException>("Equipping a non-equippable item should throw InventoryItemNotEquippableException") {
-                equipmentUC.equip(userId, nonequippableItemId)
+                equipmentUC.equip(userId, itemId)
             }
         }
 
         @Test
         fun `Given a user, when equipping an already equipped item, should throw InventoryItemAlreadyEquippedException`() {
-            val userId = createTestUserAndGetId(transaction, userTable)
-
-            /* Equip item */
-            val (equippedItemId) = createItem(userId, item = CrossPickaxe, inInventory = true, equipped = true)
+            val itemId = 0L
+            every { inventoryTable.getInventoryItems(userId) } returns mapOf(
+                itemId to EquippableInventoryItem(SquarePickaxe, equipped = true)
+            )
 
             assertThrows<InventoryItemAlreadyEquippedException>("Equipping an already-equipped item should throw InventoryItemAlreadyEquippedException") {
-                equipmentUC.equip(userId, equippedItemId)
+                equipmentUC.equip(userId, itemId)
             }
         }
     }
@@ -143,77 +105,49 @@ class EquipmentUCImplTests {
     inner class Unequip {
         @Test
         fun `Given a user with an equipped item, when unequipping it, it should return unequipped`() {
-            val userId = createTestUserAndGetId(transaction, userTable)
+            val itemId = 0L
+            every { inventoryTable.getInventoryItem(userId, itemId) } returns EquippableInventoryItem(IcePick, equipped = true)
 
-            /* Equip item */
-            val (equippedItemId, equippedItem) = createItem(userId, item = IcePick, inInventory = true, equipped = true)
+            equipmentUC.unequip(userId, itemId)
 
-            /* Item is initially equipped */
-            assertTrue((equippedItem as EquippableInventoryItem).equipped)
-
-            /* Unequip item */
-            equipmentUC.unequip(userId, equippedItemId)
-
-            /* Item should now be unequipped */
-            val newlyUnequippedItem = transaction { inventoryTable.getInventoryItem(userId, equippedItemId) }
-
-            assertNotNull(newlyUnequippedItem, "Item should still exist in inventory after unequipping it.")
-            assertFalse((newlyUnequippedItem as EquippableInventoryItem).equipped, "Item should be unequipped after unequip() call.")
+            verifySequence {
+                inventoryTable.getInventoryItem(userId, itemId)
+                inventoryTable.setItemEquipped(userId, itemId, equipped = false)
+            }
         }
 
         @Test
         fun `Given a user, when unequipping an item not in inventory, or which doesn't exist, should throw InventoryItemNotFoundException`() {
-            val userId = createTestUserAndGetId(transaction, userTable)
-
-            /* Create item but not placed in inventory */
-            val (itemId) = createItem(userId, item = SquarePickaxe, inInventory = false)
+            val itemId = 0L
+            every { inventoryTable.getInventoryItem(userId, itemId) } returns null
 
             assertThrows<InventoryItemNotFoundException>("Unequipping an item not in inventory should throw an InventoryItemNotFoundException") {
                 equipmentUC.unequip(userId, itemId)
-            }
-
-            assertThrows<InventoryItemNotFoundException>("Unequipping an item that does not exist should throw an InventoryItemNotFoundException") {
-                equipmentUC.equip(userId, 10)
             }
         }
 
         @Test
         fun `Given a user, when unequipping a non-equippable held item, should throw InventoryItemNotEquippableException`() {
-            val userId = createTestUserAndGetId(transaction, userTable)
+            val itemId = 0L
+            val item = InventoryItem(Stone(quantity = 1))
 
-            /* Insert equippable item into inventory */
-            val (nonequippableItemId) = createItem(userId, item = Stone(quantity = 1), inInventory = true)
+            assert(item !is InventoryItem.Equippable)
+
+            every { inventoryTable.getInventoryItem(userId, itemId) } returns item
 
             assertThrows<InventoryItemNotEquippableException>("Unequipping a non-equippable item should throw InventoryItemNotEquippableException") {
-                equipmentUC.unequip(userId, nonequippableItemId)
+                equipmentUC.unequip(userId, itemId)
             }
         }
 
         @Test
         fun `Given a user, when unequipping an already unequipped item, should throw InventoryItemNotEquippedException`() {
-            val userId = createTestUserAndGetId(transaction, userTable)
-
-            /* Hold item unequipped */
-            val (equippedItemId) = createItem(userId, item = CrossPickaxe, inInventory = true, equipped = false)
+            val itemId = 0L
+            every { inventoryTable.getInventoryItem(userId, itemId) } returns EquippableInventoryItem(CrossPickaxe, equipped = false)
 
             assertThrows<InventoryItemNotEquippedException>("Unequipping an already-unequipped item should throw InventoryItemNotEquippedException") {
-                equipmentUC.unequip(userId, equippedItemId)
+                equipmentUC.unequip(userId, itemId)
             }
         }
-    }
-
-    fun createItem(userId: Int, item: MaterializedItem, inInventory: Boolean, equipped: Boolean? = null): Pair<Long, InventoryItem?> {
-        val itemId = transaction {
-            val id = materializedItemTable.insertItemAndGetId(item)
-            if (inInventory) {
-                inventoryTable.insertItem(userId, id, item.base)
-                if (item.base is BaseItem.Equippable) inventoryTable.setItemEquipped(userId, id, equipped!!)
-            }
-
-            return@transaction id
-        }
-        val invItem = transaction { inventoryTable.getInventoryItem(userId, itemId) }
-
-        return itemId to invItem
     }
 }
