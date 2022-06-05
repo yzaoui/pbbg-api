@@ -3,7 +3,6 @@ package com.bitwiserain.pbbg.app.db.usecase
 import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.DexTable
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
-import com.bitwiserain.pbbg.app.db.repository.Joins
 import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.app.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.app.db.repository.market.MarketInventoryTable
@@ -205,7 +204,7 @@ class MarketUCImpl(
             gameItemsToInsert.add(materializedItemTable.insertItemAndGetId(item))
         }
         /* Insert items into game's market */
-        Joins.Market.insertItems(userId, gameItemsToInsert)
+        marketInventoryTable.insertItems(userId, gameItemsToInsert)
         /* Update quantity of game's items */
         gameItemsToUpdateQuantity.forEach { materializedItemTable.updateQuantity(it.key, it.value) }
         /* Remove user's items */
