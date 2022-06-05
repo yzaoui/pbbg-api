@@ -15,11 +15,6 @@ object Joins {
                 .single()
                 .value
 
-        fun getItems(userId: Int) =
-            (MarketInventoryTableImpl.Exposed innerJoin MaterializedItemTableImpl.Exposed innerJoin MarketTableImpl.Exposed)
-                .select { MarketTableImpl.Exposed.userId.eq(userId) }
-                .associate { it[MaterializedItemTableImpl.Exposed.id].value to it.toMaterializedItem() }
-
         fun insertItems(userId: Int, itemIds: Iterable<Long>) {
             val marketId = getMarketId(userId)
 

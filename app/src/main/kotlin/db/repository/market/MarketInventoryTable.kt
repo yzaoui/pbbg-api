@@ -1,12 +1,17 @@
 package com.bitwiserain.pbbg.app.db.repository.market
 
 import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTableImpl
+import com.bitwiserain.pbbg.app.db.repository.toMaterializedItem
+import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 
 interface MarketInventoryTable {
+
+    fun getItems(userId: Int): Map<Long, MaterializedItem>
 
     fun insertItem(marketId: Int, itemId: Long)
 
@@ -22,6 +27,11 @@ class MarketInventoryTableImpl : MarketInventoryTable {
 
         override val primaryKey = PrimaryKey(marketId, materializedItem)
     }
+
+    override fun getItems(userId: Int) =
+        (Exposed innerJoin MaterializedItemTableImpl.Exposed innerJoin MarketTableImpl.Exposed)
+            .select { MarketTableImpl.Exposed.userId.eq(userId) }
+            .associate { it[MaterializedItemTableImpl.Exposed.id].value to it.toMaterializedItem() }
 
     override fun insertItem(marketId: Int, itemId: Long) {
         Exposed.insert {
