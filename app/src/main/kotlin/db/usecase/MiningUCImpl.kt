@@ -4,7 +4,6 @@ import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.DexTable
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.repository.ItemHistoryTable
-import com.bitwiserain.pbbg.app.db.repository.Joins
 import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.app.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.app.db.repository.mine.MineCellTable
@@ -100,7 +99,7 @@ class MiningUCImpl(
         /* Get currently running mine session */
         val mineSession = mineSessionTable.getSession(userId) ?: throw NotInMineSessionException()
 
-        val inventoryItems = Joins.getInventoryItems(userId)
+        val inventoryItems = inventoryTable.getInventoryItems(userId)
 
         /* Get currently equipped pickaxe */
         val pickaxe = inventoryItems

@@ -31,7 +31,7 @@ class MarketUCImpl(
         val gold = userStatsTable.getUserStats(userId).gold
 
         val userMarket = Market(
-            Joins.getInventoryItems(userId)
+            inventoryTable.getInventoryItems(userId)
                 .filterOutZeroQuantityItems()
                 .mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }
         )
@@ -47,7 +47,7 @@ class MarketUCImpl(
 
     override fun buy(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction {
         var gold = userStatsTable.getUserStats(userId).gold
-        val userMarket = Joins.getInventoryItems(userId).toMutableMap()
+        val userMarket = inventoryTable.getInventoryItems(userId).toMutableMap()
         val gameMarket = Joins.Market.getItems(userId).toMutableMap()
         val dex = dexTable.getDiscovered(userId)
 
@@ -131,7 +131,7 @@ class MarketUCImpl(
         return@transaction UserAndGameMarkets(
             gold = gold,
             userMarket = Market(
-                Joins.getInventoryItems(userId)
+                inventoryTable.getInventoryItems(userId)
                     .filterOutZeroQuantityItems()
                     .mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }
             ),
@@ -145,7 +145,7 @@ class MarketUCImpl(
 
     override fun sell(userId: Int, orders: List<MarketOrder>): UserAndGameMarkets = transaction {
         var gold = userStatsTable.getUserStats(userId).gold
-        val userMarket = Joins.getInventoryItems(userId).toMutableMap()
+        val userMarket = inventoryTable.getInventoryItems(userId).toMutableMap()
         val gameMarket = Joins.Market.getItems(userId).toMutableMap()
 
         val gameItemsToInsert = mutableSetOf<Long>()
@@ -216,7 +216,7 @@ class MarketUCImpl(
         return@transaction UserAndGameMarkets(
             gold = gold,
             userMarket = Market(
-                Joins.getInventoryItems(userId)
+                inventoryTable.getInventoryItems(userId)
                     .filterOutZeroQuantityItems()
                     .mapValues { MarketItem(it.value.item, PriceManager.getSellPrice(it.value.item)) }
             ),

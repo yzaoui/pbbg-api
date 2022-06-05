@@ -2,7 +2,6 @@ package com.bitwiserain.pbbg.app.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.app.SchemaHelper
 import com.bitwiserain.pbbg.app.db.repository.InventoryTableImpl
-import com.bitwiserain.pbbg.app.db.repository.Joins
 import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTableImpl
 import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.app.db.usecase.InventoryUCImpl
@@ -26,7 +25,7 @@ class InventoryUCImplTests {
     private val inventoryTable = InventoryTableImpl()
     private val materializedItemTable = MaterializedItemTableImpl()
     private val userTable = UserTableImpl()
-    private val inventoryUC: InventoryUC = InventoryUCImpl(transaction)
+    private val inventoryUC: InventoryUC = InventoryUCImpl(transaction, inventoryTable)
 
     @AfterEach
     fun dropDatabase() {
@@ -47,7 +46,7 @@ class InventoryUCImplTests {
             // Equip cross pickaxe
             InventoryTableImpl.Exposed.update({ InventoryTableImpl.Exposed.userId.eq(userId) and InventoryTableImpl.Exposed.materializedItem.eq(pickId) }) { it[equipped] = true }
 
-            return@transaction Inventory(Joins.getInventoryItems(userId)) to inventoryUC.getInventory(userId)
+            return@transaction Inventory(inventoryTable.getInventoryItems(userId)) to inventoryUC.getInventory(userId)
         }
 
         // TODO: Better assertions, not testing equality here

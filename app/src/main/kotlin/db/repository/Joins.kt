@@ -11,11 +11,6 @@ import org.jetbrains.exposed.sql.update
 
 object Joins {
 
-    fun getInventoryItems(userId: Int): Map<Long, InventoryItem> =
-        (InventoryTableImpl.Exposed innerJoin MaterializedItemTableImpl.Exposed)
-            .select { InventoryTableImpl.Exposed.userId.eq(userId) }
-            .associate { it[MaterializedItemTableImpl.Exposed.id].value to it.toInventoryItem() }
-
     fun getInventoryItem(userId: Int, itemId: Long): InventoryItem? =
         (InventoryTableImpl.Exposed innerJoin MaterializedItemTableImpl.Exposed)
             .select { InventoryTableImpl.Exposed.userId.eq(userId) and InventoryTableImpl.Exposed.materializedItem.eq(itemId) }

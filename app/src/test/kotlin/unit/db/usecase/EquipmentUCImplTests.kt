@@ -34,7 +34,7 @@ class EquipmentUCImplTests {
     private val inventoryTable = InventoryTableImpl()
     private val materializedItemTable = MaterializedItemTableImpl()
     private val userTable = UserTableImpl()
-    private val equipmentUC: EquipmentUC = EquipmentUCImpl(transaction)
+    private val equipmentUC: EquipmentUC = EquipmentUCImpl(transaction, inventoryTable)
 
     @AfterEach
     fun dropDatabase() {

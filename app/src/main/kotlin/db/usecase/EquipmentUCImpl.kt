@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.app.db.usecase
 
 import com.bitwiserain.pbbg.app.db.Transaction
+import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.repository.Joins
 import com.bitwiserain.pbbg.app.domain.model.BaseItem
 import com.bitwiserain.pbbg.app.domain.model.InventoryItem
@@ -10,9 +11,9 @@ import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippableExcepti
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippedException
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotFoundException
 
-class EquipmentUCImpl(private val transaction: Transaction) : EquipmentUC {
+class EquipmentUCImpl(private val transaction: Transaction, private val inventoryTable: InventoryTable) : EquipmentUC {
     override fun equip(userId: Int, itemId: Long): Unit = transaction {
-        val inventoryItems = Joins.getInventoryItems(userId)
+        val inventoryItems = inventoryTable.getInventoryItems(userId)
 
         /* Get item from inventory table */
         val item = inventoryItems[itemId] ?: throw InventoryItemNotFoundException(itemId)

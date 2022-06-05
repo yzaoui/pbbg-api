@@ -79,7 +79,7 @@ class RegisterUserUCImplTest {
         fun `When registering a new user, the user's inventory should contain 1 ice pick, 2 apple saplings, 5 tomato seeds`() {
             val userId = (registerUser("username", "password") as Result.Success).userId
 
-            val inventoryItems = transaction { Joins.getInventoryItems(userId) }
+            val inventoryItems = transaction { inventoryTable.getInventoryItems(userId) }
 
             inventoryItems shouldHaveSize 3
             // TODO: Finish this test
