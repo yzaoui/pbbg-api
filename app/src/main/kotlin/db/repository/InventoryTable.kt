@@ -25,6 +25,8 @@ interface InventoryTable {
 
     fun getHeldItemsOfBaseKind(userId: Int, itemEnum: ItemEnum): Map<Long, MaterializedItem>
 
+    fun getInventoryItem(userId: Int, itemId: Long): InventoryItem?
+
     fun getInventoryItems(userId: Int): Map<Long, InventoryItem>
 
     fun setItemEquipped(userId: Int, itemId: Long, equipped: Boolean)
@@ -73,6 +75,12 @@ class InventoryTableImpl : InventoryTable {
         (Exposed innerJoin MaterializedItemTableImpl.Exposed)
             .select { Exposed.userId.eq(userId) and MaterializedItemTableImpl.Exposed.itemEnum.eq(itemEnum) }
             .associate { it[MaterializedItemTableImpl.Exposed.id].value to it.toMaterializedItem() }
+
+    override fun getInventoryItem(userId: Int, itemId: Long): InventoryItem? =
+        (Exposed innerJoin MaterializedItemTableImpl.Exposed)
+            .select { Exposed.userId.eq(userId) and Exposed.materializedItem.eq(itemId) }
+            .singleOrNull()
+            ?.toInventoryItem()
 
     override fun getInventoryItems(userId: Int): Map<Long, InventoryItem> =
         (Exposed innerJoin MaterializedItemTableImpl.Exposed)

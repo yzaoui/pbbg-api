@@ -2,19 +2,11 @@ package com.bitwiserain.pbbg.app.db.repository
 
 import com.bitwiserain.pbbg.app.db.repository.market.MarketInventoryTableImpl
 import com.bitwiserain.pbbg.app.db.repository.market.MarketTableImpl
-import com.bitwiserain.pbbg.app.domain.model.InventoryItem
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.select
 
 object Joins {
-
-    fun getInventoryItem(userId: Int, itemId: Long): InventoryItem? =
-        (InventoryTableImpl.Exposed innerJoin MaterializedItemTableImpl.Exposed)
-            .select { InventoryTableImpl.Exposed.userId.eq(userId) and InventoryTableImpl.Exposed.materializedItem.eq(itemId) }
-            .singleOrNull()
-            ?.toInventoryItem()
 
     object Market {
         private fun getMarketId(userId: Int) =

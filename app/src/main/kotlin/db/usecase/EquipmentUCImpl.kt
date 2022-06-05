@@ -2,7 +2,6 @@ package com.bitwiserain.pbbg.app.db.usecase
 
 import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
-import com.bitwiserain.pbbg.app.db.repository.Joins
 import com.bitwiserain.pbbg.app.domain.model.BaseItem
 import com.bitwiserain.pbbg.app.domain.model.InventoryItem
 import com.bitwiserain.pbbg.app.domain.usecase.EquipmentUC
@@ -46,7 +45,7 @@ class EquipmentUCImpl(private val transaction: Transaction, private val inventor
 
     override fun unequip(userId: Int, itemId: Long): Unit = transaction {
         /* Get item from inventory table */
-        val item = Joins.getInventoryItem(userId, itemId) ?: throw InventoryItemNotFoundException(itemId)
+        val item = inventoryTable.getInventoryItem(userId, itemId) ?: throw InventoryItemNotFoundException(itemId)
 
         /* Make sure item is equippable */
         if (item !is InventoryItem.Equippable) throw InventoryItemNotEquippableException(itemId)

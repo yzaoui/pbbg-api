@@ -2,7 +2,6 @@ package com.bitwiserain.pbbg.app.test.unit.db.usecase
 
 import com.bitwiserain.pbbg.app.SchemaHelper
 import com.bitwiserain.pbbg.app.db.repository.InventoryTableImpl
-import com.bitwiserain.pbbg.app.db.repository.Joins
 import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTableImpl
 import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.app.db.usecase.EquipmentUCImpl
@@ -57,7 +56,7 @@ class EquipmentUCImplTests {
             equipmentUC.equip(userId, itemId)
 
             /* Item should now be equipped */
-            val newItemInInventory = transaction { Joins.getInventoryItem(userId, itemId) }
+            val newItemInInventory = transaction { inventoryTable.getInventoryItem(userId, itemId) }
 
             assertNotNull(newItemInInventory, "Item should still exist in inventory after equipping it.")
             assertTrue((newItemInInventory as EquippableInventoryItem).equipped, "Item should be equipped after equip() call.")
@@ -83,7 +82,7 @@ class EquipmentUCImplTests {
             equipmentUC.equip(userId, oldPickaxeToEquipId)
 
             /* Originally-equipped pickaxe should be in inventory and unequipped */
-            val newOriginallyEquippedPickaxe = transaction { Joins.getInventoryItem(userId, oldOriginallyEquippedPickaxeId) }
+            val newOriginallyEquippedPickaxe = transaction { inventoryTable.getInventoryItem(userId, oldOriginallyEquippedPickaxeId) }
             assertNotNull(newOriginallyEquippedPickaxe, "Originally-equipped pickaxe should still be in inventory after equipping another pickaxe.")
             assertFalse(
                 (newOriginallyEquippedPickaxe as EquippableInventoryItem).equipped,
@@ -91,7 +90,7 @@ class EquipmentUCImplTests {
             )
 
             /* Newly-equipped pickaxe should be in inventory and equipped */
-            val newPickaxeToEquip = transaction { Joins.getInventoryItem(userId, oldPickaxeToEquipId) }
+            val newPickaxeToEquip = transaction { inventoryTable.getInventoryItem(userId, oldPickaxeToEquipId) }
             assertNotNull(newPickaxeToEquip, "Newly-equipped pickaxe should still be in inventory after equipping it while already having another pickaxe equipped.")
             assertTrue(
                 (newPickaxeToEquip as EquippableInventoryItem).equipped,
@@ -156,7 +155,7 @@ class EquipmentUCImplTests {
             equipmentUC.unequip(userId, equippedItemId)
 
             /* Item should now be unequipped */
-            val newlyUnequippedItem = transaction { Joins.getInventoryItem(userId, equippedItemId) }
+            val newlyUnequippedItem = transaction { inventoryTable.getInventoryItem(userId, equippedItemId) }
 
             assertNotNull(newlyUnequippedItem, "Item should still exist in inventory after unequipping it.")
             assertFalse((newlyUnequippedItem as EquippableInventoryItem).equipped, "Item should be unequipped after unequip() call.")
@@ -208,12 +207,12 @@ class EquipmentUCImplTests {
             val id = materializedItemTable.insertItemAndGetId(item)
             if (inInventory) {
                 inventoryTable.insertItem(userId, id, item.base)
-                if (item.base is BaseItem.Equippable) Joins.setItemEquipped(userId, id, equipped!!)
+                if (item.base is BaseItem.Equippable) inventoryTable.setItemEquipped(userId, id, equipped!!)
             }
 
             return@transaction id
         }
-        val invItem = transaction { Joins.getInventoryItem(userId, itemId) }
+        val invItem = transaction { inventoryTable.getInventoryItem(userId, itemId) }
 
         return itemId to invItem
     }
