@@ -37,11 +37,11 @@ class EquipmentUCImpl(private val transaction: Transaction, private val inventor
 
         /* Unequip item currently in this equipment slot if any */
         equippedItems.filter(isSameCategoryAsTargetItem).entries.singleOrNull()?.let {
-            Joins.setItemEquipped(userId, it.key, equipped = false)
+            inventoryTable.setItemEquipped(userId, it.key, equipped = false)
         }
 
         /* Equip item */
-        Joins.setItemEquipped(userId, itemId, equipped = true)
+        inventoryTable.setItemEquipped(userId, itemId, equipped = true)
     }
 
     override fun unequip(userId: Int, itemId: Long): Unit = transaction {
@@ -54,6 +54,6 @@ class EquipmentUCImpl(private val transaction: Transaction, private val inventor
         if (!item.equipped) throw InventoryItemNotEquippedException(itemId)
 
         /* Unequip item */
-        Joins.setItemEquipped(userId, itemId, equipped = false)
+        inventoryTable.setItemEquipped(userId, itemId, equipped = false)
     }
 }

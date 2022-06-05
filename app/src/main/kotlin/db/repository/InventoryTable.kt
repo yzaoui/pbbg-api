@@ -11,6 +11,7 @@ import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.update
 
 interface InventoryTable {
 
@@ -25,6 +26,8 @@ interface InventoryTable {
     fun getHeldItemsOfBaseKind(userId: Int, itemEnum: ItemEnum): Map<Long, MaterializedItem>
 
     fun getInventoryItems(userId: Int): Map<Long, InventoryItem>
+
+    fun setItemEquipped(userId: Int, itemId: Long, equipped: Boolean)
 }
 
 class InventoryTableImpl : InventoryTable {
@@ -75,4 +78,10 @@ class InventoryTableImpl : InventoryTable {
         (Exposed innerJoin MaterializedItemTableImpl.Exposed)
             .select { Exposed.userId.eq(userId) }
             .associate { it[MaterializedItemTableImpl.Exposed.id].value to it.toInventoryItem() }
+
+    override fun setItemEquipped(userId: Int, itemId: Long, equipped: Boolean) {
+        Exposed.update({ Exposed.userId.eq(userId) and Exposed.materializedItem.eq(itemId) }) {
+            it[Exposed.equipped] = equipped
+        }
+    }
 }

@@ -7,7 +7,6 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.update
 
 object Joins {
 
@@ -16,11 +15,6 @@ object Joins {
             .select { InventoryTableImpl.Exposed.userId.eq(userId) and InventoryTableImpl.Exposed.materializedItem.eq(itemId) }
             .singleOrNull()
             ?.toInventoryItem()
-
-    fun setItemEquipped(userId: Int, itemId: Long, equipped: Boolean) =
-        InventoryTableImpl.Exposed.update({ InventoryTableImpl.Exposed.userId.eq(userId) and InventoryTableImpl.Exposed.materializedItem.eq(itemId) }) {
-            it[InventoryTableImpl.Exposed.equipped] = equipped
-        }
 
     object Market {
         private fun getMarketId(userId: Int) =
