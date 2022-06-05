@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.app.test.unit.db.usecase
 
-import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.SquadTable
 import com.bitwiserain.pbbg.app.db.repository.UnitTable
 import com.bitwiserain.pbbg.app.db.repository.battle.BattleSessionTable
@@ -8,6 +7,7 @@ import com.bitwiserain.pbbg.app.db.usecase.UnitUCImpl
 import com.bitwiserain.pbbg.app.domain.model.MyUnit
 import com.bitwiserain.pbbg.app.domain.model.Squad
 import com.bitwiserain.pbbg.app.domain.usecase.SquadInBattleException
+import com.bitwiserain.pbbg.app.test.db.TestTransaction
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verifyAll
@@ -20,15 +20,12 @@ import kotlin.test.assertEquals
 class UnitUCImplTests {
 
     val userId: Int = 1234
-    private val transaction: Transaction = object : Transaction {
-        override fun <T> invoke(block: () -> T): T = block()
-    }
 
     private val battleSessionTable: BattleSessionTable = mockk()
     private val squadTable: SquadTable = mockk()
     private val unitTable: UnitTable = mockk(relaxUnitFun = true)
 
-    private val unitUC: UnitUCImpl = UnitUCImpl(transaction, battleSessionTable, squadTable, unitTable)
+    private val unitUC: UnitUCImpl = UnitUCImpl(TestTransaction, battleSessionTable, squadTable, unitTable)
 
     @Test
     fun `When calling getSquad(), should return the user's squad`() {

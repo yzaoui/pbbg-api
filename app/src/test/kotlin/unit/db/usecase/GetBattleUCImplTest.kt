@@ -1,10 +1,10 @@
 package com.bitwiserain.pbbg.app.test.unit.db.usecase
 
-import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.SquadTable
 import com.bitwiserain.pbbg.app.db.repository.battle.BattleEnemyTable
 import com.bitwiserain.pbbg.app.db.repository.battle.BattleSessionTable
 import com.bitwiserain.pbbg.app.db.usecase.GetBattleUCImpl
+import com.bitwiserain.pbbg.app.test.db.TestTransaction
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.DisplayName
@@ -20,9 +20,6 @@ class GetBattleUCImplTest {
     private val battleSessionNotNull = 123L
     private var battleSession: Long? = null
 
-    private val transaction: Transaction = object : Transaction {
-        override fun <T> invoke(block: () -> T): T = block()
-    }
     private val battleEnemyTable: BattleEnemyTable = mockk {
         every { getEnemies(battleSessionNotNull) } returns mockk()
     }
@@ -34,7 +31,7 @@ class GetBattleUCImplTest {
         every { getAllies(userId) } returns mockk()
     }
 
-    private val getBattle: GetBattleUCImpl = GetBattleUCImpl(transaction, battleEnemyTable, battleSessionTable, squadTable)
+    private val getBattle: GetBattleUCImpl = GetBattleUCImpl(TestTransaction, battleEnemyTable, battleSessionTable, squadTable)
 
     @Test
     @DisplayName("When generating a battle and requesting the current battle, it should be returned")

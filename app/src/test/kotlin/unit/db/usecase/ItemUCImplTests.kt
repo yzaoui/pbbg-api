@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.app.test.unit.db.usecase
 
-import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.model.User
 import com.bitwiserain.pbbg.app.db.repository.ItemHistoryTable
 import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTable
@@ -11,6 +10,7 @@ import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistory
 import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.app.domain.usecase.ItemNotFoundException
 import com.bitwiserain.pbbg.app.domain.usecase.ItemUC
+import com.bitwiserain.pbbg.app.test.db.TestTransaction
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
@@ -22,15 +22,11 @@ import kotlin.test.assertTrue
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class ItemUCImplTests {
 
-    private val transaction: Transaction = object : Transaction {
-        override fun <T> invoke(block: () -> T): T = block()
-    }
-
     private val itemHistoryTable: ItemHistoryTable = mockk()
     private val materializedItemTable: MaterializedItemTable = mockk()
     private val userTable: UserTable = mockk()
 
-    private val itemUC: ItemUC = ItemUCImpl(transaction, itemHistoryTable, materializedItemTable, userTable)
+    private val itemUC: ItemUC = ItemUCImpl(TestTransaction, itemHistoryTable, materializedItemTable, userTable)
 
     @Test
     fun `Given an item in existence with a history, when calling for its details, should return all its expected details`() {

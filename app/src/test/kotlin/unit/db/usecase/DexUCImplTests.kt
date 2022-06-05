@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.app.test.unit.db.usecase
 
-import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.DexTable
 import com.bitwiserain.pbbg.app.db.usecase.DexUCImpl
 import com.bitwiserain.pbbg.app.domain.model.BaseItem
@@ -10,6 +9,7 @@ import com.bitwiserain.pbbg.app.domain.model.dex.DexItem
 import com.bitwiserain.pbbg.app.domain.usecase.DexUC
 import com.bitwiserain.pbbg.app.domain.usecase.InvalidItemException
 import com.bitwiserain.pbbg.app.domain.usecase.InvalidUnitException
+import com.bitwiserain.pbbg.app.test.db.TestTransaction
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Nested
@@ -27,11 +27,7 @@ class DexUCImplTests {
 
     private val dexTable: DexTable = mockk()
 
-    private val transaction: Transaction = object : Transaction {
-        override fun <T> invoke(block: () -> T): T = block()
-    }
-
-    private val dexUC: DexUC = DexUCImpl(transaction, dexTable)
+    private val dexUC: DexUC = DexUCImpl(TestTransaction, dexTable)
 
     @Nested
     inner class DexItems {

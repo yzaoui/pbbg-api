@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.app.test.unit.db.usecase
 
-import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.usecase.EquipmentUCImpl
 import com.bitwiserain.pbbg.app.domain.model.InventoryItem
@@ -10,6 +9,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemAlreadyEquippedExcep
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippableException
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotEquippedException
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotFoundException
+import com.bitwiserain.pbbg.app.test.db.TestTransaction
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verifySequence
@@ -23,13 +23,9 @@ class EquipmentUCImplTests {
 
     private val userId: Int = 1234
 
-    private val transaction: Transaction = object : Transaction {
-        override fun <T> invoke(block: () -> T): T = block()
-    }
-
     private val inventoryTable: InventoryTable = mockk(relaxUnitFun = true)
 
-    private val equipmentUC: EquipmentUCImpl = EquipmentUCImpl(transaction, inventoryTable)
+    private val equipmentUC: EquipmentUCImpl = EquipmentUCImpl(TestTransaction, inventoryTable)
 
     @Nested
     inner class Equip {

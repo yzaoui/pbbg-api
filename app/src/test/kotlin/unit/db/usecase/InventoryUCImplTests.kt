@@ -1,10 +1,10 @@
 package com.bitwiserain.pbbg.app.test.unit.db.usecase
 
-import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.usecase.InventoryUCImpl
 import com.bitwiserain.pbbg.app.domain.model.InventoryItem
 import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
+import com.bitwiserain.pbbg.app.test.db.TestTransaction
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
@@ -16,15 +16,11 @@ class InventoryUCImplTests {
 
     private val userId: Int = 1234
 
-    private val transaction: Transaction = object : Transaction {
-        override fun <T> invoke(block: () -> T): T = block()
-    }
-
     private val inventoryTable: InventoryTable = mockk {
         every { getInventoryItems(userId) } returns mapOf()
     }
 
-    private val inventoryUC: InventoryUCImpl = InventoryUCImpl(transaction, inventoryTable)
+    private val inventoryUC: InventoryUCImpl = InventoryUCImpl(TestTransaction, inventoryTable)
 
     @Test
     fun `Given a user with items, when calling for inventory, those items should return`() {
