@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.app.test
+package com.bitwiserain.pbbg.app.testintegration
 
 import com.bitwiserain.pbbg.app.BCryptHelper
 import com.bitwiserain.pbbg.app.SchemaHelper

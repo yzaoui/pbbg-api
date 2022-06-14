@@ -1,16 +1,12 @@
-package com.bitwiserain.pbbg.app.test.integration
+package com.bitwiserain.pbbg.app.testintegration
 
 import com.bitwiserain.pbbg.app.SchemaHelper
-import com.bitwiserain.pbbg.app.test.MutableClock
-import com.bitwiserain.pbbg.app.test.initDatabase
-import com.bitwiserain.pbbg.app.test.integration.api.GETInventory
-import com.bitwiserain.pbbg.app.test.integration.api.GETPlots
-import com.bitwiserain.pbbg.app.test.integration.api.POSTPlant
-import com.bitwiserain.pbbg.app.test.integration.model.Inventory
-import com.bitwiserain.pbbg.app.test.integration.model.farm.Plot
-import com.bitwiserain.pbbg.app.test.integration.requestbody.PlantRequest
-import com.bitwiserain.pbbg.app.test.registerUserAndGetToken
-import com.bitwiserain.pbbg.app.test.testApp
+import com.bitwiserain.pbbg.app.testintegration.api.GETInventory
+import com.bitwiserain.pbbg.app.testintegration.api.GETPlots
+import com.bitwiserain.pbbg.app.testintegration.api.POSTPlant
+import com.bitwiserain.pbbg.app.testintegration.model.Inventory
+import com.bitwiserain.pbbg.app.testintegration.model.farm.Plot
+import com.bitwiserain.pbbg.app.testintegration.requestbody.PlantRequest
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json

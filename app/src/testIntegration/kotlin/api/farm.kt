@@ -1,6 +1,6 @@
-package com.bitwiserain.pbbg.app.test.integration.api
+package com.bitwiserain.pbbg.app.testintegration.api
 
-import com.bitwiserain.pbbg.app.test.integration.requestbody.PlantRequest
+import com.bitwiserain.pbbg.app.testintegration.requestbody.PlantRequest
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
