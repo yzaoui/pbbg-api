@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.app.test.unit.db.usecase
 
-import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.SquadTable
 import com.bitwiserain.pbbg.app.db.repository.UnitTable
 import com.bitwiserain.pbbg.app.db.repository.battle.BattleEnemyTable
@@ -9,6 +8,7 @@ import com.bitwiserain.pbbg.app.db.usecase.GenerateBattleUCImpl
 import com.bitwiserain.pbbg.app.domain.model.MyUnit
 import com.bitwiserain.pbbg.app.domain.usecase.BattleAlreadyInProgressException
 import com.bitwiserain.pbbg.app.domain.usecase.NoAlliesAliveException
+import com.bitwiserain.pbbg.app.test.db.TestTransaction
 import com.bitwiserain.pbbg.app.test.db.repository.BattleEnemyTableTestImpl
 import com.bitwiserain.pbbg.app.test.db.repository.UnitTableTestImpl
 import io.mockk.every
@@ -37,15 +37,12 @@ class GenerateBattleUCImplTest {
         }
     )
 
-    private val transaction: Transaction = object : Transaction {
-        override fun <T> invoke(block: () -> T): T = block()
-    }
     private val battleEnemyTable: BattleEnemyTable = BattleEnemyTableTestImpl(units = units)
     private val battleSessionTable: BattleSessionTable = mockk(relaxUnitFun = true)
     private val squadTable: SquadTable = mockk()
     private val unitTable: UnitTable = UnitTableTestImpl(units)
 
-    private val generateBattle = GenerateBattleUCImpl(transaction, battleEnemyTable, battleSessionTable, squadTable, unitTable)
+    private val generateBattle = GenerateBattleUCImpl(TestTransaction, battleEnemyTable, battleSessionTable, squadTable, unitTable)
 
     @Test
     fun `Given an out-of-battle user, when generating a new battle, a battle containing the squad and 1+ enemies should return`() {

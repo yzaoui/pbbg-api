@@ -4,7 +4,6 @@ import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.DexTable
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.repository.ItemHistoryTable
-import com.bitwiserain.pbbg.app.db.repository.Joins
 import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistory
@@ -22,7 +21,7 @@ fun storeInInventoryReturnItemID(
     itemHistoryTable: ItemHistoryTable,
     materializedItemTable: MaterializedItemTable,
 ): Long = transaction {
-    val heldItems = Joins.getHeldItemsOfBaseKind(userId, itemToStore.enum)
+    val heldItems = inventoryTable.getHeldItemsOfBaseKind(userId, itemToStore.enum)
 
     val itemId: Long
 

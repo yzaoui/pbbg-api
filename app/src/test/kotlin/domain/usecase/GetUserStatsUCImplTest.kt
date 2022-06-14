@@ -1,43 +1,27 @@
 package com.bitwiserain.pbbg.app.test.domain.usecase
 
-import com.bitwiserain.pbbg.app.SchemaHelper
-import com.bitwiserain.pbbg.app.db.repository.UserStatsTableImpl
-import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
+import com.bitwiserain.pbbg.app.db.repository.UserStatsTable
+import com.bitwiserain.pbbg.app.domain.model.UserStats
 import com.bitwiserain.pbbg.app.domain.usecase.GetUserStatsUCImpl
-import com.bitwiserain.pbbg.app.test.createTestUserAndGetId
-import com.bitwiserain.pbbg.app.test.initDatabase
-import io.kotest.assertions.assertSoftly
+import com.bitwiserain.pbbg.app.test.db.TestTransaction
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.AfterEach
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.jupiter.api.Test
 
 class GetUserStatsUCImplTest {
 
-    private val transaction = initDatabase()
-    private val userTable = UserTableImpl()
-    private val userStatsTable = UserStatsTableImpl()
-    private val getUserStats = GetUserStatsUCImpl(transaction, userStatsTable)
+    val userId = 1234
 
-    @AfterEach
-    fun dropDatabase() {
-        SchemaHelper.dropTables(transaction)
-    }
+    private val userStatsTable: UserStatsTable = mockk()
+
+    private val getUserStats: GetUserStatsUCImpl = GetUserStatsUCImpl(TestTransaction, userStatsTable)
 
     @Test
     fun `When getting user stats by ID, the user stats should return`() {
-        val userId = createTestUserAndGetId(transaction, userTable)
+        val expectedUserStats: UserStats = mockk()
+        every { userStatsTable.getUserStats(userId) } returns expectedUserStats
 
-        transaction {
-            userStatsTable.createUserStats(userId)
-            userStatsTable.updateGold(userId, 20)
-            userStatsTable.updateMiningExp(userId, 500)
-        }
-
-        val stats = getUserStats(userId)
-
-        assertSoftly(stats) {
-            gold shouldBe 20
-            miningExp shouldBe 500
-        }
+        getUserStats(userId) shouldBe expectedUserStats
     }
 }

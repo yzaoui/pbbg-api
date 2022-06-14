@@ -4,7 +4,6 @@ import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.DexTable
 import com.bitwiserain.pbbg.app.db.repository.InventoryTable
 import com.bitwiserain.pbbg.app.db.repository.ItemHistoryTable
-import com.bitwiserain.pbbg.app.db.repository.Joins
 import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.app.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.app.db.repository.farm.MaterializedPlantTable
@@ -53,7 +52,7 @@ class FarmUCImpl(
         if (plot.plant != null) throw OccupiedPlotException()
 
         /* Make sure user owns this item */
-        val item = (Joins.getInventoryItem(userId, itemId) ?: throw InventoryItemNotFoundException(itemId)).item
+        val item = (inventoryTable.getInventoryItem(userId, itemId) ?: throw InventoryItemNotFoundException(itemId)).item
         /* and that there is at least 1 item */
         if (item is MaterializedItem.Stackable && item.quantity < 1) throw InsufficientItemQuantity()
 
