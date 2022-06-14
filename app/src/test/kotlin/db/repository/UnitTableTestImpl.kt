@@ -4,7 +4,7 @@ import com.bitwiserain.pbbg.app.db.repository.UnitTable
 import com.bitwiserain.pbbg.app.domain.model.MyUnit
 import com.bitwiserain.pbbg.app.domain.model.MyUnitEnum
 
-class UnitTableTestImpl(private val units: MutableMap<Long, MyUnit>) : UnitTable {
+class UnitTableTestImpl(private val units: MutableMap<Long, MyUnit> = mutableMapOf()) : UnitTable {
     override fun insertUnitAndGetId(unit: UnitTable.UnitForm): Long {
         val id = units.size.toLong()
         val unitEnum = unit.enum
