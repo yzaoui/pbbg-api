@@ -43,7 +43,7 @@ configurations["testIntegrationImplementation"].extendsFrom(configurations.imple
 configurations["testIntegrationRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
 dependencies {
-    implementation(group = "com.h2database", name = "h2", version = "2.1.210")
+    implementation(group = "com.h2database", name = "h2", version = "2.1.214")
     implementation(group = "org.postgresql", name = "postgresql", version = "42.2.18")
     implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.3.0")
     implementation(group = "org.jetbrains.exposed", name = "exposed-core", version = Versions.EXPOSED)
