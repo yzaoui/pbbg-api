@@ -5,7 +5,7 @@ import org.jetbrains.gradle.ext.settings
 object Versions {
     const val KOTLIN = "1.6.10"
     const val KTOR = "1.6.4"
-    const val EXPOSED = "0.37.3"
+    const val EXPOSED = "0.38.2"
     const val JUNIT_JUPITER = "5.8.1"
     const val KOTEST = "5.3.0"
 }
