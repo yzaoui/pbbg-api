@@ -1,14 +1,16 @@
 package com.bitwiserain.pbbg.app.view.model.farm
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BasePlantJSON(
-    @SerializedName("id") val id: Int,
-    @SerializedName("name") val name: String,
-    @SerializedName("description") val description: String,
-    @SerializedName("icon") val icon: String,
-    @SerializedName("growingPeriod") val growingPeriod: Long,
-    @SerializedName("growingSprite") val growingSprite: String,
-    @SerializedName("maturePeriod") val maturePeriod: Long?,
-    @SerializedName("matureSprite") val matureSprite: String?
+    @SerialName("id") val id: Int,
+    @SerialName("name") val name: String,
+    @SerialName("description") val description: String,
+    @SerialName("icon") val icon: String,
+    @SerialName("growingPeriod") val growingPeriod: Long,
+    @SerialName("growingSprite") val growingSprite: String,
+    @SerialName("maturePeriod") val maturePeriod: Long?,
+    @SerialName("matureSprite") val matureSprite: String?
 )

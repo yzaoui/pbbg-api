@@ -2,11 +2,13 @@ package com.bitwiserain.pbbg.app.view.model.mine
 
 import com.bitwiserain.pbbg.app.view.model.LevelProgressJSON
 import com.bitwiserain.pbbg.app.view.model.LevelUpJSON
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MineActionResultJSON(
-    @SerializedName("minedItemResults") val minedItemResults: List<MinedItemResultJSON>,
-    @SerializedName("levelUps") val levelUps: List<LevelUpJSON>,
-    @SerializedName("mine") val mine: MineJSON,
-    @SerializedName("miningLvl") val miningLvl: LevelProgressJSON
+    @SerialName("minedItemResults") val minedItemResults: List<MinedItemResultJSON>,
+    @SerialName("levelUps") val levelUps: List<LevelUpJSON>,
+    @SerialName("mine") val mine: MineJSON,
+    @SerialName("miningLvl") val miningLvl: LevelProgressJSON
 )

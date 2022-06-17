@@ -9,32 +9,22 @@ import io.ktor.application.call
 import io.ktor.request.receive
 import io.ktor.routing.Route
 import io.ktor.routing.post
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 fun Route.loginAPI(login: LoginUC) = post("/login") {
-    val params = call.receive<Map<String, Any>>()
+    val params = call.receive<JsonObject>()
+    val usernameParam = params["username"]?.let { it.jsonPrimitive.content }
+    val passwordParam = params["password"]?.let { it.jsonPrimitive.content }
 
-    val errors = mutableMapOf<String, String>()
-
-    val usernameParam = params["username"]
-    val usernameError = if (usernameParam == null || usernameParam !is String) {
-        "A username is required"
-    } else {
-        null
+    if (usernameParam == null || passwordParam == null) {
+        return@post call.respondFail(buildMap {
+            if (usernameParam == null) put("username", "A username is required.")
+            if (passwordParam == null) put("password", "A password is required.")
+        })
     }
 
-    val passwordParam = params["password"]
-    val passwordError = if (passwordParam == null || passwordParam !is String) {
-        "A password is required"
-    } else {
-        null
-    }
-
-    usernameError?.let { errors["username"] = it }
-    passwordError?.let { errors["password"] = it }
-
-    if (errors.isNotEmpty()) return@post call.respondFail(errors)
-
-    val result = login(username = usernameParam as String, password = passwordParam as String)
+    val result = login(username = usernameParam, password = passwordParam)
 
     when (result) {
         is LoginUC.Result.Success -> {

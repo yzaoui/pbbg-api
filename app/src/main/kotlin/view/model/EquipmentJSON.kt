@@ -1,8 +1,10 @@
 package com.bitwiserain.pbbg.app.view.model
 
 import com.bitwiserain.pbbg.app.view.model.inventory.InventoryItemJSON
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class EquipmentJSON(
-    @SerializedName("pickaxe") val pickaxe: InventoryItemJSON?
+    @SerialName("pickaxe") val pickaxe: InventoryItemJSON?
 )

@@ -1,9 +1,11 @@
 package com.bitwiserain.pbbg.app.view.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MaterializedItemJSON(
-    @SerializedName("id") val id: Long,
-    @SerializedName("baseItem") val baseItem: BaseItemJSON,
-    @SerializedName("quantity") val quantity: Int?
+    @SerialName("id") val id: Long,
+    @SerialName("baseItem") val baseItem: BaseItemJSON,
+    @SerialName("quantity") val quantity: Int?
 )

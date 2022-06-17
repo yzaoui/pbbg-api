@@ -29,9 +29,12 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MinePositionParams(val x: Int, val y: Int)
 
+@Serializable
 data class MineGenerateParams(val mineTypeId: Int)
 
 fun Route.mine(miningUC: MiningUC) = route("/mine") {

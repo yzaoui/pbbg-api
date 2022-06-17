@@ -1,10 +1,12 @@
 package com.bitwiserain.pbbg.app.view.model.friends
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class FriendshipJSON {
-    @SerializedName("none") NONE,
-    @SerializedName("request-sent") REQUEST_SENT,
-    @SerializedName("request-received") REQUEST_RECEIVED,
-    @SerializedName("confirmed") CONFIRMED
+    @SerialName("none") NONE,
+    @SerialName("request-sent") REQUEST_SENT,
+    @SerialName("request-received") REQUEST_RECEIVED,
+    @SerialName("confirmed") CONFIRMED
 }

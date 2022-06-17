@@ -1,10 +1,11 @@
 package com.bitwiserain.pbbg.app.view.model.dex
 
 import com.bitwiserain.pbbg.app.view.model.MyUnitEnumJSON
-import com.google.gson.annotations.SerializedName
-import java.util.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class DexUnitsJSON(
-    @SerializedName("discoveredUnits") val discoveredUnits: SortedMap<Int, MyUnitEnumJSON>,
-    @SerializedName("lastUnitId") val lastUnitId: Int
+    @SerialName("discoveredUnits") val discoveredUnits: Map<Int, MyUnitEnumJSON>,
+    @SerialName("lastUnitId") val lastUnitId: Int
 )

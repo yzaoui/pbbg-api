@@ -1,16 +1,22 @@
 package com.bitwiserain.pbbg.app.view.model.dex
 
 import com.bitwiserain.pbbg.app.view.model.BaseItemJSON
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
-sealed class DexItemJSON(
-    @SerializedName("type") val type: String
-) {
+@Serializable
+@JsonClassDiscriminator("type")
+sealed class DexItemJSON {
+    @Serializable
+    @SerialName("discovered")
     data class DiscoveredDexItemJSON(
-        @SerializedName("baseItem") val baseItem: BaseItemJSON
-    ) : DexItemJSON("discovered")
+        @SerialName("baseItem") val baseItem: BaseItemJSON
+    ) : DexItemJSON()
 
+    @Serializable
+    @SerialName("undiscovered")
     data class UndiscoveredDexItemJSON(
-        @SerializedName("id") val id: Int
-    ) : DexItemJSON("undiscovered")
+        @SerialName("id") val id: Int
+    ) : DexItemJSON()
 }

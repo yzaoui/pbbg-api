@@ -29,6 +29,7 @@ import io.ktor.routing.optionalParam
 import io.ktor.routing.param
 import io.ktor.routing.post
 import io.ktor.routing.route
+import kotlinx.serialization.Serializable
 
 fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = route("/inventory") {
     /**
@@ -103,6 +104,7 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
     }
 }
 
+@Serializable
 private data class EquipmentActionParams(
     val inventoryItemId: Long
 )

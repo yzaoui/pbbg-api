@@ -1,9 +1,11 @@
 package com.bitwiserain.pbbg.app.view.model.friends
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class FriendInfoJSON(
-    @SerializedName("userId") val userId: Int,
-    @SerializedName("username") val username: String,
-    @SerializedName("friendship") val friendship: FriendshipJSON
+    @SerialName("userId") val userId: Int,
+    @SerialName("username") val username: String,
+    @SerialName("friendship") val friendship: FriendshipJSON
 )

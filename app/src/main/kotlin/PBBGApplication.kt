@@ -68,7 +68,6 @@ import io.ktor.features.CORS
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
-import io.ktor.gson.gson
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.resources
@@ -76,6 +75,12 @@ import io.ktor.http.content.static
 import io.ktor.response.respond
 import io.ktor.routing.route
 import io.ktor.routing.routing
+import io.ktor.serialization.json
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.put
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -166,9 +171,7 @@ fun Application.mainWithDependencies(clock: Clock) {
 
     install(ContentNegotiation) {
         // Handles "application/json" content type
-        gson {
-            serializeNulls()
-        }
+        json()
     }
     install(Authentication) {
         jwt {
@@ -234,16 +237,54 @@ fun Application.mainWithDependencies(clock: Clock) {
  * Ktor-related extensions *
  ***************************/
 
-suspend inline fun ApplicationCall.respondSuccess(data: Any? = null, status: HttpStatusCode = HttpStatusCode.OK) {
-    respond(status, mapOf("status" to "success", "data" to data))
+suspend inline fun <reified T : Any> ApplicationCall.respondSuccess(data: T? = null, status: HttpStatusCode = HttpStatusCode.OK) {
+    respond(
+        status,
+        buildJsonObject {
+            put("status", "success")
+            put("data", Json.encodeToJsonElement(data))
+        }
+    )
 }
 
-suspend inline fun ApplicationCall.respondFail(data: Any? = null, status: HttpStatusCode = HttpStatusCode.BadRequest) {
-    respond(status, mapOf("status" to "fail", "data" to data))
+suspend inline fun ApplicationCall.respondSuccess(status: HttpStatusCode = HttpStatusCode.OK) {
+    respond(
+        status,
+        buildJsonObject {
+            put("status", "success")
+            put("data", JsonNull)
+        }
+    )
+}
+
+suspend inline fun <reified T : Any> ApplicationCall.respondFail(data: T? = null, status: HttpStatusCode = HttpStatusCode.BadRequest) {
+    respond(
+        status,
+        buildJsonObject {
+            put("status", "fail")
+            put("data", Json.encodeToJsonElement(data))
+        }
+    )
+}
+
+suspend inline fun ApplicationCall.respondFail(status: HttpStatusCode = HttpStatusCode.BadRequest) {
+    respond(
+        status,
+        buildJsonObject {
+            put("status", "fail")
+            put("data", JsonNull)
+        }
+    )
 }
 
 suspend inline fun ApplicationCall.respondError(message: String = "", status: HttpStatusCode = HttpStatusCode.InternalServerError) {
-    respond(status, mapOf("status" to "error", "message" to message))
+    respond(
+        status,
+        buildJsonObject {
+            put("status", "error")
+            put("message", message)
+        }
+    )
 }
 
 val ApplicationCall.user

@@ -1,10 +1,12 @@
 package com.bitwiserain.pbbg.app.view.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class UserStatsJSON(
-    @SerializedName("username") val username: String,
-    @SerializedName("gold") val gold: Long,
-    @SerializedName("mining") val miningLvlProgress: LevelProgressJSON,
-    @SerializedName("farming") val farmingLvlProgress: LevelProgressJSON
+    @SerialName("username") val username: String,
+    @SerialName("gold") val gold: Long,
+    @SerialName("mining") val miningLvlProgress: LevelProgressJSON,
+    @SerialName("farming") val farmingLvlProgress: LevelProgressJSON
 )

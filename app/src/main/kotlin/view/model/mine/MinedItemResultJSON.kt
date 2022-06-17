@@ -1,9 +1,11 @@
 package com.bitwiserain.pbbg.app.view.model.mine
 
 import com.bitwiserain.pbbg.app.view.model.MaterializedItemJSON
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MinedItemResultJSON(
-    @SerializedName("item") val item: MaterializedItemJSON,
-    @SerializedName("expPerIndividualItem") val expPerIndividualItem: Int
+    @SerialName("item") val item: MaterializedItemJSON,
+    @SerialName("expPerIndividualItem") val expPerIndividualItem: Int
 )

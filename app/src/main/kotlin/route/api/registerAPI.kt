@@ -9,20 +9,22 @@ import io.ktor.application.call
 import io.ktor.request.receive
 import io.ktor.routing.Route
 import io.ktor.routing.post
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 fun Route.registerAPI(registerUser: RegisterUserUC) = post("/register") {
-    val params = call.receive<Map<String, Any>>()
-    val usernameParam = params["username"] as? String
-    val passwordParam = params["password"] as? String
+    val params = call.receive<JsonObject>()
+    val usernameParam = params["username"]?.let { it.jsonPrimitive.content }
+    val passwordParam = params["password"]?.let { it.jsonPrimitive.content }
 
     if (usernameParam == null || passwordParam == null) {
-        return@post call.respondFail(mapOf(
-            "username" to if (usernameParam == null) "A username is required." else null,
-            "password" to if (passwordParam == null) "A password is required." else null
-        ))
+        return@post call.respondFail(buildMap {
+            if (usernameParam == null) put("username", "A username is required.")
+            if (passwordParam == null) put("password", "A password is required.")
+        })
     }
 
-    val result = registerUser(usernameParam, passwordParam)
+    val result = registerUser(username = usernameParam, password = passwordParam)
 
     when (result) {
         is RegisterUserUC.Result.Success -> {

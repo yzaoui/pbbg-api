@@ -5,7 +5,7 @@ import org.jetbrains.gradle.ext.settings
 object Versions {
     const val KOTLIN = "1.6.10"
     const val KTOR = "1.6.4"
-    const val EXPOSED = "0.37.3"
+    const val EXPOSED = "0.38.2"
     const val JUNIT_JUPITER = "5.8.1"
     const val KOTEST = "5.3.0"
 }
@@ -43,14 +43,14 @@ configurations["testIntegrationImplementation"].extendsFrom(configurations.imple
 configurations["testIntegrationRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
 dependencies {
-    implementation(group = "com.h2database", name = "h2", version = "2.1.210")
+    implementation(group = "com.h2database", name = "h2", version = "2.1.214")
     implementation(group = "org.postgresql", name = "postgresql", version = "42.2.18")
-    implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.3.0")
+    implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.3.3")
     implementation(group = "org.jetbrains.exposed", name = "exposed-core", version = Versions.EXPOSED)
     implementation(group = "org.jetbrains.exposed", name = "exposed-jdbc", version = Versions.EXPOSED)
     implementation(group = "at.favre.lib", name = "bcrypt", version = "0.9.0")
     implementation(group = "io.ktor", name = "ktor-server-netty", version = Versions.KTOR)
-    implementation(group = "io.ktor", name = "ktor-gson", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-serialization", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-auth-jwt", version = Versions.KTOR)
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
 

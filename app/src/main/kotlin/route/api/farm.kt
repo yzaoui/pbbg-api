@@ -17,6 +17,7 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
+import kotlinx.serialization.Serializable
 import java.time.Clock
 import java.time.Instant
 
@@ -54,7 +55,10 @@ fun Route.farm(farmUC: FarmUC, clock: Clock) = route("/farm") {
     }
 }
 
+@Serializable
 private data class PlantParams(val plotId: Long, val itemId: Long)
+
+@Serializable
 private data class HarvestParams(val plotId: Long)
 
 private fun Plot.toJSON(now: Instant) = PlotJSON(

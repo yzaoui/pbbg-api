@@ -1,11 +1,15 @@
 package com.bitwiserain.pbbg.app.view.model.battle
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
-sealed class UnitEffectJSON(
-    @SerializedName("type") val type: String
-) {
+@Serializable
+@JsonClassDiscriminator("type")
+sealed class UnitEffectJSON {
+    @Serializable
+    @SerialName("health")
     data class HealthJSON(
-        @SerializedName("delta") val delta: Int
-    ) : UnitEffectJSON("health")
+        @SerialName("delta") val delta: Int
+    ) : UnitEffectJSON()
 }

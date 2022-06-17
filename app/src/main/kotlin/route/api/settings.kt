@@ -9,16 +9,18 @@ import io.ktor.request.receive
 import io.ktor.routing.Route
 import io.ktor.routing.post
 import io.ktor.routing.route
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 fun Route.settings(changePassword: ChangePasswordUC) = route("/settings") {
     post("/change-password") {
-        val params = call.receive<Map<String, Any>>()
+        val params = call.receive<JsonObject>()
 
-        val currentPassword = params["currentPassword"]
-        val newPassword = params["newPassword"]
-        val confirmNewPassword = params["confirmNewPassword"]
+        val currentPassword = params["currentPassword"]?.let { it.jsonPrimitive.content }
+        val newPassword = params["newPassword"]?.let { it.jsonPrimitive.content }
+        val confirmNewPassword = params["confirmNewPassword"]?.let { it.jsonPrimitive.content }
 
-        if (currentPassword !is String || newPassword !is String || confirmNewPassword !is String) {
+        if (currentPassword == null || newPassword == null || confirmNewPassword == null) {
             return@post call.respondFail("Missing parameter(s).")
         }
 
