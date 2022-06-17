@@ -1,5 +1,9 @@
 package com.bitwiserain.pbbg.app.view.model.market
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class MarketJSON(
-    val items: List<MarketItemJSON>
+    @SerialName("items") val items: List<MarketItemJSON>
 )

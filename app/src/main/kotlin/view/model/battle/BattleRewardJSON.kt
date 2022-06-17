@@ -1,9 +1,11 @@
 package com.bitwiserain.pbbg.app.view.model.battle
 
 import com.bitwiserain.pbbg.app.view.model.MaterializedItemJSON
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BattleRewardJSON(
-    @SerializedName("gold") val gold: Int,
-    @SerializedName("items") val items: List<MaterializedItemJSON>
+    @SerialName("gold") val gold: Int,
+    @SerialName("items") val items: List<MaterializedItemJSON>
 )

@@ -1,12 +1,12 @@
 package com.bitwiserain.pbbg.app.view.model.battle
 
 import com.bitwiserain.pbbg.app.view.model.MyUnitJSON
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BattleJSON(
-    @SerializedName("allies") val allies: List<MyUnitJSON>,
-    @SerializedName("enemies") val enemies: List<MyUnitJSON>,
-    @SerializedName("turns") val turns: List<TurnJSON>
+    @SerialName("allies") val allies: List<MyUnitJSON>,
+    @SerialName("enemies") val enemies: List<MyUnitJSON>,
+    @SerialName("turns") val turns: List<TurnJSON>
 )
-
-

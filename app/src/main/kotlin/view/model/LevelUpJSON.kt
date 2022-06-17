@@ -1,8 +1,10 @@
 package com.bitwiserain.pbbg.app.view.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class LevelUpJSON(
-    @SerializedName("newLevel") val newLevel: Int,
-    @SerializedName("additionalMessage") val additionalMessage: String? = null
+    @SerialName("newLevel") val newLevel: Int,
+    @SerialName("additionalMessage") val additionalMessage: String? = null
 )

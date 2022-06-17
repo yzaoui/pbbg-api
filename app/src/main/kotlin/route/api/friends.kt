@@ -21,6 +21,7 @@ import io.ktor.routing.get
 import io.ktor.routing.param
 import io.ktor.routing.post
 import io.ktor.routing.route
+import kotlinx.serialization.Serializable
 
 fun Route.friends(friendsUC: FriendsUC) = route("/friends") {
     get {
@@ -66,6 +67,7 @@ fun Route.friends(friendsUC: FriendsUC) = route("/friends") {
     }
 }
 
+@Serializable
 private data class ChangeFriendshipParams(val userId: Int)
 
 private fun Friends.toJSON() = FriendsJSON(

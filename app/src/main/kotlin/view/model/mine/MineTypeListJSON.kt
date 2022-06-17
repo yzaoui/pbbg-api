@@ -1,8 +1,10 @@
 package com.bitwiserain.pbbg.app.view.model.mine
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MineTypeListJSON(
-    @SerializedName("types") val types: List<MineTypeJSON>,
-    @SerializedName("nextUnlockLevel") val nextUnlockLevel: Int?
+    @SerialName("types") val types: List<MineTypeJSON>,
+    @SerialName("nextUnlockLevel") val nextUnlockLevel: Int?
 )

@@ -13,6 +13,7 @@ import com.bitwiserain.pbbg.app.view.model.battle.*
 import io.ktor.application.call
 import io.ktor.request.receive
 import io.ktor.routing.*
+import kotlinx.serialization.Serializable
 
 fun Route.battleAPI(battleUC: BattleUC, generateBattle: GenerateBattleUC, getBattle: GetBattleUC) = route("/battle") {
     route("/session") {
@@ -80,6 +81,7 @@ fun Route.battleAPI(battleUC: BattleUC, generateBattle: GenerateBattleUC, getBat
     }
 }
 
+@Serializable
 private data class AttackParams(val targetUnitId: Long)
 
 private fun BattleActionResult.toJSON() = BattleActionResultJSON(

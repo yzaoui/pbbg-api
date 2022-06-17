@@ -1,9 +1,11 @@
 package com.bitwiserain.pbbg.app.view.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class LevelProgressJSON(
-    @SerializedName("level") val level: Int,
-    @SerializedName("relativeExp") val relativeExp: Long,
-    @SerializedName("relativeExpToNextLevel") val relativeExpToNextLevel: Long
+    @SerialName("level") val level: Int,
+    @SerialName("relativeExp") val relativeExp: Long,
+    @SerialName("relativeExpToNextLevel") val relativeExpToNextLevel: Long
 )

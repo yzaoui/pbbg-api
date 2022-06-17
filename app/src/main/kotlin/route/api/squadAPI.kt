@@ -15,6 +15,7 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
+import kotlinx.serialization.Serializable
 
 fun Route.squadAPI(unitUC: UnitUC) = route("/squad") {
     /**
@@ -47,6 +48,7 @@ fun Route.squadAPI(unitUC: UnitUC) = route("/squad") {
     }
 }
 
+@Serializable
 private class SquadJSON(
     val units: List<MyUnitJSON>
 )

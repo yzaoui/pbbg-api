@@ -50,7 +50,7 @@ dependencies {
     implementation(group = "org.jetbrains.exposed", name = "exposed-jdbc", version = Versions.EXPOSED)
     implementation(group = "at.favre.lib", name = "bcrypt", version = "0.9.0")
     implementation(group = "io.ktor", name = "ktor-server-netty", version = Versions.KTOR)
-    implementation(group = "io.ktor", name = "ktor-gson", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-serialization", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-auth-jwt", version = Versions.KTOR)
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
 

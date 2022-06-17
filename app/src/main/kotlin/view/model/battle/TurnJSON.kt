@@ -1,7 +1,9 @@
 package com.bitwiserain.pbbg.app.view.model.battle
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class TurnJSON(
-    @SerializedName("unitId") val unitId: Long
+    @SerialName("unitId") val unitId: Long
 )

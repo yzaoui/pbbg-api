@@ -1,9 +1,11 @@
 package com.bitwiserain.pbbg.app.view.model.battle
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BattleActionResultJSON(
-    @SerializedName("battle") val battle: BattleJSON,
-    @SerializedName("unitEffects") val unitEffects: Map<Long, UnitEffectJSON>,
-    @SerializedName("reward") val reward: BattleRewardJSON? = null
+    @SerialName("battle") val battle: BattleJSON,
+    @SerialName("unitEffects") val unitEffects: Map<Long, UnitEffectJSON>,
+    @SerialName("reward") val reward: BattleRewardJSON?
 )

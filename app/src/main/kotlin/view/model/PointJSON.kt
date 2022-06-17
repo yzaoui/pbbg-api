@@ -1,8 +1,10 @@
 package com.bitwiserain.pbbg.app.view.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class PointJSON(
-    @SerializedName("x") val x: Int,
-    @SerializedName("y") val y: Int
+    @SerialName("x") val x: Int,
+    @SerialName("y") val y: Int
 )

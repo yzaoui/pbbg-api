@@ -1,7 +1,11 @@
 package com.bitwiserain.pbbg.app.view.model.market
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UserAndGameMarketsJSON(
-    val gold: Long,
-    val userMarket: MarketJSON,
-    val gameMarket: MarketJSON
+    @SerialName("gold") val gold: Long,
+    @SerialName("userMarket") val userMarket: MarketJSON,
+    @SerialName("gameMarket") val gameMarket: MarketJSON
 )

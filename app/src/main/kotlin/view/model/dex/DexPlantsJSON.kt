@@ -1,13 +1,14 @@
 package com.bitwiserain.pbbg.app.view.model.dex
 
 import com.bitwiserain.pbbg.app.view.model.farm.BasePlantJSON
-import com.google.gson.annotations.SerializedName
-import java.util.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
- * Client equivalent of [com.bitwiserain.pbbg.domain.model.dex.DexPlants].
+ * Client equivalent of [com.bitwiserain.pbbg.app.domain.model.dex.DexPlants].
  */
+@Serializable
 data class DexPlantsJSON(
-    @SerializedName("discoveredPlants") val discoveredPlants: SortedMap<Int, BasePlantJSON>,
-    @SerializedName("lastPlantId") val lastPlantId: Int
+    @SerialName("discoveredPlants") val discoveredPlants: Map<Int, BasePlantJSON>,
+    @SerialName("lastPlantId") val lastPlantId: Int
 )

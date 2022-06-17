@@ -1,10 +1,12 @@
 package com.bitwiserain.pbbg.app.view.model.mine
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MineJSON(
-    @SerializedName("width") val width: Int,
-    @SerializedName("height") val height: Int,
-    @SerializedName("cells") val cells: List<List<MineEntityJSON?>>,
-    @SerializedName("type") val type: MineTypeJSON
+    @SerialName("width") val width: Int,
+    @SerialName("height") val height: Int,
+    @SerialName("cells") val cells: List<List<MineEntityJSON?>>,
+    @SerialName("type") val type: MineTypeJSON
 )

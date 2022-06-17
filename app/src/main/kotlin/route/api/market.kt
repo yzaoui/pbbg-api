@@ -17,6 +17,7 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
+import kotlinx.serialization.Serializable
 
 fun Route.market(marketUC: MarketUC) = route("/market") {
     /**
@@ -64,8 +65,11 @@ fun Route.market(marketUC: MarketUC) = route("/market") {
     }
 }
 
+@Serializable
 private data class MarketOrderListParams(val orders: List<MarketOrderParams>)
-private data class MarketOrderParams(val id: Long, val quantity: Int?)
+
+@Serializable
+private data class MarketOrderParams(val id: Long, val quantity: Int? = null)
 
 fun Market.toJSON() = MarketJSON(
     items = items.map { MarketItemJSON(it.value.item.toJSON(it.key), it.value.price) }

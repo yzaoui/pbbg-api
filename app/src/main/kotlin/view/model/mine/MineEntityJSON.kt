@@ -1,6 +1,7 @@
 package com.bitwiserain.pbbg.app.view.model.mine
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * Represents an entity within a mine cell.
@@ -8,7 +9,8 @@ import com.google.gson.annotations.SerializedName
  * @property name The name of this entity.
  * @property imageURL The URL to get this entity's image representation.
  */
+@Serializable
 data class MineEntityJSON(
-    @SerializedName("name") val name: String,
-    @SerializedName("imageURL") val imageURL: String
+    @SerialName("name") val name: String,
+    @SerialName("imageURL") val imageURL: String
 )
