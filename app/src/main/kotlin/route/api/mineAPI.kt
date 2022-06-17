@@ -22,13 +22,13 @@ import com.bitwiserain.pbbg.app.view.model.mine.MineJSON
 import com.bitwiserain.pbbg.app.view.model.mine.MineTypeJSON
 import com.bitwiserain.pbbg.app.view.model.mine.MineTypeListJSON
 import com.bitwiserain.pbbg.app.view.model.mine.MinedItemResultJSON
-import io.ktor.application.call
-import io.ktor.request.ContentTransformationException
-import io.ktor.request.receive
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.route
+import io.ktor.server.application.call
+import io.ktor.server.request.ContentTransformationException
+import io.ktor.server.request.receive
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
 import kotlinx.serialization.Serializable
 
 @Serializable

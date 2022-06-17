@@ -21,14 +21,14 @@ import com.bitwiserain.pbbg.app.view.model.MaterializedItemJSON
 import com.bitwiserain.pbbg.app.view.model.PointJSON
 import com.bitwiserain.pbbg.app.view.model.inventory.InventoryItemJSON
 import com.bitwiserain.pbbg.app.view.model.inventory.InventoryJSON
-import io.ktor.application.call
-import io.ktor.request.receive
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.optionalParam
-import io.ktor.routing.param
-import io.ktor.routing.post
-import io.ktor.routing.route
+import io.ktor.server.application.call
+import io.ktor.server.request.receive
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
+import io.ktor.server.routing.optionalParam
+import io.ktor.server.routing.param
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
 import kotlinx.serialization.Serializable
 
 fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = route("/inventory") {

@@ -4,7 +4,7 @@ import org.jetbrains.gradle.ext.settings
 
 object Versions {
     const val KOTLIN = "1.6.10"
-    const val KTOR = "1.6.4"
+    const val KTOR = "2.0.2"
     const val EXPOSED = "0.38.2"
     const val JUNIT_JUPITER = "5.8.1"
     const val KOTEST = "5.3.0"
@@ -49,9 +49,13 @@ dependencies {
     implementation(group = "org.jetbrains.exposed", name = "exposed-core", version = Versions.EXPOSED)
     implementation(group = "org.jetbrains.exposed", name = "exposed-jdbc", version = Versions.EXPOSED)
     implementation(group = "at.favre.lib", name = "bcrypt", version = "0.9.0")
-    implementation(group = "io.ktor", name = "ktor-server-netty", version = Versions.KTOR)
-    implementation(group = "io.ktor", name = "ktor-serialization", version = Versions.KTOR)
-    implementation(group = "io.ktor", name = "ktor-auth-jwt", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-server-auth-jwt-jvm", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-server-call-logging-jvm", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-server-content-negotiation-jvm", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-server-cors-jvm", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-server-netty-jvm", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-server-status-pages-jvm", version = Versions.KTOR)
+    implementation(group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version = Versions.KTOR)
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
 
     testImplementation(kotlin("test"))
@@ -61,7 +65,7 @@ dependencies {
     testRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = Versions.JUNIT_JUPITER)
 
     testIntegrationImplementation(kotlin("test"))
-    testIntegrationImplementation(group = "io.ktor", name = "ktor-server-test-host", version = Versions.KTOR)
+    testIntegrationImplementation(group = "io.ktor", name = "ktor-server-test-host-jvm", version = Versions.KTOR)
     testIntegrationImplementation(group = "io.kotest", name = "kotest-assertions-core", version = Versions.KOTEST)
     testIntegrationImplementation(group = "org.junit.jupiter", name = "junit-jupiter-api", version = Versions.JUNIT_JUPITER)
     testIntegrationRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = Versions.JUNIT_JUPITER)

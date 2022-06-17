@@ -10,10 +10,10 @@ import com.bitwiserain.pbbg.app.respondSuccess
 import com.bitwiserain.pbbg.app.view.model.itemdetails.ItemDetailsJSON
 import com.bitwiserain.pbbg.app.view.model.itemdetails.ItemHistoryInfoJSON
 import com.bitwiserain.pbbg.app.view.model.itemdetails.ItemHistoryJSON
-import io.ktor.application.call
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.route
+import io.ktor.server.application.call
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
 
 private const val ITEM_ID_PARAM = "id"
 

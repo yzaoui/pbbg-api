@@ -11,12 +11,12 @@ import com.bitwiserain.pbbg.app.user
 import com.bitwiserain.pbbg.app.view.model.market.MarketItemJSON
 import com.bitwiserain.pbbg.app.view.model.market.MarketJSON
 import com.bitwiserain.pbbg.app.view.model.market.UserAndGameMarketsJSON
-import io.ktor.application.call
-import io.ktor.request.receive
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.route
+import io.ktor.server.application.call
+import io.ktor.server.request.receive
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
 import kotlinx.serialization.Serializable
 
 fun Route.market(marketUC: MarketUC) = route("/market") {

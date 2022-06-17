@@ -4,10 +4,10 @@ import com.bitwiserain.pbbg.app.domain.usecase.UnitNotFoundException
 import com.bitwiserain.pbbg.app.domain.usecase.UnitUC
 import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
-import io.ktor.application.call
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.route
+import io.ktor.server.application.call
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
 
 private const val UNIT_ID_PARAM = "id"
 

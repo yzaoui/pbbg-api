@@ -56,26 +56,25 @@ import com.bitwiserain.pbbg.app.route.api.squadAPI
 import com.bitwiserain.pbbg.app.route.api.unit
 import com.bitwiserain.pbbg.app.route.api.user
 import com.bitwiserain.pbbg.app.route.api.userStats
-import io.ktor.application.Application
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.auth.Authentication
-import io.ktor.auth.authenticate
-import io.ktor.auth.authentication
-import io.ktor.auth.jwt.jwt
-import io.ktor.features.CORS
-import io.ktor.features.CallLogging
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.StatusPages
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.resources
-import io.ktor.http.content.static
-import io.ktor.response.respond
-import io.ktor.routing.route
-import io.ktor.routing.routing
-import io.ktor.serialization.json
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.authentication
+import io.ktor.server.auth.jwt.jwt
+import io.ktor.server.http.content.resources
+import io.ktor.server.http.content.static
+import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.response.respond
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.buildJsonObject
@@ -104,7 +103,7 @@ fun Application.mainWithDependencies(clock: Clock) {
         else -> throw RuntimeException("Environment (KTOR_ENV) must be either dev or prod.")
     }
 
-    API_ROOT = when(appEnvironment) {
+    API_ROOT = when (appEnvironment) {
         ApplicationEnvironment.DEV -> "http://localhost:${environment.config.property("ktor.deployment.port").getString()}"
         ApplicationEnvironment.PROD -> "https://pbbg-api.bitwiserain.com"
     }
@@ -173,13 +172,18 @@ fun Application.mainWithDependencies(clock: Clock) {
         // Handles "application/json" content type
         json()
     }
+
+    val jwtRealm = environment.config.property("jwt.realm").getString()
+    val jwtSecret = environment.config.property("jwt.secret").getString()
+    val jwtIssuer = environment.config.property("jwt.issuer").getString()
     install(Authentication) {
         jwt {
-            realm = environment.config.property("jwt.realm").getString()
-            verifier(JWT
-                .require(Algorithm.HMAC256(environment.config.property("jwt.secret").getString()))
-                .withIssuer(environment.config.property("jwt.issuer").getString())
-                .build()
+            realm = jwtRealm
+            verifier(
+                JWT
+                    .require(Algorithm.HMAC256(jwtSecret))
+                    .withIssuer(jwtIssuer)
+                    .build()
             )
             validate {
                 it.payload.getClaim("user.id").asInt()?.let {
@@ -192,13 +196,13 @@ fun Application.mainWithDependencies(clock: Clock) {
     }
     install(CORS) {
         anyHost()
-        header(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.Authorization)
         allowNonSimpleContentTypes = true
     }
     install(StatusPages) {
-        exception<Throwable> {
+        exception<Throwable> { call, cause ->
             call.respondError()
-            it.printStackTrace()
+            cause.printStackTrace()
         }
     }
     routing {

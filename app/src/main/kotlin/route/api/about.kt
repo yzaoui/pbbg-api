@@ -2,10 +2,10 @@ package com.bitwiserain.pbbg.app.route.api
 
 import com.bitwiserain.pbbg.app.domain.usecase.AboutUC
 import com.bitwiserain.pbbg.app.respondSuccess
-import io.ktor.application.call
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.route
+import io.ktor.server.application.call
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
 
 fun Route.about(aboutUC: AboutUC) = route("/about") {
     get("/version") {

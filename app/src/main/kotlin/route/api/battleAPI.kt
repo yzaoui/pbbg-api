@@ -10,9 +10,9 @@ import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
 import com.bitwiserain.pbbg.app.user
 import com.bitwiserain.pbbg.app.view.model.battle.*
-import io.ktor.application.call
-import io.ktor.request.receive
-import io.ktor.routing.*
+import io.ktor.server.application.call
+import io.ktor.server.request.receive
+import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 
 fun Route.battleAPI(battleUC: BattleUC, generateBattle: GenerateBattleUC, getBattle: GetBattleUC) = route("/battle") {
