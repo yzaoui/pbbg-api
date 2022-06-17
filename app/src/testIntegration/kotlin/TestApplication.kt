@@ -5,10 +5,10 @@ import com.bitwiserain.pbbg.app.SchemaHelper
 import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.UserTable
 import com.bitwiserain.pbbg.app.mainWithDependencies
-import io.ktor.config.MapApplicationConfig
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.server.config.MapApplicationConfig
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody

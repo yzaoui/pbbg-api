@@ -17,11 +17,11 @@ import com.bitwiserain.pbbg.app.view.model.dex.DexItemJSON
 import com.bitwiserain.pbbg.app.view.model.dex.DexItemsJSON
 import com.bitwiserain.pbbg.app.view.model.dex.DexPlantsJSON
 import com.bitwiserain.pbbg.app.view.model.dex.DexUnitsJSON
-import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.route
+import io.ktor.server.application.call
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
 
 fun Route.dexAPI(dexUC: DexUC) = route("/dex") {
     route("/items/{id?}") {

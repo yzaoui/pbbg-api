@@ -10,11 +10,11 @@ import com.bitwiserain.pbbg.app.user
 import com.bitwiserain.pbbg.app.userOptional
 import com.bitwiserain.pbbg.app.view.model.UserProfileJSON
 import com.bitwiserain.pbbg.app.view.model.friends.FriendshipJSON
-import io.ktor.application.call
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.param
-import io.ktor.routing.route
+import io.ktor.server.application.call
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
+import io.ktor.server.routing.param
+import io.ktor.server.routing.route
 
 private const val USER_ID_PARAM = "id"
 

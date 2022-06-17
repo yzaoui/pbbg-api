@@ -1,6 +1,6 @@
 package com.bitwiserain.pbbg.app.db.model
 
-import io.ktor.auth.Principal
+import io.ktor.server.auth.Principal
 import java.time.Instant
 
 /**

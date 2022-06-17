@@ -10,11 +10,11 @@ import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
 import com.bitwiserain.pbbg.app.user
 import com.bitwiserain.pbbg.app.view.model.MyUnitJSON
-import io.ktor.application.call
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.route
+import io.ktor.server.application.call
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
 import kotlinx.serialization.Serializable
 
 fun Route.squadAPI(unitUC: UnitUC) = route("/squad") {
