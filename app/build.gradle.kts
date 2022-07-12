@@ -56,7 +56,7 @@ dependencies {
     implementation(group = "io.ktor", name = "ktor-server-netty-jvm", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-server-status-pages-jvm", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version = Versions.KTOR)
-    implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
+    implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.11")
 
     testImplementation(kotlin("test"))
     testImplementation(group = "io.kotest", name = "kotest-assertions-core", version = Versions.KOTEST)
