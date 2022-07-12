@@ -8,6 +8,11 @@ object Versions {
     const val EXPOSED = "0.38.2"
     const val JUNIT_JUPITER = "5.8.1"
     const val KOTEST = "5.3.0"
+    const val LOGBACK = "1.2.11"
+    const val KOTLINX_SERIALIZATION = "1.3.3"
+    const val POSTGRESQL = "42.4.0"
+    const val H2 = "2.1.214"
+    const val MOCKK = "1.12.3"
 }
 
 plugins {
@@ -43,9 +48,9 @@ configurations["testIntegrationImplementation"].extendsFrom(configurations.imple
 configurations["testIntegrationRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
 dependencies {
-    implementation(group = "com.h2database", name = "h2", version = "2.1.214")
-    implementation(group = "org.postgresql", name = "postgresql", version = "42.4.0")
-    implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.3.3")
+    implementation(group = "com.h2database", name = "h2", version = Versions.H2)
+    implementation(group = "org.postgresql", name = "postgresql", version = Versions.POSTGRESQL)
+    implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = Versions.KOTLINX_SERIALIZATION)
     implementation(group = "org.jetbrains.exposed", name = "exposed-core", version = Versions.EXPOSED)
     implementation(group = "org.jetbrains.exposed", name = "exposed-jdbc", version = Versions.EXPOSED)
     implementation(group = "at.favre.lib", name = "bcrypt", version = "0.9.0")
@@ -56,11 +61,11 @@ dependencies {
     implementation(group = "io.ktor", name = "ktor-server-netty-jvm", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-server-status-pages-jvm", version = Versions.KTOR)
     implementation(group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version = Versions.KTOR)
-    implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.11")
+    implementation(group = "ch.qos.logback", name = "logback-classic", version = Versions.LOGBACK)
 
     testImplementation(kotlin("test"))
     testImplementation(group = "io.kotest", name = "kotest-assertions-core", version = Versions.KOTEST)
-    testImplementation(group = "io.mockk", name = "mockk", version = "1.12.3")
+    testImplementation(group = "io.mockk", name = "mockk", version = Versions.MOCKK)
     testImplementation(group = "org.junit.jupiter", name = "junit-jupiter-api", version = Versions.JUNIT_JUPITER)
     testRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = Versions.JUNIT_JUPITER)
 
