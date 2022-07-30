@@ -3,7 +3,7 @@ import org.jetbrains.gradle.ext.packagePrefix
 import org.jetbrains.gradle.ext.settings
 
 object Versions {
-    const val KTOR = "2.0.2"
+    const val KTOR = "2.0.3"
     const val EXPOSED = "0.38.2"
     const val JUNIT_JUPITER = "5.8.1"
     const val KOTEST = "5.3.0"
