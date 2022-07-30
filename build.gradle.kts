@@ -1,5 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.6.21"/*Versions.KOTLIN*/ apply false
+    // ___KOTLIN_VERSION___
+    kotlin("jvm") version "1.7.10" apply false
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.3" apply false
 }
 

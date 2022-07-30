@@ -3,8 +3,7 @@ import org.jetbrains.gradle.ext.packagePrefix
 import org.jetbrains.gradle.ext.settings
 
 object Versions {
-    const val KOTLIN = "1.6.10"
-    const val KTOR = "2.0.2"
+    const val KTOR = "2.0.3"
     const val EXPOSED = "0.38.2"
     const val JUNIT_JUPITER = "5.8.1"
     const val KOTEST = "5.3.0"
@@ -18,10 +17,12 @@ object Versions {
 plugins {
     application
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow").version("7.1.0")
-    kotlin("plugin.serialization").version(/*Versions.KOTLIN*/"1.6.21")
+    id("com.github.johnrengelman.shadow") version "7.1.0"
+    // ___KOTLIN_VERSION___
+    kotlin("plugin.serialization") version "1.7.10"
     id("org.jetbrains.kotlinx.kover") version "0.5.0"
-    id("org.jetbrains.dokka") version /*Versions.KOTLIN*/"1.6.21"
+    // ___KOTLIN_VERSION___
+    id("org.jetbrains.dokka") version "1.7.10"
     id("org.jetbrains.gradle.plugin.idea-ext")
 }
 
