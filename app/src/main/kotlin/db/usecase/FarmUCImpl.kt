@@ -8,6 +8,7 @@ import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.app.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.app.db.repository.farm.MaterializedPlantTable
 import com.bitwiserain.pbbg.app.db.repository.farm.MaterializedPlantTable.PlantForm
+import com.bitwiserain.pbbg.app.db.repository.farm.PlotListTable
 import com.bitwiserain.pbbg.app.db.repository.farm.PlotTable
 import com.bitwiserain.pbbg.app.domain.model.BaseItem
 import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
@@ -35,11 +36,18 @@ class FarmUCImpl(
     private val materializedItemTable: MaterializedItemTable,
     private val materializedPlantTable: MaterializedPlantTable,
     private val plotTable: PlotTable,
+    private val plotListTable: PlotListTable,
     private val userStatsTable: UserStatsTable,
 ) : FarmUC {
 
     override fun getPlots(userId: Int): List<Plot> = transaction {
-        return@transaction plotTable.getPlots(userId)
+        getPlotsInOrder(userId)
+    }
+
+    private fun getPlotsInOrder(userId: Int): List<Plot> {
+        val plotIdList = plotListTable.get(userId)
+
+        return plotTable.getPlots(userId).sortedBy { plotIdList.indexOf(it.id) }
     }
 
     override fun plant(userId: Int, plotId: Long, itemId: Long): Plot = transaction {
@@ -126,5 +134,11 @@ class FarmUCImpl(
 
     override fun expand(userId: Int): Plot = transaction {
         return@transaction plotTable.createAndGetEmptyPlot(userId)
+    }
+
+    override fun reorder(userId: Int, plotId: Long, targetIndex: Int): List<Plot> = transaction {
+        plotListTable.reorder(userId, plotId, targetIndex)
+
+        return@transaction getPlotsInOrder(userId)
     }
 }

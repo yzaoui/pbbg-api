@@ -38,6 +38,13 @@ interface FarmUC {
      * @return The new plot.
      */
     fun expand(userId: Int): Plot
+
+    /**
+     * Reorders plots by moving one by its [plotId] to a given [targetIndex].
+     *
+     * @return The updated list of the user's plots.
+     */
+    fun reorder(userId: Int, plotId: Long, targetIndex: Int): List<Plot>
 }
 
 class UserPlotNotFoundException : Exception()
