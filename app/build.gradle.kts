@@ -90,7 +90,7 @@ val testIntegration = task<Test>("testIntegration") {
     shouldRunAfter("test")
 }
 
-tasks.test {
+tasks.check {
     dependsOn(testIntegration)
 }
 
