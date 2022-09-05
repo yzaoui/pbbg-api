@@ -17,6 +17,7 @@ import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.app.db.repository.battle.BattleEnemyTableImpl
 import com.bitwiserain.pbbg.app.db.repository.battle.BattleSessionTableImpl
 import com.bitwiserain.pbbg.app.db.repository.farm.MaterializedPlantTableImpl
+import com.bitwiserain.pbbg.app.db.repository.farm.PlotListTableImpl
 import com.bitwiserain.pbbg.app.db.repository.farm.PlotTableImpl
 import com.bitwiserain.pbbg.app.db.repository.market.MarketInventoryTableImpl
 import com.bitwiserain.pbbg.app.db.repository.market.MarketTableImpl
@@ -141,6 +142,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     val mineCellTable = MineCellTableImpl()
     val mineSessionTable = MineSessionTableImpl()
     val plotTable = PlotTableImpl()
+    val plotListTable = PlotListTableImpl()
     val squadTable = SquadTableImpl()
     val unitTable = UnitTableImpl()
     val userTable = UserTableImpl()
@@ -149,15 +151,15 @@ fun Application.mainWithDependencies(clock: Clock) {
     val getUserStats = GetUserStatsUCImpl(transaction, userStatsTable)
     val changePassword = ChangePasswordUCImpl(transaction, userTable)
     val registerUser = RegisterUserUCImpl(
-        transaction, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable, unitTable, userTable,
-        userStatsTable
+        transaction, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, plotListTable, squadTable, unitTable,
+        userTable, userStatsTable
     )
     val login = LoginUCImpl(transaction, userTable)
     val marketUC = MarketUCImpl(transaction, dexTable, inventoryTable, marketInventoryTable, materializedItemTable, userStatsTable)
     val inventoryUC = InventoryUCImpl(transaction, inventoryTable)
     val itemUC = ItemUCImpl(transaction, itemHistoryTable, materializedItemTable, userTable)
     val miningUC = MiningUCImpl(transaction, clock, dexTable, inventoryTable, itemHistoryTable, materializedItemTable, mineCellTable, mineSessionTable, userStatsTable)
-    val farmUC = FarmUCImpl(transaction, clock, dexTable, inventoryTable, itemHistoryTable, materializedItemTable, materializedPlantTable, plotTable, userStatsTable)
+    val farmUC = FarmUCImpl(transaction, clock, dexTable, inventoryTable, itemHistoryTable, materializedItemTable, materializedPlantTable, plotTable, plotListTable, userStatsTable)
     val equipmentUC = EquipmentUCImpl(transaction, inventoryTable)
     val unitUC = UnitUCImpl(transaction, battleSessionTable, squadTable, unitTable)
     val battleUC = BattleUCImpl(transaction, battleEnemyTable, battleSessionTable, squadTable, unitTable)
@@ -318,8 +320,8 @@ object SchemaHelper {
         SchemaUtils.create(
             UserTableImpl.Exposed, MineSessionTableImpl.Exposed, MineCellTableImpl.Exposed, MaterializedItemTableImpl.Exposed, InventoryTableImpl.Exposed,
             UserStatsTableImpl.Exposed, UnitTableImpl.Exposed, SquadTableImpl.Exposed, BattleSessionTableImpl.Exposed, BattleEnemyTableImpl.Exposed, DexTableImpl.Exposed,
-            MarketTableImpl.Exposed, MarketInventoryTableImpl.Exposed, ItemHistoryTableImpl.Exposed, PlotTableImpl.Exposed, MaterializedPlantTableImpl.Exposed,
-            FriendsTableImpl.Exposed
+            MarketTableImpl.Exposed, MarketInventoryTableImpl.Exposed, ItemHistoryTableImpl.Exposed, PlotTableImpl.Exposed, PlotListTableImpl.Exposed,
+            MaterializedPlantTableImpl.Exposed, FriendsTableImpl.Exposed
         )
     }
 
@@ -327,8 +329,8 @@ object SchemaHelper {
         SchemaUtils.drop(
             UserTableImpl.Exposed, MineSessionTableImpl.Exposed, MineCellTableImpl.Exposed, MaterializedItemTableImpl.Exposed, InventoryTableImpl.Exposed,
             UserStatsTableImpl.Exposed, UnitTableImpl.Exposed, SquadTableImpl.Exposed, BattleSessionTableImpl.Exposed, BattleEnemyTableImpl.Exposed, DexTableImpl.Exposed,
-            MarketTableImpl.Exposed, MarketInventoryTableImpl.Exposed, ItemHistoryTableImpl.Exposed, PlotTableImpl.Exposed, MaterializedPlantTableImpl.Exposed,
-            FriendsTableImpl.Exposed
+            MarketTableImpl.Exposed, MarketInventoryTableImpl.Exposed, ItemHistoryTableImpl.Exposed, PlotTableImpl.Exposed, PlotListTableImpl.Exposed,
+            MaterializedPlantTableImpl.Exposed, FriendsTableImpl.Exposed
         )
     }
 }
