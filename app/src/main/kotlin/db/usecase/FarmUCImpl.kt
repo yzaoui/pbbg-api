@@ -41,9 +41,13 @@ class FarmUCImpl(
 ) : FarmUC {
 
     override fun getPlots(userId: Int): List<Plot> = transaction {
+        getPlotsInOrder(userId)
+    }
+
+    private fun getPlotsInOrder(userId: Int): List<Plot> {
         val plotIdList = plotListTable.get(userId)
 
-        return@transaction plotTable.getPlots(userId).sortedBy { plotIdList.indexOf(it.id) }
+        return plotTable.getPlots(userId).sortedBy { plotIdList.indexOf(it.id) }
     }
 
     override fun plant(userId: Int, plotId: Long, itemId: Long): Plot = transaction {
@@ -130,5 +134,11 @@ class FarmUCImpl(
 
     override fun expand(userId: Int): Plot = transaction {
         return@transaction plotTable.createAndGetEmptyPlot(userId)
+    }
+
+    override fun reorder(userId: Int, plotId: Long, targetIndex: Int): List<Plot> = transaction {
+        plotListTable.reorder(userId, plotId, targetIndex)
+
+        return@transaction getPlotsInOrder(userId)
     }
 }
