@@ -53,6 +53,15 @@ fun Route.farm(farmUC: FarmUC, clock: Clock) = route("/farm") {
 
         call.respondSuccess(newPlot.toJSON(now))
     }
+
+    post("/reorder") {
+        val now = clock.instant()
+        val params = call.receive<ReorderParams>()
+
+        val updatedPlots = farmUC.reorder(call.user.id, params.plotId, params.targetIndex)
+
+        call.respondSuccess(updatedPlots.map { it.toJSON(now) })
+    }
 }
 
 @Serializable
@@ -60,6 +69,9 @@ private data class PlantParams(val plotId: Long, val itemId: Long)
 
 @Serializable
 private data class HarvestParams(val plotId: Long)
+
+@Serializable
+private data class ReorderParams(val plotId: Long, val targetIndex: Int)
 
 private fun Plot.toJSON(now: Instant) = PlotJSON(
     id = id,
