@@ -8,6 +8,7 @@ import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTable
 import com.bitwiserain.pbbg.app.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.app.db.repository.farm.MaterializedPlantTable
 import com.bitwiserain.pbbg.app.db.repository.farm.MaterializedPlantTable.PlantForm
+import com.bitwiserain.pbbg.app.db.repository.farm.PlotListTable
 import com.bitwiserain.pbbg.app.db.repository.farm.PlotTable
 import com.bitwiserain.pbbg.app.domain.model.BaseItem
 import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
@@ -35,11 +36,14 @@ class FarmUCImpl(
     private val materializedItemTable: MaterializedItemTable,
     private val materializedPlantTable: MaterializedPlantTable,
     private val plotTable: PlotTable,
+    private val plotListTable: PlotListTable,
     private val userStatsTable: UserStatsTable,
 ) : FarmUC {
 
     override fun getPlots(userId: Int): List<Plot> = transaction {
-        return@transaction plotTable.getPlots(userId)
+        val plotIdList = plotListTable.get(userId)
+
+        return@transaction plotTable.getPlots(userId).sortedBy { plotIdList.indexOf(it.id) }
     }
 
     override fun plant(userId: Int, plotId: Long, itemId: Long): Plot = transaction {
