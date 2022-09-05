@@ -2,6 +2,9 @@ package com.bitwiserain.pbbg.app.db.repository.farm
 
 import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.app.domain.model.farm.Plot
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
@@ -30,10 +33,23 @@ class PlotTableImpl : PlotTable {
         val plantId = reference("plant_id", MaterializedPlantTableImpl.Exposed, ReferenceOption.SET_NULL).nullable()
     }
 
-    override fun createAndGetEmptyPlot(userId: Int): Plot = Exposed.insertAndGetId {
-        it[Exposed.userId] = EntityID(userId, UserTableImpl.Exposed)
-    }.let {
-        Plot(it.value, null)
+    override fun createAndGetEmptyPlot(userId: Int): Plot {
+        val newPlotId = Exposed.insertAndGetId {
+            it[Exposed.userId] = EntityID(userId, UserTableImpl.Exposed)
+        }.value
+
+        val currentPlotIdList: List<Long?> = PlotListTableImpl.Exposed
+            .select { PlotListTableImpl.Exposed.userId.eq(userId) }
+            .single()[PlotListTableImpl.Exposed.plotIdList]
+            .let(Json::decodeFromString)
+
+        val updatedPlotIdListJSON = Json.encodeToString(currentPlotIdList + newPlotId)
+
+        PlotListTableImpl.Exposed.update({ PlotListTableImpl.Exposed.userId.eq(userId) }) {
+            it[PlotListTableImpl.Exposed.plotIdList] = updatedPlotIdListJSON
+        }
+
+        return Plot(newPlotId, null)
     }
 
     override fun updatePlot(userId: Int, plotId: Long, plantId: Long) {
