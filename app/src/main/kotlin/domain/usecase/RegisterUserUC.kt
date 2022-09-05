@@ -15,6 +15,7 @@ import com.bitwiserain.pbbg.app.db.repository.UnitTable
 import com.bitwiserain.pbbg.app.db.repository.UnitTable.UnitForm
 import com.bitwiserain.pbbg.app.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.app.db.repository.UserTable
+import com.bitwiserain.pbbg.app.db.repository.farm.PlotListTable
 import com.bitwiserain.pbbg.app.db.repository.farm.PlotTable
 import com.bitwiserain.pbbg.app.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.app.db.repository.market.MarketTable
@@ -64,6 +65,7 @@ class RegisterUserUCImpl(
     private val marketInventoryTable: MarketInventoryTable,
     private val materializedItemTable: MaterializedItemTable,
     private val plotTable: PlotTable,
+    private val plotListTable: PlotListTable,
     private val squadTable: SquadTable,
     private val unitTable: UnitTable,
     private val userTable: UserTable,
@@ -142,6 +144,7 @@ class RegisterUserUCImpl(
             }
 
             /* Create user farm */
+            plotListTable.insertUser(userId)
             plotTable.createAndGetEmptyPlot(userId)
 
             return@transaction Result.Success(userId)
