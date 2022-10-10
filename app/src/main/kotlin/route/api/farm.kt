@@ -90,8 +90,8 @@ fun IBasePlant.toJSON() = BasePlantJSON(
     name = friendlyName,
     description = description,
     icon = "$API_ROOT/img/plant-icon/$spriteName.png",
-    growingPeriod = growingPeriod.seconds,
+    growingPeriod = growingPeriod.inWholeSeconds,
     growingSprite = "$API_ROOT/img/plant/$spriteName-growing.gif",
-    maturePeriod = if (this is IBasePlant.Maturable) maturePeriod.seconds else null,
+    maturePeriod = if (this is IBasePlant.Maturable) maturePeriod.inWholeSeconds else null,
     matureSprite = if (this is IBasePlant.Maturable) "$API_ROOT/img/plant/$spriteName-mature.gif" else null
 )

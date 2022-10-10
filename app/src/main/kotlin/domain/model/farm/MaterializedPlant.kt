@@ -1,12 +1,13 @@
 package com.bitwiserain.pbbg.app.domain.model.farm
 
 import java.time.Instant
+import kotlin.time.toJavaDuration
 
 interface IMaterializedPlant {
     val basePlant: IBasePlant
     val cycleStart: Instant
 
-    fun canBeHarvested(now: Instant): Boolean = now >= cycleStart.plus(basePlant.growingPeriod)
+    fun canBeHarvested(now: Instant): Boolean = now >= cycleStart.plus(basePlant.growingPeriod.toJavaDuration())
 
     interface Maturable : IMaterializedPlant {
         override val basePlant: IBasePlant.Maturable
@@ -14,11 +15,11 @@ interface IMaterializedPlant {
         override fun canBeHarvested(now: Instant): Boolean = if (harvests == 0) {
             super.canBeHarvested(now)
         } else {
-            now >= cycleStart.plus(basePlant.maturePeriod)
+            now >= cycleStart.plus(basePlant.maturePeriod.toJavaDuration())
         }
 
         // Plant is mature if it's been harvested before, or if its immature growing period is over
-        fun isMature(now: Instant): Boolean = harvests > 0 || now >= cycleStart.plus(basePlant.growingPeriod)
+        fun isMature(now: Instant): Boolean = harvests > 0 || now >= cycleStart.plus(basePlant.growingPeriod.toJavaDuration())
     }
 }
 

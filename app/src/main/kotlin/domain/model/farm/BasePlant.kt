@@ -1,6 +1,8 @@
 package com.bitwiserain.pbbg.app.domain.model.farm
 
-import java.time.Duration
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 interface IBasePlant {
     val enum: PlantEnum
@@ -20,14 +22,14 @@ sealed class BasePlant : IBasePlant {
         override val friendlyName = "Apple Tree"
         override val description = "Apple Tree description here."
         override val spriteName = "apple-tree"
-        override val growingPeriod: Duration = Duration.ofMinutes(1)
-        override val maturePeriod: Duration = Duration.ofSeconds(40)
+        override val growingPeriod: Duration = 1.minutes
+        override val maturePeriod: Duration = 40.seconds
     }
     object TomatoPlant : BasePlant() {
         override val enum by lazy { PlantEnum.TOMATO_PLANT }
         override val friendlyName = "Tomato Plant"
         override val description = "Tomato Plant description here."
         override val spriteName = "tomato-plant"
-        override val growingPeriod: Duration = Duration.ofSeconds(20)
+        override val growingPeriod: Duration = 20.seconds
     }
 }
