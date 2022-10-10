@@ -13,6 +13,7 @@ import com.bitwiserain.pbbg.app.db.repository.SquadTable
 import com.bitwiserain.pbbg.app.db.repository.UnitTable
 import com.bitwiserain.pbbg.app.db.repository.UserStatsTable
 import com.bitwiserain.pbbg.app.db.repository.UserTable
+import com.bitwiserain.pbbg.app.db.repository.farm.PlotListTable
 import com.bitwiserain.pbbg.app.db.repository.farm.PlotTable
 import com.bitwiserain.pbbg.app.db.repository.market.MarketInventoryTable
 import com.bitwiserain.pbbg.app.db.repository.market.MarketTable
@@ -60,6 +61,7 @@ class RegisterUserUCImplTest {
     private val plotTable: PlotTable = mockk {
         every { createAndGetEmptyPlot(userId) } returns mockk()
     }
+    private val plotListTable: PlotListTable = mockk(relaxUnitFun = true)
     private val squadTable: SquadTable = mockk(relaxUnitFun = true)
     private val unitTable: UnitTable = UnitTableTestImpl()
     private val userTable: UserTable = mockk {
@@ -70,8 +72,8 @@ class RegisterUserUCImplTest {
     private val userStatsTable: UserStatsTable = mockk(relaxUnitFun = true)
 
     private val registerUser: RegisterUserUCImpl = RegisterUserUCImpl(
-        TestTransaction, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, squadTable, unitTable, userTable,
-        userStatsTable
+        TestTransaction, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, plotListTable, squadTable,
+        unitTable, userTable, userStatsTable
     )
 
     @BeforeEach
