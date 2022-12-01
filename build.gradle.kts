@@ -1,7 +1,7 @@
 plugins {
     // ___KOTLIN_VERSION___
     kotlin("jvm") version "1.7.21" apply false
-    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.3" apply false
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7" apply false
 }
 
 group = "com.bitwiserain"
