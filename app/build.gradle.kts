@@ -19,9 +19,8 @@ plugins {
     kotlin("jvm")
     id("com.github.johnrengelman.shadow") version "7.1.0"
     // ___KOTLIN_VERSION___
-    kotlin("plugin.serialization") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.21"
     id("org.jetbrains.kotlinx.kover") version "0.5.0"
-    // ___KOTLIN_VERSION___
     id("org.jetbrains.dokka") version "1.7.10"
     id("org.jetbrains.gradle.plugin.idea-ext")
 }
