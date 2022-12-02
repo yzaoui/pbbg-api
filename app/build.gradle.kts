@@ -3,26 +3,25 @@ import org.jetbrains.gradle.ext.packagePrefix
 import org.jetbrains.gradle.ext.settings
 
 object Versions {
-    const val KTOR = "2.0.3"
-    const val EXPOSED = "0.38.2"
+    const val KTOR = "2.1.3"
+    const val EXPOSED = "0.41.1"
     const val JUNIT_JUPITER = "5.8.1"
-    const val KOTEST = "5.3.0"
-    const val LOGBACK = "1.2.11"
-    const val KOTLINX_SERIALIZATION = "1.3.3"
+    const val KOTEST = "5.5.4"
+    const val LOGBACK = "1.4.5"
+    const val KOTLINX_SERIALIZATION = "1.4.1"
     const val POSTGRESQL = "42.4.0"
     const val H2 = "2.1.214"
-    const val MOCKK = "1.12.3"
+    const val MOCKK = "1.13.1"
 }
 
 plugins {
     application
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow") version "7.1.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     // ___KOTLIN_VERSION___
-    kotlin("plugin.serialization") version "1.7.10"
-    id("org.jetbrains.kotlinx.kover") version "0.5.0"
-    // ___KOTLIN_VERSION___
-    id("org.jetbrains.dokka") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.21"
+    id("org.jetbrains.kotlinx.kover") version "0.6.1"
+    id("org.jetbrains.dokka") version "1.7.20"
     id("org.jetbrains.gradle.plugin.idea-ext")
 }
 

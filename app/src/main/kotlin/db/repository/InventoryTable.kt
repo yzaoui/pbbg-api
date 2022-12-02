@@ -5,6 +5,8 @@ import com.bitwiserain.pbbg.app.domain.model.InventoryItem
 import com.bitwiserain.pbbg.app.domain.model.ItemEnum
 import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.batchInsert
