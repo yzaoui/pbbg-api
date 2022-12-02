@@ -17,7 +17,7 @@ object Versions {
 plugins {
     application
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow") version "7.1.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     // ___KOTLIN_VERSION___
     kotlin("plugin.serialization") version "1.7.21"
     id("org.jetbrains.kotlinx.kover") version "0.5.0"
