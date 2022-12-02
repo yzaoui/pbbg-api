@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.app.db.repository.MaterializedItemTableImpl
 import com.bitwiserain.pbbg.app.db.repository.toMaterializedItem
 import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.deleteWhere

@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.app.db.model.MineCell
 import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.select

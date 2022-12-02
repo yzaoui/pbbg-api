@@ -4,6 +4,7 @@ import com.bitwiserain.pbbg.app.db.repository.UserTableImpl
 import com.bitwiserain.pbbg.app.domain.model.battle.BattleQueue
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select

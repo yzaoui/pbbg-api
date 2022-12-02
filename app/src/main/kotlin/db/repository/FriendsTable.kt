@@ -2,6 +2,7 @@ package com.bitwiserain.pbbg.app.db.repository
 
 import com.bitwiserain.pbbg.app.domain.model.friends.Friendship
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere

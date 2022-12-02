@@ -5,6 +5,7 @@ import com.bitwiserain.pbbg.app.domain.model.farm.MaterializedPlant
 import com.bitwiserain.pbbg.app.domain.model.farm.PlantEnum
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.update
