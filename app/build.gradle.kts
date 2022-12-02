@@ -7,7 +7,7 @@ object Versions {
     const val EXPOSED = "0.38.2"
     const val JUNIT_JUPITER = "5.8.1"
     const val KOTEST = "5.3.0"
-    const val LOGBACK = "1.2.11"
+    const val LOGBACK = "1.4.5"
     const val KOTLINX_SERIALIZATION = "1.3.3"
     const val POSTGRESQL = "42.4.0"
     const val H2 = "2.1.214"
