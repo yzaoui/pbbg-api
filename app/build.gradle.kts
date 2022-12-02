@@ -11,7 +11,7 @@ object Versions {
     const val KOTLINX_SERIALIZATION = "1.4.1"
     const val POSTGRESQL = "42.4.0"
     const val H2 = "2.1.214"
-    const val MOCKK = "1.12.3"
+    const val MOCKK = "1.13.1"
 }
 
 plugins {
