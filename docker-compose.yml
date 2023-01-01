@@ -1,0 +1,30 @@
+services:
+  web:
+    build: .
+    environment:
+      - "KTOR_ENV=prod"
+      - "PORT=8080"
+      # This needs to match the db name & port exposed in the `db` config below
+      - "JDBC_ADDRESS=postgresql://db:5432/pbbg?user=postgres"
+      # Fill in secret
+      - "JWT_SECRET="
+    ports:
+      # Fill in port
+      - ":8080"
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: pbbg
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "54333:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 1s
+volumes:
+  postgresdata:
