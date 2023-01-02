@@ -4,6 +4,8 @@ services:
     environment:
       - "KTOR_ENV=prod"
       - "PORT=8080"
+      # Fill in API root
+      - "API_ROOT="
       # This needs to match the db name & port exposed in the `db` config below
       - "JDBC_ADDRESS=postgresql://db:5432/pbbg?user=postgres"
       # Fill in secret

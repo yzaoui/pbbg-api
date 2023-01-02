@@ -52,6 +52,7 @@ fun testApp(clock: Clock, block: TestApplicationEngine.() -> Unit) {
     withTestApplication({
         (environment.config as MapApplicationConfig).apply {
             put("ktor.environment", "prod")
+            put("ktor.deployment.root", "https://pbbg-api.bitwiserain.com")
             put("jdbc.address", "h2:mem:test;DB_CLOSE_DELAY=-1")
             put("jwt.issuer", "https://pbbg-api.bitwiserain.com")
             put("jwt.realm", "PBBG API Server")

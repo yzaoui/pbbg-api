@@ -11,6 +11,7 @@ A persistent browser-based game built on Ktor.
 |---|---|---|---|
 |`KTOR_ENV`|Yes|Application environment|`dev`, `prod`|
 |`PORT`|Yes|The port on which to deploy the server|Valid port number|
+|`API_ROOT`|Yes|The root URL pointing to the server|Valid URL|
 |`JDBC_ADDRESS`|No|Application database address|Valid JDBC address, appended to `jdbc`<br>H2 or PostgreSQL currently supported<br>Default: `h2:./default`|
 |`JWT_SECRET`|Yes|Secret used for JWT tokens|Any string|
 
