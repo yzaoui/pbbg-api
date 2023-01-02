@@ -90,7 +90,7 @@ enum class ApplicationEnvironment {
     DEV,
     PROD
 }
-lateinit var appEnvironment: ApplicationEnvironment
+lateinit var APP_ENVIRONMENT: ApplicationEnvironment
 lateinit var API_ROOT: String
 
 fun Application.main() {
@@ -98,13 +98,13 @@ fun Application.main() {
 }
 
 fun Application.mainWithDependencies(clock: Clock) {
-    appEnvironment = when (environment.config.propertyOrNull("ktor.environment")?.getString()) {
+    APP_ENVIRONMENT = when (environment.config.propertyOrNull("ktor.environment")?.getString()) {
         "dev" -> ApplicationEnvironment.DEV
         "prod" -> ApplicationEnvironment.PROD
         else -> throw RuntimeException("Environment (KTOR_ENV) must be either dev or prod.")
     }
 
-    API_ROOT = when (appEnvironment) {
+    API_ROOT = when (APP_ENVIRONMENT) {
         ApplicationEnvironment.DEV -> "http://localhost:${environment.config.property("ktor.deployment.port").getString()}"
         ApplicationEnvironment.PROD -> "https://pbbg-api.bitwiserain.com"
     }
