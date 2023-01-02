@@ -102,7 +102,7 @@ fun Application.mainWithDependencies(clock: Clock) {
     APP_ENVIRONMENT = when (environment.config.propertyOrNull("ktor.environment")?.getString()) {
         "dev" -> ApplicationEnvironment.DEV
         "prod" -> ApplicationEnvironment.PROD
-        else -> throw RuntimeException("Environment (KTOR_ENV) must be either dev or prod.")
+        else -> throw ApplicationConfigurationException("Environment (KTOR_ENV) must be either dev or prod.")
     }
 
     API_ROOT = environment.config.propertyOrNull("ktor.deployment.root")?.getString()
