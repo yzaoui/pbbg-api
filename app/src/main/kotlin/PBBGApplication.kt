@@ -67,6 +67,7 @@ import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.jwt
+import io.ktor.server.config.ApplicationConfigurationException
 import io.ktor.server.http.content.resources
 import io.ktor.server.http.content.static
 import io.ktor.server.plugins.callloging.CallLogging
@@ -104,10 +105,8 @@ fun Application.mainWithDependencies(clock: Clock) {
         else -> throw RuntimeException("Environment (KTOR_ENV) must be either dev or prod.")
     }
 
-    API_ROOT = when (APP_ENVIRONMENT) {
-        ApplicationEnvironment.DEV -> "http://localhost:${environment.config.property("ktor.deployment.port").getString()}"
-        ApplicationEnvironment.PROD -> "https://pbbg-api.bitwiserain.com"
-    }
+    API_ROOT = environment.config.propertyOrNull("ktor.deployment.root")?.getString()
+        ?: throw ApplicationConfigurationException("API_ROOT must be provided.")
 
     /*************
      * Set up db *
