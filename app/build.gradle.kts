@@ -3,6 +3,7 @@ import org.jetbrains.gradle.ext.packagePrefix
 import org.jetbrains.gradle.ext.settings
 
 object Versions {
+    // __KTOR_VERSION
     const val KTOR = "2.1.3"
     const val EXPOSED = "0.41.1"
     const val JUNIT_JUPITER = "5.8.1"
@@ -17,12 +18,12 @@ object Versions {
 plugins {
     application
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow") version "7.1.2"
     // ___KOTLIN_VERSION___
     kotlin("plugin.serialization") version "1.7.21"
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
     id("org.jetbrains.dokka") version "1.7.20"
     id("org.jetbrains.gradle.plugin.idea-ext")
+    id("io.ktor.plugin")
 }
 
 application {
@@ -78,6 +79,12 @@ dependencies {
 
 tasks.withType<ShadowJar> {
     archiveClassifier.set("")
+}
+
+ktor {
+    fatJar {
+        archiveFileName.set("app.jar")
+    }
 }
 
 val testIntegration = task<Test>("testIntegration") {
