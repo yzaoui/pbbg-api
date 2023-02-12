@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.app.API_ROOT
 import com.bitwiserain.pbbg.app.domain.model.BaseItem
 import com.bitwiserain.pbbg.app.domain.model.Inventory
 import com.bitwiserain.pbbg.app.domain.model.InventoryItem
@@ -14,6 +13,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.InventoryItemNotFoundException
 import com.bitwiserain.pbbg.app.domain.usecase.InventoryUC
 import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.serverRootURL
 import com.bitwiserain.pbbg.app.user
 import com.bitwiserain.pbbg.app.view.model.BaseItemJSON
 import com.bitwiserain.pbbg.app.view.model.EquipmentJSON
@@ -46,7 +46,7 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
 
             val inventory = inventoryUC.getInventory(call.user.id, filter)
 
-            call.respondSuccess(inventory.toJSON())
+            call.respondSuccess(inventory.toJSON(serverRootURL = call.request.serverRootURL))
         }
     }
 
@@ -77,17 +77,18 @@ fun Route.inventoryAPI(inventoryUC: InventoryUC, equipmentUC: EquipmentUC) = rou
                     }
 
                     val body = call.receive<EquipmentActionParams>()
+                    val serverRootURL = call.request.serverRootURL
 
                     when (equipAction) {
                         "equip" -> {
                             equipmentUC.equip(call.user.id, body.inventoryItemId)
 
-                            call.respondSuccess(inventoryUC.getInventory(call.user.id).toJSON())
+                            call.respondSuccess(inventoryUC.getInventory(call.user.id).toJSON(serverRootURL = serverRootURL))
                         }
                         "unequip" -> {
                             equipmentUC.unequip(call.user.id, body.inventoryItemId)
 
-                            call.respondSuccess(inventoryUC.getInventory(call.user.id).toJSON())
+                            call.respondSuccess(inventoryUC.getInventory(call.user.id).toJSON(serverRootURL = serverRootURL))
                         }
                     }
                 } catch (e: InventoryItemNotFoundException) {
@@ -109,29 +110,29 @@ private data class EquipmentActionParams(
     val inventoryItemId: Long
 )
 
-private fun Inventory.toJSON() = InventoryJSON(
-    items = items.map { it.toJSON() },
+private fun Inventory.toJSON(serverRootURL: String) = InventoryJSON(
+    items = items.map { it.toJSON(serverRootURL = serverRootURL) },
     equipment = EquipmentJSON(pickaxe = items
         .filter { it.value.base is BaseItem.Pickaxe && (it.value as InventoryItem.Equippable).equipped }
-        .entries.singleOrNull()?.toJSON())
+        .entries.singleOrNull()?.toJSON(serverRootURL = serverRootURL))
 )
 
-private fun Map.Entry<Long, InventoryItem>.toJSON(): InventoryItemJSON {
+private fun Map.Entry<Long, InventoryItem>.toJSON(serverRootURL: String): InventoryItemJSON {
     val invItem = value
     val matItem = value.item
     val equipped = if (invItem is InventoryItem.Equippable) invItem.equipped else null
 
-    return InventoryItemJSON(matItem.toJSON(key), equipped)
+    return InventoryItemJSON(matItem.toJSON(key, serverRootURL = serverRootURL), equipped)
 }
 
 // TODO: Find appropriate place for this adapter
-fun MaterializedItem.toJSON(id: Long) = MaterializedItemJSON(
+fun MaterializedItem.toJSON(id: Long, serverRootURL: String) = MaterializedItemJSON(
     id = id,
-    baseItem = this.base.toJSON(),
+    baseItem = this.base.toJSON(serverRootURL = serverRootURL),
     quantity = if (this is MaterializedItem.Stackable) quantity else null
 )
 
-fun BaseItem.toJSON(serverRootURL: String = API_ROOT) = BaseItemJSON(
+fun BaseItem.toJSON(serverRootURL: String) = BaseItemJSON(
     id = id,
     friendlyName = friendlyName,
     img16 = "$serverRootURL/img/item/$spriteName-16.png",

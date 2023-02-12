@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.app.API_ROOT
 import com.bitwiserain.pbbg.app.domain.UnitExperienceManager
 import com.bitwiserain.pbbg.app.domain.model.MyUnit
 import com.bitwiserain.pbbg.app.domain.model.Squad
@@ -8,6 +7,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.SquadInBattleException
 import com.bitwiserain.pbbg.app.domain.usecase.UnitUC
 import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.serverRootURL
 import com.bitwiserain.pbbg.app.user
 import com.bitwiserain.pbbg.app.view.model.MyUnitJSON
 import io.ktor.server.application.call
@@ -25,7 +25,7 @@ fun Route.squadAPI(unitUC: UnitUC) = route("/squad") {
     get {
         val squad = unitUC.getSquad(call.user.id)
 
-        call.respondSuccess(squad.toJSON())
+        call.respondSuccess(squad.toJSON(serverRootURL = call.request.serverRootURL))
     }
 
     route("/heal") {
@@ -40,7 +40,7 @@ fun Route.squadAPI(unitUC: UnitUC) = route("/squad") {
             try {
                 val healedSquad = unitUC.healSquad(call.user.id)
 
-                call.respondSuccess(healedSquad.toJSON())
+                call.respondSuccess(healedSquad.toJSON(serverRootURL = call.request.serverRootURL))
             } catch (e: SquadInBattleException) {
                 call.respondFail("Can't heal squad while a battle is in session.")
             }
@@ -53,11 +53,11 @@ private class SquadJSON(
     val units: List<MyUnitJSON>
 )
 
-private fun Squad.toJSON() = SquadJSON(
-    units = units.map { it.toJSON() }
+private fun Squad.toJSON(serverRootURL: String) = SquadJSON(
+    units = units.map { it.toJSON(serverRootURL = serverRootURL) }
 )
 
-fun MyUnit.toJSON(serverRootURL: String = API_ROOT) = MyUnitJSON(
+fun MyUnit.toJSON(serverRootURL: String) = MyUnitJSON(
     id = id,
     name = enum.friendlyName,
     baseUnitId = enum.ordinal,

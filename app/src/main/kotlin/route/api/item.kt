@@ -7,6 +7,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.ItemNotFoundException
 import com.bitwiserain.pbbg.app.domain.usecase.ItemUC
 import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.serverRootURL
 import com.bitwiserain.pbbg.app.view.model.itemdetails.ItemDetailsJSON
 import com.bitwiserain.pbbg.app.view.model.itemdetails.ItemHistoryInfoJSON
 import com.bitwiserain.pbbg.app.view.model.itemdetails.ItemHistoryJSON
@@ -24,15 +25,15 @@ fun Route.item(itemUC: ItemUC) = route("/item/{$ITEM_ID_PARAM}") {
         try {
             val itemDetails = itemUC.getItemDetails(itemId)
 
-            call.respondSuccess(itemDetails.toJSON(itemId))
+            call.respondSuccess(itemDetails.toJSON(itemId, serverRootURL = call.request.serverRootURL))
         } catch (e: ItemNotFoundException) {
             call.respondFail("Item with this ID does not exist.")
         }
     }
 }
 
-fun ItemDetails.toJSON(itemId: Long) = ItemDetailsJSON(
-    item = item.toJSON(itemId),
+fun ItemDetails.toJSON(itemId: Long, serverRootURL: String) = ItemDetailsJSON(
+    item = item.toJSON(itemId, serverRootURL = serverRootURL),
     history = history.map { it.toJSON() },
     linkedUserInfo = linkedUserInfo
 )
