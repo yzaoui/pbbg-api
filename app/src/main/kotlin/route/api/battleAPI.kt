@@ -8,6 +8,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.GetBattleUC
 import com.bitwiserain.pbbg.app.domain.usecase.NoAlliesAliveException
 import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.serverRootURL
 import com.bitwiserain.pbbg.app.user
 import com.bitwiserain.pbbg.app.view.model.battle.*
 import io.ktor.server.application.call
@@ -25,7 +26,7 @@ fun Route.battleAPI(battleUC: BattleUC, generateBattle: GenerateBattleUC, getBat
         get {
             val battle = getBattle(call.user.id)
 
-            call.respondSuccess(battle?.toJSON())
+            call.respondSuccess(battle?.toJSON(serverRootURL = call.request.serverRootURL))
         }
 
         param("action", "generate") {
@@ -41,7 +42,7 @@ fun Route.battleAPI(battleUC: BattleUC, generateBattle: GenerateBattleUC, getBat
                 try {
                     val battle = generateBattle(call.user.id)
 
-                    call.respondSuccess(battle.toJSON())
+                    call.respondSuccess(battle.toJSON(serverRootURL = call.request.serverRootURL))
                 } catch (e: BattleAlreadyInProgressException) {
                     call.respondFail("There is already a battle in progress.")
                 } catch (e: NoAlliesAliveException) {
@@ -64,7 +65,7 @@ fun Route.battleAPI(battleUC: BattleUC, generateBattle: GenerateBattleUC, getBat
 
             val result = battleUC.allyTurn(call.user.id, BattleAction.Attack(params.targetUnitId))
 
-            call.respondSuccess(result.toJSON())
+            call.respondSuccess(result.toJSON(serverRootURL = call.request.serverRootURL))
         }
     }
 
@@ -76,7 +77,7 @@ fun Route.battleAPI(battleUC: BattleUC, generateBattle: GenerateBattleUC, getBat
         post {
             val result = battleUC.enemyTurn(call.user.id)
 
-            call.respondSuccess(result.toJSON())
+            call.respondSuccess(result.toJSON(serverRootURL = call.request.serverRootURL))
         }
     }
 }
@@ -84,10 +85,10 @@ fun Route.battleAPI(battleUC: BattleUC, generateBattle: GenerateBattleUC, getBat
 @Serializable
 private data class AttackParams(val targetUnitId: Long)
 
-private fun BattleActionResult.toJSON() = BattleActionResultJSON(
-    battle = battle.toJSON(),
+private fun BattleActionResult.toJSON(serverRootURL: String) = BattleActionResultJSON(
+    battle = battle.toJSON(serverRootURL),
     unitEffects = unitEffects.mapValues { it.value.toJSON() },
-    reward = reward?.toJSON()
+    reward = reward?.toJSON(serverRootURL = serverRootURL)
 )
 
 private fun UnitEffect.toJSON() = when (this) {
@@ -98,14 +99,14 @@ private fun UnitEffect.Health.toJSON() = UnitEffectJSON.HealthJSON(
     delta = delta
 )
 
-private fun BattleReward.toJSON() = BattleRewardJSON(
+private fun BattleReward.toJSON(serverRootURL: String) = BattleRewardJSON(
     gold = gold,
-    items = items.map { it.value.toJSON(it.key) }
+    items = items.map { it.value.toJSON(it.key, serverRootURL = serverRootURL) }
 )
 
-private fun Battle.toJSON() = BattleJSON(
-    allies = allies.map { it.toJSON() },
-    enemies = enemies.map { it.toJSON() },
+private fun Battle.toJSON(serverRootURL: String) = BattleJSON(
+    allies = allies.map { it.toJSON(serverRootURL = serverRootURL) },
+    enemies = enemies.map { it.toJSON(serverRootURL = serverRootURL) },
     turns = battleQueue.turns.map { it.toJSON() }
 )
 

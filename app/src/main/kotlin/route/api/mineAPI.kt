@@ -1,6 +1,5 @@
 package com.bitwiserain.pbbg.app.route.api
 
-import com.bitwiserain.pbbg.app.API_ROOT
 import com.bitwiserain.pbbg.app.domain.model.mine.Mine
 import com.bitwiserain.pbbg.app.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
@@ -14,6 +13,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.UnfulfilledLevelRequirementExcept
 import com.bitwiserain.pbbg.app.respondError
 import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
+import com.bitwiserain.pbbg.app.serverRootURL
 import com.bitwiserain.pbbg.app.user
 import com.bitwiserain.pbbg.app.view.model.LevelUpJSON
 import com.bitwiserain.pbbg.app.view.model.mine.MineActionResultJSON
@@ -46,7 +46,7 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
     get {
         val mine = miningUC.getMine(call.user.id)
 
-        call.respondSuccess(mine?.toJSON())
+        call.respondSuccess(mine?.toJSON(serverRootURL = call.request.serverRootURL))
     }
 
     route("/perform") {
@@ -65,7 +65,7 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
             try {
                 val (x: Int, y: Int) = call.receive(MinePositionParams::class)
 
-                val mineActionResult = miningUC.submitMineAction(call.user.id, x, y).toJSON()
+                val mineActionResult = miningUC.submitMineAction(call.user.id, x, y).toJSON(serverRootURL = call.request.serverRootURL)
 
                 call.respondSuccess(mineActionResult)
             } catch (e: ContentTransformationException) {
@@ -100,7 +100,7 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
 
                 val mine = miningUC.generateMine(call.user.id, mineTypeId, 30, 20)
 
-                call.respondSuccess(mine.toJSON())
+                call.respondSuccess(mine.toJSON(serverRootURL = call.request.serverRootURL))
             } catch (e: AlreadyInMineException) {
                 call.respondFail("Already in a mine.")
             } catch (e: InvalidMineTypeIdException) {
@@ -132,7 +132,7 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
         get {
             val result = miningUC.getAvailableMines(call.user.id).let {
                 MineTypeListJSON(
-                    types = it.mines.map { it.toJSON() },
+                    types = it.mines.map { it.toJSON(serverRootURL = call.request.serverRootURL) },
                     nextUnlockLevel = it.nextUnlockLevel
                 )
             }
@@ -143,35 +143,35 @@ fun Route.mine(miningUC: MiningUC) = route("/mine") {
 }
 
 // TODO: Find appropriate place for this adapter
-private fun Mine.toJSON() = MineJSON(
+private fun Mine.toJSON(serverRootURL: String) = MineJSON(
     width = width,
     height = height,
-    cells = List(height) { y -> List(width) { x -> grid[x to y]?.toJSON() } },
-    type = mineType.toJSON()
+    cells = List(height) { y -> List(width) { x -> grid[x to y]?.toJSON(serverRootURL = serverRootURL) } },
+    type = mineType.toJSON(serverRootURL = serverRootURL)
 )
 
 // TODO: Find appropriate place for this adapter
-private fun MineEntity.toJSON() = MineEntityJSON(
+private fun MineEntity.toJSON(serverRootURL: String) = MineEntityJSON(
     name = friendlyName,
-    imageURL = "$API_ROOT/img/mine/entity/$spriteName.png"
+    imageURL = "$serverRootURL/img/mine/entity/$spriteName.png"
 )
 
 // TODO: Find appropriate place for this adapter
-private fun MineActionResult.toJSON() = MineActionResultJSON(
+private fun MineActionResult.toJSON(serverRootURL: String) = MineActionResultJSON(
     minedItemResults = minedItemResults.map {
         MinedItemResultJSON(
-            item = it.item.toJSON(it.id),
+            item = it.item.toJSON(it.id, serverRootURL = serverRootURL),
             expPerIndividualItem = it.expPerIndividualItem
         )
     },
     levelUps = levelUps.map { LevelUpJSON(it.newLevel, it.additionalMessage) },
-    mine = mine.toJSON(),
+    mine = mine.toJSON(serverRootURL = serverRootURL),
     miningLvl = miningLvl.toJSON()
 )
 
-private fun MineType.toJSON() = MineTypeJSON(
+private fun MineType.toJSON(serverRootURL: String) = MineTypeJSON(
     id = ordinal,
     name = friendlyName,
     minLevel = minLevel,
-    backgroundURL = "$API_ROOT/img/mine/background/${spriteName}.png"
+    backgroundURL = "$serverRootURL/img/mine/background/${spriteName}.png"
 )

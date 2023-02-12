@@ -55,9 +55,8 @@ fun testApp(clock: Clock, block: suspend ApplicationTestBuilder.() -> Unit) = te
     environment {
         config = MapApplicationConfig().apply {
             put("ktor.environment", "prod")
-            put("ktor.deployment.root", "https://pbbg-api.bitwiserain.com")
             put("jdbc.address", "h2:mem:test;DB_CLOSE_DELAY=-1")
-            put("jwt.issuer", "https://pbbg-api.bitwiserain.com")
+            put("jwt.issuer", "PBBG")
             put("jwt.realm", "PBBG API Server")
             put("jwt.secret", "eShVmYp3s6v9y\$B&E)H@McQfTjWnZr4t")
         }

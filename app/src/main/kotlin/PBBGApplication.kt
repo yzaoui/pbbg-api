@@ -74,6 +74,7 @@ import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.response.respond
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -92,7 +93,6 @@ enum class ApplicationEnvironment {
     PROD
 }
 lateinit var APP_ENVIRONMENT: ApplicationEnvironment
-lateinit var API_ROOT: String
 
 fun Application.main() {
     mainWithDependencies(Clock.systemUTC())
@@ -104,9 +104,6 @@ fun Application.mainWithDependencies(clock: Clock) {
         "prod" -> ApplicationEnvironment.PROD
         else -> throw ApplicationConfigurationException("Environment (KTOR_ENV) must be either dev or prod.")
     }
-
-    API_ROOT = environment.config.propertyOrNull("ktor.deployment.root")?.getString()
-        ?: throw ApplicationConfigurationException("API_ROOT must be provided.")
 
     /*************
      * Set up db *
@@ -302,6 +299,10 @@ fun Application.makeToken(userId: Int): String = JWT.create()
     .withIssuer(environment.config.property("jwt.issuer").getString())
     .withClaim("user.id", userId)
     .sign(Algorithm.HMAC256(environment.config.property("jwt.secret").getString()))
+
+val ApplicationRequest.serverRootURL get() = with(local) {
+    "$scheme://$serverHost${if (serverPort != 80) ":$serverPort" else ""}"
+}
 
 /**********
  * BCrypt *
