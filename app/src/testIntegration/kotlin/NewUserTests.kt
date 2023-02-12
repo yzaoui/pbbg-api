@@ -5,12 +5,14 @@ import com.bitwiserain.pbbg.app.testintegration.api.GETInventory
 import com.bitwiserain.pbbg.app.testintegration.model.Inventory
 import com.bitwiserain.pbbg.app.testintegration.response.RegisterResponse
 import com.bitwiserain.pbbg.app.testintegration.response.UserResponse
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.setBody
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -38,52 +40,51 @@ class NewUserTests {
 
     @Test
     fun `Given valid credentials, when registering, a successful response should return with an auth token`() = testApp(clock) {
-        handleRequest(HttpMethod.Post, "/api/register") {
-            addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        val response = client.post("/api/register") {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(
                 buildJsonObject {
                     put("username", "username")
                     put("password", "password")
                 }.toString()
             )
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
+        }
 
-            val body = Json.parseToJsonElement(response.content.orEmpty()).jsonObject
-            assertEquals("success", body["status"]?.let { it.jsonPrimitive.content })
+        assertEquals(HttpStatusCode.OK, response.status)
 
-            assertDoesNotThrow {
-                Json.decodeFromJsonElement<RegisterResponse>(body.getValue("data"))
-            }
+        val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        assertEquals("success", body["status"]?.let { it.jsonPrimitive.content })
+
+        assertDoesNotThrow {
+            Json.decodeFromJsonElement<RegisterResponse>(body.getValue("data"))
         }
     }
 
     @Test
     fun `When registering successfully, user should have 0 gold, 0 mining exp, and 0 farming exp`() = testApp(clock) {
-        handleRequest(HttpMethod.Get, "/api/user-stats") {
-            addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-            addHeader(HttpHeaders.Authorization, "Bearer ${registerUserAndGetToken()}")
-        }.apply {
-            val body = Json.parseToJsonElement(response.content.orEmpty()).jsonObject
-            assertEquals("success", body["status"]?.let { it.jsonPrimitive.content })
-
-            val userStats = assertDoesNotThrow {
-                Json.decodeFromJsonElement<UserResponse>(body.getValue("data"))
-            }
-
-            assertEquals(0, userStats.gold, "Gold amount should be 0.")
-            assertEquals(1, userStats.mining.level, "Mining level should be 1.")
-            assertEquals(0, userStats.mining.relativeExp, "Mining experience should be 0.")
-            assertEquals(1, userStats.farming.level, "Farming level should be 1.")
-            assertEquals(0, userStats.farming.relativeExp, "Farming experience should be 0.")
+        val response = client.get("/api/user-stats") {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            header(HttpHeaders.Authorization, "Bearer ${registerUserAndGetToken()}")
         }
+        val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        assertEquals("success", body["status"]?.let { it.jsonPrimitive.content })
+
+        val userStats = assertDoesNotThrow {
+            Json.decodeFromJsonElement<UserResponse>(body.getValue("data"))
+        }
+
+        assertEquals(0, userStats.gold, "Gold amount should be 0.")
+        assertEquals(1, userStats.mining.level, "Mining level should be 1.")
+        assertEquals(0, userStats.mining.relativeExp, "Mining experience should be 0.")
+        assertEquals(1, userStats.farming.level, "Farming level should be 1.")
+        assertEquals(0, userStats.farming.relativeExp, "Farming experience should be 0.")
     }
 
     @Test
     fun `When registering successfully, user should have 1 ice pick, 2 apple saplings, 5 tomato seeds, and nothing equipped`() = testApp(clock) {
         val inventoryResponse = GETInventory(registerUserAndGetToken())
 
-        val body = Json.parseToJsonElement(inventoryResponse.content.orEmpty()).jsonObject
+        val body = Json.parseToJsonElement(inventoryResponse.bodyAsText()).jsonObject
 
         val inventory = assertDoesNotThrow {
             Json.decodeFromJsonElement<Inventory>(body.getValue("data"))

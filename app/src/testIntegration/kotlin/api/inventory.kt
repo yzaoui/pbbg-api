@@ -1,12 +1,12 @@
 package com.bitwiserain.pbbg.app.testintegration.api
 
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.server.testing.TestApplicationEngine
-import io.ktor.server.testing.TestApplicationResponse
-import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.ApplicationTestBuilder
 
-fun TestApplicationEngine.GETInventory(token: String, filter: String? = null): TestApplicationResponse =
-    handleRequest(HttpMethod.Get, "/api/inventory" + if (filter != null) "?filter=$filter" else "") {
-        addHeader(HttpHeaders.Authorization, "Bearer $token")
-    }.response
+suspend fun ApplicationTestBuilder.GETInventory(token: String, filter: String? = null): HttpResponse =
+    client.get("/api/inventory" + if (filter != null) "?filter=$filter" else "") {
+        header(HttpHeaders.Authorization, "Bearer $token")
+    }
