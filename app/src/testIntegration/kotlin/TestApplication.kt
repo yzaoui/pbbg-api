@@ -5,14 +5,15 @@ import com.bitwiserain.pbbg.app.SchemaHelper
 import com.bitwiserain.pbbg.app.db.Transaction
 import com.bitwiserain.pbbg.app.db.repository.UserTable
 import com.bitwiserain.pbbg.app.mainWithDependencies
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
 import io.ktor.server.config.MapApplicationConfig
-import io.ktor.server.testing.TestApplicationEngine
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.setBody
-import io.ktor.server.testing.withTestApplication
+import io.ktor.server.testing.ApplicationTestBuilder
+import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
@@ -36,8 +37,10 @@ fun createTestUserAndGetId(transaction: Transaction, userTable: UserTable, usern
     userTable.createUserAndGetId(username, BCryptHelper.hashPassword(password), Clock.systemUTC().instant())
 }
 
-fun TestApplicationEngine.registerUserAndGetToken(username: String = "username", password: String = "password") = handleRequest(HttpMethod.Post, "/api/register") {
-    addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+suspend fun ApplicationTestBuilder.registerUserAndGetToken(
+    username: String = "username", password: String = "password"
+) = client.post("/api/register") {
+    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     setBody(
         buildJsonObject {
             put("username", username)
@@ -45,12 +48,12 @@ fun TestApplicationEngine.registerUserAndGetToken(username: String = "username",
         }.toString()
     )
 }.run {
-    Json.parseToJsonElement(response.content.orEmpty()).jsonObject.getValue("data").jsonObject.getValue("token").jsonPrimitive.content
+    Json.parseToJsonElement(bodyAsText()).jsonObject.getValue("data").jsonObject.getValue("token").jsonPrimitive.content
 }
 
-fun testApp(clock: Clock, block: TestApplicationEngine.() -> Unit) {
-    withTestApplication({
-        (environment.config as MapApplicationConfig).apply {
+fun testApp(clock: Clock, block: suspend ApplicationTestBuilder.() -> Unit) = testApplication {
+    environment {
+        config = MapApplicationConfig().apply {
             put("ktor.environment", "prod")
             put("ktor.deployment.root", "https://pbbg-api.bitwiserain.com")
             put("jdbc.address", "h2:mem:test;DB_CLOSE_DELAY=-1")
@@ -58,6 +61,9 @@ fun testApp(clock: Clock, block: TestApplicationEngine.() -> Unit) {
             put("jwt.realm", "PBBG API Server")
             put("jwt.secret", "eShVmYp3s6v9y\$B&E)H@McQfTjWnZr4t")
         }
+    }
+    application {
         mainWithDependencies(clock)
-    }, block)
+    }
+    block()
 }

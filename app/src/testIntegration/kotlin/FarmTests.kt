@@ -7,6 +7,7 @@ import com.bitwiserain.pbbg.app.testintegration.api.POSTPlant
 import com.bitwiserain.pbbg.app.testintegration.model.Inventory
 import com.bitwiserain.pbbg.app.testintegration.model.farm.Plot
 import com.bitwiserain.pbbg.app.testintegration.requestbody.PlantRequest
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
@@ -34,9 +35,9 @@ class FarmTests {
     @Test
     fun `Given a new user, farm should have one plot`() = testApp(clock) {
         val response = GETPlots(registerUserAndGetToken())
-        assertEquals(HttpStatusCode.OK, response.status())
+        assertEquals(HttpStatusCode.OK, response.status)
 
-        val body = Json.parseToJsonElement(response.content.orEmpty()).jsonObject
+        val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
         assertEquals("success", body["status"]?.let { it.jsonPrimitive.content })
 
         val plots: List<Plot> = assertDoesNotThrow {
@@ -52,12 +53,12 @@ class FarmTests {
         val token = registerUserAndGetToken()
 
         val plot = GETPlots(token).run {
-            Json.decodeFromJsonElement(ListSerializer(Plot.serializer()), Json.parseToJsonElement(content.orEmpty()).jsonObject.getValue("data")).single()
+            Json.decodeFromJsonElement(ListSerializer(Plot.serializer()), Json.parseToJsonElement(bodyAsText()).jsonObject.getValue("data")).single()
         }
 
         /* Retrieve apple sapling from initial inventory */
         val appleSaplingInInventory = GETInventory(token, filter = "plantable").run {
-            Json.decodeFromJsonElement<Inventory>(Json.parseToJsonElement(content.orEmpty()).jsonObject.getValue("data"))
+            Json.decodeFromJsonElement<Inventory>(Json.parseToJsonElement(bodyAsText()).jsonObject.getValue("data"))
                 .items.single { it.item.baseItem.friendlyName == "Apple Sapling" }.item
         }
         val initialAppleSaplingQuantity = appleSaplingInInventory.quantity!!
@@ -68,8 +69,8 @@ class FarmTests {
             itemId = appleSaplingInInventory.id
         ))
 
-        assertEquals(HttpStatusCode.OK, plantResponse.status())
-        val plantResponseBody = Json.parseToJsonElement(plantResponse.content.orEmpty()).jsonObject
+        assertEquals(HttpStatusCode.OK, plantResponse.status)
+        val plantResponseBody = Json.parseToJsonElement(plantResponse.bodyAsText()).jsonObject
         assertEquals("success", plantResponseBody["status"]?.let { it.jsonPrimitive.content })
 
         val occupiedPlot = assertDoesNotThrow {
@@ -80,7 +81,7 @@ class FarmTests {
 
         /* Check apple sapling was depleted */
         val newAppleSaplingQuantity = GETInventory(token).run {
-            Json.decodeFromJsonElement<Inventory>(Json.parseToJsonElement(content.orEmpty()).jsonObject.getValue("data"))
+            Json.decodeFromJsonElement<Inventory>(Json.parseToJsonElement(bodyAsText()).jsonObject.getValue("data"))
                 .items.single { it.item.baseItem.friendlyName == "Apple Sapling" }.item.quantity!!
         }
 
