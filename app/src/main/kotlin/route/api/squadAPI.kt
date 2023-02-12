@@ -57,7 +57,7 @@ private fun Squad.toJSON() = SquadJSON(
     units = units.map { it.toJSON() }
 )
 
-fun MyUnit.toJSON() = MyUnitJSON(
+fun MyUnit.toJSON(serverRootURL: String = API_ROOT) = MyUnitJSON(
     id = id,
     name = enum.friendlyName,
     baseUnitId = enum.ordinal,
@@ -66,6 +66,6 @@ fun MyUnit.toJSON() = MyUnitJSON(
     atk = atk,
     def = def,
     levelProgress = UnitExperienceManager.getLevelProgress(exp).toJSON(),
-    idleAnimationURL = "$API_ROOT/img/unit/${enum.spriteName}.gif",
-    iconURL = "$API_ROOT/img/unit-icon/${enum.spriteName}.png"
+    idleAnimationURL = "$serverRootURL/img/unit/${enum.spriteName}.gif",
+    iconURL = "$serverRootURL/img/unit-icon/${enum.spriteName}.png"
 )

@@ -85,13 +85,13 @@ private fun MaterializedPlant.toJSON(now: Instant) = MaterializedPlantJSON(
     harvests = (this as? IMaterializedPlant.Maturable)?.harvests
 )
 
-fun IBasePlant.toJSON() = BasePlantJSON(
+fun IBasePlant.toJSON(serverRootURL: String = API_ROOT) = BasePlantJSON(
     id = enum.ordinal + 1,
     name = friendlyName,
     description = description,
-    icon = "$API_ROOT/img/plant-icon/$spriteName.png",
+    icon = "$serverRootURL/img/plant-icon/$spriteName.png",
     growingPeriod = growingPeriod.inWholeSeconds,
-    growingSprite = "$API_ROOT/img/plant/$spriteName-growing.gif",
+    growingSprite = "$serverRootURL/img/plant/$spriteName-growing.gif",
     maturePeriod = if (this is IBasePlant.Maturable) maturePeriod.inWholeSeconds else null,
-    matureSprite = if (this is IBasePlant.Maturable) "$API_ROOT/img/plant/$spriteName-mature.gif" else null
+    matureSprite = if (this is IBasePlant.Maturable) "$serverRootURL/img/plant/$spriteName-mature.gif" else null
 )

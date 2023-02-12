@@ -151,9 +151,9 @@ private fun Mine.toJSON() = MineJSON(
 )
 
 // TODO: Find appropriate place for this adapter
-private fun MineEntity.toJSON() = MineEntityJSON(
+private fun MineEntity.toJSON(serverRootURL: String = API_ROOT) = MineEntityJSON(
     name = friendlyName,
-    imageURL = "$API_ROOT/img/mine/entity/$spriteName.png"
+    imageURL = "$serverRootURL/img/mine/entity/$spriteName.png"
 )
 
 // TODO: Find appropriate place for this adapter
@@ -169,9 +169,9 @@ private fun MineActionResult.toJSON() = MineActionResultJSON(
     miningLvl = miningLvl.toJSON()
 )
 
-private fun MineType.toJSON() = MineTypeJSON(
+private fun MineType.toJSON(serverRootURL: String = API_ROOT) = MineTypeJSON(
     id = ordinal,
     name = friendlyName,
     minLevel = minLevel,
-    backgroundURL = "$API_ROOT/img/mine/background/${spriteName}.png"
+    backgroundURL = "$serverRootURL/img/mine/background/${spriteName}.png"
 )

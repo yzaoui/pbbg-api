@@ -131,12 +131,12 @@ fun MaterializedItem.toJSON(id: Long) = MaterializedItemJSON(
     quantity = if (this is MaterializedItem.Stackable) quantity else null
 )
 
-fun BaseItem.toJSON() = BaseItemJSON(
+fun BaseItem.toJSON(serverRootURL: String = API_ROOT) = BaseItemJSON(
     id = id,
     friendlyName = friendlyName,
-    img16 = "$API_ROOT/img/item/$spriteName-16.png",
-    img32 = "$API_ROOT/img/item/$spriteName-32.png",
-    img64 = "$API_ROOT/img/item/$spriteName-64.png",
+    img16 = "$serverRootURL/img/item/$spriteName-16.png",
+    img32 = "$serverRootURL/img/item/$spriteName-32.png",
+    img64 = "$serverRootURL/img/item/$spriteName-64.png",
     description = description,
     grid = if (this is BaseItem.GridPreviewable) grid.map { PointJSON(it.x, it.y) }.toSet() else null
 )

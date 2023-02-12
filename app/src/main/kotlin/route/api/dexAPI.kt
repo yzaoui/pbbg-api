@@ -92,12 +92,12 @@ fun Route.dexAPI(dexUC: DexUC) = route("/dex") {
 }
 
 // TODO: Find appropriate place for this adapter
-fun MyUnitEnum.toJSON() = MyUnitEnumJSON(
+fun MyUnitEnum.toJSON(serverRootURL: String = API_ROOT) = MyUnitEnumJSON(
     id = ordinal + 1,
     friendlyName = friendlyName,
     description = description,
-    fullURL = "$API_ROOT/img/unit/$spriteName.gif",
-    iconURL = "$API_ROOT/img/unit-icon/$spriteName.png",
+    fullURL = "$serverRootURL/img/unit/$spriteName.gif",
+    iconURL = "$serverRootURL/img/unit-icon/$spriteName.png",
     baseHP = baseHP,
     baseAtk = baseAtk,
     baseDef = baseDef,
