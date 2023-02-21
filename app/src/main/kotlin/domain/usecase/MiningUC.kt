@@ -7,11 +7,6 @@ import com.bitwiserain.pbbg.app.domain.model.mine.MineType
 
 interface MiningUC {
     /**
-     * Get the user's current mine, or null if not currently in one.
-     */
-    fun getMine(userId: Int): Mine?
-
-    /**
      * Generate a new mine and enter it.
      *
      * @param userId The user's ID.

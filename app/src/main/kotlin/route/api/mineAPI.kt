@@ -10,6 +10,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.app.domain.usecase.NoEquippedPickaxeException
 import com.bitwiserain.pbbg.app.domain.usecase.NotInMineSessionException
 import com.bitwiserain.pbbg.app.domain.usecase.UnfulfilledLevelRequirementException
+import com.bitwiserain.pbbg.app.domain.usecase.mine.GetMine
 import com.bitwiserain.pbbg.app.respondError
 import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
@@ -37,14 +38,14 @@ data class MinePositionParams(val x: Int, val y: Int)
 @Serializable
 data class MineGenerateParams(val mineTypeId: Int)
 
-fun Route.mine(miningUC: MiningUC) = route("/mine") {
+fun Route.mine(miningUC: MiningUC, getMine: GetMine) = route("/mine") {
     /**
      * On success:
      *   [MineJSON] When user has a mine in session.
      *   null When user does not have a mine in session.
      */
     get {
-        val mine = miningUC.getMine(call.user.id)
+        val mine = getMine(call.user.id)
 
         call.respondSuccess(mine?.toJSON(serverRootURL = call.request.serverRootURL))
     }

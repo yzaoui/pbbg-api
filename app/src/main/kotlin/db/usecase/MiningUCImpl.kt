@@ -42,15 +42,6 @@ class MiningUCImpl(
     private val userStatsTable: UserStatsTable,
 ) : MiningUC {
 
-    override fun getMine(userId: Int): Mine? = transaction {
-        /* Get currently running mine session */
-        val mineSession = mineSessionTable.getSession(userId) ?: return@transaction null
-
-        val grid = mineCellTable.getGrid(mineSession.id)
-
-        Mine(mineSession.width, mineSession.height, grid, mineSession.mineType)
-    }
-
     override fun generateMine(userId: Int, mineTypeId: Int, width: Int, height: Int): Mine = transaction {
         // Don't generate mine when already in one
         if (mineSessionTable.getSession(userId) != null) throw AlreadyInMineException()
