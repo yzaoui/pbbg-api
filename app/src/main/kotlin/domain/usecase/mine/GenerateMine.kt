@@ -8,28 +8,43 @@ import com.bitwiserain.pbbg.app.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.app.domain.model.mine.Mine
 import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.app.domain.model.mine.MineType
+import com.bitwiserain.pbbg.app.domain.usecase.mine.GenerateMine.Result
 import kotlin.random.Random
 
 /**
  * Generate a new mine and enter it.
  */
-fun interface GenerateMine : (Int, Int, Int, Int) -> Mine {
+fun interface GenerateMine : (Int, Int, Int, Int) -> Result {
     /**
      * @param userId The user's ID.
      * @param mineTypeId The kind of mine to generate.
      * @param width The width in cells of the mine to generate.
      * @param height The height in cells of the mine to generate.
-     *
-     * @throws AlreadyInMineException when already in a mine.
-     * @throws InvalidMineTypeIdException when [mineTypeId] does not map to a valid [MineType].
-     * @throws UnfulfilledLevelRequirementException when minimum mining level requirement is not met.
      */
-    override fun invoke(userId: Int, mineTypeId: Int, width: Int, height: Int): Mine
-}
+    override fun invoke(userId: Int, mineTypeId: Int, width: Int, height: Int): Result
 
-class AlreadyInMineException : Exception()
-class InvalidMineTypeIdException(val id: Int) : Exception()
-class UnfulfilledLevelRequirementException(val currentLevel: Int, val requiredMinimumLevel: Int) : Exception()
+    sealed class Result {
+        /**
+         * Mine was successfully generated.
+         */
+        data class SuccessfullyGenerated(val mine: Mine) : Result()
+
+        /**
+         * User is already in a mine.
+         */
+        object AlreadyInMine : Result()
+
+        /**
+         * Given mine type ID does not map to a valid [MineType].
+         */
+        object InvalidMineTypeId : Result()
+
+        /**
+         * Minimum mining level requirement is not met for the given mine type.
+         */
+        data class UnfulfilledLevelRequirement(val currentLevel: Int, val requiredMinimumLevel: Int) : Result()
+    }
+}
 
 class GenerateMineImpl(
     private val transaction: Transaction,
@@ -38,14 +53,14 @@ class GenerateMineImpl(
     private val userStatsTable: UserStatsTable,
 ) : GenerateMine {
 
-    override fun invoke(userId: Int, mineTypeId: Int, width: Int, height: Int): Mine = transaction {
+    override fun invoke(userId: Int, mineTypeId: Int, width: Int, height: Int): Result = transaction {
         // Don't generate mine when already in one
-        if (mineSessionTable.getSession(userId) != null) throw AlreadyInMineException()
+        if (mineSessionTable.getSession(userId) != null) return@transaction Result.AlreadyInMine
 
         val mineType = try {
             MineType.values()[mineTypeId]
         } catch (e: ArrayIndexOutOfBoundsException) {
-            throw InvalidMineTypeIdException(id = mineTypeId)
+            return@transaction Result.InvalidMineTypeId
         }
 
         val itemEntries = mutableMapOf<Pair<Int, Int>, MineEntity>()
@@ -61,7 +76,7 @@ class GenerateMineImpl(
 
         val userMiningProgress = MiningExperienceManager.getLevelProgress(userMiningExp)
 
-        if (userMiningProgress.level < mineType.minLevel) throw UnfulfilledLevelRequirementException(
+        if (userMiningProgress.level < mineType.minLevel) return@transaction Result.UnfulfilledLevelRequirement(
             currentLevel = userMiningProgress.level,
             requiredMinimumLevel = mineType.minLevel
         )
@@ -70,6 +85,6 @@ class GenerateMineImpl(
 
         mineCellTable.insertCells(mineSessionId, itemEntries)
 
-        return@transaction Mine(width, height, itemEntries, mineType)
+        return@transaction Result.SuccessfullyGenerated(Mine(width, height, itemEntries, mineType))
     }
 }

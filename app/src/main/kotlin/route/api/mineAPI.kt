@@ -7,12 +7,9 @@ import com.bitwiserain.pbbg.app.domain.model.mine.MineType
 import com.bitwiserain.pbbg.app.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.app.domain.usecase.NoEquippedPickaxeException
 import com.bitwiserain.pbbg.app.domain.usecase.NotInMineSessionException
-import com.bitwiserain.pbbg.app.domain.usecase.mine.AlreadyInMineException
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GenerateMine
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetAvailableMines
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetMine
-import com.bitwiserain.pbbg.app.domain.usecase.mine.InvalidMineTypeIdException
-import com.bitwiserain.pbbg.app.domain.usecase.mine.UnfulfilledLevelRequirementException
 import com.bitwiserain.pbbg.app.respondError
 import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
@@ -93,25 +90,25 @@ fun Route.mine(
          *
          * On success:
          *   [MineJSON]
-         *
-         * Error situations:
-         *   [AlreadyInMineException] Must not already be in a mine.
-         *   [InvalidMineTypeIdException] Mine type ID must be a valid type ID.
-         *   [UnfulfilledLevelRequirementException] Must have minimum required level.
          */
         post {
-            try {
-                val (mineTypeId: Int) = call.receive<MineGenerateParams>()
+            val (mineTypeId: Int) = call.receive<MineGenerateParams>()
 
-                val mine = generateMine(call.user.id, mineTypeId, 30, 20)
+            val result = generateMine(call.user.id, mineTypeId, 30, 20)
 
-                call.respondSuccess(mine.toJSON(serverRootURL = call.request.serverRootURL))
-            } catch (e: AlreadyInMineException) {
-                call.respondFail("Already in a mine.")
-            } catch (e: InvalidMineTypeIdException) {
-                call.respondFail("There is no mine with ID: ${e.id}.")
-            } catch (e: UnfulfilledLevelRequirementException) {
-                call.respondFail("Current mining level (level ${e.currentLevel}) does not meet minimum mining level requirement (level ${e.requiredMinimumLevel}) to generate this type of mine.")
+            when (result) {
+                is GenerateMine.Result.SuccessfullyGenerated -> {
+                    call.respondSuccess(result.mine.toJSON(serverRootURL = call.request.serverRootURL))
+                }
+                GenerateMine.Result.AlreadyInMine -> {
+                    call.respondFail("Already in a mine.")
+                }
+                GenerateMine.Result.InvalidMineTypeId -> {
+                    call.respondFail("There is no mine with ID: $mineTypeId.")
+                }
+                is GenerateMine.Result.UnfulfilledLevelRequirement -> {
+                    call.respondFail("Current mining level (level ${result.currentLevel}) does not meet minimum mining level requirement (level ${result.requiredMinimumLevel}) to generate this type of mine.")
+                }
             }
         }
     }
