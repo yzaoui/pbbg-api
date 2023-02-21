@@ -51,9 +51,9 @@ class MiningUCImpl(
         Mine(mineSession.width, mineSession.height, grid, mineSession.mineType)
     }
 
-    override fun generateMine(userId: Int, mineTypeId: Int, width: Int, height: Int): Mine {
+    override fun generateMine(userId: Int, mineTypeId: Int, width: Int, height: Int): Mine = transaction {
         // Don't generate mine when already in one
-        if (getMine(userId) != null) throw AlreadyInMineException()
+        if (mineSessionTable.getSession(userId) != null) throw AlreadyInMineException()
 
         val mineType = try {
             MineType.values()[mineTypeId]
@@ -70,23 +70,20 @@ class MiningUCImpl(
             }
         }
 
-        transaction {
+        val userMiningExp = userStatsTable.getUserStats(userId).miningExp
 
-            val userMiningExp = userStatsTable.getUserStats(userId).miningExp
+        val userMiningProgress = MiningExperienceManager.getLevelProgress(userMiningExp)
 
-            val userMiningProgress = MiningExperienceManager.getLevelProgress(userMiningExp)
+        if (userMiningProgress.level < mineType.minLevel) throw UnfulfilledLevelRequirementException(
+            currentLevel = userMiningProgress.level,
+            requiredMinimumLevel = mineType.minLevel
+        )
 
-            if (userMiningProgress.level < mineType.minLevel) throw UnfulfilledLevelRequirementException(
-                currentLevel = userMiningProgress.level,
-                requiredMinimumLevel = mineType.minLevel
-            )
+        val mineSessionId = mineSessionTable.insertSessionAndGetId(userId, width, height, mineType)
 
-            val mineSessionId = mineSessionTable.insertSessionAndGetId(userId, width, height, mineType)
+        mineCellTable.insertCells(mineSessionId, itemEntries)
 
-            mineCellTable.insertCells(mineSessionId, itemEntries)
-        }
-
-        return Mine(width, height, itemEntries, mineType)
+        return@transaction Mine(width, height, itemEntries, mineType)
     }
 
     override fun exitMine(userId: Int): Unit = transaction {
