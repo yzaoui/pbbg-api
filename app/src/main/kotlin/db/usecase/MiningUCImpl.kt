@@ -15,7 +15,6 @@ import com.bitwiserain.pbbg.app.domain.model.MaterializedItem
 import com.bitwiserain.pbbg.app.domain.model.MaterializedItem.Stackable
 import com.bitwiserain.pbbg.app.domain.model.Point
 import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistoryInfo
-import com.bitwiserain.pbbg.app.domain.model.mine.AvailableMines
 import com.bitwiserain.pbbg.app.domain.model.mine.Mine
 import com.bitwiserain.pbbg.app.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
@@ -147,28 +146,6 @@ class MiningUCImpl(
             mine = Mine(mineSession.width, mineSession.height, mineCellTable.getGrid(mineSession.id), mineSession.mineType),
             miningLvl = newLevelProgress
         )
-    }
-
-    override fun getAvailableMines(userId: Int): AvailableMines {
-        val userMiningLevel = transaction {
-            userStatsTable.getUserStats(userId).miningExp
-        }.let { exp ->
-            MiningExperienceManager.getLevelProgress(exp)
-        }.level
-
-        val mines = mutableListOf<MineType>()
-        var nextUnlockLevel: Int? = null
-
-        for (mine in MineType.values()) {
-            if (userMiningLevel >= mine.minLevel) {
-                mines.add(mine)
-            } else {
-                nextUnlockLevel = mine.minLevel
-                break
-            }
-        }
-
-        return AvailableMines(mines, nextUnlockLevel)
     }
 
     private fun mineEntityToItem(entity: MineEntity, quantity: Int): MaterializedItem = when (entity) {

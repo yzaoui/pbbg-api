@@ -10,6 +10,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.app.domain.usecase.NoEquippedPickaxeException
 import com.bitwiserain.pbbg.app.domain.usecase.NotInMineSessionException
 import com.bitwiserain.pbbg.app.domain.usecase.UnfulfilledLevelRequirementException
+import com.bitwiserain.pbbg.app.domain.usecase.mine.GetAvailableMines
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetMine
 import com.bitwiserain.pbbg.app.respondError
 import com.bitwiserain.pbbg.app.respondFail
@@ -38,7 +39,7 @@ data class MinePositionParams(val x: Int, val y: Int)
 @Serializable
 data class MineGenerateParams(val mineTypeId: Int)
 
-fun Route.mine(miningUC: MiningUC, getMine: GetMine) = route("/mine") {
+fun Route.mine(miningUC: MiningUC, getMine: GetMine, getAvailableMines: GetAvailableMines) = route("/mine") {
     /**
      * On success:
      *   [MineJSON] When user has a mine in session.
@@ -131,7 +132,7 @@ fun Route.mine(miningUC: MiningUC, getMine: GetMine) = route("/mine") {
          *   [MineTypeListJSON]
          */
         get {
-            val result = miningUC.getAvailableMines(call.user.id).let {
+            val result = getAvailableMines(call.user.id).let {
                 MineTypeListJSON(
                     types = it.mines.map { it.toJSON(serverRootURL = call.request.serverRootURL) },
                     nextUnlockLevel = it.nextUnlockLevel

@@ -41,6 +41,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.ChangePasswordUCImpl
 import com.bitwiserain.pbbg.app.domain.usecase.GetUserStatsUCImpl
 import com.bitwiserain.pbbg.app.domain.usecase.LoginUCImpl
 import com.bitwiserain.pbbg.app.domain.usecase.RegisterUserUCImpl
+import com.bitwiserain.pbbg.app.domain.usecase.mine.GetAvailableMinesImpl
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetMineImpl
 import com.bitwiserain.pbbg.app.route.api.about
 import com.bitwiserain.pbbg.app.route.api.battleAPI
@@ -151,6 +152,7 @@ fun Application.mainWithDependencies(clock: Clock) {
         transaction, clock, dexTable, inventoryTable, itemHistoryTable, marketTable, marketInventoryTable, materializedItemTable, plotTable, plotListTable, squadTable, unitTable,
         userTable, userStatsTable
     )
+    val getAvailableMines = GetAvailableMinesImpl(transaction, userStatsTable)
     val getMine = GetMineImpl(transaction, mineCellTable, mineSessionTable)
     val login = LoginUCImpl(transaction, userTable)
     val marketUC = MarketUCImpl(transaction, dexTable, inventoryTable, marketInventoryTable, materializedItemTable, userStatsTable)
@@ -216,7 +218,7 @@ fun Application.mainWithDependencies(clock: Clock) {
                 inventoryAPI(inventoryUC, equipmentUC)
                 market(marketUC)
                 battleAPI(battleUC, generateBattle, getBattle)
-                mine(miningUC, getMine)
+                mine(miningUC, getMine, getAvailableMines)
                 farm(farmUC, clock)
                 dexAPI(dexUC)
                 squadAPI(unitUC)
