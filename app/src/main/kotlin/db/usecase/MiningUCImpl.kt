@@ -18,16 +18,11 @@ import com.bitwiserain.pbbg.app.domain.model.itemdetails.ItemHistoryInfo
 import com.bitwiserain.pbbg.app.domain.model.mine.Mine
 import com.bitwiserain.pbbg.app.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
-import com.bitwiserain.pbbg.app.domain.model.mine.MineType
 import com.bitwiserain.pbbg.app.domain.model.mine.MinedItemResult
-import com.bitwiserain.pbbg.app.domain.usecase.AlreadyInMineException
-import com.bitwiserain.pbbg.app.domain.usecase.InvalidMineTypeIdException
 import com.bitwiserain.pbbg.app.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.app.domain.usecase.NoEquippedPickaxeException
 import com.bitwiserain.pbbg.app.domain.usecase.NotInMineSessionException
-import com.bitwiserain.pbbg.app.domain.usecase.UnfulfilledLevelRequirementException
 import java.time.Clock
-import kotlin.random.Random
 
 class MiningUCImpl(
     private val transaction: Transaction,
@@ -40,41 +35,6 @@ class MiningUCImpl(
     private val mineSessionTable: MineSessionTable,
     private val userStatsTable: UserStatsTable,
 ) : MiningUC {
-
-    override fun generateMine(userId: Int, mineTypeId: Int, width: Int, height: Int): Mine = transaction {
-        // Don't generate mine when already in one
-        if (mineSessionTable.getSession(userId) != null) throw AlreadyInMineException()
-
-        val mineType = try {
-            MineType.values()[mineTypeId]
-        } catch (e: ArrayIndexOutOfBoundsException) {
-            throw InvalidMineTypeIdException(id = mineTypeId)
-        }
-
-        val itemEntries = mutableMapOf<Pair<Int, Int>, MineEntity>()
-        (0 until height).forEach { y ->
-            (0 until width).forEach { x ->
-                mineType.rollForMineEntity(Random.nextFloat())?.let {
-                    itemEntries.put(x to y, it)
-                }
-            }
-        }
-
-        val userMiningExp = userStatsTable.getUserStats(userId).miningExp
-
-        val userMiningProgress = MiningExperienceManager.getLevelProgress(userMiningExp)
-
-        if (userMiningProgress.level < mineType.minLevel) throw UnfulfilledLevelRequirementException(
-            currentLevel = userMiningProgress.level,
-            requiredMinimumLevel = mineType.minLevel
-        )
-
-        val mineSessionId = mineSessionTable.insertSessionAndGetId(userId, width, height, mineType)
-
-        mineCellTable.insertCells(mineSessionId, itemEntries)
-
-        return@transaction Mine(width, height, itemEntries, mineType)
-    }
 
     override fun exitMine(userId: Int): Unit = transaction {
         mineSessionTable.deleteSession(userId)

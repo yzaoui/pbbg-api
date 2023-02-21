@@ -4,14 +4,15 @@ import com.bitwiserain.pbbg.app.domain.model.mine.Mine
 import com.bitwiserain.pbbg.app.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.app.domain.model.mine.MineType
-import com.bitwiserain.pbbg.app.domain.usecase.AlreadyInMineException
-import com.bitwiserain.pbbg.app.domain.usecase.InvalidMineTypeIdException
 import com.bitwiserain.pbbg.app.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.app.domain.usecase.NoEquippedPickaxeException
 import com.bitwiserain.pbbg.app.domain.usecase.NotInMineSessionException
-import com.bitwiserain.pbbg.app.domain.usecase.UnfulfilledLevelRequirementException
+import com.bitwiserain.pbbg.app.domain.usecase.mine.AlreadyInMineException
+import com.bitwiserain.pbbg.app.domain.usecase.mine.GenerateMine
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetAvailableMines
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetMine
+import com.bitwiserain.pbbg.app.domain.usecase.mine.InvalidMineTypeIdException
+import com.bitwiserain.pbbg.app.domain.usecase.mine.UnfulfilledLevelRequirementException
 import com.bitwiserain.pbbg.app.respondError
 import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
@@ -39,7 +40,9 @@ data class MinePositionParams(val x: Int, val y: Int)
 @Serializable
 data class MineGenerateParams(val mineTypeId: Int)
 
-fun Route.mine(miningUC: MiningUC, getMine: GetMine, getAvailableMines: GetAvailableMines) = route("/mine") {
+fun Route.mine(
+    miningUC: MiningUC, getMine: GetMine, getAvailableMines: GetAvailableMines, generateMine: GenerateMine
+) = route("/mine") {
     /**
      * On success:
      *   [MineJSON] When user has a mine in session.
@@ -100,7 +103,7 @@ fun Route.mine(miningUC: MiningUC, getMine: GetMine, getAvailableMines: GetAvail
             try {
                 val (mineTypeId: Int) = call.receive<MineGenerateParams>()
 
-                val mine = miningUC.generateMine(call.user.id, mineTypeId, 30, 20)
+                val mine = generateMine(call.user.id, mineTypeId, 30, 20)
 
                 call.respondSuccess(mine.toJSON(serverRootURL = call.request.serverRootURL))
             } catch (e: AlreadyInMineException) {
