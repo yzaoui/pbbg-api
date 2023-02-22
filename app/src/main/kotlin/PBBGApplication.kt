@@ -44,7 +44,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.mine.ExitMineImpl
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GenerateMineImpl
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetAvailableMinesImpl
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetMineImpl
-import com.bitwiserain.pbbg.app.domain.usecase.mine.MiningUCImpl
+import com.bitwiserain.pbbg.app.domain.usecase.mine.SubmitMineActionImpl
 import com.bitwiserain.pbbg.app.route.api.about
 import com.bitwiserain.pbbg.app.route.api.battleAPI
 import com.bitwiserain.pbbg.app.route.api.dexAPI
@@ -158,11 +158,11 @@ fun Application.mainWithDependencies(clock: Clock) {
     val getAvailableMines = GetAvailableMinesImpl(transaction, userStatsTable)
     val getMine = GetMineImpl(transaction, mineCellTable, mineSessionTable)
     val exitMine = ExitMineImpl(transaction, mineSessionTable)
+    val submitMineAction = SubmitMineActionImpl(transaction, clock, dexTable, inventoryTable, itemHistoryTable, materializedItemTable, mineCellTable, mineSessionTable, userStatsTable)
     val login = LoginUCImpl(transaction, userTable)
     val marketUC = MarketUCImpl(transaction, dexTable, inventoryTable, marketInventoryTable, materializedItemTable, userStatsTable)
     val inventoryUC = InventoryUCImpl(transaction, inventoryTable)
     val itemUC = ItemUCImpl(transaction, itemHistoryTable, materializedItemTable, userTable)
-    val miningUC = MiningUCImpl(transaction, clock, dexTable, inventoryTable, itemHistoryTable, materializedItemTable, mineCellTable, mineSessionTable, userStatsTable)
     val farmUC = FarmUCImpl(transaction, clock, dexTable, inventoryTable, itemHistoryTable, materializedItemTable, materializedPlantTable, plotTable, plotListTable, userStatsTable)
     val equipmentUC = EquipmentUCImpl(transaction, inventoryTable)
     val unitUC = UnitUCImpl(transaction, battleSessionTable, squadTable, unitTable)
@@ -222,7 +222,7 @@ fun Application.mainWithDependencies(clock: Clock) {
                 inventoryAPI(inventoryUC, equipmentUC)
                 market(marketUC)
                 battleAPI(battleUC, generateBattle, getBattle)
-                mine(miningUC, getMine, getAvailableMines, generateMine, exitMine)
+                mine(submitMineAction, getMine, getAvailableMines, generateMine, exitMine)
                 farm(farmUC, clock)
                 dexAPI(dexUC)
                 squadAPI(unitUC)

@@ -22,18 +22,18 @@ import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.app.domain.model.mine.MinedItemResult
 import java.time.Clock
 
-interface MiningUC {
+fun interface SubmitMineAction : (Int, Int, Int) -> MineActionResult {
     /**
      * @throws NoEquippedPickaxeException when mining cannot occur due to the lack of an equipped pickaxe.
      * @throws NotInMineSessionException when mining cannot occur due to the lack of an existing mining session.
      */
-    fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult
+    override fun invoke(userId: Int, x: Int, y: Int): MineActionResult
 }
 
 class NoEquippedPickaxeException : Exception()
 class NotInMineSessionException : Exception()
 
-class MiningUCImpl(
+class SubmitMineActionImpl(
     private val transaction: Transaction,
     private val clock: Clock,
     private val dexTable: DexTable,
@@ -43,9 +43,9 @@ class MiningUCImpl(
     private val mineCellTable: MineCellTable,
     private val mineSessionTable: MineSessionTable,
     private val userStatsTable: UserStatsTable,
-) : MiningUC {
+) : SubmitMineAction {
 
-    override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction {
+    override fun invoke(userId: Int, x: Int, y: Int): MineActionResult = transaction {
         val now = clock.instant()
 
         /* Get currently running mine session */
