@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LevelUpJSON(
     @SerialName("newLevel") val newLevel: Int,
-    @SerialName("additionalMessage") val additionalMessage: String? = null
+    @SerialName("additionalMessage") val additionalMessage: String?,
 )

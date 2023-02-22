@@ -176,7 +176,10 @@ fun Application.mainWithDependencies(clock: Clock) {
 
     install(ContentNegotiation) {
         // Handles "application/json" content type
-        json()
+        json(json = Json {
+            explicitNulls = true
+            encodeDefaults = true
+        })
     }
 
     val jwtRealm = environment.config.property("jwt.realm").getString()
