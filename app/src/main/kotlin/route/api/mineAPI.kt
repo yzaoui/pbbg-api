@@ -7,6 +7,7 @@ import com.bitwiserain.pbbg.app.domain.model.mine.MineType
 import com.bitwiserain.pbbg.app.domain.usecase.MiningUC
 import com.bitwiserain.pbbg.app.domain.usecase.NoEquippedPickaxeException
 import com.bitwiserain.pbbg.app.domain.usecase.NotInMineSessionException
+import com.bitwiserain.pbbg.app.domain.usecase.mine.ExitMine
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GenerateMine
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetAvailableMines
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetMine
@@ -38,7 +39,7 @@ data class MinePositionParams(val x: Int, val y: Int)
 data class MineGenerateParams(val mineTypeId: Int)
 
 fun Route.mine(
-    miningUC: MiningUC, getMine: GetMine, getAvailableMines: GetAvailableMines, generateMine: GenerateMine
+    miningUC: MiningUC, getMine: GetMine, getAvailableMines: GetAvailableMines, generateMine: GenerateMine, exitMine: ExitMine
 ) = route("/mine") {
     /**
      * On success:
@@ -119,8 +120,7 @@ fun Route.mine(
          *   null
          */
         post {
-            // TODO: Maybe throw an exception if not currently in a mine
-            miningUC.exitMine(call.user.id)
+            exitMine(call.user.id)
 
             call.respondSuccess()
         }

@@ -36,10 +36,6 @@ class MiningUCImpl(
     private val userStatsTable: UserStatsTable,
 ) : MiningUC {
 
-    override fun exitMine(userId: Int): Unit = transaction {
-        mineSessionTable.deleteSession(userId)
-    }
-
     override fun submitMineAction(userId: Int, x: Int, y: Int): MineActionResult = transaction {
         val now = clock.instant()
 
