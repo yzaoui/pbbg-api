@@ -34,7 +34,6 @@ import com.bitwiserain.pbbg.app.db.usecase.GetBattleUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.InventoryUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.ItemUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.MarketUCImpl
-import com.bitwiserain.pbbg.app.db.usecase.MiningUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.UnitUCImpl
 import com.bitwiserain.pbbg.app.db.usecase.UserProfileUCImpl
 import com.bitwiserain.pbbg.app.domain.usecase.ChangePasswordUCImpl
@@ -45,6 +44,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.mine.ExitMineImpl
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GenerateMineImpl
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetAvailableMinesImpl
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetMineImpl
+import com.bitwiserain.pbbg.app.domain.usecase.mine.MiningUCImpl
 import com.bitwiserain.pbbg.app.route.api.about
 import com.bitwiserain.pbbg.app.route.api.battleAPI
 import com.bitwiserain.pbbg.app.route.api.dexAPI
