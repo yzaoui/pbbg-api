@@ -1,4 +1,4 @@
-package com.bitwiserain.pbbg.app.domain.usecase
+package com.bitwiserain.pbbg.app.domain.usecase.mine
 
 import com.bitwiserain.pbbg.app.domain.model.mine.MineActionResult
 

@@ -19,9 +19,9 @@ import com.bitwiserain.pbbg.app.domain.model.mine.Mine
 import com.bitwiserain.pbbg.app.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.app.domain.model.mine.MinedItemResult
-import com.bitwiserain.pbbg.app.domain.usecase.MiningUC
-import com.bitwiserain.pbbg.app.domain.usecase.NoEquippedPickaxeException
-import com.bitwiserain.pbbg.app.domain.usecase.NotInMineSessionException
+import com.bitwiserain.pbbg.app.domain.usecase.mine.MiningUC
+import com.bitwiserain.pbbg.app.domain.usecase.mine.NoEquippedPickaxeException
+import com.bitwiserain.pbbg.app.domain.usecase.mine.NotInMineSessionException
 import java.time.Clock
 
 class MiningUCImpl(
