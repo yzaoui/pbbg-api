@@ -8,10 +8,7 @@ import com.bitwiserain.pbbg.app.domain.usecase.mine.ExitMine
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GenerateMine
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetAvailableMines
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GetMine
-import com.bitwiserain.pbbg.app.domain.usecase.mine.NoEquippedPickaxeException
-import com.bitwiserain.pbbg.app.domain.usecase.mine.NotInMineSessionException
 import com.bitwiserain.pbbg.app.domain.usecase.mine.SubmitMineAction
-import com.bitwiserain.pbbg.app.respondError
 import com.bitwiserain.pbbg.app.respondFail
 import com.bitwiserain.pbbg.app.respondSuccess
 import com.bitwiserain.pbbg.app.serverRootURL
@@ -58,27 +55,26 @@ fun Route.mine(
      *
      * On success:
      *   [MineActionResultJSON]
-     *
-     * Error situations:
-     *   [NoEquippedPickaxeException] Must have a pickaxe equipped to mine.
-     *   [NotInMineSessionException] Must be in a mine to mine.
      */
     post("/perform") {
-        try {
-            val (x: Int, y: Int) = call.receive(MinePositionParams::class)
-
-            val mineActionResult = submitMineAction(call.user.id, x, y).toJSON(serverRootURL = call.request.serverRootURL)
-
-            call.respondSuccess(mineActionResult)
+        val (x: Int, y: Int) = try {
+            call.receive<MinePositionParams>()
         } catch (e: ContentTransformationException) {
-            call.respondFail("Missing or invalid parameters.")
-        } catch (e: NoEquippedPickaxeException) {
-            call.respondFail("A pickaxe must be equipped in order to perform a mining operation.")
-        } catch (e: NotInMineSessionException) {
-            call.respondFail("A mine session must be in progress in order to perform a mining operation.")
-        } catch (e: Exception) {
-            e.printStackTrace()
-            call.respondError(e.message.orEmpty())
+            return@post call.respondFail("Missing or invalid parameters.")
+        }
+
+        val result = submitMineAction(call.user.id, x, y)
+
+        when (result) {
+            is SubmitMineAction.Result.Success -> {
+                call.respondSuccess(result.data.toJSON(serverRootURL = call.request.serverRootURL))
+            }
+            SubmitMineAction.Result.NoEquippedPickaxe -> {
+                call.respondFail("A pickaxe must be equipped in order to perform a mining operation.")
+            }
+            SubmitMineAction.Result.NotInMineSession -> {
+                call.respondFail("A mine session must be in progress in order to perform a mining operation.")
+            }
         }
     }
 

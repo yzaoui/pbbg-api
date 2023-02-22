@@ -20,18 +20,29 @@ import com.bitwiserain.pbbg.app.domain.model.mine.Mine
 import com.bitwiserain.pbbg.app.domain.model.mine.MineActionResult
 import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.app.domain.model.mine.MinedItemResult
+import com.bitwiserain.pbbg.app.domain.usecase.mine.SubmitMineAction.Result
 import java.time.Clock
 
-fun interface SubmitMineAction : (Int, Int, Int) -> MineActionResult {
-    /**
-     * @throws NoEquippedPickaxeException when mining cannot occur due to the lack of an equipped pickaxe.
-     * @throws NotInMineSessionException when mining cannot occur due to the lack of an existing mining session.
-     */
-    override fun invoke(userId: Int, x: Int, y: Int): MineActionResult
-}
+fun interface SubmitMineAction : (Int, Int, Int) -> Result {
+    override fun invoke(userId: Int, x: Int, y: Int): Result
 
-class NoEquippedPickaxeException : Exception()
-class NotInMineSessionException : Exception()
+    sealed class Result {
+        /**
+         * Action was successfully processed.
+         */
+        data class Success(val data: MineActionResult) : Result()
+
+        /**
+         * Mining cannot occur due to the lack of an equipped pickaxe.
+         */
+        object NoEquippedPickaxe : Result()
+
+        /**
+         * Mining cannot occur due to the lack of an existing mining session.
+         */
+        object NotInMineSession : Result()
+    }
+}
 
 class SubmitMineActionImpl(
     private val transaction: Transaction,
@@ -45,11 +56,11 @@ class SubmitMineActionImpl(
     private val userStatsTable: UserStatsTable,
 ) : SubmitMineAction {
 
-    override fun invoke(userId: Int, x: Int, y: Int): MineActionResult = transaction {
+    override fun invoke(userId: Int, x: Int, y: Int): Result = transaction {
         val now = clock.instant()
 
         /* Get currently running mine session */
-        val mineSession = mineSessionTable.getSession(userId) ?: throw NotInMineSessionException()
+        val mineSession = mineSessionTable.getSession(userId) ?: return@transaction Result.NotInMineSession
 
         val inventoryItems = inventoryTable.getInventoryItems(userId)
 
@@ -60,13 +71,10 @@ class SubmitMineActionImpl(
                 return@filter invItem is InventoryItem.Equippable && invItem.equipped && it.value.base is BaseItem.Pickaxe
             }
             .entries.singleOrNull()
-            ?.let { it.value.item }
-            ?: throw NoEquippedPickaxeException()
-        val pickaxeBase = pickaxe.base as? BaseItem.Pickaxe
-        if (pickaxeBase !is BaseItem.Pickaxe) throw NoEquippedPickaxeException()
+            ?.let { it.value.item.base as? BaseItem.Pickaxe } ?: return@transaction Result.NoEquippedPickaxe
 
         // Cells that the currently equipped pickaxe at this location can reach
-        val reacheableCells = reachableCells(x, y, mineSession.width, mineSession.height, pickaxeBase.grid)
+        val reacheableCells = reachableCells(x, y, mineSession.width, mineSession.height, pickaxe.grid)
 
         // The mine cells of this mine, filtered to only get those that are reachable with this pickaxe and location
         // TODO: Exposed isn't likely to support tuples in `WHERE IN` expressions, consider using raw SQL
@@ -105,11 +113,13 @@ class SubmitMineActionImpl(
             userStatsTable.updateMiningExp(userId, newLevelProgress.absoluteExp)
         }
 
-        MineActionResult(
-            minedItemResults = minedItemResults,
-            levelUps = MiningExperienceManager.getLevelUpResults(currentLevelProgress.level, newLevelProgress.level),
-            mine = Mine(mineSession.width, mineSession.height, mineCellTable.getGrid(mineSession.id), mineSession.mineType),
-            miningLvl = newLevelProgress
+        return@transaction Result.Success(
+            MineActionResult(
+                minedItemResults = minedItemResults,
+                levelUps = MiningExperienceManager.getLevelUpResults(currentLevelProgress.level, newLevelProgress.level),
+                mine = Mine(mineSession.width, mineSession.height, mineCellTable.getGrid(mineSession.id), mineSession.mineType),
+                miningLvl = newLevelProgress
+            )
         )
     }
 
