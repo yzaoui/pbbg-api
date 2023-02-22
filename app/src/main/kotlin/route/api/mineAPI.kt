@@ -52,95 +52,87 @@ fun Route.mine(
         call.respondSuccess(mine?.toJSON(serverRootURL = call.request.serverRootURL))
     }
 
-    route("/perform") {
-        /**
-         * Expects body:
-         *   [MinePositionParams]
-         *
-         * On success:
-         *   [MineActionResultJSON]
-         *
-         * Error situations:
-         *   [NoEquippedPickaxeException] Must have a pickaxe equipped to mine.
-         *   [NotInMineSessionException] Must be in a mine to mine.
-         */
-        post {
-            try {
-                val (x: Int, y: Int) = call.receive(MinePositionParams::class)
+    /**
+     * Expects body:
+     *   [MinePositionParams]
+     *
+     * On success:
+     *   [MineActionResultJSON]
+     *
+     * Error situations:
+     *   [NoEquippedPickaxeException] Must have a pickaxe equipped to mine.
+     *   [NotInMineSessionException] Must be in a mine to mine.
+     */
+    post("/perform") {
+        try {
+            val (x: Int, y: Int) = call.receive(MinePositionParams::class)
 
-                val mineActionResult = submitMineAction(call.user.id, x, y).toJSON(serverRootURL = call.request.serverRootURL)
+            val mineActionResult = submitMineAction(call.user.id, x, y).toJSON(serverRootURL = call.request.serverRootURL)
 
-                call.respondSuccess(mineActionResult)
-            } catch (e: ContentTransformationException) {
-                call.respondFail("Missing or invalid parameters.")
-            } catch (e: NoEquippedPickaxeException) {
-                call.respondFail("A pickaxe must be equipped in order to perform a mining operation.")
-            } catch (e: NotInMineSessionException) {
-                call.respondFail("A mine session must be in progress in order to perform a mining operation.")
-            } catch (e: Exception) {
-                e.printStackTrace()
-                call.respondError(e.message.orEmpty())
+            call.respondSuccess(mineActionResult)
+        } catch (e: ContentTransformationException) {
+            call.respondFail("Missing or invalid parameters.")
+        } catch (e: NoEquippedPickaxeException) {
+            call.respondFail("A pickaxe must be equipped in order to perform a mining operation.")
+        } catch (e: NotInMineSessionException) {
+            call.respondFail("A mine session must be in progress in order to perform a mining operation.")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            call.respondError(e.message.orEmpty())
+        }
+    }
+
+    /**
+     * Expects body:
+     *   [MineGenerateParams]
+     *
+     * On success:
+     *   [MineJSON]
+     */
+    post("/generate") {
+        val (mineTypeId: Int) = call.receive<MineGenerateParams>()
+
+        val result = generateMine(call.user.id, mineTypeId, 30, 20)
+
+        when (result) {
+            is GenerateMine.Result.SuccessfullyGenerated -> {
+                call.respondSuccess(result.mine.toJSON(serverRootURL = call.request.serverRootURL))
+            }
+            GenerateMine.Result.AlreadyInMine -> {
+                call.respondFail("Already in a mine.")
+            }
+            GenerateMine.Result.InvalidMineTypeId -> {
+                call.respondFail("There is no mine with ID: $mineTypeId.")
+            }
+            is GenerateMine.Result.UnfulfilledLevelRequirement -> {
+                call.respondFail("Current mining level (level ${result.currentLevel}) does not meet minimum mining level requirement (level ${result.requiredMinimumLevel}) to generate this type of mine.")
             }
         }
     }
 
-    route("/generate") {
-        /**
-         * Expects body:
-         *   [MineGenerateParams]
-         *
-         * On success:
-         *   [MineJSON]
-         */
-        post {
-            val (mineTypeId: Int) = call.receive<MineGenerateParams>()
+    /**
+     * On success:
+     *   null
+     */
+    post("/exit") {
+        exitMine(call.user.id)
 
-            val result = generateMine(call.user.id, mineTypeId, 30, 20)
-
-            when (result) {
-                is GenerateMine.Result.SuccessfullyGenerated -> {
-                    call.respondSuccess(result.mine.toJSON(serverRootURL = call.request.serverRootURL))
-                }
-                GenerateMine.Result.AlreadyInMine -> {
-                    call.respondFail("Already in a mine.")
-                }
-                GenerateMine.Result.InvalidMineTypeId -> {
-                    call.respondFail("There is no mine with ID: $mineTypeId.")
-                }
-                is GenerateMine.Result.UnfulfilledLevelRequirement -> {
-                    call.respondFail("Current mining level (level ${result.currentLevel}) does not meet minimum mining level requirement (level ${result.requiredMinimumLevel}) to generate this type of mine.")
-                }
-            }
-        }
+        call.respondSuccess()
     }
 
-    route("/exit") {
-        /**
-         * On success:
-         *   null
-         */
-        post {
-            exitMine(call.user.id)
-
-            call.respondSuccess()
+    /**
+     * On success:
+     *   [MineTypeListJSON]
+     */
+    get("/types") {
+        val result = getAvailableMines(call.user.id).let {
+            MineTypeListJSON(
+                types = it.mines.map { it.toJSON(serverRootURL = call.request.serverRootURL) },
+                nextUnlockLevel = it.nextUnlockLevel
+            )
         }
-    }
 
-    route("/types") {
-        /**
-         * On success:
-         *   [MineTypeListJSON]
-         */
-        get {
-            val result = getAvailableMines(call.user.id).let {
-                MineTypeListJSON(
-                    types = it.mines.map { it.toJSON(serverRootURL = call.request.serverRootURL) },
-                    nextUnlockLevel = it.nextUnlockLevel
-                )
-            }
-
-            call.respondSuccess(result)
-        }
+        call.respondSuccess(result)
     }
 }
 
