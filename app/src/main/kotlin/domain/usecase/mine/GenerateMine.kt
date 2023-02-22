@@ -6,7 +6,6 @@ import com.bitwiserain.pbbg.app.db.repository.mine.MineCellTable
 import com.bitwiserain.pbbg.app.db.repository.mine.MineSessionTable
 import com.bitwiserain.pbbg.app.domain.MiningExperienceManager
 import com.bitwiserain.pbbg.app.domain.model.mine.Mine
-import com.bitwiserain.pbbg.app.domain.model.mine.MineEntity
 import com.bitwiserain.pbbg.app.domain.model.mine.MineType
 import com.bitwiserain.pbbg.app.domain.usecase.mine.GenerateMine.Result
 import kotlin.random.Random
@@ -63,11 +62,12 @@ class GenerateMineImpl(
             return@transaction Result.InvalidMineTypeId
         }
 
-        val itemEntries = mutableMapOf<Pair<Int, Int>, MineEntity>()
-        (0 until height).forEach { y ->
-            (0 until width).forEach { x ->
-                mineType.rollForMineEntity(Random.nextFloat())?.let {
-                    itemEntries[x to y] = it
+        val itemEntries = buildMap {
+            (0 until height).forEach { y ->
+                (0 until width).forEach { x ->
+                    mineType.rollForMineEntity(Random.nextFloat())?.let {
+                        this[x to y] = it
+                    }
                 }
             }
         }
