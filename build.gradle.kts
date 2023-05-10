@@ -3,7 +3,7 @@ plugins {
     kotlin("jvm") version "1.7.21" apply false
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7" apply false
     // __KTOR_VERSION
-    id("io.ktor.plugin") version "2.2.3" apply false
+    id("io.ktor.plugin") version "2.3.0" apply false
 }
 
 group = "com.bitwiserain"

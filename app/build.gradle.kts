@@ -4,7 +4,7 @@ import org.jetbrains.gradle.ext.settings
 
 object Versions {
     // __KTOR_VERSION
-    const val KTOR = "2.2.3"
+    const val KTOR = "2.3.0"
     const val EXPOSED = "0.41.1"
     const val JUNIT_JUPITER = "5.8.1"
     const val KOTEST = "5.5.4"
