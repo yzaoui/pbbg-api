@@ -1,0 +1,959 @@
+openapi: "3.0.3"
+info:
+  title: "PBBG"
+  description: "PBBG"
+  version: "1.0.0"
+paths:
+  /about/patch-notes:
+    get:
+      description: "Retrieves patch notes, in decreasing version order, in Markdown syntax."
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  type: string
+  /about/version:
+    get:
+      description: "Retrieves the currently-running version of the server."
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                type: string
+                example: "1.2.3"
+  /battle/allyTurn:
+    post:
+      description: "Performs an ally turn."
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                "targetUnitId":
+                  type: integer
+                  format: int64
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/BattleActionResult"
+  /battle/enemyTurn:
+    post:
+      description: "Performs an enemy turn."
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/BattleActionResult"
+  /battle/session:
+    get:
+      description: "Retrieves the battle in session, if there is one."
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Battle"
+                # TODO: add nullability here with OAS 3.1.0
+    post:
+      description: ""
+      parameters:
+        - in: query
+          name: action
+          required: true
+          schema:
+            type: string
+            # TODO: specify allowed values: "generate"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Battle"
+  /dex/items:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/DexItems"
+#  /dex/items/{id}:
+#    get:
+#      description: ""
+#      parameters:
+#      - name: "id"
+#        in: "path"
+#        required: true
+#        schema:
+#          type: "integer"
+#      responses:
+#        "200":
+#          description: "OK"
+#          content:
+#            "application/json":
+#              schema:
+#                type: "object"
+#        "400":
+#          description: "Bad Request"
+#          content:
+#            '*/*':
+#              schema:
+#                $ref: "#/components/schemas/JsonObject"
+#  /dex/plants/{id}:
+#    get:
+#      description: ""
+#      parameters:
+#      - name: "id"
+#        in: "path"
+#        required: true
+#        schema:
+#          type: "integer"
+#      responses:
+#        "200":
+#          description: "OK"
+#          content:
+#            '*/*':
+#              schema:
+#                type: "object"
+#        "400":
+#          description: "Bad Request"
+#          content:
+#            '*/*':
+#              schema:
+#                $ref: "#/components/schemas/JsonObject"
+#  /dex/units/{id}:
+#    get:
+#      description: ""
+#      parameters:
+#      - name: "id"
+#        in: "path"
+#        required: true
+#        schema:
+#          type: "integer"
+#      responses:
+#        "200":
+#          description: "OK"
+#          content:
+#            '*/*':
+#              schema:
+#                type: "object"
+#        "400":
+#          description: "Bad Request"
+#          content:
+#            '*/*':
+#              schema:
+#                $ref: "#/components/schemas/JsonObject"
+  /farm/expand:
+    post:
+      description: "Expands the farm by adding one plot."
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Plot"
+  /farm/harvest:
+    post:
+      description: ""
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                "plotId":
+                  type: integer
+                  format: int64
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Plot"
+  /farm/plant:
+    post:
+      description: ""
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                "plotId":
+                  type: integer
+                  format: int64
+                "itemId":
+                  type: integer
+                  format: int64
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Plot"
+  /farm/plots:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Plot"
+  /farm/reorder:
+    post:
+      description: ""
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                "plotId":
+                  type: integer
+                  format: int64
+                "targetIndex":
+                  type: integer
+                  format: int32
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Plot"
+  /friends:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Friends"
+#  /friends/change-friendship/action:
+#    post:
+#      description: ""
+#      parameters:
+#      - name: "action"
+#        in: "query"
+#        required: false
+#        schema:
+#          type: "string"
+#      requestBody:
+#        content:
+#          '*/*':
+#            schema:
+#              $ref: "#/components/schemas/ChangeFriendshipParams"
+#        required: true
+#      responses:
+#        "400":
+#          description: "Bad Request"
+#          content:
+#            '*/*':
+#              schema:
+#                type: "object"
+#        "200":
+#          description: "OK"
+#          content:
+#            '*/*':
+#              schema:
+#                $ref: "#/components/schemas/JsonObject"
+#  /inventory/equipment/action:
+#    post:
+#      description: "Expects query string: <br> action = equip | unequip <br> Expects\
+#        \ body: <br>  EquipmentActionParams On success: <br>  InventoryJSON Error\
+#        \ situations: <br>  InventoryItemNotFoundException Must have a pickaxe equipped\
+#        \ to mine. <br>  InventoryItemNotEquippableException Must be in a mine to\
+#        \ mine. <br>  InventoryItemAlreadyEquippedException Redundant action if item\
+#        \ is already equipped <br>  InventoryItemNotEquippedException Redundant action\
+#        \ if item is already unequipped"
+#      parameters:
+#      - name: "action"
+#        in: "query"
+#        required: false
+#        schema:
+#          type: "string"
+#      requestBody:
+#        content:
+#          '*/*':
+#            schema:
+#              $ref: "#/components/schemas/EquipmentActionParams"
+#        required: true
+#      responses:
+#        "400":
+#          description: "Bad Request"
+#          content:
+#            '*/*':
+#              schema:
+#                type: "object"
+#        "200":
+#          description: "OK"
+#          content:
+#            '*/*':
+#              schema:
+#                type: "object"
+  /item/{id}:
+    get:
+      description: ""
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ItemDetails"
+        "400":
+          description: "Bad Request"
+          content:
+            "application/json":
+              schema:
+                type: string
+                example: "Item with this ID does not exist."
+  /login:
+    post:
+      description: ""
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                "username":
+                  type: string
+                "password":
+                  type: string
+                  format: password
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  "token":
+                    type: string
+        "400":
+          description: "Bad Request"
+          content:
+            "application/json":
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      "username":
+                        type: string
+                        nullable: true
+                      "password":
+                        type: string
+                        nullable: true
+                    example:
+                      "username": "A username is required."
+                      "password": "A password is required."
+                  - type: string
+                    example: "Credentials do not match an existing account"
+  /market:
+    get:
+      description: "Retrieves the user & game markets."
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UserAndGameMarkets"
+  /market/buy:
+    post:
+      description: "Expects body: <br>  MarketOrderListParams On success: <br>  UserAndGameMarketsJSON "
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/MarketOrderListParams"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UserAndGameMarkets"
+        "400":
+          description: "Bad Request"
+          content:
+            "application/json":
+              schema:
+                type: string
+                example: "Not enough gold to make this transaction."
+  /market/sell:
+    post:
+      description: "Expects body: <br>  MarketOrderListParams On success: <br>  UserAndGameMarketsJSON "
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/MarketOrderListParams"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UserAndGameMarkets"
+  /mine:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Mine"
+#  /mine/exit:
+#    post:
+#      description: "On success: <br> null"
+#      responses:
+#        "200":
+#          description: "OK"
+#          content:
+#            '*/*':
+#              schema:
+#                $ref: "#/components/schemas/JsonObject"
+  /mine/generate:
+    post:
+      description: "Expects body: <br>  MineGenerateParams On success: <br>  MineJSON "
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/MineGenerateParams"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /mine/perform:
+    post:
+      description: "Expects body: <br>  MinePositionParams On success: <br>  MineActionResultJSON "
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/MinePositionParams"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+  /mine/types:
+    get:
+      description: "On success: <br>  MineTypeListJSON "
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+  /register:
+    post:
+      description: ""
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/JsonObject"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+  /settings/change-password:
+    post:
+      description: ""
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/JsonObject"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+  /squad:
+    get:
+      description: "On success: <br>  SquadJSON "
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+  /squad/heal:
+    post:
+      description: "On success: <br>  SquadJSON Error situations: <br>  SquadInBattleException "
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+  /unit/{id}:
+    get:
+      description: ""
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+  /user-stats:
+    get:
+      description: "On success: <br>  UserStatsJSON "
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+  /user/{id}:
+    get:
+      description: ""
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+  /user/search/text:
+    get:
+      description: ""
+      parameters:
+      - name: "text"
+        in: "query"
+        required: false
+        schema:
+          type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+components:
+  schemas:
+    "PatchNotes":
+      type: array
+      items:
+        type: string
+    "BattleActionResult":
+      type: object
+      properties:
+        "battle":
+          $ref: "#/components/schemas/Battle"
+    "Battle":
+      type: object
+      properties:
+        "allies":
+          type: array
+          items:
+            $ref: "#/components/schemas/MyUnit"
+        "enemies":
+          type: array
+          items:
+            $ref: "#/components/schemas/MyUnit"
+        "turns":
+          type: array
+          items:
+            $ref: "#/components/schemas/Turn"
+    "MyUnit":
+      type: object
+      properties:
+        "id":
+          type: integer
+          format: int64
+        "name":
+          type: string
+        "baseUnitId":
+          type: integer
+          format: int32
+        "hp":
+          type: integer
+          format: int32
+        "maxHP":
+          type: integer
+          format: int32
+        "atk":
+          type: integer
+          format: int32
+        "def":
+          type: integer
+          format: int32
+        "levelProgress":
+          $ref: "#/components/schemas/LevelProgress"
+        "idleAnimationURL":
+          type: string
+        "iconURL":
+          type: string
+    "LevelProgress":
+      type: object
+      properties:
+        "level":
+          type: integer
+          format: int32
+        "relativeExp":
+          type: integer
+          format: int64
+        "relativeExpToNextLevel":
+          type: integer
+          format: int64
+    "Turn":
+      type: object
+      properties:
+        "unitId":
+          type: integer
+          format: int64
+#    "DexItem":
+#      discriminator:
+#        propertyName: "type"
+#        mapping:
+#          "discovered": "#/components/schemas"
+#      oneOf:
+#        - type: object
+#          required:
+#            - "type"
+#          properties:
+#            "type":
+#              type: string
+#            "baseItem":
+#              # TODO: Fill
+#        - type: object
+#          required:
+#            - "type"
+#          properties:
+#            "type":
+#              type:
+    "DexItems":
+      type: object
+      properties:
+        "discoveredItems":
+          type: object # TODO: Specify
+        "lastItemId":
+          type: integer
+          format: int32
+    "Plot":
+      type: object
+      properties:
+        "id":
+          type: integer
+          format: int64
+        "plant":
+          # TODO: Replace with null type in OAS 3.1.0
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/MaterializedPlant"
+    "BasePlant":
+      type: object
+      properties:
+        "id":
+          type: integer
+          format: int32
+        "name":
+          type: string
+        "description":
+          type: string
+        "icon":
+          type: string
+        "growingPeriod":
+          type: integer
+          format: int64
+        "growingSprite":
+          type: string
+        "maturePeriod":
+          type: integer
+          format: int64
+          nullable: true
+        "matureSprite":
+          type: string
+          nullable: true
+    "MaterializedPlant":
+      type: object
+      properties:
+        "basePlant":
+          $ref: "#/components/schemas/BasePlant"
+        "cycleStart":
+          type: string
+        "isMature":
+          type: boolean
+          nullable: false
+        "harvests":
+          type: integer
+          format: int32
+          nullable: true
+    "Friends":
+      type: object
+      properties:
+        "friendsInfo":
+          type: array
+          items:
+            $ref: "#/components/schemas/FriendInfo"
+    "FriendInfo":
+      type: object
+      properties:
+        "userId":
+          type: integer
+          format: int32
+        "username":
+          type: string
+        "friendship":
+          $ref: "#/components/schemas/Friendship"
+    "Friendship":
+      type: string
+      enum:
+        - "none"
+        - "request-sent"
+        - "request-received"
+        - "confirmed"
+    "ItemDetails":
+      type: object
+      properties:
+        "item":
+          $ref: "#/components/schemas/MaterializedItem"
+        "history":
+          type: array
+          items:
+            $ref: "#/components/schemas/ItemHistory"
+        "linkedUserInfo":
+          type: object # TODO: Specify
+    "MaterializedItem":
+      type: object
+      properties:
+        "id":
+          type: integer
+          format: int64
+        "baseItem":
+          $ref: "#/components/schemas/BaseItem"
+        "quantity":
+          type: integer
+          format: int32
+          nullable: true
+    "ItemHistory":
+      type: object
+      properties:
+        "date":
+          type: integer
+          format: int64
+        "info":
+          $ref: "#/components/schemas/ItemHistoryInfo"
+    "ItemHistoryInfo":
+      type: object
+      properties:
+        "type":
+          type: string
+        "userId":
+          type: integer
+          format: int64
+          nullable: true
+    "BaseItem":
+      type: object
+      properties:
+        "id":
+          type: integer
+          format: int32
+        "friendlyName":
+          type: string
+        "img16":
+          type: string
+        "img32":
+          type: string
+        "img64":
+          type: string
+        "description":
+          type: string
+        "grid":
+          type: object # TODO: Specify
+    "UserAndGameMarkets":
+      type: object
+      properties:
+        "gold":
+          type: integer
+          format: int64
+        "userMarket":
+          $ref: "#/components/schemas/Market"
+        "gameMarket":
+          $ref: "#/components/schemas/Market"
+    "Market":
+      type: object
+      properties:
+        "items":
+          type: array
+          items:
+            $ref: "#/components/schemas/MarketItem"
+    "MarketItem":
+      type: object
+      properties:
+        "item":
+          $ref: "#/components/schemas/MaterializedItem"
+        "price":
+          type: integer
+          format: int32
+    ChangeFriendshipParams:
+      type: "object"
+      properties:
+        userId:
+          type: "integer"
+          format: "int32"
+    EquipmentActionParams:
+      type: "object"
+      properties:
+        inventoryItemId:
+          type: "integer"
+          format: "int64"
+    MarketOrderListParams:
+      type: object
+      properties:
+        "orders":
+          type: array
+          items:
+            type: object
+            properties:
+              "id":
+                type: integer
+                format: int64
+              "quantity":
+                type: integer
+                format: int32
+    MineGenerateParams:
+      type: "object"
+      properties:
+        mineTypeId:
+          type: "integer"
+          format: "int32"
+    MinePositionParams:
+      type: "object"
+      properties:
+        x:
+          type: "integer"
+          format: "int32"
+        "y":
+          type: "integer"
+          format: "int32"
