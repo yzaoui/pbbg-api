@@ -18,10 +18,9 @@ object Versions {
 plugins {
     application
     kotlin("jvm")
-    // ___KOTLIN_VERSION___
-    kotlin("plugin.serialization") version "1.7.21"
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
-    id("org.jetbrains.dokka") version "1.7.20"
+    kotlin("plugin.serialization")
+    id("org.jetbrains.kotlinx.kover")
+    id("org.jetbrains.dokka")
     id("org.jetbrains.gradle.plugin.idea-ext")
     id("io.ktor.plugin")
 }

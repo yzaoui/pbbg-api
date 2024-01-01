@@ -1,13 +1,15 @@
 rootProject.name = "pbbg"
 
-// This block is only here while kotlinx.serialization remains unpublished
 pluginManagement {
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "kotlinx-serialization") {
-                useModule("org.jetbrains.kotlin:kotlin-serialization:${requested.version}")
-            }
-        }
+    plugins {
+        val KOTLIN_VERSION = "1.7.21"
+        kotlin("jvm") version KOTLIN_VERSION
+        kotlin("plugin.serialization") version KOTLIN_VERSION
+        id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
+        // __KTOR_VERSION
+        id("io.ktor.plugin") version "2.3.0"
+        id("org.jetbrains.kotlinx.kover") version "0.6.1"
+        id("org.jetbrains.dokka") version "1.7.20"
     }
 }
 
