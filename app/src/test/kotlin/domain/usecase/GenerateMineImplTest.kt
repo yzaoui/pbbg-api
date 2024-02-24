@@ -39,7 +39,7 @@ class GenerateMineImplTest {
     fun invalidMineTypeId() {
         // User is not in a mine session
         every { mineSessionTable.getSession(userId) } returns null
-        val invalidMineType = 2000.also { check(it !in MineType.values().indices) }
+        val invalidMineType = 2000.also { check(it !in MineType.entries.indices) }
 
         val result = generateMine(userId, invalidMineType, width = 10, height = 10)
 

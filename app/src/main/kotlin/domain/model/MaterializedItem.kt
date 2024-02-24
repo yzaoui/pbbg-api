@@ -23,16 +23,16 @@ sealed class MaterializedItem {
         override fun copy(quantity: Int): CopperOre = CopperOre(quantity)
     }
 
-    object IcePick : MaterializedItem() {
+    data object IcePick : MaterializedItem() {
         override val base get() = BaseItem.Pickaxe.IcePick
     }
-    object PlusPickaxe : MaterializedItem() {
+    data object PlusPickaxe : MaterializedItem() {
         override val base get() = BaseItem.Pickaxe.PlusPickaxe
     }
-    object CrossPickaxe : MaterializedItem() {
+    data object CrossPickaxe : MaterializedItem() {
         override val base get() = BaseItem.Pickaxe.CrossPickaxe
     }
-    object SquarePickaxe : MaterializedItem() {
+    data object SquarePickaxe : MaterializedItem() {
         override val base get() = BaseItem.Pickaxe.SquarePickaxe
     }
 

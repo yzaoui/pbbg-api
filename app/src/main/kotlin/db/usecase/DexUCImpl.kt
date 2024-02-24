@@ -21,15 +21,15 @@ class DexUCImpl(private val transaction: Transaction, private val dexTable: DexT
 
         return@transaction DexItems(
             discoveredItems = discoveredItems,
-            lastItemId = ItemEnum.values().lastIndex + 1
+            lastItemId = ItemEnum.entries.lastIndex + 1
         )
     }
 
     override fun getIndividualDexBaseItem(userId: Int, itemId: Int): DexItem = transaction {
         val itemEnumOrdinal = itemId - 1
-        if (itemEnumOrdinal !in ItemEnum.values().indices) throw InvalidItemException()
+        if (itemEnumOrdinal !in ItemEnum.entries.indices) throw InvalidItemException()
 
-        val enum = ItemEnum.values()[itemEnumOrdinal]
+        val enum = ItemEnum.entries[itemEnumOrdinal]
 
         if (!dexTable.hasEntry(userId, enum)) return@transaction DexItem.UndiscoveredDexItem(itemId)
 
@@ -37,33 +37,33 @@ class DexUCImpl(private val transaction: Transaction, private val dexTable: DexT
     }
 
     override fun getDexUnits(userId: Int): DexUnits = transaction {
-        val discoveredUnits = MyUnitEnum.values().toSet()
+        val discoveredUnits = MyUnitEnum.entries.toSet()
 
         return@transaction DexUnits(
             discoveredUnits = discoveredUnits,
-            lastUnitId = MyUnitEnum.values().lastIndex + 1
+            lastUnitId = MyUnitEnum.entries.lastIndex + 1
         )
     }
 
     override fun getDexUnit(userId: Int, unitId: Int): MyUnitEnum {
         val unitEnumOrdinal = unitId - 1
-        if (unitEnumOrdinal !in MyUnitEnum.values().indices) throw InvalidUnitException()
+        if (unitEnumOrdinal !in MyUnitEnum.entries.indices) throw InvalidUnitException()
 
-        return MyUnitEnum.values()[unitEnumOrdinal]
+        return MyUnitEnum.entries[unitEnumOrdinal]
     }
 
     override fun getDexPlants(userId: Int): DexPlants {
         // TODO: Make sure user has discovered these plants
         return DexPlants(
-            discoveredPlants = PlantEnum.values().associate { it.ordinal + 1 to it.basePlant },
-            lastPlantId = PlantEnum.values().lastIndex + 1
+            discoveredPlants = PlantEnum.entries.associate { it.ordinal + 1 to it.basePlant },
+            lastPlantId = PlantEnum.entries.lastIndex + 1
         )
     }
 
     override fun getDexPlant(userId: Int, plantId: Int): BasePlant {
         val plantEnumOrdinal = plantId - 1
-        if (plantEnumOrdinal !in PlantEnum.values().indices) throw InvalidPlantException()
+        if (plantEnumOrdinal !in PlantEnum.entries.indices) throw InvalidPlantException()
 
-        return PlantEnum.values()[plantEnumOrdinal].basePlant
+        return PlantEnum.entries[plantEnumOrdinal].basePlant
     }
 }

@@ -11,12 +11,12 @@ fun <T> List<T>.reorder(fromIndex: Int, toIndex: Int): List<T> {
     return if (fromIndex == toIndex) {
         toList()
     } else if (toIndex < fromIndex) {
-        slice(0 until toIndex) +
+        slice(0..<toIndex) +
                 get(fromIndex) +
-                slice(toIndex until fromIndex) +
+                slice(toIndex..<fromIndex) +
                 slice((fromIndex + 1)..lastIndex)
     } else {
-        slice (0 until fromIndex) +
+        slice (0..<fromIndex) +
                 slice((fromIndex + 1)..toIndex) +
                 get(fromIndex) +
                 slice((toIndex + 1)..lastIndex)

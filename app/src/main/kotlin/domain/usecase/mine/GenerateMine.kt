@@ -31,12 +31,12 @@ fun interface GenerateMine : (Int, Int, Int, Int) -> Result {
         /**
          * User is already in a mine.
          */
-        object AlreadyInMine : Result()
+        data object AlreadyInMine : Result()
 
         /**
          * Given mine type ID does not map to a valid [MineType].
          */
-        object InvalidMineTypeId : Result()
+        data object InvalidMineTypeId : Result()
 
         /**
          * Minimum mining level requirement is not met for the given mine type.
@@ -56,15 +56,11 @@ class GenerateMineImpl(
         // Don't generate mine when already in one
         if (mineSessionTable.getSession(userId) != null) return@transaction Result.AlreadyInMine
 
-        val mineType = try {
-            MineType.values()[mineTypeId]
-        } catch (e: ArrayIndexOutOfBoundsException) {
-            return@transaction Result.InvalidMineTypeId
-        }
+        val mineType = MineType.entries.getOrNull(mineTypeId) ?: return@transaction Result.InvalidMineTypeId
 
         val itemEntries = buildMap {
-            (0 until height).forEach { y ->
-                (0 until width).forEach { x ->
+            (0..<height).forEach { y ->
+                (0..<width).forEach { x ->
                     mineType.rollForMineEntity(Random.nextFloat())?.let {
                         this[x to y] = it
                     }

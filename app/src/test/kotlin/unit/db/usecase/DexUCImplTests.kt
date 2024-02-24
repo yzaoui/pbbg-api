@@ -67,13 +67,13 @@ class DexUCImplTests {
         @Test
         fun `Given a user, when calling for an invalid item by ID, an InvalidItemException should be thrown`() {
             assertFailsWith<InvalidItemException> {
-                dexUC.getIndividualDexBaseItem(userId, ItemEnum.values().size + 7)
+                dexUC.getIndividualDexBaseItem(userId, ItemEnum.entries.size + 7)
             }
         }
 
         @Test
         fun `Given a user who hasn't discovered an item, when calling for said item by its ID, it should be undiscovered`() {
-            val item = ItemEnum.values().random().baseItem
+            val item = ItemEnum.entries.random().baseItem
 
             every { dexTable.hasEntry(userId, item.enum) } returns false
 
@@ -90,7 +90,7 @@ class DexUCImplTests {
         fun `When calling getDexUnits(), all dex units should be returned`() {
             val dexUnits = dexUC.getDexUnits(userId)
 
-            assertEquals(MyUnitEnum.values().toSet(), dexUnits.discoveredUnits)
+            assertEquals(MyUnitEnum.entries.toSet(), dexUnits.discoveredUnits)
         }
     }
 
@@ -100,7 +100,7 @@ class DexUCImplTests {
         fun `Given a dex unit ID, when calling getDexUnit(), that dex unit should be returned`() {
             val dexUnit = dexUC.getDexUnit(userId, 2)
 
-            assertEquals(MyUnitEnum.values()[1], dexUnit)
+            assertEquals(MyUnitEnum.entries[1], dexUnit)
         }
 
         @Test

@@ -2,7 +2,7 @@ rootProject.name = "pbbg"
 
 pluginManagement {
     plugins {
-        val KOTLIN_VERSION = "1.7.21"
+        val KOTLIN_VERSION = "1.9.22"
         kotlin("jvm") version KOTLIN_VERSION
         kotlin("plugin.serialization") version KOTLIN_VERSION
         id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
