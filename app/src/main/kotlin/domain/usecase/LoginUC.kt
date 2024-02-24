@@ -13,7 +13,7 @@ interface LoginUC {
 
     sealed interface Result {
         data class Success(val userId: Int) : Result
-        object CredentialsDontMatchError : Result
+        data object CredentialsDontMatchError : Result
     }
 }
 

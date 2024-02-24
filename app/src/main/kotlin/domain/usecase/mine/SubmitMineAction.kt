@@ -35,12 +35,12 @@ fun interface SubmitMineAction : (Int, Int, Int) -> Result {
         /**
          * Mining cannot occur due to the lack of an equipped pickaxe.
          */
-        object NoEquippedPickaxe : Result()
+        data object NoEquippedPickaxe : Result()
 
         /**
          * Mining cannot occur due to the lack of an existing mining session.
          */
-        object NotInMineSession : Result()
+        data object NotInMineSession : Result()
     }
 }
 
@@ -136,7 +136,7 @@ class SubmitMineActionImpl(
             val newX = x + it.x
             val newY = y + it.y
 
-            if ((newX in 0 until width) && newY in 0 until height) {
+            if ((newX in 0..<width) && newY in 0..<height) {
                 cells.add(Point(newX, newY))
             }
         }

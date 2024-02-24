@@ -31,7 +31,7 @@ class GetAvailableMinesImpl(
         val mines = mutableListOf<MineType>()
         var nextUnlockLevel: Int? = null
 
-        for (mine in MineType.values()) {
+        for (mine in MineType.entries) {
             if (userMiningLevel >= mine.minLevel) {
                 mines.add(mine)
             } else {

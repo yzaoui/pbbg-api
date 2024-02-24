@@ -12,16 +12,15 @@ object Versions {
     const val KOTLINX_SERIALIZATION = "1.4.1"
     const val POSTGRESQL = "42.4.0"
     const val H2 = "2.1.214"
-    const val MOCKK = "1.13.1"
+    const val MOCKK = "1.13.9"
 }
 
 plugins {
     application
     kotlin("jvm")
-    // ___KOTLIN_VERSION___
-    kotlin("plugin.serialization") version "1.7.21"
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
-    id("org.jetbrains.dokka") version "1.7.20"
+    kotlin("plugin.serialization")
+    id("org.jetbrains.kotlinx.kover")
+    id("org.jetbrains.dokka")
     id("org.jetbrains.gradle.plugin.idea-ext")
     id("io.ktor.plugin")
 }

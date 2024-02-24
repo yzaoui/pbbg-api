@@ -46,7 +46,7 @@ interface RegisterUserUC {
         /**
          * The username is not available.
          */
-        object UsernameNotAvailableError : Result
+        data object UsernameNotAvailableError : Result
 
         /**
          * The username or password don't match the required formats.

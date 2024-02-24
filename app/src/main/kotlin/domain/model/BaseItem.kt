@@ -124,8 +124,8 @@ sealed class BaseItem {
 private fun Array<Array<Int>>.toPoints(width: Int, height: Int, center: Point): Set<Point> {
     val set = mutableSetOf<Point>()
 
-    for (row in 0 until height) {
-        for (col in 0 until width) {
+    for (row in 0..<height) {
+        for (col in 0..<width) {
             if (this[row][col] == 1) set.add(Point(col - center.x, row - center.y))
         }
     }

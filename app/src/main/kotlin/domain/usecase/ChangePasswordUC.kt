@@ -16,27 +16,27 @@ interface ChangePasswordUC {
         /**
          * Password changed successfully.
          */
-        object Success : Result
+        data object Success : Result
 
         /**
          * Current password does not match the user's current password.
          */
-        object WrongCurrentPasswordError : Result
+        data object WrongCurrentPasswordError : Result
 
         /**
          * New password confirmation does not match new password.
          */
-        object UnconfirmedNewPasswordError : Result
+        data object UnconfirmedNewPasswordError : Result
 
         /**
          * New password is the same as current password.
          */
-        object NewPasswordNotNewError : Result
+        data object NewPasswordNotNewError : Result
 
         /**
          * New password doesn't fulfill password format requirement.
          */
-        object IllegalPasswordError : Result
+        data object IllegalPasswordError : Result
     }
 }
 

@@ -25,7 +25,7 @@ sealed class BasePlant : IBasePlant {
         override val growingPeriod: Duration = 1.minutes
         override val maturePeriod: Duration = 40.seconds
     }
-    object TomatoPlant : BasePlant() {
+    data object TomatoPlant : BasePlant() {
         override val enum by lazy { PlantEnum.TOMATO_PLANT }
         override val friendlyName = "Tomato Plant"
         override val description = "Tomato Plant description here."

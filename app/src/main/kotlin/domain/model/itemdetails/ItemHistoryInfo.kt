@@ -11,17 +11,17 @@ sealed class ItemHistoryInfo {
 
     @Serializable
     @SerialName("created-market")
-    object CreatedInMarket : ItemHistoryInfo()
+    data object CreatedInMarket : ItemHistoryInfo()
 
     @Serializable
     @SerialName("created-user")
-    class CreatedWithUser(override val userId: Int) : ItemHistoryInfo(), HasUserId
+    data class CreatedWithUser(override val userId: Int) : ItemHistoryInfo(), HasUserId
 
     @Serializable
     @SerialName("first-mined")
-    class FirstMined(override val userId: Int) : ItemHistoryInfo(), HasUserId
+    data class FirstMined(override val userId: Int) : ItemHistoryInfo(), HasUserId
 
     @Serializable
     @SerialName("first-harvested")
-    class FirstHarvested(override val userId: Int) : ItemHistoryInfo(), HasUserId
+    data class FirstHarvested(override val userId: Int) : ItemHistoryInfo(), HasUserId
 }

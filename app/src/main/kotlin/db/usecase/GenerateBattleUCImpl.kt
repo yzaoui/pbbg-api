@@ -33,8 +33,8 @@ class GenerateBattleUCImpl(
 
         val newEnemies = mutableListOf<UnitTable.UnitForm>()
         // Add 1-3 new enemies
-        for (i in 0 until (1..3).random()) {
-            newEnemies.add(UnitTable.UnitForm(MyUnitEnum.values().random(), (7..14).random(), (5..7).random(), (5..7).random(), (6..8).random(), (4..7).random()))
+        for (i in 0..<(1..3).random()) {
+            newEnemies.add(UnitTable.UnitForm(MyUnitEnum.entries.random(), (7..14).random(), (5..7).random(), (5..7).random(), (6..8).random(), (4..7).random()))
         }
         // TODO: There's gotta be a way to do this in batch :/
         for (enemy in newEnemies) {
